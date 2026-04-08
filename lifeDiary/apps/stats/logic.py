@@ -1,9 +1,11 @@
 from datetime import timedelta
+from django.db.models import Count
 from apps.dashboard.models import TimeBlock
 from apps.core.utils import (
     serialize_for_js,
     get_week_date_range,
     get_month_date_range,
+    calculate_goal_percent,
     UNCLASSIFIED_TAG_NAME,
     UNCLASSIFIED_TAG_COLOR,
     SLEEP_TAG_NAME,
@@ -109,11 +111,18 @@ class StatsCalculator:
             )
 
     def fill_empty_slots_monthly(self, user, daily_tag_stats, daily_totals, total_days):
+        daily_counts = dict(
+            TimeBlock.objects.filter(
+                user=user,
+                date__range=[self.start_of_month, self.end_of_month],
+            )
+            .values_list("date")
+            .annotate(cnt=Count("id"))
+            .values_list("date", "cnt")
+        )
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
-            recorded_blocks = TimeBlock.objects.filter(
-                user=user, date=current_date
-            ).count()
+            recorded_blocks = daily_counts.get(current_date, 0)
             empty_blocks = TOTAL_SLOTS_PER_DAY - recorded_blocks
             if empty_blocks > 0:
                 empty_hours = empty_blocks * MINUTES_PER_SLOT / 60
@@ -132,11 +141,18 @@ class StatsCalculator:
 
     def fill_empty_slots_analysis(self, user, tag_analysis_data):
         total_days = (self.end_of_month - self.start_of_month).days + 1
+        daily_counts = dict(
+            TimeBlock.objects.filter(
+                user=user,
+                date__range=[self.start_of_month, self.end_of_month],
+            )
+            .values_list("date")
+            .annotate(cnt=Count("id"))
+            .values_list("date", "cnt")
+        )
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
-            recorded_blocks = TimeBlock.objects.filter(
-                user=user, date=current_date
-            ).count()
+            recorded_blocks = daily_counts.get(current_date, 0)
             empty_blocks = TOTAL_SLOTS_PER_DAY - recorded_blocks
             if empty_blocks > 0:
                 empty_minutes = empty_blocks * MINUTES_PER_SLOT
@@ -423,39 +439,14 @@ def get_stats_context(user, selected_date):
     context["user_goals_daily"] = user_goals_daily
     context["user_goals_weekly"] = user_goals_weekly
     context["user_goals_monthly"] = user_goals_monthly
-    today = selected_date
-    for goal in user_goals_daily:
-        actual = 0
-        for tag_stat in daily_stats["tag_stats"]:
-            if tag_stat["name"] == goal.tag.name:
-                actual = tag_stat["hours"]
-        percent = (
-            int((actual / goal.target_hours) * 100) if goal.target_hours > 0 else None
-        )
-        goal.percent = percent
-        goal.actual = actual
-    for goal in user_goals_weekly:
-        actual = 0
-        for tag_stat in weekly_stats["tag_weekly_stats"]:
-            if tag_stat["name"] == goal.tag.name:
-                actual = tag_stat["total_hours"]
-        # 사용자가 입력한 목표 시간을 그대로 사용 (주간 총 시간)
-        percent = (
-            int((actual / goal.target_hours) * 100) if goal.target_hours > 0 else None
-        )
-        goal.percent = percent
-        goal.actual = actual
-    for goal in user_goals_monthly:
-        actual = 0
-        for tag_stat in monthly_stats["tag_stats"]:
-            if tag_stat["name"] == goal.tag.name:
-                actual = tag_stat["total_hours"]
-        # 사용자가 입력한 목표 시간을 그대로 사용 (월간 총 시간)
-        percent = (
-            int((actual / goal.target_hours) * 100) if goal.target_hours > 0 else None
-        )
-        goal.percent = percent
-        goal.actual = actual
+    for goals in [user_goals_daily, user_goals_weekly, user_goals_monthly]:
+        for goal in goals:
+            goal.actual, goal.percent = calculate_goal_percent(
+                goal,
+                daily_stats=daily_stats,
+                weekly_stats=weekly_stats,
+                monthly_stats=monthly_stats,
+            )
     user_note = UserNote.objects.filter(user=user).order_by("-created_at").first()
     context["user_note"] = user_note
     return context

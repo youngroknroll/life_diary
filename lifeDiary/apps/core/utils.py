@@ -170,6 +170,39 @@ def format_time_display(hours, minutes):
         return "0분"
 
 
+def calculate_goal_percent(goal, daily_stats=None, weekly_stats=None, monthly_stats=None):
+    """
+    목표 달성률 계산 헬퍼
+
+    Args:
+        goal: UserGoal 인스턴스 (period, target_hours, tag 필요)
+        daily_stats: 일간 통계 dict (tag_stats 키 포함)
+        weekly_stats: 주간 통계 dict (tag_weekly_stats 키 포함)
+        monthly_stats: 월간 통계 dict (tag_stats 키 포함)
+
+    Returns:
+        tuple: (actual_hours, percent)
+    """
+    actual = 0
+    if goal.period == "daily" and daily_stats:
+        for tag_stat in daily_stats.get("tag_stats", []):
+            if tag_stat["name"] == goal.tag.name:
+                actual = tag_stat.get("hours", 0)
+    elif goal.period == "weekly" and weekly_stats:
+        for tag_stat in weekly_stats.get("tag_weekly_stats", []):
+            if tag_stat["name"] == goal.tag.name:
+                actual = tag_stat.get("total_hours", 0)
+    elif goal.period == "monthly" and monthly_stats:
+        for tag_stat in monthly_stats.get("tag_stats", []):
+            if tag_stat["name"] == goal.tag.name:
+                actual = tag_stat.get("total_hours", 0)
+
+    percent = (
+        int((actual / goal.target_hours) * 100) if goal.target_hours > 0 else None
+    )
+    return actual, percent
+
+
 def get_week_date_range(target_date):
     """
     주어진 날짜가 포함된 주의 시작일과 종료일을 반환 (월요일 시작)

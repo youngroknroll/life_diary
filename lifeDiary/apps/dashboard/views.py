@@ -7,6 +7,8 @@ from django.db.models import Q
 
 from apps.tags.models import Tag
 from .models import TimeBlock
+import logging
+
 from apps.core.utils import (
     safe_date_parse,
     serialize_for_js,
@@ -107,6 +109,14 @@ def time_block_api(request):
         if not slot_indexes:
             return error_response("슬롯 인덱스가 누락되었습니다.", "MISSING_SLOTS")
 
+        if not isinstance(slot_indexes, list) or not all(
+            isinstance(i, int) and 0 <= i < TOTAL_SLOTS_PER_DAY for i in slot_indexes
+        ):
+            return error_response(
+                f"슬롯 인덱스는 0~{TOTAL_SLOTS_PER_DAY - 1} 범위의 정수 배열이어야 합니다.",
+                "INVALID_SLOTS",
+            )
+
         if not selected_date_str:
             return error_response("날짜가 누락되었습니다.", "MISSING_DATE")
 
@@ -133,6 +143,9 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
     try:
         tag_id = data.get("tag_id")
         memo = data.get("memo", "")
+
+        if memo and len(memo) > 500:
+            return error_response("메모는 500자를 초과할 수 없습니다.", "MEMO_TOO_LONG")
 
         if not tag_id:
             return error_response("태그가 선택되지 않았습니다.", "MISSING_TAG")
@@ -199,10 +212,9 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
             201,
         )
 
-    except Exception as e:
-        return error_response(
-            f"저장 중 오류가 발생했습니다: {str(e)}", "SERVER_ERROR", 500
-        )
+    except Exception:
+        logging.getLogger(__name__).exception("시간 블록 저장 중 오류")
+        return error_response("저장 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
 
 
 def _handle_time_block_delete(request, slot_indexes, selected_date):
@@ -220,7 +232,6 @@ def _handle_time_block_delete(request, slot_indexes, selected_date):
             {"deleted_count": deleted_count, "requested_count": len(slot_indexes)},
         )
 
-    except Exception as e:
-        return error_response(
-            f"삭제 중 오류가 발생했습니다: {str(e)}", "SERVER_ERROR", 500
-        )
+    except Exception:
+        logging.getLogger(__name__).exception("시간 블록 삭제 중 오류")
+        return error_response("삭제 중 오류가 발생했습니다.", "SERVER_ERROR", 500)

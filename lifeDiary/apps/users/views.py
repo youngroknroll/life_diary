@@ -1,17 +1,19 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .models import UserGoal, UserNote
 from .forms import UserGoalForm, UserNoteForm
 from apps.tags.models import Tag
 from apps.stats.logic import (
+    get_daily_stats_data,
     get_weekly_stats_data,
     get_monthly_stats_data,
     StatsCalculator,
 )
+from apps.core.utils import calculate_goal_percent
 
 import datetime
 
@@ -97,7 +99,7 @@ def usergoal_create(request):
 
 @login_required
 def usergoal_update(request, pk):
-    goal = UserGoal.objects.get(pk=pk, user=request.user)
+    goal = get_object_or_404(UserGoal, pk=pk, user=request.user)
     if request.method == "POST":
         form = UserGoalForm(request.POST, instance=goal)
         if form.is_valid():
@@ -112,8 +114,9 @@ def usergoal_update(request, pk):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def usergoal_delete(request, pk):
-    goal = UserGoal.objects.get(pk=pk, user=request.user)
+    goal = get_object_or_404(UserGoal, pk=pk, user=request.user)
     if request.method == "POST":
         goal.delete()
         return redirect("users:mypage")
@@ -142,7 +145,7 @@ def usernote_create(request):
 
 @login_required
 def usernote_update(request, pk):
-    note = UserNote.objects.get(pk=pk, user=request.user)
+    note = get_object_or_404(UserNote, pk=pk, user=request.user)
     if request.method == "POST":
         form = UserNoteForm(request.POST, instance=note)
         if form.is_valid():
@@ -154,8 +157,9 @@ def usernote_update(request, pk):
 
 
 @login_required
+@require_http_methods(["GET", "POST"])
 def usernote_delete(request, pk):
-    note = UserNote.objects.get(pk=pk, user=request.user)
+    note = get_object_or_404(UserNote, pk=pk, user=request.user)
     if request.method == "POST":
         note.delete()
         return redirect("users:usernote_list")
@@ -169,54 +173,17 @@ def mypage(request):
     # 통계 데이터 가져오기
     today = datetime.date.today()
     calculator = StatsCalculator(user, today)
+    daily_stats = get_daily_stats_data(user, today, calculator)
     weekly_stats = get_weekly_stats_data(user, today, calculator)
     monthly_stats = get_monthly_stats_data(user, today, calculator)
     # 목표별 달성률 계산
     for goal in goals:
-        if goal.period == "daily":
-            # 일간: 오늘 해당 태그 실제 시간
-            actual = 0
-            for tag_stat in weekly_stats["tag_weekly_stats"]:
-                if tag_stat["name"] == goal.tag.name:
-                    # 오늘이 week_dates[?]에 해당하는 인덱스
-                    day_index = (today - calculator.start_of_week).days
-                    if 0 <= day_index < 7:
-                        actual = tag_stat["daily_hours"][day_index]
-            percent = (
-                int((actual / goal.target_hours) * 100)
-                if goal.target_hours > 0
-                else None
-            )
-            goal.percent = percent
-            goal.actual = actual
-        elif goal.period == "weekly":
-            # 주간: 해당 태그 주간 총합
-            actual = 0
-            for tag_stat in weekly_stats["tag_weekly_stats"]:
-                if tag_stat["name"] == goal.tag.name:
-                    actual = tag_stat["total_hours"]
-            # 사용자가 입력한 목표 시간을 그대로 사용 (주간 총 시간)
-            percent = (
-                int((actual / goal.target_hours) * 100)
-                if goal.target_hours > 0
-                else None
-            )
-            goal.percent = percent
-            goal.actual = actual
-        elif goal.period == "monthly":
-            # 월간: 해당 태그 월간 총합
-            actual = 0
-            for tag_stat in monthly_stats["tag_stats"]:
-                if tag_stat["name"] == goal.tag.name:
-                    actual = tag_stat["total_hours"]
-            # 사용자가 입력한 목표 시간을 그대로 사용 (월간 총 시간)
-            percent = (
-                int((actual / goal.target_hours) * 100)
-                if goal.target_hours > 0
-                else None
-            )
-            goal.percent = percent
-            goal.actual = actual
+        goal.actual, goal.percent = calculate_goal_percent(
+            goal,
+            daily_stats=daily_stats,
+            weekly_stats=weekly_stats,
+            monthly_stats=monthly_stats,
+        )
     if request.method == "POST":
         form = UserGoalForm(request.POST)
         if form.is_valid():

@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -61,9 +63,10 @@ def tag_list_create(request):
             ]
 
             return JsonResponse({"success": True, "tags": tag_list})
-        except Exception as e:
+        except Exception:
+            logging.getLogger(__name__).exception("태그 조회 중 오류")
             return JsonResponse(
-                {"success": False, "message": f"태그 조회 중 오류: {e}"}, status=500
+                {"success": False, "message": "태그 조회 중 오류가 발생했습니다."}, status=500
             )
 
     elif request.method == "POST":
@@ -126,9 +129,10 @@ def tag_list_create(request):
             return JsonResponse(
                 {"success": False, "message": "잘못된 형식의 요청입니다."}, status=400
             )
-        except Exception as e:
+        except Exception:
+            logging.getLogger(__name__).exception("태그 생성 중 오류")
             return JsonResponse(
-                {"success": False, "message": f"태그 생성 중 오류: {e}"}, status=500
+                {"success": False, "message": "태그 생성 중 오류가 발생했습니다."}, status=500
             )
 
 
@@ -205,9 +209,10 @@ def tag_detail_update_delete(request, tag_id):
             return JsonResponse(
                 {"success": False, "message": "잘못된 형식의 요청입니다."}, status=400
             )
-        except Exception as e:
+        except Exception:
+            logging.getLogger(__name__).exception("태그 수정 중 오류")
             return JsonResponse(
-                {"success": False, "message": f"태그 수정 중 오류: {e}"}, status=500
+                {"success": False, "message": "태그 수정 중 오류가 발생했습니다."}, status=500
             )
 
     elif request.method == "DELETE":
@@ -230,7 +235,8 @@ def tag_detail_update_delete(request, tag_id):
                 {"success": True, "message": f'"{tag_name}" 태그가 삭제되었습니다.'}
             )
 
-        except Exception as e:
+        except Exception:
+            logging.getLogger(__name__).exception("태그 삭제 중 오류")
             return JsonResponse(
-                {"success": False, "message": f"태그 삭제 중 오류: {e}"}, status=500
+                {"success": False, "message": "태그 삭제 중 오류가 발생했습니다."}, status=500
             )

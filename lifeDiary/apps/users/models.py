@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator
 from apps.tags.models import Tag
 
 # Create your models here.
@@ -13,7 +14,7 @@ class UserGoal(models.Model):
         max_length=10,
         choices=[("daily", "일간"), ("weekly", "주간"), ("monthly", "월간")],
     )
-    target_hours = models.FloatField()
+    target_hours = models.FloatField(validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

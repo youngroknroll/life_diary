@@ -1,6 +1,11 @@
 # AI 피드백 생성 로직 분리
 
+import logging
 import statistics
+
+from apps.core.utils import UNCLASSIFIED_TAG_NAME, SLEEP_TAG_NAME
+
+logger = logging.getLogger(__name__)
 
 
 def generate_feedback(context):
@@ -8,16 +13,14 @@ def generate_feedback(context):
     # 1. 목표 기반 피드백 (월간)
     for goal in context.get("user_goals_monthly", []):
         if goal.percent is not None and goal.percent < 100:
-            remain = (
-                goal.target_hours * context["monthly_stats"]["total_days"] - goal.actual
-            )
+            remain = goal.target_hours - goal.actual
             if remain > 0:
                 feedback.append(
-                    f"이번 달 '{goal.tag.name}' 목표({goal.target_hours * context['monthly_stats']['total_days']}시간) 중 {goal.actual:.1f}시간을 달성했습니다. {remain:.1f}시간만 더 해보세요!"
+                    f"이번 달 '{goal.tag.name}' 목표({goal.target_hours}시간) 중 {goal.actual:.1f}시간을 달성했습니다. {remain:.1f}시간만 더 해보세요!"
                 )
         elif goal.percent is not None and goal.percent >= 100:
             feedback.append(
-                f"이번 달 '{goal.tag.name}' 목표({goal.target_hours * context['monthly_stats']['total_days']}시간)를 이미 달성했습니다! 멋져요!"
+                f"이번 달 '{goal.tag.name}' 목표({goal.target_hours}시간)를 이미 달성했습니다! 멋져요!"
             )
     # 2. 비교 기반 피드백 (주간/월간)
     # 주간: 이번주 vs 지난주
@@ -51,11 +54,11 @@ def generate_feedback(context):
                                 f"이번주 '{tag['name']}' 시간이 지난주보다 {abs(percent)}% 줄었습니다. 다음주엔 더 노력해봐요!"
                             )
     except Exception:
-        pass
+        logger.exception("주간 비교 피드백 생성 중 오류")
     # 3. 불균형/과다/부족 경고 (월간)
     for tag in context["monthly_stats"]["tag_stats"]:
         if (
-            tag["name"] not in ["미분류", "휴식"]
+            tag["name"] not in [UNCLASSIFIED_TAG_NAME, SLEEP_TAG_NAME]
             and tag["total_hours"] > 0
             and context["monthly_stats"]["total_hours"] > 0
         ):
@@ -80,7 +83,7 @@ def generate_feedback(context):
                     )
     # 5. 휴식 과다 경고
     rest = next(
-        (tag for tag in context["monthly_stats"]["tag_stats"] if tag["name"] == "휴식"),
+        (tag for tag in context["monthly_stats"]["tag_stats"] if tag["name"] == SLEEP_TAG_NAME),
         None,
     )
     if rest and context["monthly_stats"]["total_hours"] > 0:
@@ -96,7 +99,7 @@ def generate_feedback(context):
         (
             tag
             for tag in context["monthly_stats"]["tag_stats"]
-            if tag["name"] == "미분류"
+            if tag["name"] == UNCLASSIFIED_TAG_NAME
         ),
         None,
     )

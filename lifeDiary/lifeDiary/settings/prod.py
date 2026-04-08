@@ -15,6 +15,14 @@ from .dev import *
 DEBUG = False
 ALLOWED_HOSTS = ["lifediary.onrender.com"]
 
+# 프로덕션 보안 설정
+SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000  # 1년
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_HSTS_PRELOAD = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
 # 프로덕션 전용 세션 보안 설정
 SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 종료 시 세션 만료
