@@ -154,16 +154,16 @@ def tag_detail_update_delete(request, tag_id):
             data = json.loads(request.body)
             name = data.get("name", "").strip()
             color = data.get("color", "").strip()
-            is_default = data.get("is_default", tag.is_default)
-
-            if is_default and not request.user.is_superuser:
+            requested_is_default = data.get("is_default", tag.is_default)
+            if requested_is_default != tag.is_default and not request.user.is_superuser:
                 return JsonResponse(
                     {
                         "success": False,
-                        "message": "기본 태그는 관리자만 설정할 수 있습니다.",
+                        "message": "기본 태그 설정 변경은 관리자만 할 수 있습니다.",
                     },
                     status=403,
                 )
+            is_default = requested_is_default
 
             if not name or not color:
                 return JsonResponse(

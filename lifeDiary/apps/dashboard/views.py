@@ -59,8 +59,9 @@ def dashboard_view(request):
     # 통계 계산 (core 유틸리티 사용)
     stats = calculate_time_statistics(len(slot_data))
 
-    # 시간 헤더 (1분, 11분, 21분, 31분, 41분, 51분)
-    time_headers = [f"{(i * 10 - 1) % 60 + 1}분" for i in range(1, 13)]
+    # 각 컬럼은 10분 슬롯의 종료 분(9, 19, 29, 39, 49, 59)을 2행 반복
+    _SLOT_END_MINUTES = [9, 19, 29, 39, 49, 59]
+    time_headers = [f"{m}분" for m in _SLOT_END_MINUTES * 2]
 
     context = {
         "page_title": "대시보드",

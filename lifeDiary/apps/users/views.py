@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from .models import UserGoal, UserNote
 from .forms import UserGoalForm, UserNoteForm
 from apps.tags.models import Tag
@@ -16,6 +17,11 @@ from apps.stats.logic import (
 from apps.core.utils import calculate_goal_percent
 
 import datetime
+
+
+def _get_user_tag_queryset(user):
+    """사용자 태그 + 기본 태그 쿼리셋"""
+    return Tag.objects.filter(Q(user=user) | Q(is_default=True))
 
 
 @require_POST
@@ -35,9 +41,10 @@ def signup_view(request):
     if request.method == "POST":
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "회원가입이 완료되었습니다. 로그인해주세요.")
-            return redirect("users:login")
+            user = form.save()
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+            messages.success(request, f"{user.username}님, 환영합니다! 회원가입이 완료되었습니다.")
+            return redirect("home")
     else:
         form = UserCreationForm()
 
@@ -91,9 +98,7 @@ def usergoal_create(request):
             return redirect("users:mypage")
     else:
         form = UserGoalForm()
-    form.fields["tag"].queryset = Tag.objects.filter(
-        user=request.user
-    ) | Tag.objects.filter(is_default=True)
+    form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
     return render(request, "users/usergoal_form.html", {"form": form, "mode": "create"})
 
 
@@ -107,9 +112,7 @@ def usergoal_update(request, pk):
             return redirect("users:mypage")
     else:
         form = UserGoalForm(instance=goal)
-    form.fields["tag"].queryset = Tag.objects.filter(
-        user=request.user
-    ) | Tag.objects.filter(is_default=True)
+    form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
     return render(request, "users/usergoal_form.html", {"form": form, "mode": "update"})
 
 
@@ -194,7 +197,5 @@ def mypage(request):
     else:
         form = UserGoalForm()
         form.fields["period"].initial = "monthly"
-    form.fields["tag"].queryset = Tag.objects.filter(user=user) | Tag.objects.filter(
-        is_default=True
-    )
+    form.fields["tag"].queryset = _get_user_tag_queryset(user)
     return render(request, "users/mypage.html", {"goals": goals, "form": form})

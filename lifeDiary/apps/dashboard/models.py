@@ -25,7 +25,7 @@ class TimeBlock(models.Model):
     tag = models.ForeignKey(
         Tag, on_delete=models.SET_NULL, null=True, verbose_name="태그"
     )
-    memo = models.TextField(
+    memo = models.CharField(
         blank=True,
         max_length=500,
         verbose_name="메모",
