@@ -3,10 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
 
 import json
-from django.db.models import Q
 
-from apps.tags.models import Tag
-from .models import TimeBlock
+from apps.tags.repositories import TagRepository
+from .repositories import TimeBlockRepository
 import logging
 
 from apps.core.utils import (
@@ -19,6 +18,9 @@ from apps.core.utils import (
     get_time_from_slot,
 )
 
+_time_block_repo = TimeBlockRepository()
+_tag_repo = TagRepository()
+
 
 @login_required
 @require_GET
@@ -29,9 +31,7 @@ def dashboard_view(request):
     selected_date = safe_date_parse(request.GET.get("date"))
 
     # 시간 블록 데이터 조회
-    time_blocks = TimeBlock.objects.filter(
-        user=request.user, date=selected_date
-    ).select_related("tag")
+    time_blocks = _time_block_repo.find_by_date(request.user, selected_date)
     slot_data = {
         block.slot_index: {"tag": block.tag, "memo": block.memo, "id": block.id}
         for block in time_blocks
@@ -52,9 +52,7 @@ def dashboard_view(request):
         )
 
     # 사용자의 모든 태그 + 공용 기본 태그 조회 (기본 태그 우선)
-    user_tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True)).order_by(
-        "-is_default", "name"
-    )
+    user_tags = _tag_repo.find_accessible_ordered(request.user)
 
     # 통계 계산 (core 유틸리티 사용)
     stats = calculate_time_statistics(len(slot_data))
@@ -152,18 +150,15 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
             return error_response("태그가 선택되지 않았습니다.", "MISSING_TAG")
 
         # 태그 존재 확인 (사용자 태그 + 기본 태그)
-        try:
-            tag = Tag.objects.get(
-                Q(id=tag_id, user=request.user) | Q(id=tag_id, is_default=True)
-            )
-        except Tag.DoesNotExist:
+        tag = _tag_repo.find_by_id_accessible(tag_id, request.user)
+        if not tag:
             return error_response(
                 "존재하지 않는 태그이거나 접근 권한이 없습니다.", "TAG_NOT_FOUND", 404
             )
 
         # 기존 블록 조회
-        existing_blocks = TimeBlock.objects.filter(
-            user=request.user, date=selected_date, slot_index__in=slot_indexes
+        existing_blocks = _time_block_repo.find_by_slots(
+            request.user, selected_date, slot_indexes
         )
         existing_slots = {block.slot_index: block for block in existing_blocks}
 
@@ -181,7 +176,7 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
             else:
                 # 새 블록 생성
                 time_blocks_to_create.append(
-                    TimeBlock(
+                    _time_block_repo.build(
                         user=request.user,
                         date=selected_date,
                         slot_index=slot_index,
@@ -195,11 +190,11 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
         updated_count = 0
 
         if time_blocks_to_create:
-            TimeBlock.objects.bulk_create(time_blocks_to_create)
+            _time_block_repo.bulk_create(time_blocks_to_create)
             created_count = len(time_blocks_to_create)
 
         if time_blocks_to_update:
-            TimeBlock.objects.bulk_update(time_blocks_to_update, ["tag", "memo"])
+            _time_block_repo.bulk_update(time_blocks_to_update, ["tag", "memo"])
             updated_count = len(time_blocks_to_update)
 
         return success_response(
@@ -221,9 +216,9 @@ def _handle_time_block_create_update(request, data, slot_indexes, selected_date)
 def _handle_time_block_delete(request, slot_indexes, selected_date):
     """시간 블록 삭제 처리 (core 유틸리티 사용)"""
     try:
-        deleted_count, _ = TimeBlock.objects.filter(
-            user=request.user, date=selected_date, slot_index__in=slot_indexes
-        ).delete()
+        deleted_count = _time_block_repo.delete_by_slots(
+            request.user, selected_date, slot_indexes
+        )
 
         if deleted_count == 0 and len(slot_indexes) > 0:
             return error_response("삭제할 기록이 없습니다.", "NO_BLOCKS_FOUND", 404)

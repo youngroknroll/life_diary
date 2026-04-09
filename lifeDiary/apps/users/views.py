@@ -1,13 +1,12 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
-from .models import UserGoal, UserNote
 from .forms import UserGoalForm, UserNoteForm
-from apps.tags.models import Tag
+from .repositories import GoalRepository, NoteRepository
+from apps.tags.repositories import TagRepository
 from apps.stats.logic import (
     get_daily_stats_data,
     get_weekly_stats_data,
@@ -18,10 +17,14 @@ from apps.core.utils import calculate_goal_percent
 
 import datetime
 
+_goal_repo = GoalRepository()
+_note_repo = NoteRepository()
+_tag_repo = TagRepository()
+
 
 def _get_user_tag_queryset(user):
     """사용자 태그 + 기본 태그 쿼리셋"""
-    return Tag.objects.filter(Q(user=user) | Q(is_default=True))
+    return _tag_repo.find_accessible(user)
 
 
 @require_POST
@@ -83,7 +86,7 @@ def login_view(request):
 
 @login_required
 def usergoal_list(request):
-    goals = UserGoal.objects.filter(user=request.user).select_related("tag")
+    goals = _goal_repo.find_by_user(request.user)
     return render(request, "users/usergoal_list.html", {"goals": goals})
 
 
@@ -104,7 +107,7 @@ def usergoal_create(request):
 
 @login_required
 def usergoal_update(request, pk):
-    goal = get_object_or_404(UserGoal, pk=pk, user=request.user)
+    goal = _goal_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         form = UserGoalForm(request.POST, instance=goal)
         if form.is_valid():
@@ -119,7 +122,7 @@ def usergoal_update(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def usergoal_delete(request, pk):
-    goal = get_object_or_404(UserGoal, pk=pk, user=request.user)
+    goal = _goal_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         goal.delete()
         return redirect("users:mypage")
@@ -128,7 +131,7 @@ def usergoal_delete(request, pk):
 
 @login_required
 def usernote_list(request):
-    notes = UserNote.objects.filter(user=request.user).order_by("-created_at")
+    notes = _note_repo.find_by_user(request.user)
     return render(request, "users/usernote_list.html", {"notes": notes})
 
 
@@ -148,7 +151,7 @@ def usernote_create(request):
 
 @login_required
 def usernote_update(request, pk):
-    note = get_object_or_404(UserNote, pk=pk, user=request.user)
+    note = _note_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         form = UserNoteForm(request.POST, instance=note)
         if form.is_valid():
@@ -162,7 +165,7 @@ def usernote_update(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def usernote_delete(request, pk):
-    note = get_object_or_404(UserNote, pk=pk, user=request.user)
+    note = _note_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         note.delete()
         return redirect("users:usernote_list")
@@ -172,7 +175,7 @@ def usernote_delete(request, pk):
 @login_required
 def mypage(request):
     user = request.user
-    goals = UserGoal.objects.filter(user=user).select_related("tag")
+    goals = _goal_repo.find_by_user(user)
     # 통계 데이터 가져오기
     today = datetime.date.today()
     calculator = StatsCalculator(user, today)

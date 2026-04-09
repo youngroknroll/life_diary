@@ -1,6 +1,4 @@
 from datetime import timedelta
-from django.db.models import Count
-from apps.dashboard.models import TimeBlock
 from apps.core.utils import (
     serialize_for_js,
     get_week_date_range,
@@ -13,7 +11,12 @@ from apps.core.utils import (
     SLOTS_PER_HOUR,
     MINUTES_PER_SLOT,
 )
-from apps.users.models import UserGoal, UserNote
+from apps.dashboard.repositories import TimeBlockRepository
+from apps.users.repositories import GoalRepository, NoteRepository
+
+_time_block_repo = TimeBlockRepository()
+_goal_repo = GoalRepository()
+_note_repo = NoteRepository()
 
 
 # --- 통계 계산기 ---
@@ -111,14 +114,8 @@ class StatsCalculator:
             )
 
     def fill_empty_slots_monthly(self, user, daily_tag_stats, daily_totals, total_days):
-        daily_counts = dict(
-            TimeBlock.objects.filter(
-                user=user,
-                date__range=[self.start_of_month, self.end_of_month],
-            )
-            .values_list("date")
-            .annotate(cnt=Count("id"))
-            .values_list("date", "cnt")
+        daily_counts = _time_block_repo.find_daily_counts(
+            user, self.start_of_month, self.end_of_month
         )
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
@@ -141,14 +138,8 @@ class StatsCalculator:
 
     def fill_empty_slots_analysis(self, user, tag_analysis_data):
         total_days = (self.end_of_month - self.start_of_month).days + 1
-        daily_counts = dict(
-            TimeBlock.objects.filter(
-                user=user,
-                date__range=[self.start_of_month, self.end_of_month],
-            )
-            .values_list("date")
-            .annotate(cnt=Count("id"))
-            .values_list("date", "cnt")
+        daily_counts = _time_block_repo.find_daily_counts(
+            user, self.start_of_month, self.end_of_month
         )
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
@@ -162,9 +153,7 @@ class StatsCalculator:
 
 
 def get_daily_stats_data(user, selected_date, calculator):
-    time_blocks = TimeBlock.objects.filter(
-        user=user, date=selected_date
-    ).select_related("tag")
+    time_blocks = _time_block_repo.find_by_date(user, selected_date)
     tag_stats = {}
     hourly_stats = [{} for _ in range(24)]
     active_blocks_count = 0
@@ -226,9 +215,7 @@ def get_weekly_stats_data(user, selected_date, calculator):
     tag_weekly_stats = {}
     excluded_tags = {SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME}
     for date_item in week_dates:
-        daily_blocks = TimeBlock.objects.filter(
-            user=user, date=date_item
-        ).select_related("tag")
+        daily_blocks = _time_block_repo.find_by_date(user, date_item)
         daily_tag_stats = {}
         active_blocks_count = 0
         active_minutes = 0
@@ -291,9 +278,9 @@ def get_weekly_stats_data(user, selected_date, calculator):
 
 
 def get_monthly_stats_data(user, selected_date, calculator):
-    monthly_blocks = TimeBlock.objects.filter(
-        user=user, date__range=[calculator.start_of_month, calculator.end_of_month]
-    ).select_related("tag")
+    monthly_blocks = _time_block_repo.find_by_month(
+        user, calculator.start_of_month, calculator.end_of_month
+    )
     total_days = (calculator.end_of_month - calculator.start_of_month).days + 1
     daily_tag_stats = {}
     daily_totals = [0] * total_days
@@ -352,9 +339,9 @@ def get_monthly_stats_data(user, selected_date, calculator):
 
 
 def get_tag_analysis_data(user, selected_date, calculator):
-    monthly_blocks = TimeBlock.objects.filter(
-        user=user, date__range=[calculator.start_of_month, calculator.end_of_month]
-    ).select_related("tag")
+    monthly_blocks = _time_block_repo.find_by_month(
+        user, calculator.start_of_month, calculator.end_of_month
+    )
     tag_analysis_data = {}
 
     def process_block(block, tag_info):
@@ -427,15 +414,9 @@ def get_stats_context(user, selected_date):
             }
         ),
     }
-    user_goals_daily = UserGoal.objects.filter(
-        user=user, period="daily"
-    ).select_related("tag")
-    user_goals_weekly = UserGoal.objects.filter(
-        user=user, period="weekly"
-    ).select_related("tag")
-    user_goals_monthly = UserGoal.objects.filter(
-        user=user, period="monthly"
-    ).select_related("tag")
+    user_goals_daily = _goal_repo.find_by_period(user, "daily")
+    user_goals_weekly = _goal_repo.find_by_period(user, "weekly")
+    user_goals_monthly = _goal_repo.find_by_period(user, "monthly")
     context["user_goals_daily"] = user_goals_daily
     context["user_goals_weekly"] = user_goals_weekly
     context["user_goals_monthly"] = user_goals_monthly
@@ -447,6 +428,6 @@ def get_stats_context(user, selected_date):
                 weekly_stats=weekly_stats,
                 monthly_stats=monthly_stats,
             )
-    user_note = UserNote.objects.filter(user=user).order_by("-created_at").first()
+    user_note = _note_repo.find_latest(user)
     context["user_note"] = user_note
     return context

@@ -1,25 +1,24 @@
 import logging
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
-from django.db import models
-from django.db.models import Q
 import json
 
-from .models import Tag
-from apps.dashboard.models import TimeBlock
+from .repositories import TagRepository
+from apps.dashboard.repositories import TimeBlockRepository
 from apps.core.utils import serialize_for_js
+
+_tag_repo = TagRepository()
+_time_block_repo = TimeBlockRepository()
 
 # Create your views here.
 
 
 @login_required
 def index(request):
-    tags = Tag.objects.filter(Q(user=request.user) | Q(is_default=True)).order_by(
-        "-is_default", "name"
-    )
+    tags = _tag_repo.find_accessible_ordered(request.user)
     context = {
         "tags": tags,
         "tags_json": serialize_for_js(
@@ -46,9 +45,7 @@ def tag_list_create(request):
     if request.method == "GET":
         # 사용자가 사용 가능한 모든 태그 조회 (기존 get_tags 로직)
         try:
-            tags = Tag.objects.filter(
-                Q(is_default=True) | Q(user=request.user)
-            ).order_by("is_default", "name")
+            tags = _tag_repo.find_accessible(request.user).order_by("is_default", "name")
 
             tag_list = [
                 {
@@ -93,9 +90,7 @@ def tag_list_create(request):
                 )
 
             # 중복 확인
-            if Tag.objects.filter(
-                Q(user=request.user, name=name) | Q(is_default=True, name=name)
-            ).exists():
+            if _tag_repo.exists_duplicate(request.user, name):
                 return JsonResponse(
                     {
                         "success": False,
@@ -104,12 +99,7 @@ def tag_list_create(request):
                     status=400,
                 )
 
-            tag = Tag.objects.create(
-                user=None if is_default else request.user,
-                name=name,
-                color=color,
-                is_default=is_default,
-            )
+            tag = _tag_repo.create(request.user, name, color, is_default)
 
             return JsonResponse(
                 {
@@ -143,10 +133,7 @@ def tag_detail_update_delete(request, tag_id):
     특정 태그 수정 (PUT) 또는 삭제 (DELETE)
     """
     # 태그 객체 가져오기 (권한 확인 포함)
-    if request.user.is_superuser:
-        tag = get_object_or_404(Tag, id=tag_id)
-    else:
-        tag = get_object_or_404(Tag, id=tag_id, user=request.user, is_default=False)
+    tag = _tag_repo.get_for_owner_or_404(tag_id, request.user)
 
     if request.method == "PUT":
         # 태그 수정 (기존 update_tag 로직)
@@ -172,13 +159,7 @@ def tag_detail_update_delete(request, tag_id):
                 )
 
             # 중복 확인 (자신 제외)
-            if (
-                Tag.objects.filter(
-                    Q(user=request.user, name=name) | Q(is_default=True, name=name)
-                )
-                .exclude(id=tag.id)
-                .exists()
-            ):
+            if _tag_repo.exists_duplicate(request.user, name, exclude_id=tag.id):
                 return JsonResponse(
                     {
                         "success": False,
@@ -191,7 +172,7 @@ def tag_detail_update_delete(request, tag_id):
             tag.color = color
             tag.is_default = is_default
             tag.user = None if is_default else request.user
-            tag.save()
+            _tag_repo.save(tag)
 
             return JsonResponse(
                 {
@@ -219,7 +200,7 @@ def tag_detail_update_delete(request, tag_id):
         # 태그 삭제 (기존 delete_tag 로직)
         try:
             # 기본 태그는 사용 중이면 삭제 불가
-            if tag.is_default and TimeBlock.objects.filter(tag=tag).exists():
+            if tag.is_default and _time_block_repo.is_tag_in_use(tag):
                 return JsonResponse(
                     {
                         "success": False,
@@ -229,7 +210,7 @@ def tag_detail_update_delete(request, tag_id):
                 )
 
             tag_name = tag.name
-            tag.delete()
+            _tag_repo.delete(tag)
 
             return JsonResponse(
                 {"success": True, "message": f'"{tag_name}" 태그가 삭제되었습니다.'}
