@@ -13,6 +13,18 @@ from .dev import *
 
 # 프로덕션 환경 오버라이드
 DEBUG = False
+
+# 프로덕션 DB (Supabase PostgreSQL)
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "HOST": os.getenv("DB_HOST"),
+        "PORT": os.getenv("DB_PORT", "5432"),
+    }
+}
 ALLOWED_HOSTS = ["lifediary.onrender.com"]
 
 # 프로덕션 보안 설정
