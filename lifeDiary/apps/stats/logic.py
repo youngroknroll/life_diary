@@ -3,7 +3,6 @@ from apps.core.utils import (
     serialize_for_js,
     get_week_date_range,
     get_month_date_range,
-    calculate_goal_percent,
     UNCLASSIFIED_TAG_NAME,
     UNCLASSIFIED_TAG_COLOR,
     SLEEP_TAG_NAME,
@@ -13,6 +12,7 @@ from apps.core.utils import (
 )
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.users.repositories import GoalRepository, NoteRepository
+from apps.users.domain_services import _goal_progress_service
 
 _time_block_repo = TimeBlockRepository()
 _goal_repo = GoalRepository()
@@ -421,13 +421,12 @@ def get_stats_context(user, selected_date):
     context["user_goals_weekly"] = user_goals_weekly
     context["user_goals_monthly"] = user_goals_monthly
     for goals in [user_goals_daily, user_goals_weekly, user_goals_monthly]:
-        for goal in goals:
-            goal.actual, goal.percent = calculate_goal_percent(
-                goal,
-                daily_stats=daily_stats,
-                weekly_stats=weekly_stats,
-                monthly_stats=monthly_stats,
-            )
+        _goal_progress_service.attach_progress(
+            goals,
+            daily_stats=daily_stats,
+            weekly_stats=weekly_stats,
+            monthly_stats=monthly_stats,
+        )
     user_note = _note_repo.find_latest(user)
     context["user_note"] = user_note
     return context

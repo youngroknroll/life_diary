@@ -13,7 +13,7 @@ from apps.stats.logic import (
     get_monthly_stats_data,
     StatsCalculator,
 )
-from apps.core.utils import calculate_goal_percent
+from .domain_services import _goal_progress_service
 
 import datetime
 
@@ -183,13 +183,12 @@ def mypage(request):
     weekly_stats = get_weekly_stats_data(user, today, calculator)
     monthly_stats = get_monthly_stats_data(user, today, calculator)
     # 목표별 달성률 계산
-    for goal in goals:
-        goal.actual, goal.percent = calculate_goal_percent(
-            goal,
-            daily_stats=daily_stats,
-            weekly_stats=weekly_stats,
-            monthly_stats=monthly_stats,
-        )
+    _goal_progress_service.attach_progress(
+        goals,
+        daily_stats=daily_stats,
+        weekly_stats=weekly_stats,
+        monthly_stats=monthly_stats,
+    )
     if request.method == "POST":
         form = UserGoalForm(request.POST)
         if form.is_valid():

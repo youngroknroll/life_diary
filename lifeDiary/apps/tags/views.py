@@ -7,6 +7,7 @@ from django.views.decorators.http import require_http_methods, require_GET, requ
 import json
 
 from .repositories import TagRepository
+from .domain_services import _tag_policy_service
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.core.utils import serialize_for_js
 
@@ -53,8 +54,8 @@ def tag_list_create(request):
                     "name": tag.name,
                     "color": tag.color,
                     "is_default": tag.is_default,
-                    "can_edit": not tag.is_default or request.user.is_superuser,
-                    "can_delete": not tag.is_default or request.user.is_superuser,
+                    "can_edit": _tag_policy_service.can_edit(request.user, tag),
+                    "can_delete": _tag_policy_service.can_delete(request.user, tag),
                 }
                 for tag in tags
             ]
@@ -74,14 +75,10 @@ def tag_list_create(request):
             color = data.get("color", "").strip()
             is_default = data.get("is_default", False)
 
-            if is_default and not request.user.is_superuser:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": "기본 태그는 관리자만 생성할 수 있습니다.",
-                    },
-                    status=403,
-                )
+            try:
+                _tag_policy_service.validate_create_default(request.user, is_default)
+            except PermissionError as e:
+                return JsonResponse({"success": False, "message": str(e)}, status=403)
 
             if not name or not color:
                 return JsonResponse(
@@ -142,14 +139,12 @@ def tag_detail_update_delete(request, tag_id):
             name = data.get("name", "").strip()
             color = data.get("color", "").strip()
             requested_is_default = data.get("is_default", tag.is_default)
-            if requested_is_default != tag.is_default and not request.user.is_superuser:
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "message": "기본 태그 설정 변경은 관리자만 할 수 있습니다.",
-                    },
-                    status=403,
+            try:
+                _tag_policy_service.validate_default_flip(
+                    request.user, tag, requested_is_default
                 )
+            except PermissionError as e:
+                return JsonResponse({"success": False, "message": str(e)}, status=403)
             is_default = requested_is_default
 
             if not name or not color:
