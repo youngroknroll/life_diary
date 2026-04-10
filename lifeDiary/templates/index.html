@@ -1,137 +1,295 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ project_name }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .home-hero {
+        background: transparent;
+    }
+
+    .home-kicker {
+        color: #2f7d4f;
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+
+    .home-title {
+        color: #16231b;
+        font-size: clamp(2rem, 2.9rem, 3.4rem);
+        line-height: 1.16;
+        letter-spacing: 0;
+    }
+
+    .home-subtitle {
+        color: #4c5b52;
+        font-size: 1.08rem;
+        line-height: 1.7;
+        max-width: 38rem;
+    }
+
+    .home-primary-btn,
+    .home-secondary-btn {
+        border-radius: 8px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-weight: 700;
+    }
+
+    .home-primary-btn {
+        background: #2f7d4f;
+        border-color: #2f7d4f;
+        color: #ffffff;
+    }
+
+    .home-primary-btn:hover,
+    .home-primary-btn:focus {
+        background: #25663f;
+        border-color: #25663f;
+        color: #ffffff;
+    }
+
+    .home-secondary-btn {
+        color: #2f7d4f;
+        border-color: #98c7aa;
+        background: #ffffff;
+    }
+
+    .home-secondary-btn:hover,
+    .home-secondary-btn:focus {
+        color: #25663f;
+        border-color: #2f7d4f;
+        background: #f3f8f5;
+    }
+
+    .home-preview {
+        background: #f3f8f5;
+        border-radius: 8px;
+        min-height: 100%;
+    }
+
+    .home-preview-panel {
+        background: #ffffff;
+        border: 1px solid #d8e3d8;
+        border-radius: 8px;
+        box-shadow: 0 16px 34px rgba(43, 73, 53, 0.11);
+    }
+
+    .home-preview-image {
+        width: 100%;
+        max-height: 180px;
+        object-fit: cover;
+        object-position: top center;
+        border-radius: 8px;
+        border: 1px solid #e1e8e1;
+    }
+
+    .home-day-blocks {
+        display: grid;
+        grid-template-columns: repeat(8, minmax(0, 1fr));
+        gap: 0.45rem;
+    }
+
+    .home-day-block {
+        aspect-ratio: 1;
+        border-radius: 6px;
+        background: #dbe8df;
+    }
+
+    .home-day-block.is-work {
+        background: #4f9f68;
+    }
+
+    .home-day-block.is-rest {
+        background: #f0c24b;
+    }
+
+    .home-day-block.is-move {
+        background: #6cb6c9;
+    }
+
+    .home-day-block.is-care {
+        background: #e48f73;
+    }
+
+    .home-note {
+        background: #fff7df;
+        border: 1px solid #efd98c;
+        border-radius: 8px;
+        color: #5d4a15;
+    }
+
+    .home-section-title {
+        color: #16231b;
+        letter-spacing: 0;
+    }
+
+    .home-feature {
+        height: 100%;
+        background: #ffffff;
+        border: 1px solid #dfe7df;
+        border-radius: 8px;
+        padding: 1.5rem;
+    }
+
+    .home-feature-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f4ec;
+        color: #2f7d4f;
+        font-size: 1.25rem;
+    }
+
+    .home-nudge {
+        background: #ffffff;
+        border: 1px solid #d8e3d8;
+        border-radius: 8px;
+    }
+
+    @media (max-width: 991.98px) {
+        .home-preview {
+            margin-top: 2rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<div class="row">
-    <div class="col-12">
-        <div class="jumbotron bg-primary text-white rounded-3 p-5 mb-5">
-            <div class="container text-center">
-                <h1 class="display-4 fw-bold mb-4">
-                    <i class="fas fa-clock me-3"></i>
-                    {{ project_name }}
-                </h1>
-                <p class="lead mb-4">{{ project_description }}</p>
-                
-                {% if user.is_authenticated %}
-                    <div class="d-flex justify-content-center gap-3">
-                        <a href="{% url 'dashboard:index' %}" class="btn btn-light btn-lg">
-                            <i class="fas fa-tachometer-alt me-2"></i>
-                            대시보드 시작하기
+<section class="home-hero mb-5">
+    <div class="row g-0 align-items-stretch">
+        <div class="col-lg-7">
+            <div class="p-4 p-md-5">
+                <p class="home-kicker mb-3">Life Diary</p>
+                <h1 class="home-title fw-bold mb-4">하루를 단순하게 기록하세요</h1>
+                <p class="home-subtitle mb-4">
+                    활동을 고르고, 오늘의 흐름을 남기고, 나중에 돌아봅니다.
+                </p>
+
+                <div class="d-flex flex-wrap gap-3">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'dashboard:index' %}" class="btn home-primary-btn px-4">
+                            <i class="fas fa-pen-to-square"></i>
+                            오늘 기록하기
                         </a>
                         {% if user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-cog me-2"></i>
+                        <a href="{% url 'admin:index' %}" class="btn home-secondary-btn px-4">
+                            <i class="fas fa-cog"></i>
                             관리자 패널
                         </a>
                         {% endif %}
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="btn home-primary-btn px-4">
+                            <i class="fas fa-right-to-bracket"></i>
+                            로그인하고 기록 시작
+                        </a>
+                        <a href="{% url 'users:signup' %}" class="btn home-secondary-btn px-4">
+                            회원가입
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="home-preview p-4 p-md-5 d-flex align-items-center">
+                <div class="home-preview-panel p-4 w-100">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <p class="text-muted small mb-1">오늘의 기록</p>
+                            <h2 class="h5 fw-bold mb-0">가볍게 남긴 하루</h2>
+                        </div>
+                        <i class="fas fa-calendar-day text-success fs-4" aria-hidden="true"></i>
                     </div>
-                {% else %}
-                    <a href="{% url 'users:login' %}" class="btn btn-light btn-lg">
-                        <i class="fas fa-sign-in-alt me-2"></i>
-                        로그인하여 시작하기
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
 
-<!-- Features Section -->
-<div class="row">
-    <div class="col-12">
-        <h2 class="text-center mb-5">
-            <i class="fas fa-star me-2 text-warning"></i>
-            주요 기능
-        </h2>
-    </div>
-</div>
+                    <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-preview-image mb-4" alt="태그로 하루 기록을 정리하는 화면 예시">
 
-<div class="row g-4 mb-5">
-    {% for feature in features %}
-    <div class="col-md-4">
-        <div class="card h-100 shadow-sm">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="{{ feature.icon }} text-primary" style="font-size: 3rem;"></i>
+                    <div class="home-day-blocks mb-4" aria-label="하루 기록 예시">
+                        <span class="home-day-block is-work"></span>
+                        <span class="home-day-block is-work"></span>
+                        <span class="home-day-block is-rest"></span>
+                        <span class="home-day-block is-move"></span>
+                        <span class="home-day-block is-care"></span>
+                        <span class="home-day-block"></span>
+                        <span class="home-day-block is-work"></span>
+                        <span class="home-day-block is-rest"></span>
+                        <span class="home-day-block is-work"></span>
+                        <span class="home-day-block is-move"></span>
+                        <span class="home-day-block is-care"></span>
+                        <span class="home-day-block"></span>
+                        <span class="home-day-block is-rest"></span>
+                        <span class="home-day-block is-work"></span>
+                        <span class="home-day-block is-care"></span>
+                        <span class="home-day-block is-move"></span>
+                    </div>
+
+                    <div class="home-note p-3">
+                        <p class="fw-bold mb-1">오늘의 한 줄</p>
+                        <p class="mb-0 small">집중한 시간과 쉬어간 시간을 한눈에 남겼어요.</p>
+                    </div>
                 </div>
-                <h5 class="card-title">{{ feature.title }}</h5>
-                <p class="card-text text-muted">{{ feature.description }}</p>
             </div>
         </div>
     </div>
-    {% endfor %}
-</div>
+</section>
 
-<!-- How it Works Section -->
-<div class="row">
-    <div class="col-12">
-        <h2 class="text-center mb-5">
-            <i class="fas fa-lightbulb me-2 text-warning"></i>
-            사용 방법
-        </h2>
+<section class="mb-5">
+    <div class="row align-items-end mb-4">
+        <div class="col-lg-7">
+            <p class="home-kicker mb-2">How it works</p>
+            <h2 class="home-section-title fw-bold mb-0">복잡한 정리 없이 이어지는 기록</h2>
+        </div>
     </div>
-</div>
 
-<div class="row g-4 mb-5">
-    <div class="col-md-3">
-        <div class="text-center">
-            <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                <span class="fw-bold fs-4">1</span>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="home-feature">
+                <div class="home-feature-icon mb-3">
+                    <i class="fas fa-pen"></i>
+                </div>
+                <h3 class="h5 fw-bold">기록하기</h3>
+                <p class="text-muted mb-0">오늘 한 일을 가볍게 남깁니다.</p>
             </div>
-            <h5>태그 생성</h5>
-            <p class="text-muted">업무, 운동, 식사 등 활동별 태그를 색상과 함께 생성하세요.</p>
+        </div>
+        <div class="col-md-4">
+            <div class="home-feature">
+                <div class="home-feature-icon mb-3">
+                    <i class="fas fa-tags"></i>
+                </div>
+                <h3 class="h5 fw-bold">정리하기</h3>
+                <p class="text-muted mb-0">태그로 하루의 흐름을 구분합니다.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="home-feature">
+                <div class="home-feature-icon mb-3">
+                    <i class="fas fa-chart-simple"></i>
+                </div>
+                <h3 class="h5 fw-bold">돌아보기</h3>
+                <p class="text-muted mb-0">쌓인 기록에서 생활 패턴을 확인합니다.</p>
+            </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="text-center">
-            <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                <span class="fw-bold fs-4">2</span>
-            </div>
-            <h5>시간 기록</h5>
-            <p class="text-muted">144칸 그리드에서 10분 단위로 활동을 클릭하여 기록하세요.</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="text-center">
-            <div class="bg-info text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                <span class="fw-bold fs-4">3</span>
-            </div>
-            <h5>패턴 분석</h5>
-            <p class="text-muted">일/주/월 단위 히트맵으로 생활 패턴을 시각화합니다.</p>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="text-center">
-            <div class="bg-warning text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                <span class="fw-bold fs-4">4</span>
-            </div>
-            <h5>성찰 & 개선</h5>
-            <p class="text-muted">통계를 통해 시간 사용 패턴을 성찰하고 개선하세요.</p>
-        </div>
-    </div>
-</div>
+</section>
 
-<!-- Status Section -->
 {% if user.is_authenticated %}
-<div class="row">
-    <div class="col-12">
-        <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
-            <div class="d-flex align-items-center">
-                <i class="fas fa-info-circle me-3 fs-4"></i>
-                <div>
-                    <h5 class="mb-1">안녕하세요, {{ user.username }}님!</h5>
-                    <p class="mb-0">대시보드에서 오늘의 시간 기록을 시작해보세요.</p>
-                </div>
-                <div class="ms-auto">
-                    <a href="{% url 'dashboard:index' %}" class="btn btn-info">
-                        대시보드로 이동
-                    </a>
-                </div>
-            </div>
+<section class="home-nudge p-4 mb-4">
+    <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">{{ user.username }}님, 오늘 기록을 이어가세요</h2>
+            <p class="text-muted mb-0">지금 남긴 작은 기록이 나중에 하루의 흐름이 됩니다.</p>
         </div>
+        <a href="{% url 'dashboard:index' %}" class="btn home-primary-btn px-4">
+            오늘 기록하기
+        </a>
     </div>
-</div>
+</section>
 {% endif %}
-{% endblock %} 
+{% endblock %}

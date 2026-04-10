@@ -8,22 +8,22 @@ def index(request: HttpRequest):
     """
     context = {
         "project_name": "라이프 다이어리",
-        "project_description": "하루 24시간을 10분 단위로 직관적으로 기록하고 시각화하는 서비스입니다.",
+        "project_description": "복잡한 입력 없이 하루를 단순하게 기록하고 돌아보는 서비스입니다.",
         "features": [
             {
-                "icon": "fas fa-th",
-                "title": "TimeGrid 입력",
-                "description": "클릭·드래그·터치로 복수 슬롯 선택하여 태그 저장",
+                "icon": "fas fa-pen",
+                "title": "기록하기",
+                "description": "오늘 한 일을 가볍게 남깁니다.",
             },
             {
                 "icon": "fas fa-tags",
-                "title": "태그 관리",
-                "description": "태그(이름·색상) CRUD 기능",
+                "title": "정리하기",
+                "description": "태그로 하루의 흐름을 구분합니다.",
             },
             {
-                "icon": "fas fa-chart-bar",
-                "title": "실시간 통계",
-                "description": "일·주·월 단위 히트맵과 태그별 파이차트",
+                "icon": "fas fa-chart-simple",
+                "title": "돌아보기",
+                "description": "쌓인 기록에서 생활 패턴을 확인합니다.",
             },
         ],
     }
