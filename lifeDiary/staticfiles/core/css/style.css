@@ -1,23 +1,71 @@
+/* =========================================================
+   Design Tokens — 단일 팔레트 출처
+   ========================================================= */
 :root {
-    --primary-color: #0d6efd;
+    /* Brand palette (녹색 테마) */
+    --color-primary: #2f7d4f;
+    --color-primary-hover: #25663f;
+    --color-primary-soft: #e8f4ec;
+    --color-primary-border: #98c7aa;
+
+    /* Text */
+    --color-text: #16231b;
+    --color-text-muted: #4c5b52;
+
+    /* Surface */
+    --color-surface: #ffffff;
+    --color-surface-soft: #f3f8f5;
+    --color-border: #d8e3d8;
+    --color-border-soft: #dfe7df;
+    --color-border-muted: #e1e8e1;
+
+    /* Accent (하루 기록 블록) */
+    --color-accent-work: #4f9f68;
+    --color-accent-rest: #f0c24b;
+    --color-accent-move: #6cb6c9;
+    --color-accent-care: #e48f73;
+    --color-accent-muted: #dbe8df;
+
+    /* Note (노란 강조 박스) */
+    --color-note-bg: #fff7df;
+    --color-note-border: #efd98c;
+    --color-note-text: #5d4a15;
+
+    /* Bootstrap 호환 alias */
+    --primary-color: var(--color-primary);
     --success-color: #198754;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
     --info-color: #0dcaf0;
-    --light-color: #f8f9fa;
-    --dark-color: #212529;
+    --light-color: var(--color-surface-soft);
+    --dark-color: var(--color-text);
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 15px;
+
+    /* Typography */
+    --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+/* =========================================================
+   Base
+   ========================================================= */
 body {
     background-color: var(--light-color);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-body);
+    color: var(--color-text);
 }
 
 .navbar-brand {
     font-weight: bold;
-    color: var(--primary-color) !important;
+    color: var(--color-primary) !important;
 }
 
+/* =========================================================
+   Time Grid (대시보드 시간대 입력)
+   ========================================================= */
 .time-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
@@ -28,7 +76,7 @@ body {
 
 .time-slot {
     aspect-ratio: 1;
-    border: 1px solid #dee2e6;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -38,12 +86,12 @@ body {
 
 .time-slot:hover {
     transform: scale(1.05);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .time-slot.selected {
     border-width: 2px;
-    border-color: var(--primary-color);
+    border-color: var(--color-primary);
 }
 
 .time-slot.filled {
@@ -55,7 +103,7 @@ body {
     position: absolute;
     top: 2px;
     left: 2px;
-    color: #6c757d;
+    color: var(--color-text-muted);
     line-height: 1;
 }
 
@@ -68,27 +116,92 @@ body {
     }
 }
 
+/* =========================================================
+   Card & Button (전역 공통)
+   ========================================================= */
 .card-header {
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-work));
     color: white;
 }
 
-/* 통계 페이지 탭 스타일 - 더 구체적인 선택자 */
 .card-header .nav-link {
     color: white !important;
 }
 
 .card-header .nav-link.active {
-    color: black !important;
-    background-color: white;
+    color: var(--color-text) !important;
+    background-color: var(--color-surface);
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-work));
     border: none;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--info-color), var(--primary-color));
+    background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
     transform: translateY(-1px);
-} 
+}
+
+/* =========================================================
+   Auth Card — login/signup 공통
+   ========================================================= */
+.auth-card {
+    margin-top: 3rem;
+    border: none;
+    border-radius: var(--radius-lg);
+}
+
+.auth-card .card-header {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0 !important;
+}
+
+.auth-card .form-control {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    padding: 12px 15px;
+}
+
+.auth-card .form-control:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 0.2rem rgba(47, 125, 79, 0.2);
+}
+
+.auth-card .btn-primary {
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-weight: bold;
+}
+
+.auth-card .form-text {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+}
+
+/* =========================================================
+   Loading Modal (base.html에서 이관)
+   ========================================================= */
+.loading-modal {
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+}
+
+.loading-spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 4px solid var(--color-surface-soft);
+    border-top: 4px solid var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    color: var(--color-text-muted);
+    font-size: 1.1rem;
+    margin-top: 1rem;
+}
