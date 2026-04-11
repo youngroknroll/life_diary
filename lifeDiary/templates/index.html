@@ -81,11 +81,54 @@
 
     .home-preview-image {
         width: 100%;
-        max-height: 180px;
-        object-fit: cover;
-        object-position: top center;
+        max-height: 280px;
+        object-fit: contain;
+        object-position: center;
         border-radius: 8px;
         border: 1px solid #e1e8e1;
+        background: #ffffff;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .home-preview-trigger {
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+    }
+
+    .home-preview-trigger:hover .home-preview-image,
+    .home-preview-trigger:focus .home-preview-image {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 24px rgba(43, 73, 53, 0.14);
+    }
+
+    .home-preview-trigger:focus-visible {
+        outline: 3px solid rgba(47, 125, 79, 0.32);
+        outline-offset: 6px;
+        border-radius: 8px;
+    }
+
+    .home-preview-caption {
+        color: #4c5b52;
+        line-height: 1.6;
+    }
+
+    .home-image-modal .modal-content {
+        background: #ffffff;
+        border-radius: 8px;
+    }
+
+    .home-image-modal .modal-body {
+        padding: 0;
+    }
+
+    .home-modal-image {
+        width: 100%;
+        height: auto;
+        display: block;
     }
 
     .home-day-blocks {
@@ -209,7 +252,19 @@
                         <i class="fas fa-calendar-day text-success fs-4" aria-hidden="true"></i>
                     </div>
 
-                    <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-preview-image mb-4" alt="태그로 하루 기록을 정리하는 화면 예시">
+                    <div class="mb-4">
+                        <p class="fw-bold mb-2">소비시간의 분류</p>
+                        <button
+                            type="button"
+                            class="home-preview-trigger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#homePreviewImageModal"
+                            aria-label="소비시간의 분류 이미지 크게 보기"
+                        >
+                            <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-preview-image" alt="소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시">
+                        </button>
+                        <p class="home-preview-caption small mt-2 mb-0">클릭해서 크게 볼 수 있습니다.</p>
+                    </div>
 
                     <div class="home-day-blocks mb-4" aria-label="하루 기록 예시">
                         <span class="home-day-block is-work"></span>
@@ -239,6 +294,20 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade home-image-modal" id="homePreviewImageModal" tabindex="-1" aria-labelledby="homePreviewImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header">
+                <h2 class="modal-title h5 fw-bold mb-0" id="homePreviewImageModalLabel">소비시간의 분류</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+            </div>
+            <div class="modal-body">
+                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-modal-image" alt="소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시">
+            </div>
+        </div>
+    </div>
+</div>
 
 <section class="mb-5">
     <div class="row align-items-end mb-4">
