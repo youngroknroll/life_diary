@@ -1,5 +1,8 @@
 from datetime import timedelta
 from apps.core.utils import (
+    DAYS_PER_WEEK,
+    HOURS_PER_DAY,
+    MINUTES_PER_HOUR,
     serialize_for_js,
     get_week_date_range,
     get_month_date_range,
@@ -9,6 +12,13 @@ from apps.core.utils import (
     TOTAL_SLOTS_PER_DAY,
     SLOTS_PER_HOUR,
     MINUTES_PER_SLOT,
+)
+from .services import (
+    build_unclassified_analysis_entry,
+    build_unclassified_daily_entry,
+    build_unclassified_monthly_entry,
+    build_unclassified_weekly_entry,
+    minutes_to_hours,
 )
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.users.repositories import GoalRepository, NoteRepository
@@ -49,23 +59,14 @@ class StatsCalculator:
             return
         if data_type == "daily":
             if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = {
-                    "name": UNCLASSIFIED_TAG_NAME,
-                    "color": UNCLASSIFIED_TAG_COLOR,
-                    "minutes": 0,
-                    "blocks": 0,
-                }
+                data_container[UNCLASSIFIED_TAG_NAME] = build_unclassified_daily_entry()
             data_container[UNCLASSIFIED_TAG_NAME]["minutes"] += empty_minutes
             data_container[UNCLASSIFIED_TAG_NAME]["blocks"] += (
                 empty_minutes // MINUTES_PER_SLOT
             )
         elif data_type == "weekly":
             if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = {
-                    "name": UNCLASSIFIED_TAG_NAME,
-                    "color": UNCLASSIFIED_TAG_COLOR,
-                    "daily_minutes": [0] * 7,
-                }
+                data_container[UNCLASSIFIED_TAG_NAME] = build_unclassified_weekly_entry()
             data_container[UNCLASSIFIED_TAG_NAME]["daily_minutes"][
                 day_index
             ] += empty_minutes
@@ -73,12 +74,9 @@ class StatsCalculator:
             pass
         elif data_type == "analysis":
             if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = {
-                    "name": UNCLASSIFIED_TAG_NAME,
-                    "color": UNCLASSIFIED_TAG_COLOR,
-                    "total_minutes": 0,
-                    "total_blocks": 0,
-                }
+                data_container[UNCLASSIFIED_TAG_NAME] = (
+                    build_unclassified_analysis_entry()
+                )
             data_container[UNCLASSIFIED_TAG_NAME]["total_minutes"] += empty_minutes
             data_container[UNCLASSIFIED_TAG_NAME]["total_blocks"] += (
                 empty_minutes // MINUTES_PER_SLOT
@@ -91,9 +89,9 @@ class StatsCalculator:
             )
 
     def fill_empty_slots_daily(self, time_blocks, tag_stats, hourly_stats):
-        for hour in range(24):
+        for hour in range(HOURS_PER_DAY):
             total_minutes_in_hour = sum(hourly_stats[hour].values())
-            empty_minutes = 60 - total_minutes_in_hour
+            empty_minutes = MINUTES_PER_HOUR - total_minutes_in_hour
             if empty_minutes > 0:
                 self.add_unclassified_data(tag_stats, empty_minutes, data_type="daily")
                 self.add_unclassified_to_hourly_stats(hourly_stats, hour, empty_minutes)
@@ -122,14 +120,11 @@ class StatsCalculator:
             recorded_blocks = daily_counts.get(current_date, 0)
             empty_blocks = TOTAL_SLOTS_PER_DAY - recorded_blocks
             if empty_blocks > 0:
-                empty_hours = empty_blocks * MINUTES_PER_SLOT / 60
+                empty_hours = empty_blocks * MINUTES_PER_SLOT / MINUTES_PER_HOUR
                 if UNCLASSIFIED_TAG_NAME not in daily_tag_stats:
-                    daily_tag_stats[UNCLASSIFIED_TAG_NAME] = {
-                        "name": UNCLASSIFIED_TAG_NAME,
-                        "color": UNCLASSIFIED_TAG_COLOR,
-                        "daily_hours": [0] * total_days,
-                        "total_hours": 0,
-                    }
+                    daily_tag_stats[UNCLASSIFIED_TAG_NAME] = (
+                        build_unclassified_monthly_entry(total_days)
+                    )
                 daily_tag_stats[UNCLASSIFIED_TAG_NAME]["daily_hours"][
                     day_index
                 ] += empty_hours
@@ -155,7 +150,7 @@ class StatsCalculator:
 def get_daily_stats_data(user, selected_date, calculator):
     time_blocks = _time_block_repo.find_by_date(user, selected_date)
     tag_stats = {}
-    hourly_stats = [{} for _ in range(24)]
+    hourly_stats = [{} for _ in range(HOURS_PER_DAY)]
     active_blocks_count = 0
 
     def process_block(block, tag_info):
@@ -181,7 +176,7 @@ def get_daily_stats_data(user, selected_date, calculator):
     calculator.process_blocks_without_tag(time_blocks, process_block)
     calculator.fill_empty_slots_daily(time_blocks, tag_stats, hourly_stats)
     for tag_data in tag_stats.values():
-        tag_data["hours"] = round(tag_data["minutes"] / 60, 1)
+        tag_data["hours"] = minutes_to_hours(tag_data["minutes"])
     peak_hour = -1
     max_minutes = -1
     for hour, hour_data in enumerate(hourly_stats):
@@ -196,8 +191,8 @@ def get_daily_stats_data(user, selected_date, calculator):
         ),
         "hourly_stats": hourly_stats,
         "total_blocks": TOTAL_SLOTS_PER_DAY,
-        "total_hours": 24.0,
-        "active_hours": round(active_blocks_count * MINUTES_PER_SLOT / 60, 1),
+        "total_hours": float(HOURS_PER_DAY),
+        "active_hours": minutes_to_hours(active_blocks_count * MINUTES_PER_SLOT),
         "fill_percentage": round((len(time_blocks) / TOTAL_SLOTS_PER_DAY) * 100, 1),
         "peak_hour": peak_hour,
         "max_minutes": max_minutes,
@@ -210,7 +205,7 @@ def get_daily_stats_data(user, selected_date, calculator):
 
 
 def get_weekly_stats_data(user, selected_date, calculator):
-    week_dates = [calculator.start_of_week + timedelta(days=i) for i in range(7)]
+    week_dates = [calculator.start_of_week + timedelta(days=i) for i in range(DAYS_PER_WEEK)]
     weekly_data = []
     tag_weekly_stats = {}
     excluded_tags = {SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME}
@@ -229,15 +224,15 @@ def get_weekly_stats_data(user, selected_date, calculator):
             daily_tag_stats[tag_name] += MINUTES_PER_SLOT
             if tag_name not in excluded_tags:
                 active_blocks_count += 1
-                active_minutes += 10
+                active_minutes += MINUTES_PER_SLOT
             if tag_name not in tag_weekly_stats:
                 tag_weekly_stats[tag_name] = {
                     "name": tag_name,
                     "color": tag_color,
-                    "daily_minutes": [0] * 7,
+                    "daily_minutes": [0] * DAYS_PER_WEEK,
                 }
             day_index = (date_item - calculator.start_of_week).days
-            tag_weekly_stats[tag_name]["daily_minutes"][day_index] += 10
+            tag_weekly_stats[tag_name]["daily_minutes"][day_index] += MINUTES_PER_SLOT
 
         calculator.process_blocks_without_tag(daily_blocks, process_block)
         calculator.fill_empty_slots_weekly(
@@ -252,14 +247,14 @@ def get_weekly_stats_data(user, selected_date, calculator):
                 ],
                 "total_blocks": active_blocks_count,
                 "total_minutes": active_minutes,
-                "total_hours": round(active_minutes / 60, 1),
-                "fill_percentage": round((len(daily_blocks) / 144) * 100, 1),
+                "total_hours": minutes_to_hours(active_minutes),
+                "fill_percentage": round((len(daily_blocks) / TOTAL_SLOTS_PER_DAY) * 100, 1),
                 "tag_stats": daily_tag_stats,
             }
         )
     for tag_data in tag_weekly_stats.values():
-        tag_data["total_hours"] = round(sum(tag_data["daily_minutes"]) / 60, 1)
-        tag_data["daily_hours"] = [round(m / 60, 1) for m in tag_data["daily_minutes"]]
+        tag_data["total_hours"] = minutes_to_hours(sum(tag_data["daily_minutes"]))
+        tag_data["daily_hours"] = [minutes_to_hours(m) for m in tag_data["daily_minutes"]]
         active_days = sum(1 for minutes in tag_data["daily_minutes"] if minutes > 0)
         tag_data["avg_hours"] = (
             round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
@@ -271,7 +266,7 @@ def get_weekly_stats_data(user, selected_date, calculator):
         "weekly_data": weekly_data,
         "tag_weekly_stats": list(tag_weekly_stats.values()),
         "week_total_hours": round(
-            sum(day["total_minutes"] for day in weekly_data) / 60, 1
+            sum(day["total_minutes"] for day in weekly_data) / MINUTES_PER_HOUR, 1
         ),
         "active_days": active_days,
     }
@@ -296,7 +291,7 @@ def get_monthly_stats_data(user, selected_date, calculator):
                 "daily_hours": [0] * total_days,
                 "total_hours": 0,
             }
-        hours_increment = MINUTES_PER_SLOT / 60
+        hours_increment = MINUTES_PER_SLOT / MINUTES_PER_HOUR
         daily_tag_stats[tag_name]["daily_hours"][day_index] += hours_increment
         daily_tag_stats[tag_name]["total_hours"] += hours_increment
         daily_totals[day_index] += hours_increment
@@ -365,7 +360,7 @@ def get_tag_analysis_data(user, selected_date, calculator):
             {
                 "name": data["name"],
                 "color": data["color"],
-                "total_hours": round(data["total_minutes"] / 60, 1),
+                "total_hours": minutes_to_hours(data["total_minutes"]),
                 "total_blocks": data["total_blocks"],
             }
         )

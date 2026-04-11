@@ -9,17 +9,19 @@ class TagPolicyService:
         """기본 태그 생성은 superuser만 가능."""
         return user.is_superuser
 
-    def can_edit(self, user, tag) -> bool:
-        """기본 태그는 superuser만, 일반 태그는 본인만 수정 가능."""
+    def can_manage(self, user, tag) -> bool:
+        """기본 태그는 superuser만, 일반 태그는 본인만 관리 가능."""
         if tag.is_default:
             return user.is_superuser
         return tag.user == user
 
+    def can_edit(self, user, tag) -> bool:
+        """기본 태그는 superuser만, 일반 태그는 본인만 수정 가능."""
+        return self.can_manage(user, tag)
+
     def can_delete(self, user, tag) -> bool:
         """기본 태그는 superuser만, 일반 태그는 본인만 삭제 가능."""
-        if tag.is_default:
-            return user.is_superuser
-        return tag.user == user
+        return self.can_manage(user, tag)
 
     def validate_default_flip(self, user, tag, requested_is_default) -> None:
         """

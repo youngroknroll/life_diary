@@ -6,6 +6,7 @@ import json
 
 from apps.tags.repositories import TagRepository
 from .repositories import TimeBlockRepository
+from .services import build_time_headers, validate_slot_indexes
 import logging
 
 from apps.core.utils import (
@@ -57,10 +58,6 @@ def dashboard_view(request):
     # 통계 계산 (core 유틸리티 사용)
     stats = calculate_time_statistics(len(slot_data))
 
-    # 각 컬럼은 10분 슬롯의 종료 분(9, 19, 29, 39, 49, 59)을 2행 반복
-    _SLOT_END_MINUTES = [9, 19, 29, 39, 49, 59]
-    time_headers = [f"{m}분" for m in _SLOT_END_MINUTES * 2]
-
     context = {
         "page_title": "대시보드",
         "selected_date": selected_date,
@@ -71,7 +68,7 @@ def dashboard_view(request):
         "fill_percentage": stats["fill_percentage"],
         "total_hours": stats["hours"],
         "remaining_minutes": stats["remaining_minutes"],
-        "time_headers": time_headers,
+        "time_headers": build_time_headers(),
         # JavaScript에서 사용할 데이터 (core 직렬화 함수 사용)
         "tags_json": serialize_for_js(
             [
@@ -108,9 +105,7 @@ def time_block_api(request):
         if not slot_indexes:
             return error_response("슬롯 인덱스가 누락되었습니다.", "MISSING_SLOTS")
 
-        if not isinstance(slot_indexes, list) or not all(
-            isinstance(i, int) and 0 <= i < TOTAL_SLOTS_PER_DAY for i in slot_indexes
-        ):
+        if not validate_slot_indexes(slot_indexes):
             return error_response(
                 f"슬롯 인덱스는 0~{TOTAL_SLOTS_PER_DAY - 1} 범위의 정수 배열이어야 합니다.",
                 "INVALID_SLOTS",

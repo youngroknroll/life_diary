@@ -19,7 +19,9 @@ SLEEP_TAG_NAME = "수면"
 SLOTS_PER_HOUR = 6  # 10분 단위
 TOTAL_SLOTS_PER_DAY = 144  # 24시간 * 6
 MINUTES_PER_SLOT = 10
+MINUTES_PER_HOUR = 60
 HOURS_PER_DAY = 24
+DAYS_PER_WEEK = 7
 
 
 def serialize_for_js(data):
@@ -66,14 +68,14 @@ def calculate_time_statistics(blocks_count):
         dict: 시간 통계 정보
     """
     total_minutes = blocks_count * MINUTES_PER_SLOT
-    hours = total_minutes // 60
-    remaining_minutes = total_minutes % 60
+    hours = total_minutes // MINUTES_PER_HOUR
+    remaining_minutes = total_minutes % MINUTES_PER_HOUR
 
     return {
         "total_minutes": total_minutes,
         "hours": hours,
         "remaining_minutes": remaining_minutes,
-        "total_hours_float": round(total_minutes / 60, 1),
+        "total_hours_float": round(total_minutes / MINUTES_PER_HOUR, 1),
         "fill_percentage": round((blocks_count / TOTAL_SLOTS_PER_DAY) * 100, 1),
     }
 
