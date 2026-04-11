@@ -2,7 +2,7 @@
 
 방통대 소프트웨어 경진대회 출품작
 
-배포사이트 : [라이프 다이어리]([http://www.google.co.kr](https://lifediary.onrender.com/)
+배포사이트 : [라이프 다이어리](https://lifediary.onrender.com/)
 
 ## 프로젝트 개요
 
