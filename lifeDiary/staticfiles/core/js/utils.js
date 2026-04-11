@@ -111,7 +111,6 @@ async function apiCall(url, options = {}) {
         return result;
 
     } catch (error) {
-        console.error('API Call Error:', error);
         throw error;
     } finally {
         // 로딩 상태 해제

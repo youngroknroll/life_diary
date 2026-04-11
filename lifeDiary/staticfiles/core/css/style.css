@@ -40,6 +40,10 @@
     --light-color: var(--color-surface-soft);
     --dark-color: var(--color-text);
 
+    /* Bootstrap 5 CSS 변수 오버라이드 — btn-outline-primary, text-primary 등 자동 적용 */
+    --bs-primary: #2f7d4f;
+    --bs-primary-rgb: 47, 125, 79;
+
     /* Radius */
     --radius-sm: 6px;
     --radius-md: 8px;
@@ -143,6 +147,25 @@ body {
     transform: translateY(-1px);
 }
 
+/* Bootstrap btn-outline-primary 강제 오버라이드 — 직접 color 속성 사용 */
+.btn.btn-outline-primary,
+.btn-outline-primary {
+    color: #2f7d4f !important;
+    border-color: #2f7d4f !important;
+    background-color: transparent !important;
+}
+
+.btn.btn-outline-primary:hover,
+.btn.btn-outline-primary:focus,
+.btn.btn-outline-primary:active,
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    color: #ffffff !important;
+    background-color: #2f7d4f !important;
+    border-color: #2f7d4f !important;
+}
+
 /* =========================================================
    Auth Card — login/signup 공통
    ========================================================= */
@@ -179,11 +202,29 @@ body {
 }
 
 /* =========================================================
-   Loading Modal (base.html에서 이관)
+   Loading Overlay (plain div — body 스크롤 락 없음)
    ========================================================= */
-.loading-modal {
+.loading-overlay {
+    position: fixed;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.loading-overlay.is-visible {
+    display: flex;
+}
+
+.loading-overlay-content {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 2.5rem 3rem;
+    text-align: center;
+    box-shadow: 0 16px 34px rgba(43, 73, 53, 0.2);
 }
 
 .loading-spinner {

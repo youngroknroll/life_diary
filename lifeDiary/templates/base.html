@@ -32,17 +32,13 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body data-is-superuser="{{ user.is_superuser|yesno:'true,false' }}">
-    <!-- 로딩 모달 -->
-    <div class="modal fade" id="loadingModal" tabindex="-1" aria-labelledby="loadingModalLabel" data-bs-backdrop="static" data-bs-keyboard="false" inert>
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-body text-center py-5">
-                    <div class="loading-spinner mx-auto"></div>
-                    <div class="loading-text mt-3">
-                        <i class="fas fa-clock me-2"></i>
-                        페이지를 불러오는 중입니다...
-                    </div>
-                </div>
+    <!-- 로딩 오버레이 (Bootstrap Modal 아님 - body 스크롤 락 회피) -->
+    <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
+        <div class="loading-overlay-content">
+            <div class="loading-spinner mx-auto"></div>
+            <div class="loading-text mt-3">
+                <i class="fas fa-clock me-2"></i>
+                페이지를 불러오는 중입니다...
             </div>
         </div>
     </div>
@@ -162,73 +158,48 @@
     <!-- Custom JS -->
     <script src="{% static 'core/js/utils.js' %}" defer></script>
     <script>
-        // 로딩 모달 관리
-        let loadingModal;
-        
-        // 페이지 로딩 시작 시 로딩 모달 표시 (메인페이지 제외)
-        document.addEventListener('DOMContentLoaded', function() {
-            loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
-            
-            // 메인페이지(홈)가 아닌 경우에만 로딩 모달 표시
-            const isHomePage = window.location.pathname === '/' || window.location.pathname === '';
-            
-            if (!isHomePage) {
-                loadingModal.show();
-            }
-        });
-        
-        // 모달 강제 숨김 (bfcache 복원 포함 모든 경우에 사용)
-        function forceHideLoadingModal() {
-            if (loadingModal) loadingModal.hide();
+        // 로딩 오버레이 관리 (plain div — body 스크롤 락 없음)
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        let isNavigating = false;
 
-            const modalElement = document.getElementById('loadingModal');
-            setTimeout(() => {
-                if (modalElement.classList.contains('show')) {
-                    modalElement.classList.remove('show', 'fade');
-                    modalElement.style.display = 'none';
-                    document.body.classList.remove('modal-open');
-                    const backdrop = document.querySelector('.modal-backdrop');
-                    if (backdrop) backdrop.remove();
-                }
-            }, 1000);
+        function showLoadingOverlay() {
+            if (loadingOverlay) loadingOverlay.classList.add('is-visible');
         }
 
-        // 페이지 완전 로딩 완료 시 로딩 모달 숨김
-        // window.load 이벤트는 모든 리소스(이미지, CSS, 스크립트) 로딩 완료를 보장함
-        window.addEventListener('load', forceHideLoadingModal);
+        function hideLoadingOverlay() {
+            if (loadingOverlay) loadingOverlay.classList.remove('is-visible');
+            isNavigating = false;
+        }
 
-        // bfcache(뒤로/앞으로 캐시) 복원 시 모달 숨김
-        // 뒤로가기로 복원된 페이지는 load 이벤트가 재실행되지 않으므로 pageshow로 별도 처리
+        // 페이지 로딩 시작 시 오버레이 표시 (홈 제외)
+        const isHomePage = window.location.pathname === '/' || window.location.pathname === '';
+        if (!isHomePage) {
+            showLoadingOverlay();
+        }
+
+        // 모든 리소스 로드 완료 시 숨김
+        window.addEventListener('load', hideLoadingOverlay);
+
+        // bfcache 복원 시 숨김
         window.addEventListener('pageshow', function(e) {
-            if (e.persisted) {
-                isNavigating = false;
-                forceHideLoadingModal();
-            }
+            if (e.persisted) hideLoadingOverlay();
         });
-        
-        // 페이지 이동 시 로딩 모달 표시 (한 번만)
-        let isNavigating = false;
+
+        // 페이지 이동 시 오버레이 표시
         document.addEventListener('click', function(e) {
             const link = e.target.closest('a');
-            
             if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#') && !link.target && !isNavigating) {
-                // 외부 링크나 특별한 링크가 아닌 경우에만 로딩 모달 표시
                 if (!link.href.includes('admin') && !link.href.includes('logout') && !link.href.endsWith('#')) {
                     isNavigating = true;
-                    if (loadingModal) {
-                        loadingModal.show();
-                    }
+                    showLoadingOverlay();
                 }
             }
         });
-        
-        // Dropdown 토글 감지 및 로딩 모달 숨김
+
+        // Dropdown 토글 시 오버레이 숨김 (네비게이션 아님)
         document.addEventListener('click', function(e) {
             if (e.target.matches('[data-bs-toggle="dropdown"]') || e.target.closest('[data-bs-toggle="dropdown"]')) {
-                if (loadingModal) {
-                    loadingModal.hide();
-                }
-                isNavigating = false;
+                hideLoadingOverlay();
             }
         });
         
