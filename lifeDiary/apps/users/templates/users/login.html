@@ -63,4 +63,16 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('.auth-card form').addEventListener('submit', function () {
+    var overlay = document.getElementById('loadingOverlay');
+    overlay.querySelector('.loading-text').innerHTML =
+        '<i class="fas fa-sign-in-alt me-2"></i>로그인 중입니다...';
+    overlay.classList.add('is-visible');
+    overlay.setAttribute('aria-hidden', 'false');
+});
+</script>
+{% endblock %}
