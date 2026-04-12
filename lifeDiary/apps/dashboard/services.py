@@ -1,7 +1,7 @@
 from apps.core.utils import TOTAL_SLOTS_PER_DAY
 
 
-SLOT_END_MINUTES = [9, 19, 29, 39, 49, 59]
+SLOT_END_MINUTES = [10, 20, 30, 40, 50, 60]
 
 
 def build_time_headers(slot_end_minutes=None):

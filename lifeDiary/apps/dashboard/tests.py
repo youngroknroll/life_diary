@@ -7,7 +7,7 @@ class DashboardServicesTests(SimpleTestCase):
     def test_build_time_headers(self):
         self.assertEqual(
             build_time_headers(),
-            ["9분", "19분", "29분", "39분", "49분", "59분"] * 2,
+            ["10분", "20분", "30분", "40분", "50분", "60분"] * 2,
         )
 
     def test_validate_slot_indexes_accepts_valid_list(self):
