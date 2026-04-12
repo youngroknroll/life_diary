@@ -114,9 +114,20 @@ body {
 @media (max-width: 768px) {
     .time-grid {
         grid-template-columns: repeat(6, 1fr);
+        margin: 0 1rem;
+    }
+    .time-slot {
+        aspect-ratio: auto;
+        min-height: 20px;
     }
     .slot-time {
         font-size: 0.6rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .time-slot {
+        min-height: 16px;
     }
 }
 
