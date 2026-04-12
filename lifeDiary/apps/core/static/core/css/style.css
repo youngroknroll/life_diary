@@ -102,6 +102,16 @@ body {
     opacity: 0.9;
 }
 
+.dashboard-date-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.time-header-cell {
+    font-weight: 500;
+}
+
 .slot-time {
     font-size: 0.7rem;
     position: absolute;
@@ -115,6 +125,7 @@ body {
     .time-grid {
         grid-template-columns: repeat(6, 1fr);
         margin: 0 1rem;
+        touch-action: pan-y;
     }
     .time-slot {
         aspect-ratio: auto;
@@ -122,6 +133,22 @@ body {
     }
     .slot-time {
         font-size: 0.6rem;
+    }
+    .time-header-cell:nth-child(n+7) {
+        display: none;
+    }
+    .dashboard-date-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .dashboard-date-title {
+        font-size: 1rem;
+    }
+    .dashboard-stats .fw-bold {
+        font-size: 0.9rem;
+    }
+    .dashboard-stats small {
+        font-size: 0.7rem;
     }
 }
 

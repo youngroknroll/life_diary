@@ -16,15 +16,15 @@
     <!-- 날짜 선택 및 통계 -->
     <div class="col-12 mb-4">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
+            <div class="card-header dashboard-date-header">
+                <h5 class="mb-0 dashboard-date-title">
                     <i class="fas fa-calendar-day me-2"></i>
                     {{ selected_date|date:"Y년 m월 d일 (l)" }}
                 </h5>
-                <div class="d-flex gap-2">
-                    <input type="date" 
-                           class="form-control form-control-sm" 
-                           id="dateSelector" 
+                <div class="d-flex gap-2 flex-wrap">
+                    <input type="date"
+                           class="form-control form-control-sm"
+                           id="dateSelector"
                            value="{{ selected_date|date:'Y-m-d' }}"
                            style="width: 150px;">
                     <button class="btn btn-sm btn-outline-primary" onclick="goToToday()">
@@ -38,8 +38,8 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row text-center">
-                    <div class="col-md-3">
+                <div class="row text-center dashboard-stats">
+                    <div class="col-6 col-md-3 mb-2">
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-clock text-primary me-2"></i>
                             <div>
@@ -48,7 +48,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3 mb-2">
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-check-circle text-success me-2"></i>
                             <div>
@@ -57,7 +57,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3 mb-2">
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-chart-pie text-info me-2"></i>
                             <div>
@@ -66,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-3">
+                    <div class="col-6 col-md-3 mb-2">
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-hourglass-half text-warning me-2"></i>
                             <div>
@@ -92,10 +92,10 @@
                 </h6>
             </div>
             <div class="card-body">
-                <!-- 시간 표시 헤더 (그리드와 동일한 12열 구조) -->
-                <div class="time-grid mb-3" style="grid-template-columns: repeat(12, 1fr); display: grid; gap: 2px;">
+                <!-- 시간 표시 헤더 (그리드와 동일한 열 구조) -->
+                <div class="time-grid time-header mb-3">
                     {% for time_header in time_headers %}
-                        <div class="text-center text-muted small py-1" style="font-weight: 500;">
+                        <div class="time-header-cell text-center text-muted small py-1">
                             {{ time_header }}
                         </div>
                     {% endfor %}
@@ -117,7 +117,7 @@
                              onmousedown="startDrag({{ slot.index }})"
                              onmouseenter="dragOver({{ slot.index }})"
                              onmouseup="endDrag()"
-                             ontouchstart="startDrag({{ slot.index }})"
+                             ontouchstart="handleTouchStart({{ slot.index }}, event)"
                              ontouchmove="handleTouchMove(event)"
                              ontouchend="endDrag()">
                             
@@ -359,7 +359,7 @@
         });
     };
 
-    // 드래그 시작/종료 및 터치 관련 함수들 (기존 코드와 동일)
+    // 드래그 시작/종료 및 터치 관련 함수들
     const startDrag = (slotIndex) => {
         isDragging = true;
         startSlot = slotIndex;
@@ -367,7 +367,16 @@
         selectedSlots.add(slotIndex);
         const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
         if(slotElement) slotElement.classList.add('selected');
-        event.preventDefault();
+    };
+
+    // 터치 전용: 시작 좌표 기록, 방향 판단 전까지 스크롤 허용
+    let touchStartX = 0, touchStartY = 0, touchDecided = false;
+    const handleTouchStart = (slotIndex, event) => {
+        const touch = event.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        touchDecided = false;
+        startDrag(slotIndex);
     };
     
     const dragOver = (slotIndex) => {
@@ -395,8 +404,22 @@
 
     const handleTouchMove = (event) => {
         if (!isDragging) return;
-        event.preventDefault();
         const touch = event.touches[0];
+
+        if (!touchDecided) {
+            const dx = Math.abs(touch.clientX - touchStartX);
+            const dy = Math.abs(touch.clientY - touchStartY);
+            if (dx < 5 && dy < 5) return;
+            touchDecided = true;
+            if (dy > dx) {
+                isDragging = false;
+                startSlot = null;
+                clearSelection();
+                return;
+            }
+        }
+
+        event.preventDefault();
         const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
         if (elementBelow && elementBelow.classList.contains('time-slot')) {
             const slotIndex = parseInt(elementBelow.dataset.slotIndex, 10);
