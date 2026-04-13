@@ -3,7 +3,36 @@ from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 
-# Create your models here.
+
+class Category(models.Model):
+    """
+    시간 소비의 대분류 (시스템 고정 5가지).
+    - 수동적 소비시간, 주도적 사용시간, 투자시간, 기초 생활시간, 수면시간
+    """
+
+    name = models.CharField(max_length=50, unique=True, verbose_name="카테고리명")
+    slug = models.SlugField(max_length=50, unique=True, verbose_name="슬러그")
+    description = models.TextField(blank=True, verbose_name="설명")
+    color = models.CharField(
+        max_length=7,
+        validators=[
+            RegexValidator(
+                regex=r"^#[0-9A-Fa-f]{6}$",
+                message="올바른 HEX 색상 코드를 입력하세요 (예: #FF5733)",
+            )
+        ],
+        verbose_name="색상",
+    )
+    display_order = models.PositiveSmallIntegerField(default=0, verbose_name="표시 순서")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
+
+    class Meta:
+        verbose_name = "카테고리"
+        verbose_name_plural = "카테고리들"
+        ordering = ["display_order"]
+
+    def __str__(self):
+        return self.name
 
 
 class Tag(models.Model):
@@ -13,6 +42,12 @@ class Tag(models.Model):
     - 색상: HEX 색상 코드 (예: "#FF5733")
     """
 
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.PROTECT,
+        related_name="tags",
+        verbose_name="카테고리",
+    )
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

@@ -4,7 +4,7 @@ from django.views.decorators.http import require_http_methods, require_GET
 
 import json
 
-from apps.tags.repositories import TagRepository
+from apps.tags.repositories import CategoryRepository, TagRepository
 from .repositories import TimeBlockRepository
 from .services import build_time_headers, validate_slot_indexes
 import logging
@@ -19,6 +19,7 @@ from apps.core.utils import (
     get_time_from_slot,
 )
 
+_category_repo = CategoryRepository()
 _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
 
@@ -77,8 +78,20 @@ def dashboard_view(request):
                     "name": tag.name,
                     "color": tag.color,
                     "is_default": tag.is_default,
+                    "category_id": tag.category_id,
                 }
                 for tag in user_tags
+            ]
+        ),
+        "categories_json": serialize_for_js(
+            [
+                {
+                    "id": cat.id,
+                    "name": cat.name,
+                    "slug": cat.slug,
+                    "color": cat.color,
+                }
+                for cat in _category_repo.find_all()
             ]
         ),
     }

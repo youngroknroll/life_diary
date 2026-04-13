@@ -20,10 +20,10 @@
                 </button>
             </div>
             <div class="card-body">
-                <div id="tagListContainer" class="row">
+                <div id="tagListContainer">
                     <!-- 태그 목록이 여기에 동적으로 로드됩니다 -->
                 </div>
-                
+
                 <div id="tagEmptyState" class="text-center py-4" style="display: none;">
                     <i class="fas fa-tags text-muted mb-3" style="font-size: 3rem;"></i>
                     <h5 class="text-muted">등록된 태그가 없습니다.</h5>
@@ -42,51 +42,22 @@
 <script src="{% static 'core/js/tag.js' %}" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // 서버에서 내려준 태그 목록 (최초 진입 시)
     const initialTags = JSON.parse('{{ tags_json|escapejs }}');
-    
-    // 태그 목록을 표시하는 함수 (API fetch 없이 데이터만 받아서 렌더)
-    function renderTags(tags) {
-        const container = document.getElementById('tagListContainer');
-        const emptyState = document.getElementById('tagEmptyState');
-        if (!tags || tags.length === 0) {
-            container.innerHTML = '';
-            emptyState.style.display = 'block';
-            return;
-        }
-        emptyState.style.display = 'none';
-        container.innerHTML = '';
-        // 기본 태그와 사용자 태그 분리
-        const defaultTags = tags.filter(t => t.is_default);
-        const userTags = tags.filter(t => !t.is_default);
-        // 기본 태그 섹션
-        if (defaultTags.length > 0) {
-            let html = `
-                <div class="col-12 mb-3">
-                    <h6 class="text-muted"><i class="fas fa-star me-1"></i> 기본 태그</h6>
-                </div>`;
-            defaultTags.forEach(tag => {
-                html += createTagCardHtml(tag);
-            });
-            container.innerHTML += html;
-        }
-        // 사용자 태그 섹션
-        if (userTags.length > 0) {
-            let html = `
-                <div class="col-12 mb-3 ${defaultTags.length > 0 ? 'mt-4' : ''}">
-                    <h6 class="text-muted"><i class="fas fa-user me-1"></i> 개인 태그</h6>
-                </div>`;
-            userTags.forEach(tag => {
-                html += createTagCardHtml(tag);
-            });
-            container.innerHTML += html;
-        }
+    const categories = JSON.parse('{{ categories_json|escapejs }}');
+    // 전역으로 카테고리 데이터 공유 (tag.js에서 사용)
+    window._categories = categories;
+
+    const isSuperuser = {{ user.is_superuser|yesno:"true,false" }};
+
+    function escapeHTML(str) {
+        return str.replace(/[&<>"']/g, function(match) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[match];
+        });
     }
 
-    // 태그 카드 HTML 생성 함수 (기존과 동일)
     function createTagCardHtml(tag) {
-        const canEdit = !tag.is_default || {{ user.is_superuser|yesno:"true,false" }};
-        const canDelete = !tag.is_default || {{ user.is_superuser|yesno:"true,false" }};
+        const canEdit = !tag.is_default || isSuperuser;
+        const canDelete = !tag.is_default || isSuperuser;
         return `
             <div class="col-md-6 col-lg-4 mb-3">
                 <div class="card h-100 ${tag.is_default ? 'border-warning' : ''}">
@@ -102,12 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="card-footer bg-transparent">
                         <div class="d-flex gap-2">
                             ${canEdit ? `
-                                <button class="btn btn-outline-primary btn-sm flex-fill" 
-                                        onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}})">
+                                <button class="btn btn-outline-primary btn-sm flex-fill"
+                                        onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}, category_id: ${tag.category_id}})">
                                     <i class="fas fa-edit me-1"></i>수정
                                 </button>` : ''}
                             ${canDelete ? `
-                                <button class="btn btn-outline-danger btn-sm flex-fill" 
+                                <button class="btn btn-outline-danger btn-sm flex-fill"
                                         onclick="deleteTag(${tag.id}, '${escapeHTML(tag.name)}')">
                                     <i class="fas fa-trash me-1"></i>삭제
                                 </button>` : ''}
@@ -116,38 +87,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
             </div>`;
     }
-    // HTML 특수문자 이스케이프 함수 (기존과 동일)
-    function escapeHTML(str) {
-        return str.replace(/[&<>"']/g, function(match) {
-            return {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#39;'
-            }[match];
-        });
-    }
-    // 'tags-updated' 이벤트 수신 시에만 fetch로 최신 목록 갱신
-    async function fetchAndRenderTags() {
+
+    function renderTags(tags) {
         const container = document.getElementById('tagListContainer');
         const emptyState = document.getElementById('tagEmptyState');
+        if (!tags || tags.length === 0) {
+            container.innerHTML = '';
+            emptyState.style.display = 'block';
+            return;
+        }
+        emptyState.style.display = 'none';
+        container.innerHTML = '';
+
+        // 카테고리별로 그룹핑
+        categories.forEach(cat => {
+            const catTags = tags.filter(t => t.category_id === cat.id);
+            if (catTags.length === 0) return;
+
+            let html = `
+                <div class="mb-4">
+                    <h6 class="mb-3">
+                        <span class="badge me-2" style="background-color: ${cat.color};">&nbsp;</span>
+                        ${escapeHTML(cat.name)}
+                        <small class="text-muted ms-1">(${catTags.length})</small>
+                    </h6>
+                    <div class="row">`;
+            catTags.forEach(tag => {
+                html += createTagCardHtml(tag);
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        });
+
+        // 카테고리 미할당 태그 (혹시 있을 경우)
+        const uncategorized = tags.filter(t => !t.category_id);
+        if (uncategorized.length > 0) {
+            let html = `
+                <div class="mb-4">
+                    <h6 class="mb-3 text-muted">
+                        <i class="fas fa-question-circle me-1"></i>미분류
+                        <small class="text-muted ms-1">(${uncategorized.length})</small>
+                    </h6>
+                    <div class="row">`;
+            uncategorized.forEach(tag => {
+                html += createTagCardHtml(tag);
+            });
+            html += `</div></div>`;
+            container.innerHTML += html;
+        }
+    }
+
+    async function fetchAndRenderTags() {
         try {
             const response = await fetch('/api/tags/');
             const data = await response.json();
             if (!data.success) {
-                container.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+                document.getElementById('tagListContainer').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
                 return;
             }
             renderTags(data.tags);
         } catch (error) {
             console.error('태그 로드 오류:', error);
-            container.innerHTML = `<div class="alert alert-danger">태그를 불러오는 중 오류가 발생했습니다.</div>`;
+            document.getElementById('tagListContainer').innerHTML = `<div class="alert alert-danger">태그를 불러오는 중 오류가 발생했습니다.</div>`;
         }
     }
     document.addEventListener('tags-updated', fetchAndRenderTags);
-    // 최초 진입 시에는 서버 데이터로만 렌더링
     renderTags(initialTags);
 });
 </script>
-{% endblock %} 
+{% endblock %}

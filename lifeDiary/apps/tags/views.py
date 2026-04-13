@@ -6,11 +6,12 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods, require_GET, require_POST
 import json
 
-from .repositories import TagRepository
+from .repositories import CategoryRepository, TagRepository
 from .domain_services import _tag_policy_service
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.core.utils import serialize_for_js
 
+_category_repo = CategoryRepository()
 _tag_repo = TagRepository()
 _time_block_repo = TimeBlockRepository()
 
@@ -20,8 +21,10 @@ _time_block_repo = TimeBlockRepository()
 @login_required
 def index(request):
     tags = _tag_repo.find_accessible_ordered(request.user)
+    categories = _category_repo.find_all()
     context = {
         "tags": tags,
+        "categories": categories,
         "tags_json": serialize_for_js(
             [
                 {
@@ -29,12 +32,51 @@ def index(request):
                     "name": tag.name,
                     "color": tag.color,
                     "is_default": tag.is_default,
+                    "category_id": tag.category_id,
                 }
                 for tag in tags
             ]
         ),
+        "categories_json": serialize_for_js(
+            [
+                {
+                    "id": cat.id,
+                    "name": cat.name,
+                    "slug": cat.slug,
+                    "color": cat.color,
+                }
+                for cat in categories
+            ]
+        ),
     }
     return render(request, "tags/index.html", context)
+
+
+@login_required
+@require_GET
+def category_list(request):
+    """카테고리 목록 조회"""
+    try:
+        categories = _category_repo.find_all()
+        return JsonResponse({
+            "success": True,
+            "categories": [
+                {
+                    "id": cat.id,
+                    "name": cat.name,
+                    "slug": cat.slug,
+                    "description": cat.description,
+                    "color": cat.color,
+                    "display_order": cat.display_order,
+                }
+                for cat in categories
+            ],
+        })
+    except Exception:
+        logging.getLogger(__name__).exception("카테고리 조회 중 오류")
+        return JsonResponse(
+            {"success": False, "message": "카테고리 조회 중 오류가 발생했습니다."}, status=500
+        )
 
 
 @login_required
@@ -54,6 +96,7 @@ def tag_list_create(request):
                     "name": tag.name,
                     "color": tag.color,
                     "is_default": tag.is_default,
+                    "category_id": tag.category_id,
                     "can_edit": _tag_policy_service.can_edit(request.user, tag),
                     "can_delete": _tag_policy_service.can_delete(request.user, tag),
                 }
@@ -74,6 +117,7 @@ def tag_list_create(request):
             name = data.get("name", "").strip()
             color = data.get("color", "").strip()
             is_default = data.get("is_default", False)
+            category_id = data.get("category_id")
 
             try:
                 _tag_policy_service.validate_create_default(request.user, is_default)
@@ -83,6 +127,19 @@ def tag_list_create(request):
             if not name or not color:
                 return JsonResponse(
                     {"success": False, "message": "태그명과 색상을 입력해주세요."},
+                    status=400,
+                )
+
+            if not category_id:
+                return JsonResponse(
+                    {"success": False, "message": "카테고리를 선택해주세요."},
+                    status=400,
+                )
+
+            category = _category_repo.find_by_id(category_id)
+            if not category:
+                return JsonResponse(
+                    {"success": False, "message": "존재하지 않는 카테고리입니다."},
                     status=400,
                 )
 
@@ -96,17 +153,18 @@ def tag_list_create(request):
                     status=400,
                 )
 
-            tag = _tag_repo.create(request.user, name, color, is_default)
+            tag = _tag_repo.create(request.user, name, color, is_default, category=category)
 
             return JsonResponse(
                 {
                     "success": True,
-                    "message": f"태그가 생성되었습니다.",
+                    "message": "태그가 생성되었습니다.",
                     "tag": {
                         "id": tag.id,
                         "name": tag.name,
                         "color": tag.color,
                         "is_default": tag.is_default,
+                        "category_id": tag.category_id,
                     },
                 },
                 status=201,
@@ -163,6 +221,17 @@ def tag_detail_update_delete(request, tag_id):
                     status=400,
                 )
 
+            # 카테고리 변경
+            category_id = data.get("category_id")
+            if category_id:
+                category = _category_repo.find_by_id(category_id)
+                if not category:
+                    return JsonResponse(
+                        {"success": False, "message": "존재하지 않는 카테고리입니다."},
+                        status=400,
+                    )
+                tag.category = category
+
             tag.name = name
             tag.color = color
             tag.is_default = is_default
@@ -178,6 +247,7 @@ def tag_detail_update_delete(request, tag_id):
                         "name": tag.name,
                         "color": tag.color,
                         "is_default": tag.is_default,
+                        "category_id": tag.category_id,
                     },
                 }
             )

@@ -14,6 +14,12 @@
                 <form id="tagForm">
                     <input type="hidden" id="tagFormTagId">
                     <div class="mb-3">
+                        <label for="tagFormCategory" class="form-label">카테고리</label>
+                        <select class="form-select" id="tagFormCategory" required>
+                            <option value="">카테고리를 선택하세요</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label for="tagFormName" class="form-label">태그명</label>
                         <input type="text" class="form-control" id="tagFormName" maxlength="50" required>
                     </div>
