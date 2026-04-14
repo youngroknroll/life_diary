@@ -5,7 +5,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("tags", "0005_seed_categories"),
+        ("tags", "0006_backfill_tag_category"),
     ]
 
     operations = [
