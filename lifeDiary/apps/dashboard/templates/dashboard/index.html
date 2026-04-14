@@ -155,15 +155,23 @@
     </div>
     
     <!-- 사이드바 - 태그 선택 및 정보 -->
-    <div class="col-lg-4">
+    <div class="col-lg-4" id="quickInputSidebar">
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h6 class="mb-0">
                     <i class="fas fa-edit me-2"></i>
                     빠른 입력
                 </h6>
+                <button type="button" class="btn btn-sm btn-link text-white d-lg-none" id="closeSidebarBtn" onclick="toggleSidebar(false)">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
             <div class="card-body">
+                <!-- 선택된 슬롯 정보 (인라인) -->
+                <div id="slotInfoInline" class="mb-3 p-2 border rounded bg-light">
+                    <small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택하세요</small>
+                </div>
+
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
                         <label class="form-label mb-0">태그 선택</label>
@@ -234,30 +242,17 @@
                         <i class="fas fa-save me-1"></i>
                         저장
                     </button>
-                    <button class="btn btn-outline-danger" onclick="deleteSlot()" disabled id="deleteBtn">
-                        <i class="fas fa-trash me-1"></i>
-                        삭제
-                    </button>
                 </div>
             </div>
         </div>
         
-        <!-- 선택된 슬롯 정보 -->
-        <div class="card mt-3" id="slotInfoCard" style="display: none;">
-            <div class="card-header">
-                <h6 class="mb-0">
-                    <i class="fas fa-info-circle me-2"></i>
-                    선택된 슬롯
-                </h6>
-            </div>
-            <div class="card-body">
-                <div id="slotInfo">
-                    <!-- JavaScript로 동적 업데이트 -->
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+
+<!-- 모바일 FAB (빠른 입력 열기) -->
+<button class="quick-input-fab d-lg-none" id="quickInputFab" onclick="toggleSidebar(true)" style="display: none;">
+    <i class="fas fa-edit"></i>
+</button>
 
 <!-- 태그 관리 모달, 편집 모달, 생성 모달 등은 이제 공통 템플릿으로 -->
 {% include 'tags/_tag_modal.html' %}
@@ -437,23 +432,28 @@
 
     // 슬롯 정보 표시 (메모 포함)
     const showSlotInfo = (slotIndexes) => {
-        const slotInfoCard = document.getElementById('slotInfoCard');
-        const slotInfoElement = document.getElementById('slotInfo');
+        const inlineEl = document.getElementById('slotInfoInline');
+        if (!inlineEl) return;
+
         if (!slotIndexes || slotIndexes.length === 0) {
-            if(slotInfoCard) slotInfoCard.style.display = 'none';
+            inlineEl.innerHTML = '<small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택하세요</small>';
             return;
         }
-        
+
+        const hasFilledSlot = slotIndexes.some(idx =>
+            document.querySelector(`[data-slot-index="${idx}"]`)?.classList.contains('filled')
+        );
+
         let infoHTML = '';
         if (slotIndexes.length === 1) {
             const slotIndex = slotIndexes[0];
             const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
             if (!slotElement) return;
-            
+
             const timeRange = slotElement.getAttribute('title').split(' - ')[0];
             let tagName = '빈 슬롯';
             let memo = '';
-            
+
             if (slotElement.classList.contains('filled')) {
                 const titleParts = slotElement.title.split(' - ');
                 if (titleParts.length > 1) {
@@ -469,42 +469,37 @@
                     tagName = '알 수 없음';
                 }
             }
-            
-            infoHTML = `<div class="mb-2"><strong>시간:</strong> ${timeRange}</div>
-                        <div class="mb-2"><strong>상태:</strong> ${tagName}</div>`;
-            
-            // 메모가 있으면 표시
-            if (memo) {
-                infoHTML += `<div class="mb-2"><strong>메모:</strong> <span class="text-muted">${memo}</span></div>`;
-            }
+
+            infoHTML = `<div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div><strong>시간:</strong> ${timeRange}</div>
+                    <div><strong>상태:</strong> ${tagName}</div>
+                    ${memo ? `<div class="text-muted small">${memo}</div>` : ''}
+                </div>
+                ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
+            </div>`;
         } else {
             const sortedSlots = slotIndexes.slice().sort((a, b) => a - b);
-            const startSlot = sortedSlots[0];
-            const endSlot = sortedSlots[sortedSlots.length - 1];
-            
-            const startTime = slotIndexToTime(startSlot);
-            const endTime = slotIndexToTime(endSlot + 1); // 끝 시간은 마지막 슬롯의 "끝"이므로 +1
+            const startTime = slotIndexToTime(sortedSlots[0]);
+            const endTime = slotIndexToTime(sortedSlots[sortedSlots.length - 1] + 1);
             const duration = slotIndexes.length * 10;
-            infoHTML = `<div class="mb-2"><strong>선택:</strong> ${slotIndexes.length}개 슬롯</div>
-                        <div class="mb-2"><strong>시간:</strong> ${startTime} - ${endTime}</div>
-                        <div class="mb-2"><strong>총:</strong> ${Math.floor(duration/60)}시간 ${duration%60}분</div>`;
+
+            infoHTML = `<div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <div><strong>${slotIndexes.length}개 슬롯</strong> ${startTime} - ${endTime}</div>
+                    <div class="text-muted small">${Math.floor(duration/60)}시간 ${duration%60}분</div>
+                </div>
+                ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
+            </div>`;
         }
 
-        if(slotInfoElement) slotInfoElement.innerHTML = infoHTML;
-        if(slotInfoCard) slotInfoCard.style.display = 'block';
+        inlineEl.innerHTML = infoHTML;
     };
 
-    // 버튼 상태 업데이트 (기존 코드와 동일)
+    // 버튼 상태 업데이트
     const updateButtons = () => {
         const saveBtn = document.getElementById('saveBtn');
-        const deleteBtn = document.getElementById('deleteBtn');
         if (saveBtn) saveBtn.disabled = !(selectedSlots.size > 0 && selectedTag !== null);
-        if (deleteBtn) {
-            const hasFilledSlot = Array.from(selectedSlots).some(idx => 
-                document.querySelector(`[data-slot-index="${idx}"]`)?.classList.contains('filled')
-            );
-            deleteBtn.disabled = !hasFilledSlot;
-        }
     };
         
     // 태그 선택 (기존 코드와 동일)
@@ -575,18 +570,15 @@
             return;
         }
         
-        const deleteBtn = document.getElementById('deleteBtn');
-        
         try {
             const date = document.getElementById('dateSelector').value;
-            
+
             const result = await apiCall('/api/time-blocks/', {
                 method: 'DELETE',
                 data: {
                     slot_indexes: filledSlots,
                     date: date
-                },
-                loadingElement: deleteBtn
+                }
             });
             
             showNotification(result.message, 'success');
@@ -646,6 +638,18 @@
         tagContainer.innerHTML = `<div class="alert alert-danger p-2 small">${message}</div>`;
     }
 
+    // 모바일 사이드바 접기/펼치기
+    function toggleSidebar(show) {
+        const sidebar = document.getElementById('quickInputSidebar');
+        const fab = document.getElementById('quickInputFab');
+        if (show) {
+            sidebar.style.display = '';
+            fab.style.display = 'none';
+        } else {
+            sidebar.style.display = 'none';
+            fab.style.display = '';
+        }
+    }
 
 </script>
 {% endblock %} 
