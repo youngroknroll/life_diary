@@ -63,7 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="card h-100 ${tag.is_default ? 'border-warning' : ''}">
                     <div class="card-body">
                         <div class="d-flex align-items-center mb-2">
-                            <span class="badge me-2" style="background-color: ${tag.color}; color: white; font-size: 0.9em;">
+                            <span class="badge me-2" style="background-color: ${tag.color}; color: ${getContrastTextColor(tag.color)}; font-size: 0.9em;">
                                 ${escapeHTML(tag.name)}
                             </span>
                             ${tag.is_default ? '<small class="badge bg-warning text-dark">기본</small>' : ''}

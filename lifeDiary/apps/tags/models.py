@@ -97,6 +97,14 @@ class Tag(models.Model):
         ]
         ordering = ["name"]
 
+    @property
+    def text_color(self):
+        """배경색 대비 텍스트 색상 (YIQ 공식 기반)"""
+        hex_color = self.color.lstrip('#')
+        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
+        yiq = (r * 299 + g * 587 + b * 114) / 1000
+        return '#212529' if yiq >= 128 else '#ffffff'
+
     def __str__(self):
         if self.is_default:
             return f"[기본] {self.name}"
