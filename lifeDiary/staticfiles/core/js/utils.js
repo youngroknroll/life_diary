@@ -122,33 +122,11 @@ async function apiCall(url, options = {}) {
 }
 
 /**
- * 날짜를 'YYYY-MM-DD' 형식으로 포맷팅
- * @param {Date} date - 포맷팅할 날짜 객체
- * @returns {string} - 포맷팅된 날짜 문자열
- */
-function formatDate(date) {
-    return date.toISOString().split('T')[0];
-}
-
-/**
  * 오늘 날짜로 이동하는 공통 함수
+ * date 파라미터를 제거하여 서버가 오늘 날짜로 처리하도록 함
  */
 function goToToday() {
-    const today = formatDate(new Date());
     const url = new URL(window.location);
-    url.searchParams.set('date', today);
+    url.searchParams.delete('date');
     window.location.href = url.toString();
-}
-
-/**
- * 페이지 로드 시 공통 초기화
- */
-document.addEventListener('DOMContentLoaded', function() {
-    // 전역 오늘 이동 버튼 처리
-    const todayButtons = document.querySelectorAll('[onclick="goToToday()"]');
-    todayButtons.forEach(button => {
-        button.addEventListener('click', goToToday);
-        // 기존 onclick 제거
-        button.removeAttribute('onclick');
-    });
-}); 
+} 

@@ -28,6 +28,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 카테고리 드롭다운 초기화
+    function populateCategorySelect(selectedCategoryId) {
+        const select = document.getElementById('tagFormCategory');
+        if (!select || !window._categories) return;
+        select.innerHTML = '<option value="">카테고리를 선택하세요</option>';
+        window._categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.id;
+            option.textContent = cat.name;
+            if (selectedCategoryId && cat.id === selectedCategoryId) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+    }
+
     // 전역 함수로 모달 열기 함수 등록
     window.openTagFormModal = function(tag = null) {
         const form = document.getElementById('tagForm');
@@ -47,6 +63,7 @@ document.addEventListener('DOMContentLoaded', function() {
             nameInput.value = tag.name;
             colorInput.value = tag.color;
             colorTextInput.value = tag.color; // 텍스트 필드 값도 설정
+            populateCategorySelect(tag.category_id);
             if (isDefaultCheckbox) {
                 isDefaultCheckbox.checked = tag.is_default || false;
             }
@@ -57,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const defaultColor = '#007bff';
             colorInput.value = defaultColor;
             colorTextInput.value = defaultColor; // 텍스트 필드 값도 설정
-             if (isDefaultCheckbox) {
+            populateCategorySelect(null);
+            if (isDefaultCheckbox) {
                 isDefaultCheckbox.checked = false;
             }
         }
@@ -72,9 +90,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const color = document.getElementById('tagFormColor').value; // 색상 선택기의 최종 값을 사용
         const isDefaultEl = document.getElementById('tagFormIsDefault');
         const is_default = isDefaultEl ? isDefaultEl.checked : false;
+        const categorySelect = document.getElementById('tagFormCategory');
+        const category_id = categorySelect ? parseInt(categorySelect.value) : null;
 
         if (!name) {
             showNotification('태그명을 입력해주세요.', 'warning');
+            return;
+        }
+
+        if (!category_id) {
+            showNotification('카테고리를 선택해주세요.', 'warning');
             return;
         }
 
@@ -85,7 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const result = await apiCall(url, {
                 method: method,
-                data: { name, color, is_default },
+                data: { name, color, is_default, category_id },
                 loadingElement: saveBtn
             });
 

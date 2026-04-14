@@ -287,6 +287,9 @@
     
     // 페이지 로드 시 태그 목록 로드 및 이벤트 리스너 등록
     document.addEventListener('DOMContentLoaded', function() {
+        // 카테고리 데이터 전역 공유 (tag.js 모달에서 사용)
+        window._categories = JSON.parse('{{ categories_json|escapejs }}');
+
         // 대시보드 관련 이벤트 리스너 등록
         initializeDashboard();
         
@@ -599,14 +602,9 @@
     // 태그 로딩 및 렌더링 기능
     async function loadAvailableTags() {
         try {
-            const response = await fetch('/api/tags/');
-            const result = await response.json();
-            if (result.success) {
-                renderTagContainer(result.tags);
-                renderTagLegend(result.tags);
-            } else {
-                showTagError('태그 로드 실패: ' + result.message);
-            }
+            const result = await apiCall('/api/tags/');
+            renderTagContainer(result.tags);
+            renderTagLegend(result.tags);
         } catch (error) {
             showTagError('태그 로드 중 오류가 발생했습니다.');
         }
@@ -648,12 +646,6 @@
         tagContainer.innerHTML = `<div class="alert alert-danger p-2 small">${message}</div>`;
     }
 
-    // `goToToday`는 `onclick`에서 직접 호출되므로 전역 스코프에 둡니다.
-    window.goToToday = () => {
-        const url = new URL(window.location);
-        url.searchParams.delete('date');
-        window.location.href = url.toString();
-    };
 
 </script>
 {% endblock %} 
