@@ -1,3 +1,4 @@
+{% load static %}
 <!-- 태그 설명 이미지 모달 -->
 <div class="modal fade" id="tagImageModal" tabindex="-1" aria-labelledby="tagImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -10,7 +11,7 @@
             </div>
             <div class="modal-body text-center">
                 
-                <img src='https://github.com/crescentfull/life_diary/blob/main/lifeDiary/staticfiles/core/Img/tag_usage_guide.png?raw=true' class="img-fluid" alt="태그 사용법">
+                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="img-fluid" alt="태그 사용법">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
