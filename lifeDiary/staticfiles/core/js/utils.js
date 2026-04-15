@@ -122,6 +122,22 @@ async function apiCall(url, options = {}) {
 }
 
 /**
+ * 배경색의 밝기를 기반으로 대비되는 텍스트 색상을 반환하는 함수.
+ * W3C 상대 휘도 공식을 사용합니다.
+ * @param {string} hexColor - '#RRGGBB' 형식의 HEX 색상
+ * @returns {string} - 밝은 배경이면 '#212529'(어두운 글씨), 어두운 배경이면 '#ffffff'(흰 글씨)
+ */
+function getContrastTextColor(hexColor) {
+    const hex = hexColor.replace('#', '');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    // YIQ 공식: 밝기 임계값 128
+    const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+    return yiq >= 128 ? '#212529' : '#ffffff';
+}
+
+/**
  * 오늘 날짜로 이동하는 공통 함수
  * date 파라미터를 제거하여 서버가 오늘 날짜로 처리하도록 함
  */

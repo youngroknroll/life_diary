@@ -58,35 +58,6 @@
     </form>
 </div>
 
-<script>
-function updateTargetHoursMax() {
-    const periodSelect = document.querySelector('select[name="period"]');
-    const targetHoursInput = document.querySelector('input[name="target_hours"]');
-    
-    if (periodSelect && targetHoursInput) {
-        const period = periodSelect.value;
-        let maxValue = 24; // 기본값
-        
-        switch(period) {
-            case 'daily':
-                maxValue = 24;
-                break;
-            case 'weekly':
-                maxValue = 100;
-                break;
-            case 'monthly':
-                maxValue = 300;
-                break;
-        }
-        
-        targetHoursInput.max = maxValue;
-        targetHoursInput.placeholder = `최대 ${maxValue}시간까지 입력 가능`;
-    }
-}
-
-// 페이지 로드 시 초기 설정
-document.addEventListener('DOMContentLoaded', function() {
-    updateTargetHoursMax();
-});
-</script>
+{% load static %}
+<script src="{% static 'users/js/goals.js' %}" defer></script>
 {% endblock %} 

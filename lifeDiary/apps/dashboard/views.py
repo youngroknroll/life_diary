@@ -4,14 +4,13 @@ from django.views.decorators.http import require_http_methods, require_GET
 
 import json
 
-from apps.tags.repositories import CategoryRepository, TagRepository
+from apps.tags.repositories import TagRepository
 from .repositories import TimeBlockRepository
 from .services import build_time_headers, validate_slot_indexes
 import logging
 
 from apps.core.utils import (
     safe_date_parse,
-    serialize_for_js,
     calculate_time_statistics,
     success_response,
     error_response,
@@ -19,7 +18,6 @@ from apps.core.utils import (
     get_time_from_slot,
 )
 
-_category_repo = CategoryRepository()
 _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
 
@@ -70,30 +68,6 @@ def dashboard_view(request):
         "total_hours": stats["hours"],
         "remaining_minutes": stats["remaining_minutes"],
         "time_headers": build_time_headers(),
-        # JavaScript에서 사용할 데이터 (core 직렬화 함수 사용)
-        "tags_json": serialize_for_js(
-            [
-                {
-                    "id": tag.id,
-                    "name": tag.name,
-                    "color": tag.color,
-                    "is_default": tag.is_default,
-                    "category_id": tag.category_id,
-                }
-                for tag in user_tags
-            ]
-        ),
-        "categories_json": serialize_for_js(
-            [
-                {
-                    "id": cat.id,
-                    "name": cat.name,
-                    "slug": cat.slug,
-                    "color": cat.color,
-                }
-                for cat in _category_repo.find_all()
-            ]
-        ),
     }
 
     return render(request, "dashboard/index.html", context)

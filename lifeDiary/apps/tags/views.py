@@ -9,7 +9,6 @@ import json
 from .repositories import CategoryRepository, TagRepository
 from .domain_services import _tag_policy_service
 from apps.dashboard.repositories import TimeBlockRepository
-from apps.core.utils import serialize_for_js
 
 _category_repo = CategoryRepository()
 _tag_repo = TagRepository()
@@ -20,36 +19,7 @@ _time_block_repo = TimeBlockRepository()
 
 @login_required
 def index(request):
-    tags = _tag_repo.find_accessible_ordered(request.user)
-    categories = _category_repo.find_all()
-    context = {
-        "tags": tags,
-        "categories": categories,
-        "tags_json": serialize_for_js(
-            [
-                {
-                    "id": tag.id,
-                    "name": tag.name,
-                    "color": tag.color,
-                    "is_default": tag.is_default,
-                    "category_id": tag.category_id,
-                }
-                for tag in tags
-            ]
-        ),
-        "categories_json": serialize_for_js(
-            [
-                {
-                    "id": cat.id,
-                    "name": cat.name,
-                    "slug": cat.slug,
-                    "color": cat.color,
-                }
-                for cat in categories
-            ]
-        ),
-    }
-    return render(request, "tags/index.html", context)
+    return render(request, "tags/index.html")
 
 
 @login_required

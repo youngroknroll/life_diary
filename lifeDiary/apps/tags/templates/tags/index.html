@@ -42,12 +42,8 @@
 <script src="{% static 'core/js/tag.js' %}" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const initialTags = JSON.parse('{{ tags_json|escapejs }}');
-    const categories = JSON.parse('{{ categories_json|escapejs }}');
-    // 전역으로 카테고리 데이터 공유 (tag.js에서 사용)
-    window._categories = categories;
-
     const isSuperuser = {{ user.is_superuser|yesno:"true,false" }};
+    let categories = [];
 
     function escapeHTML(str) {
         return str.replace(/[&<>"']/g, function(match) {
@@ -99,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function() {
         emptyState.style.display = 'none';
         container.innerHTML = '';
 
-        // 카테고리별로 그룹핑
         categories.forEach(cat => {
             const catTags = tags.filter(t => t.category_id === cat.id);
             if (catTags.length === 0) return;
@@ -119,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
             container.innerHTML += html;
         });
 
-        // 카테고리 미할당 태그 (혹시 있을 경우)
         const uncategorized = tags.filter(t => !t.category_id);
         if (uncategorized.length > 0) {
             let html = `
@@ -139,20 +133,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
     async function fetchAndRenderTags() {
         try {
-            const response = await fetch('/api/tags/');
-            const data = await response.json();
-            if (!data.success) {
-                document.getElementById('tagListContainer').innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
-                return;
-            }
-            renderTags(data.tags);
+            const [tagsData, catsData] = await Promise.all([
+                apiCall('/api/tags/'),
+                apiCall('/api/categories/')
+            ]);
+
+            categories = catsData.categories;
+            window._categories = categories;
+            renderTags(tagsData.tags);
         } catch (error) {
             console.error('태그 로드 오류:', error);
-            document.getElementById('tagListContainer').innerHTML = `<div class="alert alert-danger">태그를 불러오는 중 오류가 발생했습니다.</div>`;
+            document.getElementById('tagListContainer').innerHTML =
+                `<div class="alert alert-danger">태그를 불러오는 중 오류가 발생했습니다.</div>`;
         }
     }
+
     document.addEventListener('tags-updated', fetchAndRenderTags);
-    renderTags(initialTags);
+    fetchAndRenderTags();
 });
 </script>
 {% endblock %}
