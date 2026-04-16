@@ -24,6 +24,21 @@ let isDragging = false;
 let startSlot = null;
 let touchStartX = 0, touchStartY = 0, touchDecided = false;
 
+// ── 그리드 칼럼 수 (반응형) ──
+
+function getGridColumns() {
+    return window.innerWidth <= 768 ? 6 : 12;
+}
+
+function slotToRowCol(slotIndex) {
+    const cols = getGridColumns();
+    return { row: Math.floor(slotIndex / cols), col: slotIndex % cols };
+}
+
+function rowColToSlot(row, col) {
+    return row * getGridColumns() + col;
+}
+
 // ── 초기화 ──
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -119,13 +134,22 @@ const handleTouchStart = (slotIndex, event) => {
 
 const dragOver = (slotIndex) => {
     if (!isDragging || startSlot === null) return;
-    const start = Math.min(startSlot, slotIndex);
-    const end = Math.max(startSlot, slotIndex);
+
+    const startPos = slotToRowCol(startSlot);
+    const endPos = slotToRowCol(slotIndex);
+    const minRow = Math.min(startPos.row, endPos.row);
+    const maxRow = Math.max(startPos.row, endPos.row);
+    const minCol = Math.min(startPos.col, endPos.col);
+    const maxCol = Math.max(startPos.col, endPos.col);
+
     clearSelection();
-    for (let i = start; i <= end; i++) {
-        selectedSlots.add(i);
-        const slotElement = document.querySelector(`[data-slot-index="${i}"]`);
-        if (slotElement) slotElement.classList.add('selected');
+    for (let r = minRow; r <= maxRow; r++) {
+        for (let c = minCol; c <= maxCol; c++) {
+            const idx = rowColToSlot(r, c);
+            selectedSlots.add(idx);
+            const slotElement = document.querySelector(`[data-slot-index="${idx}"]`);
+            if (slotElement) slotElement.classList.add('selected');
+        }
     }
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
@@ -149,12 +173,6 @@ const handleTouchMove = (event) => {
         const dy = Math.abs(touch.clientY - touchStartY);
         if (dx < 5 && dy < 5) return;
         touchDecided = true;
-        if (dy > dx) {
-            isDragging = false;
-            startSlot = null;
-            clearSelection();
-            return;
-        }
     }
 
     event.preventDefault();
