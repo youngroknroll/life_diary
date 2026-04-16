@@ -55,26 +55,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const canEdit = !tag.is_default || isSuperuser;
         const canDelete = !tag.is_default || isSuperuser;
         return `
-            <div class="col-md-6 col-lg-4 mb-3">
-                <div class="card h-100 ${tag.is_default ? 'border-warning' : ''}">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge me-2" style="background-color: ${tag.color}; color: ${getContrastTextColor(tag.color)}; font-size: 0.9em;">
+            <div class="col-5 col-md-3 col-lg-2 mb-2">
+                <div class="card h-100 ${tag.is_default ? 'border-warning' : ''}" style="font-size: 0.85em;">
+                    <div class="card-body py-2 px-3">
+                        <div class="d-flex align-items-center mb-1">
+                            <span class="badge me-2" style="background-color: ${tag.color}; color: ${getContrastTextColor(tag.color)}; font-size: 0.85em;">
                                 ${escapeHTML(tag.name)}
                             </span>
-                            ${tag.is_default ? '<small class="badge bg-warning text-dark">기본</small>' : ''}
+                            ${tag.is_default ? '<small class="badge bg-warning text-dark" style="font-size: 0.75em;">기본</small>' : ''}
                         </div>
                         <small class="text-muted">${tag.color}</small>
                     </div>
-                    <div class="card-footer bg-transparent">
-                        <div class="d-flex gap-2">
+                    <div class="card-footer bg-transparent py-1 px-3">
+                        <div class="d-flex gap-1">
                             ${canEdit ? `
-                                <button class="btn btn-outline-primary btn-sm flex-fill"
+                                <button class="btn btn-outline-primary btn-sm flex-fill py-0"
                                         onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}, category_id: ${tag.category_id}})">
                                     <i class="fas fa-edit me-1"></i>수정
                                 </button>` : ''}
                             ${canDelete ? `
-                                <button class="btn btn-outline-danger btn-sm flex-fill"
+                                <button class="btn btn-outline-danger btn-sm flex-fill py-0"
                                         onclick="deleteTag(${tag.id}, '${escapeHTML(tag.name)}')">
                                     <i class="fas fa-trash me-1"></i>삭제
                                 </button>` : ''}

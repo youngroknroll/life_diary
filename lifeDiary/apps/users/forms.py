@@ -7,14 +7,21 @@ class UserGoalForm(forms.ModelForm):
     class Meta:
         model = UserGoal
         fields = ["tag", "period", "target_hours"]
+        labels = {
+            "tag": "태그",
+            "period": "기간",
+            "target_hours": "목표 시간",
+        }
         widgets = {
+            "tag": forms.Select(attrs={"class": "form-select", "style": "width: 50%"}),
             "period": forms.Select(
-                choices=[("daily", "일간"), ("weekly", "주간"), ("monthly", "월간")]
+                choices=[("daily", "일간"), ("weekly", "주간"), ("monthly", "월간")],
+                attrs={"class": "form-select", "style": "width: 50%"},
             ),
-            "target_hours": forms.NumberInput(attrs={"step": 0.5, "min": 0}),
+            "target_hours": forms.NumberInput(attrs={"step": 0.5, "min": 0, "class": "form-control"}),
         }
         help_texts = {
-            "target_hours": "<br>목표 시간을 입력하세요. <br>주간/월간은 해당 기간의 총 목표 시간입니다.",
+            "target_hours": "주간/월간은 해당 기간의 총 목표 시간입니다.",
         }
 
     def clean(self):

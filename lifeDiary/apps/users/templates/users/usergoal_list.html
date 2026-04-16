@@ -1,145 +1,116 @@
+<h6 class="mt-3"><i class="fas fa-calendar-day me-1"></i>일간 목표 <small class="text-muted">(하루 목표 시간)</small></h6>
+<table class="table table-bordered mb-4">
+    <thead>
+        <tr>
+            <th>태그</th>
+            <th>목표 시간</th>
+            <th>달성률</th>
+            <th>실제 기록</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for goal in goals %}
+            {% if goal.period == 'daily' %}
+                <tr>
+                    <td>{{ goal.tag.name }}</td>
+                    <td>{{ goal.target_hours }}시간</td>
+                    <td>
+                        {% if goal.percent is not None %}
+                            <span class="fw-bold">{{ goal.percent }}%</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ goal.actual|floatformat:1 }}시간</td>
+                    <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-outline-primary">수정</a></td>
+                    <td>
+                        <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 
-{% block content %}
-<div class="container mt-4">
-    
+<h6 class="mt-3"><i class="fas fa-calendar-week me-1"></i>주간 목표 <small class="text-muted">(일주일 총 목표 시간)</small></h6>
+<table class="table table-bordered mb-4">
+    <thead>
+        <tr>
+            <th>태그</th>
+            <th>목표 시간</th>
+            <th>달성률</th>
+            <th>실제 기록</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for goal in goals %}
+            {% if goal.period == 'weekly' %}
+                <tr>
+                    <td>{{ goal.tag.name }}</td>
+                    <td>{{ goal.target_hours }}시간</td>
+                    <td>
+                        {% if goal.percent is not None %}
+                            <span class="fw-bold">{{ goal.percent }}%</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ goal.actual|floatformat:1 }}시간</td>
+                    <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-outline-primary">수정</a></td>
+                    <td>
+                        <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>
 
-    <h5 class="mt-3">일간 목표 <small class="text-muted">(하루 목표 시간)</small></h5>
-    <table class="table table-bordered mb-4">
-        <thead>
-            <tr>
-                <th>태그</th>
-                <th>목표 시간</th>
-                <th>달성률</th>
-                <th>실제 기록</th>
-                <th>수정</th>
-                <th>삭제</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% with found=0 %}
-            {% for goal in goals %}
-                {% if goal.period == 'daily' %}
-                    {% if found %}{% else %}{% with found=1 %}{% endwith %}{% endif %}
-                    <tr>
-                        <td>{{ goal.tag.name }}</td>
-                        <td>{{ goal.target_hours }}시간</td>
-                        <td>
-                            {% if goal.percent is not None %}
-                                <span class="fw-bold">{{ goal.percent }}%</span>
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ goal.actual|floatformat:1 }}시간
-                        </td>
-                        <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-warning">수정</a></td>
-                        <td>
-                            <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            {% comment %} {% if not found %}
-            <tr><td colspan="6" class="text-center">등록된 일간 목표가 없습니다.</td></tr>
-            {% endif %} {% endcomment %}
-            {% endwith %}
-        </tbody>
-    </table>
-    <h5 class="mt-3">주간 목표 <small class="text-muted">(일주일 총 목표 시간)</small></h5>
-    <table class="table table-bordered mb-4">
-        <thead>
-            <tr>
-                <th>태그</th>
-                <th>목표 시간</th>
-                <th>달성률</th>
-                <th>실제 기록</th>
-                <th>수정</th>
-                <th>삭제</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% with found=0 %}
-            {% for goal in goals %}
-                {% if goal.period == 'weekly' %}
-                    {% if found %}{% else %}{% with found=1 %}{% endwith %}{% endif %}
-                    <tr>
-                        <td>{{ goal.tag.name }}</td>
-                        <td>{{ goal.target_hours }}시간</td>
-                        <td>
-                            {% if goal.percent is not None %}
-                                <span class="fw-bold">{{ goal.percent }}%</span>
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ goal.actual|floatformat:1 }}시간
-                        </td>
-                        <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-warning">수정</a></td>
-                        <td>
-                            <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            {% comment %} {% if not found %}
-            <tr><td colspan="6" class="text-center">등록된 주간 목표가 없습니다.</td></tr>
-            {% endif %} {% endcomment %}
-            {% endwith %}
-        </tbody>
-    </table>
-    <h5 class="mt-3">월간 목표 <small class="text-muted">(한 달 총 목표 시간)</small></h5>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>태그</th>
-                <th>목표 시간</th>
-                <th>달성률</th>
-                <th>실제 기록</th>
-                <th>수정</th>
-                <th>삭제</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% with found=0 %}
-            {% for goal in goals %}
-                {% if goal.period == 'monthly' %}
-                    {% if found %}{% else %}{% with found=1 %}{% endwith %}{% endif %}
-                    <tr>
-                        <td>{{ goal.tag.name }}</td>
-                        <td>{{ goal.target_hours }}시간</td>
-                        <td>
-                            {% if goal.percent is not None %}
-                                <span class="fw-bold">{{ goal.percent }}%</span>
-                            {% else %}
-                                <span class="text-muted">-</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {{ goal.actual|floatformat:1 }}시간
-                        </td>
-                        <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-warning">수정</a></td>
-                        <td>
-                            <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% endif %}
-            {% endfor %}
-            {% comment %} {% if not found %}
-            <tr><td colspan="6" class="text-center">등록된 월간 목표가 없습니다.</td></tr>
-            {% endif %} {% endcomment %}
-            {% endwith %}
-        </tbody>
-    </table>
-</div>
-{% endblock %} 
+<h6 class="mt-3"><i class="fas fa-calendar-alt me-1"></i>월간 목표 <small class="text-muted">(한 달 총 목표 시간)</small></h6>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>태그</th>
+            <th>목표 시간</th>
+            <th>달성률</th>
+            <th>실제 기록</th>
+            <th>수정</th>
+            <th>삭제</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for goal in goals %}
+            {% if goal.period == 'monthly' %}
+                <tr>
+                    <td>{{ goal.tag.name }}</td>
+                    <td>{{ goal.target_hours }}시간</td>
+                    <td>
+                        {% if goal.percent is not None %}
+                            <span class="fw-bold">{{ goal.percent }}%</span>
+                        {% else %}
+                            <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ goal.actual|floatformat:1 }}시간</td>
+                    <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-outline-primary">수정</a></td>
+                    <td>
+                        <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>

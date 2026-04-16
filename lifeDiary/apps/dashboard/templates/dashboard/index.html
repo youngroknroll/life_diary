@@ -156,20 +156,20 @@
     
     <!-- 사이드바 - 태그 선택 및 정보 -->
     <div class="col-lg-4" id="quickInputSidebar" data-tags-url="{% url 'tags:index' %}"
-        <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h6 class="mb-0">
+        <div class="card rounded-3">
+            <div class="card-header rounded-top-3 d-flex justify-content-between align-items-center">
+                <small class="mb-0">
                     <i class="fas fa-edit me-2"></i>
                     빠른 입력
-                </h6>
+                </small>
                 <button type="button" class="btn btn-sm btn-link text-white d-lg-none" id="closeSidebarBtn" onclick="toggleSidebar(false)">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="card-body">
                 <!-- 선택된 슬롯 정보 (인라인) -->
-                <div id="slotInfoInline" class="mb-3 p-2 border rounded bg-light">
-                    <small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택하세요</small>
+                <div id="slotInfoInline" class="mb-3 p-2 border rounded-3 bg-light">
+                    <small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택 후 저장하세요</small>
                 </div>
 
                 <div class="mb-3">
