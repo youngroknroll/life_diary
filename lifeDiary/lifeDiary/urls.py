@@ -26,6 +26,7 @@ admin.site.login = user_passes_test(lambda u: u.is_superuser, login_url="/")(
 )
 
 urlpatterns = [
+    path("i18n/", include("django.conf.urls.i18n")),
     path("admin/", admin.site.urls),
     path("", views.index, name="home"),
     # Page URLs
