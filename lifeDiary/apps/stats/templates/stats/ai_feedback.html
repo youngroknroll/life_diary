@@ -85,17 +85,20 @@
   </div>
 </div>
 
-<!-- AI 피드백 메시지 토스트 알림 -->
-{% if ai_feedback_msgs %}
+<!-- 라이프 피드백 메시지 토스트 알림 -->
+{% if feedback_list %}
   <div class="d-flex flex-row flex-wrap gap-1 mt-3" style="width: 100%;">
-    {% for msg in ai_feedback_msgs %}
-      <div class="toast align-items-center text-bg-primary border-0 show mb-3"
+    {% for fb in feedback_list %}
+      <div class="toast align-items-center border-0 show mb-3
+                  {% if fb.type == 'positive' %}text-bg-primary
+                  {% elif fb.type == 'warning' %}text-bg-warning
+                  {% else %}text-bg-info{% endif %}"
            role="alert" aria-live="assertive" aria-atomic="true"
            style="min-width: 350px; max-width: 400px;">
         <div class="d-flex">
           <div class="toast-body">
-            <i class="fas fa-robot me-2"></i><strong>AI 피드백</strong>
-            <div class="mt-2">{{ msg }}</div>
+            <i class="fas fa-robot me-2"></i><strong>라이프 피드백</strong>
+            <div class="mt-2">{{ fb.message }}</div>
           </div>
           <button type="button" class="btn-close btn-close-white me-2 m-auto"
                   data-bs-dismiss="toast" aria-label="Close"></button>

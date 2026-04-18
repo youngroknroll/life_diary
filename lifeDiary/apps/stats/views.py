@@ -25,6 +25,5 @@ def chunked_iterable(iterable, n):
 def index(request):
     selected_date = safe_date_parse(request.GET.get("date"))
     context = get_stats_context(request.user, selected_date)
-    feedback_msgs = generate_feedback(context)
-    context["ai_feedback_msgs"] = feedback_msgs
+    context["feedback_list"] = generate_feedback(context)
     return render(request, "stats/index.html", context)
