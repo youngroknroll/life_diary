@@ -54,12 +54,62 @@
 }
 
 /* =========================================================
+   Dark Theme Tokens
+   ========================================================= */
+[data-theme="dark"] {
+    --color-primary: #4aa66d;
+    --color-primary-hover: #5cb87e;
+    --color-primary-soft: #1a2e22;
+    --color-primary-border: #3a6b4a;
+
+    --color-text: #e0e8e2;
+    --color-text-muted: #9aab9f;
+
+    --color-surface: #1a1f1c;
+    --color-surface-soft: #232a26;
+    --color-border: #3a4a3e;
+    --color-border-soft: #2e3a32;
+    --color-border-muted: #2a3630;
+
+    --color-accent-work: #5cb87e;
+    --color-accent-rest: #d4a93a;
+    --color-accent-move: #5a9fb0;
+    --color-accent-care: #c97a5f;
+    --color-accent-muted: #2a3a2e;
+
+    --color-note-bg: #2a2615;
+    --color-note-border: #5d4a15;
+    --color-note-text: #efd98c;
+
+    --primary-color: var(--color-primary);
+    --success-color: #22a45c;
+    --warning-color: #e6ac00;
+    --danger-color: #e05555;
+    --info-color: #17a2b8;
+    --light-color: var(--color-surface-soft);
+    --dark-color: var(--color-text);
+
+    --bs-primary: #4aa66d;
+    --bs-primary-rgb: 74, 166, 109;
+
+    color-scheme: dark;
+}
+
+/* =========================================================
    Base
    ========================================================= */
 body {
     background-color: var(--light-color);
     font-family: var(--font-body);
     color: var(--color-text);
+}
+
+.navbar {
+    background-color: var(--color-surface);
+}
+
+footer {
+    background-color: var(--color-surface);
 }
 
 .navbar-brand {
@@ -169,7 +219,7 @@ body {
     height: 56px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-work));
+    background: var(--color-primary);
     color: white;
     font-size: 1.25rem;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -186,7 +236,7 @@ body {
    Card & Button (전역 공통)
    ========================================================= */
 .card-header {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-work));
+    background: var(--color-primary);
     color: white;
 }
 
@@ -200,20 +250,21 @@ body {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-accent-work));
+    background: var(--color-primary);
     border: none;
 }
 
 .btn-primary:hover {
-    background: linear-gradient(135deg, var(--color-primary-hover), var(--color-primary));
+    background: var(--color-primary-hover);
     transform: translateY(-1px);
 }
 
 /* Bootstrap btn-outline-primary 강제 오버라이드 — 직접 color 속성 사용 */
 .btn.btn-outline-primary,
 .btn-outline-primary {
-    color: #2f7d4f !important;
-    border-color: #2f7d4f !important;
+    color: rgba(0, 0, 0, 0.55) !important;
+    border: 1px solid rgba(0, 0, 0, 0.3) !important;
+    border-radius: 6px !important;
     background-color: transparent !important;
 }
 
@@ -307,4 +358,135 @@ body {
     color: var(--color-text-muted);
     font-size: 1.1rem;
     margin-top: 1rem;
+}
+
+/* =========================================================
+   Dark Mode — Bootstrap & Component Overrides
+   ========================================================= */
+[data-theme="dark"] .navbar {
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: none !important;
+}
+
+[data-theme="dark"] .navbar .nav-link {
+    color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .navbar .nav-link:hover {
+    color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .navbar-toggler-icon {
+    filter: invert(1);
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .card-body {
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .table {
+    --bs-table-bg: var(--color-surface);
+    --bs-table-color: var(--color-text);
+    --bs-table-border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .table-bordered > :not(caption) > * > * {
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] footer {
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
+}
+
+[data-theme="dark"] .btn.btn-outline-primary,
+[data-theme="dark"] .btn-outline-primary {
+    color: var(--color-text-muted) !important;
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--color-surface-soft);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(23, 162, 184, 0.15);
+    border-color: rgba(23, 162, 184, 0.3);
+    color: #5bc0de;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .text-secondary {
+    color: var(--color-text-muted) !important;
+}
+
+[data-theme="dark"] .border-primary {
+    border-color: var(--color-primary) !important;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    font-size: 1rem;
+    transition: color 0.2s, border-color 0.2s;
+}
+
+.theme-toggle:hover {
+    color: var(--color-primary);
+    border-color: var(--color-primary);
 }

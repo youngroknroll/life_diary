@@ -25,4 +25,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (periodSelect) {
         periodSelect.addEventListener('change', updateTargetHoursMax);
     }
+
+    // 목표 추가 폼 중복 제출 방지
+    const goalForm = document.querySelector('form[method="post"]');
+    if (goalForm) {
+        goalForm.addEventListener('submit', function() {
+            const submitBtn = goalForm.querySelector('button[type="submit"]');
+            if (!submitBtn || submitBtn.disabled) return;
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>저장 중...';
+        });
+    }
 });

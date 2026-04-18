@@ -214,7 +214,7 @@
                     <div class="d-grid gap-2" id="tagContainer">
                         {% if user_tags %}
                             {% for tag in user_tags %}
-                                <button class="btn btn-outline-secondary btn-sm tag-btn text-start" 
+                                <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
                                         data-tag-id="{{ tag.id }}"
                                         onclick="selectTag({{ tag.id }}, '{{ tag.color }}', '{{ tag.name }}')">
                                     <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>

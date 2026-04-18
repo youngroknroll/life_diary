@@ -1,5 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
+<script>
+    // FOUC 방지: head 파싱 전 테마 적용
+    (function() {
+        var saved = localStorage.getItem('theme');
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var theme = saved || (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+</script>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,13 +54,17 @@
     </div>
 
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm mb-4">
+    <nav class="navbar navbar-expand-lg shadow-sm mb-4">
         <div class="container">
             <a class="navbar-brand" href="{% url 'home' %}">
                 <i class="fas fa-clock me-2"></i>
                 라이프 다이어리
             </a>
             
+            <button class="theme-toggle me-2" id="themeToggle" type="button" aria-label="테마 전환">
+                <i class="fas fa-moon"></i>
+            </button>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -134,7 +148,7 @@
     </div>
     
     <!-- Footer -->
-    <footer class="bg-white mt-5 py-4 border-top">
+    <footer class="mt-5 py-4 border-top">
         <div class="container text-center">
             <p class="mb-0 text-muted" style="font-size: clamp(0.55rem, 2vw, 0.875rem); white-space: nowrap;">
                 <i class="fas fa-clock me-1"></i>
@@ -199,6 +213,35 @@
             evt.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         });
         
+        // 다크모드 토글
+        (function() {
+            const toggle = document.getElementById('themeToggle');
+            const icon = toggle.querySelector('i');
+
+            function applyTheme(theme) {
+                document.documentElement.setAttribute('data-theme', theme);
+                document.documentElement.setAttribute('data-bs-theme', theme);
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            // 초기 아이콘 동기화
+            applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+
+            toggle.addEventListener('click', function() {
+                var current = document.documentElement.getAttribute('data-theme');
+                var next = current === 'dark' ? 'light' : 'dark';
+                localStorage.setItem('theme', next);
+                applyTheme(next);
+            });
+
+            // 시스템 설정 변경 감지 (수동 선택 없을 때만)
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        })();
+
         // 알림 자동 숨김 - 시간 연장 (15초, 도움말 제외)
         document.addEventListener('DOMContentLoaded', () => {
             const alerts = document.querySelectorAll('.alert');
