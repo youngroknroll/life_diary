@@ -41,3 +41,11 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 종료 시 세션 만료
 SESSION_SAVE_EVERY_REQUEST = False  # DB session write 최소화 (Django 기본값)
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": "/tmp/lifediary-cache",
+        "OPTIONS": {"MAX_ENTRIES": 500},
+    }
+}

@@ -7,6 +7,7 @@ from django.db import transaction
 from .commands import DeleteTimeBlocksCommand, UpsertTimeBlocksCommand
 from .ports import TimeBlockWriter
 from apps.tags.ports import TagReader
+from apps.stats.use_cases import invalidate_stats_cache
 
 
 @dataclass(frozen=True)
@@ -62,6 +63,8 @@ class UpsertTimeBlocksUseCase:
             self._writer.bulk_create(to_create)
         if to_update:
             self._writer.bulk_update(to_update, ["tag", "memo"])
+
+        invalidate_stats_cache(cmd.user_id, cmd.target_date)
 
         return UpsertResult(
             created=len(to_create),

@@ -24,9 +24,11 @@ class TimeBlockRepository:
         )
 
     def find_by_month(self, user, start, end):
-        return TimeBlock.objects.filter(
-            user=user, date__range=[start, end]
-        ).select_related("tag")
+        return (
+            TimeBlock.objects.filter(user=user, date__range=[start, end])
+            .select_related("tag")
+            .only("date", "slot_index", "tag__id", "tag__name", "tag__color")
+        )
 
     def build(self, user, target_date, slot_index, tag, memo):
         return TimeBlock(user=user, date=target_date, slot_index=slot_index, tag=tag, memo=memo)

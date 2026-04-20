@@ -76,6 +76,7 @@ def tag():
     return FakeTag()
 
 
+@pytest.mark.django_db
 class TestUpsertTimeBlocksUseCase:
     def test_creates_new_blocks(self, user, tag):
         writer = FakeWriter(existing_slots=[])
@@ -126,6 +127,7 @@ class TestUpsertTimeBlocksUseCase:
             uc.execute(cmd, user)
 
 
+@pytest.mark.django_db
 class TestDeleteTimeBlocksUseCase:
     def test_deletes_existing_blocks(self, user):
         writer = FakeWriter(existing_slots=[5, 6, 7])
