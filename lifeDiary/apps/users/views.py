@@ -1,4 +1,6 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse, JsonResponse
+from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.views.decorators.http import require_POST, require_http_methods
@@ -182,12 +184,24 @@ def mypage(request):
     user = request.user
     form = UserGoalForm(request.POST or None)
     form.fields["tag"].queryset = _get_user_tag_queryset(user)
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
     if request.method == "POST":
         if form.is_valid():
             _save_goal.execute(_goal_data_from_form(form), user)
-            return redirect("users:mypage")
+            if is_ajax:
+                return HttpResponse(status=204)
+            return redirect(f"{reverse('users:mypage')}?saved=1")
+        if is_ajax:
+            errors = {field: [str(e) for e in errs] for field, errs in form.errors.items()}
+            return JsonResponse({"errors": errors}, status=400)
     else:
         form.fields["period"].initial = "monthly"
 
     data = _mypage_use_case.execute(user)
     return render(request, "users/mypage.html", {"goals": data["goals"], "form": form})
+
+
+@login_required
+def mypage_goals_partial(request):
+    data = _mypage_use_case.execute(request.user)
+    return render(request, "users/usergoal_list.html", {"goals": data["goals"]})
