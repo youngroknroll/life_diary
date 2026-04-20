@@ -231,8 +231,8 @@ const showSlotInfo = (slotIndexes) => {
 
         infoHTML = `<div class="d-flex justify-content-between align-items-start">
             <div>
-                <div><strong>시간:</strong> ${timeRange}</div>
-                <div><strong>상태:</strong> ${tagName}</div>
+                <div class="text-muted"><strong>시간:</strong> ${timeRange}</div>
+                <div class="text-muted"><strong>상태:</strong> ${tagName}</div>
                 ${memo ? `<div class="text-muted small">${memo}</div>` : ''}
             </div>
             ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
@@ -245,7 +245,7 @@ const showSlotInfo = (slotIndexes) => {
 
         infoHTML = `<div class="d-flex justify-content-between align-items-start">
             <div>
-                <div><strong>${slotIndexes.length}개 슬롯</strong> ${startTime} - ${endTime}</div>
+                <div class="text-muted"><strong>${slotIndexes.length}개 슬롯</strong> ${startTime} - ${endTime}</div>
                 <div class="text-muted small">${Math.floor(duration/60)}시간 ${duration%60}분</div>
             </div>
             ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
