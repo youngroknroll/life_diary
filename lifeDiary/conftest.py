@@ -9,3 +9,7 @@ def _use_dummy_cache(settings):
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
         }
     }
+    settings.AXES_ENABLED = False
+    settings.AUTHENTICATION_BACKENDS = [
+        "django.contrib.auth.backends.ModelBackend",
+    ]

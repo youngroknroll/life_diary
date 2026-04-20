@@ -9,23 +9,19 @@
 let charts = {};
 
 document.addEventListener('DOMContentLoaded', function() {
-    const dataEl = document.getElementById('stats-data');
-    if (!dataEl) {
-        console.error('stats-data 요소를 찾을 수 없습니다.');
-        return;
+    function parseJsonScript(id) {
+        const el = document.getElementById(id);
+        if (!el) { console.error(id + ' 요소를 찾을 수 없습니다.'); return null; }
+        try { return JSON.parse(el.textContent); }
+        catch (e) { console.error(id + ' 파싱 오류:', e); return null; }
     }
 
-    let statsData;
-    try {
-        statsData = JSON.parse(dataEl.textContent);
-    } catch (error) {
-        console.error('통계 데이터 파싱 오류:', error);
-        return;
-    }
+    const daily = parseJsonScript('daily-stats-data');
+    const weekly = parseJsonScript('weekly-stats-data');
+    const monthly = parseJsonScript('monthly-stats-data');
+    const tagAnalysis = parseJsonScript('tag-analysis-data');
 
-    const { daily, weekly, monthly, tagAnalysis } = statsData;
-
-    if (!daily || !weekly || !tagAnalysis) {
+    if (!daily || !weekly || !monthly || !tagAnalysis) {
         console.error('통계 데이터가 불완전합니다.');
         return;
     }

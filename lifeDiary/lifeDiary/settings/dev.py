@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "apps.tags",
     "apps.users",
     "apps.core",
+    "axes",
 ]
 
 MIDDLEWARE = [
@@ -59,7 +60,17 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = 1
+AXES_RESET_ON_SUCCESS = True
 
 ROOT_URLCONF = "lifeDiary.urls"
 

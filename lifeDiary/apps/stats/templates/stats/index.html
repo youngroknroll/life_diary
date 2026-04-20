@@ -337,13 +337,9 @@
 
 
 {% load static %}
-<script id="stats-data" type="application/json">
-{
-    "daily": {{ daily_stats_json|safe }},
-    "weekly": {{ weekly_stats_json|safe }},
-    "monthly": {{ monthly_stats_json|safe }},
-    "tagAnalysis": {{ tag_analysis_json|safe }}
-}
-</script>
+{{ daily_stats_json|json_script:"daily-stats-data" }}
+{{ weekly_stats_json|json_script:"weekly-stats-data" }}
+{{ monthly_stats_json|json_script:"monthly-stats-data" }}
+{{ tag_analysis_json|json_script:"tag-analysis-data" }}
 <script src="{% static 'stats/js/stats.js' %}" defer></script>
 {% endblock %} 
