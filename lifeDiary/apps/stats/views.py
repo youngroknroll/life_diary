@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 from apps.core.utils import safe_date_parse
-from .feedback import generate_feedback
+from .life_feedback import generate_feedback
 from .use_cases import GetStatsContextUseCase
 
 _get_stats_context = GetStatsContextUseCase()

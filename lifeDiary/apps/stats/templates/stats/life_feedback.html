@@ -87,14 +87,13 @@
 
 <!-- 라이프 피드백 메시지 토스트 알림 -->
 {% if feedback_list %}
-  <div class="d-flex flex-row flex-wrap gap-1 mt-3" style="width: 100%;">
+  <div class="d-flex flex-row flex-wrap gap-1 mt-3 w-100">
     {% for fb in feedback_list %}
-      <div class="toast align-items-center border-0 show mb-3
+      <div class="toast align-items-center border-0 show mb-3 life-feedback-card
                   {% if fb.type == 'positive' %}text-bg-primary
                   {% elif fb.type == 'warning' %}text-bg-warning
                   {% else %}text-bg-info{% endif %}"
-           role="alert" aria-live="assertive" aria-atomic="true"
-           style="min-width: 350px; max-width: 400px;">
+           role="alert" aria-live="assertive" aria-atomic="true">
         <div class="d-flex">
           <div class="toast-body">
             <i class="fas fa-robot me-2"></i><strong>라이프 피드백</strong>
