@@ -7,17 +7,42 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserGoalForm, UserNoteForm
 from .repositories import GoalRepository, NoteRepository
 from apps.tags.repositories import TagRepository
-from .use_cases import GetMyPageUseCase
+from .use_cases import (
+    DeleteGoalUseCase,
+    DeleteNoteUseCase,
+    GetMyPageUseCase,
+    GoalData,
+    NoteData,
+    SaveGoalUseCase,
+    SaveNoteUseCase,
+)
 
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 _tag_repo = TagRepository()
 _mypage_use_case = GetMyPageUseCase()
+_save_goal = SaveGoalUseCase(tags=_tag_repo)
+_delete_goal = DeleteGoalUseCase()
+_save_note = SaveNoteUseCase()
+_delete_note = DeleteNoteUseCase()
 
 
 def _get_user_tag_queryset(user):
     """사용자 태그 + 기본 태그 쿼리셋"""
     return _tag_repo.find_accessible(user)
+
+
+def _goal_data_from_form(form: UserGoalForm) -> GoalData:
+    cleaned = form.cleaned_data
+    return GoalData(
+        tag_id=cleaned["tag"].id,
+        period=cleaned["period"],
+        target_hours=cleaned["target_hours"],
+    )
+
+
+def _note_data_from_form(form: UserNoteForm) -> NoteData:
+    return NoteData(note=form.cleaned_data["note"])
 
 
 @require_POST
@@ -85,30 +110,22 @@ def usergoal_list(request):
 
 @login_required
 def usergoal_create(request):
-    if request.method == "POST":
-        form = UserGoalForm(request.POST)
-        if form.is_valid():
-            goal = form.save(commit=False)
-            goal.user = request.user
-            goal.save()
-            return redirect("users:mypage")
-    else:
-        form = UserGoalForm()
+    form = UserGoalForm(request.POST or None)
     form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
+    if request.method == "POST" and form.is_valid():
+        _save_goal.execute(_goal_data_from_form(form), request.user)
+        return redirect("users:mypage")
     return render(request, "users/usergoal_form.html", {"form": form, "mode": "create"})
 
 
 @login_required
 def usergoal_update(request, pk):
     goal = _goal_repo.get_or_404(pk, request.user)
-    if request.method == "POST":
-        form = UserGoalForm(request.POST, instance=goal)
-        if form.is_valid():
-            form.save()
-            return redirect("users:mypage")
-    else:
-        form = UserGoalForm(instance=goal)
+    form = UserGoalForm(request.POST or None, instance=goal)
     form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
+    if request.method == "POST" and form.is_valid():
+        _save_goal.execute(_goal_data_from_form(form), request.user, goal_id=pk)
+        return redirect("users:mypage")
     return render(request, "users/usergoal_form.html", {"form": form, "mode": "update"})
 
 
@@ -117,7 +134,7 @@ def usergoal_update(request, pk):
 def usergoal_delete(request, pk):
     goal = _goal_repo.get_or_404(pk, request.user)
     if request.method == "POST":
-        goal.delete()
+        _delete_goal.execute(request.user, pk)
         return redirect("users:mypage")
     return render(request, "users/usergoal_confirm_delete.html", {"goal": goal})
 
@@ -133,9 +150,7 @@ def usernote_create(request):
     if request.method == "POST":
         form = UserNoteForm(request.POST)
         if form.is_valid():
-            note = form.save(commit=False)
-            note.user = request.user
-            note.save()
+            _save_note.execute(_note_data_from_form(form), request.user)
             return redirect("users:usernote_list")
     else:
         form = UserNoteForm()
@@ -148,7 +163,7 @@ def usernote_update(request, pk):
     if request.method == "POST":
         form = UserNoteForm(request.POST, instance=note)
         if form.is_valid():
-            form.save()
+            _save_note.execute(_note_data_from_form(form), request.user, note_id=pk)
             return redirect("users:usernote_list")
     else:
         form = UserNoteForm(instance=note)
@@ -160,7 +175,7 @@ def usernote_update(request, pk):
 def usernote_delete(request, pk):
     note = _note_repo.get_or_404(pk, request.user)
     if request.method == "POST":
-        note.delete()
+        _delete_note.execute(request.user, pk)
         return redirect("users:usernote_list")
     return render(request, "users/usernote_confirm_delete.html", {"note": note})
 
@@ -168,17 +183,14 @@ def usernote_delete(request, pk):
 @login_required
 def mypage(request):
     user = request.user
+    form = UserGoalForm(request.POST or None)
+    form.fields["tag"].queryset = _get_user_tag_queryset(user)
     if request.method == "POST":
-        form = UserGoalForm(request.POST)
         if form.is_valid():
-            goal = form.save(commit=False)
-            goal.user = user
-            goal.save()
+            _save_goal.execute(_goal_data_from_form(form), user)
             return redirect("users:mypage")
     else:
-        form = UserGoalForm()
         form.fields["period"].initial = "monthly"
 
     data = _mypage_use_case.execute(user)
-    form.fields["tag"].queryset = _get_user_tag_queryset(user)
     return render(request, "users/mypage.html", {"goals": data["goals"], "form": form})

@@ -1,5 +1,4 @@
 from django import forms
-from django.core.exceptions import ValidationError
 from .models import UserGoal, UserNote
 
 
@@ -23,28 +22,6 @@ class UserGoalForm(forms.ModelForm):
         help_texts = {
             "target_hours": "주간/월간은 해당 기간의 총 목표 시간입니다.",
         }
-
-    def clean(self):
-        """폼 레벨 유효성 검사"""
-        cleaned_data = super().clean()
-        period = cleaned_data.get("period")
-        target_hours = cleaned_data.get("target_hours")
-
-        if period and target_hours is not None:
-            if period == "daily" and target_hours > 24:
-                raise ValidationError(
-                    {"target_hours": "일간 목표는 24시간을 초과할 수 없습니다."}
-                )
-            elif period == "weekly" and target_hours > 100:
-                raise ValidationError(
-                    {"target_hours": "주간 목표는 100시간을 초과할 수 없습니다."}
-                )
-            elif period == "monthly" and target_hours > 300:
-                raise ValidationError(
-                    {"target_hours": "월간 목표는 300시간을 초과할 수 없습니다."}
-                )
-
-        return cleaned_data
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
