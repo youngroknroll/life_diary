@@ -38,6 +38,6 @@ class UserNoteForm(forms.ModelForm):
         fields = ["note"]
         widgets = {
             "note": forms.Textarea(
-                attrs={"rows": 4, "placeholder": "특이사항을 입력하세요."}
+                attrs={"rows": 4, "placeholder": "특이사항을 입력하세요.", "class": "form-control"}
             ),
         }

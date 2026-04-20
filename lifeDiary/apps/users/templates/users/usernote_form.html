@@ -4,7 +4,13 @@
     <h2>{% if mode == 'create' %}특이사항 추가{% else %}특이사항 수정{% endif %}</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+        <div class="mb-3">
+            <label for="{{ form.note.id_for_label }}" class="form-label">{{ form.note.label }}</label>
+            {{ form.note }}
+            {% if form.note.errors %}
+                <div class="text-danger">{{ form.note.errors }}</div>
+            {% endif %}
+        </div>
         <button type="submit" class="btn btn-success">저장</button>
         <a href="{% url 'users:usernote_list' %}" class="btn btn-secondary">목록으로</a>
     </form>
