@@ -68,6 +68,7 @@ def get_weekly_stats_data(user, selected_date, calculator):
         tag_data["avg_hours"] = round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
 
     active_days = sum(1 for day in weekly_data if day["total_blocks"] > 0)
+    most_active_day = max(weekly_data, key=lambda d: d["total_minutes"]) if weekly_data else None
     return {
         "start_date": calculator.start_of_week,
         "end_date": week_dates[-1],
@@ -77,4 +78,5 @@ def get_weekly_stats_data(user, selected_date, calculator):
             sum(day["total_minutes"] for day in weekly_data) / MINUTES_PER_HOUR, 1
         ),
         "active_days": active_days,
+        "most_active_day": most_active_day,
     }
