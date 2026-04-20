@@ -1,30 +1,11 @@
-from django.conf import settings
+import pytest
 
 
-def pytest_configure(config):
-    if settings.configured:
-        return
-    settings.configure(
-        INSTALLED_APPS=[
-            "django.contrib.contenttypes",
-            "django.contrib.auth",
-            "apps.core",
-            "apps.dashboard",
-            "apps.tags",
-            "apps.users",
-            "apps.stats",
-        ],
-        DATABASES={
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": ":memory:",
-            }
-        },
-        CACHES={
-            "default": {
-                "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-            }
-        },
-        USE_TZ=False,
-        DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",
-    )
+@pytest.fixture(autouse=True)
+def _use_dummy_cache(settings):
+    """테스트 구간 동안 파일 기반 캐시 대신 DummyCache 사용."""
+    settings.CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        }
+    }
