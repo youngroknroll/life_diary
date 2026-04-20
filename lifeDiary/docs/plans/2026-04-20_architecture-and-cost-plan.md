@@ -325,7 +325,7 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 
 구조 축(§2)과 비용 축(§3)을 **교차 진행**한다. 리팩터링만 먼저 하면 비용 개선이 늦어지고, 비용 튜닝만 하면 코드가 그대로 남는다.
 
-### Phase 3-A — 즉시 비용 감소 (반나절)
+### Phase 3-A — 즉시 비용 감소 ✅ 완료 (2026-04-20)
 
 | 순서 | 작업 | 효과 |
 |------|------|------|
@@ -335,7 +335,7 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 
 **효과 측정**: Supabase 대시보드에서 일일 DB egress/writes 추이 확인.
 
-### Phase 3-B — Port + DTO 도입 (1일)
+### Phase 3-B — Port + DTO 도입 ✅ 완료 (2026-04-20)
 
 | 순서 | 작업 | 파일 |
 |------|------|------|
@@ -344,7 +344,7 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 | 3 | `UpsertTimeBlocksCommand` Pydantic 모델 | `apps/dashboard/commands.py` |
 | 4 | `requirements.txt`에 `pydantic>=2.7` 추가 | `requirements.txt` |
 
-### Phase 3-C — 첫 Use Case + 캐시 배선 (1일)
+### Phase 3-C — 첫 Use Case + 캐시 배선 ✅ 완료 (2026-04-20)
 
 | 순서 | 작업 |
 |------|------|
@@ -353,7 +353,7 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 | 3 | pytest 기반 Use Case 단위 테스트 (fake Port 주입) |
 | 4 | `find_by_date_range` 추가, `get_weekly_stats_data` 1쿼리화 (§3.3) |
 
-### Phase 3-D — Stats Use Case + 캐싱 (2일)
+### Phase 3-D — Stats Use Case + 캐싱 ✅ 완료 (2026-04-20)
 
 | 순서 | 작업 |
 |------|------|
@@ -363,7 +363,7 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 | 4 | `UpsertTimeBlocksUseCase`에 cache invalidation 추가 |
 | 5 | `only()` / `values_list()` 적용 (§3.5) |
 
-### Phase 3-E — Tags + Users 확산 (2일)
+### Phase 3-E — Tags + Users 확산 ✅ 완료 (2026-04-20)
 
 | 순서 | 작업 |
 |------|------|
@@ -372,9 +372,11 @@ TimeBlock 누적 속도가 Supabase Free 500MB에 접근할 때 착수.
 | 3 | `GetMyPageUseCase` + 필요 period만 계산 (§3.6) |
 | 4 | `users → stats` 역방향 의존 제거 |
 
-### Phase 4 — StatsCalculator 분해 (3일)
+### Phase 4 — StatsCalculator 분해 ✅ 완료 (2026-04-20)
 
-Phase 3이 안정화된 이후. `stats/aggregation/{daily,weekly,monthly,analysis}.py`로 분리. FeedbackInput DTO 도입. 주간 비교 dead path(`prev_weekly_stats`) 처리 결정.
+`stats/aggregation/{daily,weekly,monthly,analysis}.py`로 분리.
+`prev_weekly_stats` dead path 제거 (get_stats_context가 이 키를 설정한 적 없음 확인).
+FeedbackInput DTO는 현재 규모에서 불필요 → 도입 안 함.
 
 ---
 
