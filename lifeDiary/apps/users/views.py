@@ -7,19 +7,12 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserGoalForm, UserNoteForm
 from .repositories import GoalRepository, NoteRepository
 from apps.tags.repositories import TagRepository
-from apps.stats.logic import (
-    get_daily_stats_data,
-    get_weekly_stats_data,
-    get_monthly_stats_data,
-    StatsCalculator,
-)
-from .domain_services import _goal_progress_service
-
-import datetime
+from .use_cases import GetMyPageUseCase
 
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 _tag_repo = TagRepository()
+_mypage_use_case = GetMyPageUseCase()
 
 
 def _get_user_tag_queryset(user):
@@ -175,20 +168,6 @@ def usernote_delete(request, pk):
 @login_required
 def mypage(request):
     user = request.user
-    goals = _goal_repo.find_by_user(user)
-    # 통계 데이터 가져오기
-    today = datetime.date.today()
-    calculator = StatsCalculator(user, today)
-    daily_stats = get_daily_stats_data(user, today, calculator)
-    weekly_stats = get_weekly_stats_data(user, today, calculator)
-    monthly_stats = get_monthly_stats_data(user, today, calculator)
-    # 목표별 달성률 계산
-    _goal_progress_service.attach_progress(
-        goals,
-        daily_stats=daily_stats,
-        weekly_stats=weekly_stats,
-        monthly_stats=monthly_stats,
-    )
     if request.method == "POST":
         form = UserGoalForm(request.POST)
         if form.is_valid():
@@ -199,5 +178,7 @@ def mypage(request):
     else:
         form = UserGoalForm()
         form.fields["period"].initial = "monthly"
+
+    data = _mypage_use_case.execute(user)
     form.fields["tag"].queryset = _get_user_tag_queryset(user)
-    return render(request, "users/mypage.html", {"goals": goals, "form": form})
+    return render(request, "users/mypage.html", {"goals": data["goals"], "form": form})
