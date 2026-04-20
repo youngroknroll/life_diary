@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
 from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase
+from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 
 from apps.tags.models import Category, Tag
@@ -77,3 +77,23 @@ class UserGoalTagOwnershipTests(TestCase):
         self.assertFalse(
             UserGoal.objects.filter(user=self.alice, tag=self.bob_tag).exists()
         )
+
+
+class LoginViewTests(TestCase):
+    def test_login_succeeds_with_axes_backend_enabled(self):
+        User.objects.create_user("login-user", password="pw123456!!")
+
+        with override_settings(
+            AXES_ENABLED=True,
+            AUTHENTICATION_BACKENDS=[
+                "axes.backends.AxesStandaloneBackend",
+                "django.contrib.auth.backends.ModelBackend",
+            ],
+        ):
+            response = self.client.post(
+                reverse("users:login"),
+                data={"username": "login-user", "password": "pw123456!!"},
+            )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("home"))
