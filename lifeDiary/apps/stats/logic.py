@@ -206,11 +206,19 @@ def get_daily_stats_data(user, selected_date, calculator):
 
 def get_weekly_stats_data(user, selected_date, calculator):
     week_dates = [calculator.start_of_week + timedelta(days=i) for i in range(DAYS_PER_WEEK)]
+
+    all_blocks = _time_block_repo.find_by_date_range(
+        user, calculator.start_of_week, week_dates[-1]
+    )
+    blocks_by_date = {}
+    for block in all_blocks:
+        blocks_by_date.setdefault(block.date, []).append(block)
+
     weekly_data = []
     tag_weekly_stats = {}
     excluded_tags = {SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME}
     for date_item in week_dates:
-        daily_blocks = _time_block_repo.find_by_date(user, date_item)
+        daily_blocks = blocks_by_date.get(date_item, [])
         daily_tag_stats = {}
         active_blocks_count = 0
         active_minutes = 0

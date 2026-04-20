@@ -28,8 +28,16 @@ class TimeBlockRepository:
             user=user, date__range=[start, end]
         ).select_related("tag")
 
-    def build(self, user, date, slot_index, tag, memo):
-        return TimeBlock(user=user, date=date, slot_index=slot_index, tag=tag, memo=memo)
+    def build(self, user, target_date, slot_index, tag, memo):
+        return TimeBlock(user=user, date=target_date, slot_index=slot_index, tag=tag, memo=memo)
+
+    def find_by_date_range(self, user, start, end):
+        """날짜 범위 단일 쿼리 조회 — 주간 통계 최적화용"""
+        return (
+            TimeBlock.objects.filter(user=user, date__range=[start, end])
+            .select_related("tag")
+            .only("date", "slot_index", "tag__id", "tag__name", "tag__color")
+        )
 
     def bulk_create(self, blocks):
         TimeBlock.objects.bulk_create(blocks)

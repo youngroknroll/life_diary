@@ -3,11 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods, require_GET
 
 import json
+import logging
+
+from pydantic import ValidationError
 
 from apps.tags.repositories import TagRepository
+from .commands import DeleteTimeBlocksCommand, UpsertTimeBlocksCommand
 from .repositories import TimeBlockRepository
-from .services import build_time_headers, validate_slot_indexes
-import logging
+from .services import build_time_headers
+from .use_cases import DeleteTimeBlocksUseCase, UpsertTimeBlocksUseCase
 
 from apps.core.utils import (
     safe_date_parse,
@@ -20,6 +24,8 @@ from apps.core.utils import (
 
 _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
+_upsert_use_case = UpsertTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_repo)
+_delete_use_case = DeleteTimeBlocksUseCase(writer=_time_block_repo)
 
 
 @login_required
@@ -77,139 +83,74 @@ def dashboard_view(request):
 @require_http_methods(["POST", "DELETE"])
 def time_block_api(request):
     """
-    RESTful 시간 블록 API (core 유틸리티 사용)
+    RESTful 시간 블록 API
     POST: 시간 블록 생성/수정
     DELETE: 시간 블록 삭제
-
-    외부 프론트엔드(React 등)에서도 사용 가능한 표준 API
     """
     try:
         data = json.loads(request.body)
-        slot_indexes = data.get("slot_indexes", [])
-        selected_date_str = data.get("date")
-
-        # 입력 검증
-        if not slot_indexes:
-            return error_response("슬롯 인덱스가 누락되었습니다.", "MISSING_SLOTS")
-
-        if not validate_slot_indexes(slot_indexes):
-            return error_response(
-                f"슬롯 인덱스는 0~{TOTAL_SLOTS_PER_DAY - 1} 범위의 정수 배열이어야 합니다.",
-                "INVALID_SLOTS",
-            )
-
-        if not selected_date_str:
-            return error_response("날짜가 누락되었습니다.", "MISSING_DATE")
-
-        # 날짜 파싱 (core 유틸리티 사용)
-        selected_date = safe_date_parse(selected_date_str)
-        if not selected_date:
-            return error_response(
-                "올바른 날짜 형식(YYYY-MM-DD)을 사용해주세요.", "INVALID_DATE_FORMAT"
-            )
-
     except json.JSONDecodeError:
         return error_response("올바른 JSON 형식이 아닙니다.", "INVALID_JSON")
 
     if request.method == "POST":
-        return _handle_time_block_create_update(
-            request, data, slot_indexes, selected_date
-        )
-    elif request.method == "DELETE":
-        return _handle_time_block_delete(request, slot_indexes, selected_date)
+        return _handle_upsert(request, data)
+    return _handle_delete(request, data)
 
 
-def _handle_time_block_create_update(request, data, slot_indexes, selected_date):
-    """시간 블록 생성/수정 처리 (core 유틸리티 사용)"""
+def _handle_upsert(request, data):
+    logger = logging.getLogger(__name__)
     try:
-        tag_id = data.get("tag_id")
-        memo = data.get("memo", "")
-
-        if memo and len(memo) > 500:
-            return error_response("메모는 500자를 초과할 수 없습니다.", "MEMO_TOO_LONG")
-
-        if not tag_id:
-            return error_response("태그가 선택되지 않았습니다.", "MISSING_TAG")
-
-        # 태그 존재 확인 (사용자 태그 + 기본 태그)
-        tag = _tag_repo.find_by_id_accessible(tag_id, request.user)
-        if not tag:
-            return error_response(
-                "존재하지 않는 태그이거나 접근 권한이 없습니다.", "TAG_NOT_FOUND", 404
-            )
-
-        # 기존 블록 조회
-        existing_blocks = _time_block_repo.find_by_slots(
-            request.user, selected_date, slot_indexes
+        cmd = UpsertTimeBlocksCommand(
+            user_id=request.user.id,
+            target_date=data.get("date"),
+            slot_indexes=data.get("slot_indexes", []),
+            tag_id=data.get("tag_id") or 0,
+            memo=data.get("memo", ""),
         )
-        existing_slots = {block.slot_index: block for block in existing_blocks}
+    except ValidationError as exc:
+        return error_response(exc.errors()[0]["msg"], "VALIDATION_ERROR")
 
-        # 생성/수정할 블록 분류
-        time_blocks_to_create = []
-        time_blocks_to_update = []
-
-        for slot_index in slot_indexes:
-            if slot_index in existing_slots:
-                # 기존 블록 수정
-                block = existing_slots[slot_index]
-                block.tag = tag
-                block.memo = memo
-                time_blocks_to_update.append(block)
-            else:
-                # 새 블록 생성
-                time_blocks_to_create.append(
-                    _time_block_repo.build(
-                        user=request.user,
-                        date=selected_date,
-                        slot_index=slot_index,
-                        tag=tag,
-                        memo=memo,
-                    )
-                )
-
-        # 데이터베이스 업데이트
-        created_count = 0
-        updated_count = 0
-
-        if time_blocks_to_create:
-            _time_block_repo.bulk_create(time_blocks_to_create)
-            created_count = len(time_blocks_to_create)
-
-        if time_blocks_to_update:
-            _time_block_repo.bulk_update(time_blocks_to_update, ["tag", "memo"])
-            updated_count = len(time_blocks_to_update)
-
-        return success_response(
-            f"{len(slot_indexes)}개의 슬롯이 저장되었습니다.",
-            {
-                "created_count": created_count,
-                "updated_count": updated_count,
-                "total_count": len(slot_indexes),
-                "tag": {"id": tag.id, "name": tag.name, "color": tag.color},
-            },
-            201,
-        )
-
+    try:
+        result = _upsert_use_case.execute(cmd, request.user)
+    except PermissionError as exc:
+        return error_response(str(exc), "TAG_NOT_FOUND", 404)
     except Exception:
-        logging.getLogger(__name__).exception("시간 블록 저장 중 오류")
+        logger.exception("시간 블록 저장 중 오류")
         return error_response("저장 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
 
+    return success_response(
+        f"{len(cmd.slot_indexes)}개의 슬롯이 저장되었습니다.",
+        {
+            "created_count": result.created,
+            "updated_count": result.updated,
+            "total_count": len(cmd.slot_indexes),
+            "tag": {"id": result.tag_id, "name": result.tag_name, "color": result.tag_color},
+        },
+        201,
+    )
 
-def _handle_time_block_delete(request, slot_indexes, selected_date):
-    """시간 블록 삭제 처리 (core 유틸리티 사용)"""
+
+def _handle_delete(request, data):
+    logger = logging.getLogger(__name__)
     try:
-        deleted_count = _time_block_repo.delete_by_slots(
-            request.user, selected_date, slot_indexes
+        cmd = DeleteTimeBlocksCommand(
+            user_id=request.user.id,
+            target_date=data.get("date"),
+            slot_indexes=data.get("slot_indexes", []),
         )
+    except ValidationError as exc:
+        return error_response(exc.errors()[0]["msg"], "VALIDATION_ERROR")
 
-        if deleted_count == 0 and len(slot_indexes) > 0:
-            return error_response("삭제할 기록이 없습니다.", "NO_BLOCKS_FOUND", 404)
-
-        return success_response(
-            f"{deleted_count}개의 슬롯이 삭제되었습니다.",
-            {"deleted_count": deleted_count, "requested_count": len(slot_indexes)},
-        )
-
+    try:
+        result = _delete_use_case.execute(cmd, request.user)
     except Exception:
-        logging.getLogger(__name__).exception("시간 블록 삭제 중 오류")
+        logger.exception("시간 블록 삭제 중 오류")
         return error_response("삭제 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+
+    if result.deleted == 0 and result.requested > 0:
+        return error_response("삭제할 기록이 없습니다.", "NO_BLOCKS_FOUND", 404)
+
+    return success_response(
+        f"{result.deleted}개의 슬롯이 삭제되었습니다.",
+        {"deleted_count": result.deleted, "requested_count": result.requested},
+    )
