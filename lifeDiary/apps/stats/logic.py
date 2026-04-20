@@ -2,7 +2,6 @@
 stats/logic.py — 얇은 오케스트레이터.
 집계 로직은 aggregation/ 패키지에 위치한다.
 """
-from apps.core.utils import serialize_for_js
 from apps.users.repositories import GoalRepository, NoteRepository
 from apps.users.domain_services import _goal_progress_service
 
@@ -42,23 +41,23 @@ def get_stats_context(user, selected_date):
         "weekly_stats": weekly_stats,
         "monthly_stats": monthly_stats,
         "tag_analysis": tag_analysis,
-        "daily_stats_json": serialize_for_js({
+        "daily_stats_json": {
             "tag_stats": daily_stats["tag_stats"],
             "hourly_stats": daily_stats["hourly_stats"],
-        }),
-        "weekly_stats_json": serialize_for_js({
+        },
+        "weekly_stats_json": {
             "weekly_data": [
                 {"day_korean": d["day_korean"], "total_hours": d["total_hours"]}
                 for d in weekly_stats["weekly_data"]
             ],
             "tag_weekly_stats": weekly_stats["tag_weekly_stats"],
-        }),
-        "tag_analysis_json": serialize_for_js(tag_analysis),
-        "monthly_stats_json": serialize_for_js({
+        },
+        "tag_analysis_json": tag_analysis,
+        "monthly_stats_json": {
             "day_labels": monthly_stats["day_labels"],
             "tag_stats": monthly_stats["tag_stats"],
             "daily_totals": monthly_stats["daily_totals"],
-        }),
+        },
     }
 
     user_goals_daily = _goal_repo.find_by_period(user, "daily")
