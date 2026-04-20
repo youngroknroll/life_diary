@@ -14,7 +14,7 @@ from .dev import *
 # 프로덕션 환경 오버라이드
 DEBUG = False
 
-# 프로덕션 DB (Supabase PostgreSQL)
+# 프로덕션 DB (Supabase PostgreSQL — Transaction Pooler port 6543)
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -22,7 +22,9 @@ DATABASES = {
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("DB_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "PORT": os.getenv("DB_PORT", "6543"),
+        "CONN_MAX_AGE": 60,
+        "CONN_HEALTH_CHECKS": True,
     }
 }
 ALLOWED_HOSTS = ["lifediary.onrender.com"]
@@ -38,4 +40,4 @@ CSRF_COOKIE_SECURE = True
 # 프로덕션 전용 세션 보안 설정
 SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 종료 시 세션 만료
-SESSION_SAVE_EVERY_REQUEST = True  # 매 요청마다 세션 저장 (활성화 시간 갱신)
+SESSION_SAVE_EVERY_REQUEST = False  # DB session write 최소화 (Django 기본값)
