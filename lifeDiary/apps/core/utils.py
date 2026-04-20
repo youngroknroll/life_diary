@@ -95,7 +95,7 @@ def success_response(message, data=None, status=200):
     response_data = {"success": True, "message": message}
 
     if data:
-        response_data["data"] = data
+        response_data.update(data)
 
     return JsonResponse(response_data, status=status)
 
