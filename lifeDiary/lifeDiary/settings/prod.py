@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 from .dev import *
 
 # 프로덕션 환경 오버라이드
-DEBUG = False
+DEBUG = True
 
 # 프로덕션 DB (Supabase PostgreSQL — Transaction Pooler port 6543)
 DATABASES = {
