@@ -71,12 +71,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${canEdit ? `
                                 <button class="btn btn-outline-primary btn-sm flex-fill py-0"
                                         onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}, category_id: ${tag.category_id}})">
-                                    <i class="fas fa-edit me-1"></i>수정
+                                    <i class="fas fa-edit me-1 d-none d-md-inline"></i>수정
                                 </button>` : ''}
                             ${canDelete ? `
                                 <button class="btn btn-outline-danger btn-sm flex-fill py-0"
                                         onclick="deleteTag(${tag.id}, '${escapeHTML(tag.name)}')">
-                                    <i class="fas fa-trash me-1"></i>삭제
+                                    <i class="fas fa-trash me-1 d-none d-md-inline"></i>삭제
                                 </button>` : ''}
                         </div>
                     </div>

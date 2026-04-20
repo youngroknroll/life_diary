@@ -396,16 +396,3 @@ function showTagError(message) {
     tagContainer.innerHTML = `<div class="alert alert-danger p-2 small">${message}</div>`;
 }
 
-// ── 모바일 사이드바 ──
-
-function toggleSidebar(show) {
-    const sidebar = document.getElementById('quickInputSidebar');
-    const fab = document.getElementById('quickInputFab');
-    if (show) {
-        sidebar.style.display = '';
-        fab.style.display = 'none';
-    } else {
-        sidebar.style.display = 'none';
-        fab.style.display = '';
-    }
-}

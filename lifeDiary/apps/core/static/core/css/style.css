@@ -209,30 +209,6 @@ footer {
 }
 
 /* =========================================================
-   Quick Input FAB (모바일 전용)
-   ========================================================= */
-.quick-input-fab {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    width: 56px;
-    height: 56px;
-    border-radius: 50%;
-    border: none;
-    background: var(--color-primary);
-    color: white;
-    font-size: 1.25rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    z-index: 1000;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-.quick-input-fab:hover {
-    transform: scale(1.1);
-}
-
-/* =========================================================
    Card & Button (전역 공통)
    ========================================================= */
 .card-header {
@@ -376,8 +352,17 @@ footer {
     color: var(--color-text) !important;
 }
 
+[data-theme="dark"] .navbar-toggler {
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .navbar-toggler:focus {
+    box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
+}
+
 [data-theme="dark"] .navbar-toggler-icon {
-    filter: invert(1);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%239aab9f' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
 [data-theme="dark"] .card {
@@ -424,6 +409,10 @@ footer {
 [data-theme="dark"] .btn-outline-primary {
     color: var(--color-text-muted) !important;
     border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .date-selector .btn-outline-primary {
+    color: white !important;
 }
 
 [data-theme="dark"] .list-group-item {
