@@ -1,4 +1,5 @@
 asgiref==3.9.1
+pydantic>=2.7
 django==5.2.4
 et-xmlfile==2.0.0
 gunicorn==25.3.0
