@@ -1,11 +1,8 @@
 # 라이프 피드백 생성 로직
 
-import logging
 import statistics
 
-from apps.core.utils import UNCLASSIFIED_TAG_NAME, SLEEP_TAG_NAME
-
-logger = logging.getLogger(__name__)
+from apps.core.utils import SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME
 
 # 피드백 타입 상수
 POSITIVE = "positive"  # text-bg-primary (초록)
@@ -47,42 +44,7 @@ def generate_feedback(context):
     feedback.extend(_goal_feedback(context.get("user_goals_weekly", []), "이번주"))
     feedback.extend(_goal_feedback(context.get("user_goals_monthly", []), "이번 달"))
 
-    # 2. 비교 기반 피드백 (주간: 이번주 vs 지난주)
-    try:
-        weekly_stats = context["weekly_stats"]
-        prev_weekly_stats = context.get("prev_weekly_stats")
-        if prev_weekly_stats:
-            for tag in weekly_stats["tag_weekly_stats"]:
-                prev_tag = next(
-                    (
-                        t
-                        for t in prev_weekly_stats["tag_weekly_stats"]
-                        if t["name"] == tag["name"]
-                    ),
-                    None,
-                )
-                if prev_tag:
-                    diff = tag["total_hours"] - prev_tag["total_hours"]
-                    if abs(diff) >= 1:
-                        percent = (
-                            int((diff / prev_tag["total_hours"]) * 100)
-                            if prev_tag["total_hours"] > 0
-                            else 0
-                        )
-                        if diff > 0:
-                            feedback.append(_fb(
-                                f"이번주 '{tag['name']}' 시간이 지난주보다 {percent}% 늘었습니다. 잘하고 있어요!",
-                                POSITIVE,
-                            ))
-                        else:
-                            feedback.append(_fb(
-                                f"이번주 '{tag['name']}' 시간이 지난주보다 {abs(percent)}% 줄었습니다. 다음주엔 더 노력해봐요!",
-                                INFO,
-                            ))
-    except Exception:
-        logger.exception("주간 비교 피드백 생성 중 오류")
-
-    # 3. 불균형/과다/부족 경고 (월간)
+    # 2. 불균형/과다/부족 경고 (월간)
     for tag in context["monthly_stats"]["tag_stats"]:
         if (
             tag["name"] not in [UNCLASSIFIED_TAG_NAME, SLEEP_TAG_NAME]
