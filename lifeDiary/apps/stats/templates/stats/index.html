@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tag_ui %}
 
 {% block title %}통계 | 라이프 다이어리{% endblock %}
 
@@ -11,22 +12,7 @@
                     <i class="fas fa-chart-bar me-2"></i>
                     {{ selected_date|date:"Y년 m월 d일 (l)" }} 통계 분석
                 </h5>
-                <div class="d-flex gap-2 flex-wrap">
-                    <input type="date"
-                           class="form-control form-control-sm"
-                           id="dateSelector"
-                           value="{{ selected_date|date:'Y-m-d' }}"
-                           style="width: 150px;"
-                           onchange="location.href='?date=' + this.value">
-                    <button class="btn btn-sm btn-outline-primary" onclick="goToToday()">
-                        <i class="fas fa-home"></i> 오늘
-                    </button>
-                    {% if user.is_authenticated and not user.is_superuser %}
-                    <a href="{% url 'users:mypage' %}" class="btn btn-sm btn-outline-primary fw-bold">
-                        <i class="fas fa-bullseye"></i> 목표 확인
-                    </a>
-                    {% endif %}
-                </div>
+                {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value" ds_mypage_label="목표 확인" %}
             </div>
             <div class="card-body">
                 <div class="row text-center dashboard-stats">
@@ -107,13 +93,13 @@
                         <div class="row">
                             <div class="col-lg-6">
                                 <h6 class="mb-3">태그별 시간 분포</h6>
-                                <div class="text-center" style="height: 300px;">
+                                <div class="text-center chart-container">
                                     <canvas id="dailyPieChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-6">
                                 <h6 class="mb-3">시간대별 활동</h6>
-                                <div class="text-center" style="height: 300px;">
+                                <div class="text-center chart-container">
                                     <canvas id="hourlyBarChart"></canvas>
                                 </div>
                             </div>
@@ -139,12 +125,12 @@
                                             </div>
                                             <div class="col-md-8">
                                                 <h6 class="mb-2">태그별 시간 사용량</h6>
-                                                <div style="max-height: 200px; overflow-y: auto;">
+                                                <div class="tag-stats-list">
                                                     {% for tag in daily_stats.tag_stats %}
                                                         {% with percentage=tag.hours|floatformat:1 %}
                                                             <div class="d-flex justify-content-between align-items-center mb-1">
                                                                 <div>
-                                                                    <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
+                                                                    {% tag_dot tag.color %}
                                                                     <span>{{ tag.name }}</span>
                                                                 </div>
                                                                 <div class="text-end">
@@ -168,13 +154,13 @@
                         <div class="row">
                             <div class="col-lg-8">
                                 <h6 class="mb-3">주간 태그별 트렌드</h6>
-                                <div style="height: 300px;">
+                                <div class="chart-container">
                                     <canvas id="weeklyLineChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <h6 class="mb-3">요일별 활동량</h6>
-                                <div style="height: 300px;">
+                                <div class="chart-container">
                                     <canvas id="weeklyBarChart"></canvas>
                                 </div>
                             </div>
@@ -183,12 +169,7 @@
                             <div class="col-12">
                                 <h6 class="mb-3">주간 요약</h6>
                                 <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
-                                    {% with most_active_day=weekly_stats.weekly_data.0 %}
-                                        {% for day in weekly_stats.weekly_data %}
-                                            {% if day.total_minutes > most_active_day.total_minutes %}
-                                                {% with most_active_day=day %}{% endwith %}
-                                            {% endif %}
-                                        {% endfor %}
+                                    {% with most_active_day=weekly_stats.most_active_day %}
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <strong>주간 총 시간:</strong> {{ weekly_stats.week_total_hours }}시간<br>
@@ -209,7 +190,7 @@
                                                     {% for tag in weekly_stats.tag_weekly_stats %}
                                                     <div class="col-md-4 col-sm-6 mb-2">
                                                         <div class="d-flex align-items-center">
-                                                            <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
+                                                            {% tag_dot tag.color %}
                                                             <span class="small">{{ tag.name }}: <strong>{{ tag.avg_hours }}시간</strong></span>
                                                         </div>
                                                     </div>
@@ -228,7 +209,7 @@
                         <div class="row">
                             <div class="col-12">
                                 <h6 class="mb-3">월간 태그별 일별 사용량 트렌드</h6>
-                                <div style="height: 400px;">
+                                <div class="chart-container-lg">
                                     <canvas id="monthlyLineChart"></canvas>
                                 </div>
                             </div>
@@ -274,7 +255,7 @@
                                                 {% if tag.name != '미분류' %}
                                                 <div class="col-md-3 col-sm-6 mb-2">
                                                     <div class="d-flex align-items-center">
-                                                        <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
+                                                        {% tag_dot tag.color %}
                                                         <span class="small">{{ tag.name }}: <strong>{{ tag.avg_hours }}시간</strong></span>
                                                     </div>
                                                 </div>
@@ -293,18 +274,18 @@
                         <div class="row">
                             <div class="col-lg-8">
                                 <h6 class="mb-3">태그별 총 사용 시간</h6>
-                                <div style="height: 300px;">
+                                <div class="chart-container">
                                     <canvas id="tagTotalChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-4">
                                 <h6 class="mb-3">상위 태그 목록</h6>
-                                <div style="height: 300px; overflow-y: auto;">
+                                <div class="tag-analysis-scroll">
                                     {% for tag in tag_analysis|slice:":10" %}
                                     {% if tag.name != '미분류' %}
                                         <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
                                             <div>
-                                                <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
+                                                {% tag_dot tag.color %}
                                                 <span>{{ tag.name }}</span>
                                             </div>
                                             <div class="text-end">
@@ -334,8 +315,7 @@
                                             {% if tag.name != '미분류' %}
                                                 <tr>
                                                     <td>
-                                                        <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
-                                                        {{ tag.name }}
+                                                        {% tag_dot tag.color %}{{ tag.name }}
                                                     </td>
                                                     <td><strong>{{ tag.total_hours }}시간</strong></td>
                                                     <td>{{ tag.total_blocks }}개</td>
@@ -350,7 +330,7 @@
                     </div>
                 </div>
             </div>
-            {% include 'stats/ai_feedback.html' %}
+            {% include 'stats/life_feedback.html' %}
         </div>
     </div>
 </div>

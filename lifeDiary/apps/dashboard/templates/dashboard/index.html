@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load tag_ui %}
 
 {% block title %}대시보드 - {{ selected_date|date:"Y년 m월 d일" }} | 라이프 다이어리{% endblock %}
 
@@ -21,21 +22,7 @@
                     <i class="fas fa-calendar-day me-2"></i>
                     {{ selected_date|date:"Y년 m월 d일 (l)" }}
                 </h5>
-                <div class="d-flex gap-2 flex-wrap">
-                    <input type="date"
-                           class="form-control form-control-sm"
-                           id="dateSelector"
-                           value="{{ selected_date|date:'Y-m-d' }}"
-                           style="width: 150px;">
-                    <button class="btn btn-sm btn-outline-primary" onclick="goToToday()">
-                        <i class="fas fa-home"></i> 오늘
-                    </button>
-                    {% if user.is_authenticated and not user.is_superuser %}
-                    <a href="{% url 'users:mypage' %}" class="btn btn-sm btn-outline-primary fw-bold">
-                        <i class="fas fa-bullseye"></i> 목표 추가
-                    </a>
-                    {% endif %}
-                </div>
+                {% include "shared/_date_selector.html" with ds_mypage_label="목표 추가" %}
             </div>
             <div class="card-body">
                 <div class="row text-center dashboard-stats">
@@ -143,7 +130,7 @@
                     <div class="d-flex flex-wrap gap-2" id="tagLegend">
                         {% if user_tags %}
                             {% for tag in user_tags %}
-                                <span class="badge" style="background-color: {{ tag.color }}; color: {{ tag.text_color }};">{{ tag.name }}</span>
+                                {% tag_badge tag.color tag.text_color tag.name %}
                             {% endfor %}
                         {% else %}
                             <small class="text-muted">생성된 태그가 없습니다.</small>
@@ -158,7 +145,7 @@
     <div class="col-lg-4" id="quickInputSidebar" data-tags-url="{% url 'tags:index' %}">
         <div class="card rounded-3">
             <div class="card-header rounded-top-3 d-flex justify-content-between align-items-center">
-                <small class="mb-0" style="margin-left: 0.5rem">
+                <small class="mb-0 ms-2">
                     <i class="fas fa-edit me-2"></i>
                     입력정보
                 </small>
@@ -218,7 +205,7 @@
                                 <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
                                         data-tag-id="{{ tag.id }}"
                                         onclick="selectTag({{ tag.id }}, '{{ tag.color }}', '{{ tag.name }}')">
-                                    <span class="badge me-2" style="background-color: {{ tag.color }};">&nbsp;</span>
+                                    {% tag_dot tag.color %}
                                     {{ tag.name }}
                                     {% if tag.is_default %}
                                         <i class="fas fa-star text-warning ms-1" title="기본 태그"></i>
