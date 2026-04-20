@@ -490,3 +490,51 @@ footer {
     color: var(--color-primary);
     border-color: var(--color-primary);
 }
+
+/* =========================================================
+   Shared UI Utilities
+   ========================================================= */
+
+/* Date input (stats + dashboard 공용) */
+.date-input-sm {
+    width: 150px;
+}
+
+/* Chart canvas 컨테이너 */
+.chart-container {
+    height: 300px;
+}
+
+.chart-container-lg {
+    height: 400px;
+}
+
+/* 태그 통계 스크롤 목록 */
+.tag-stats-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+/* 태그 분석 스크롤 패널 */
+.tag-analysis-scroll {
+    height: 300px;
+    overflow-y: auto;
+}
+
+/* Life Feedback 카드 */
+.life-feedback-card {
+    min-width: 350px;
+    max-width: 400px;
+}
+
+/* 목표 안내 패널 (mypage) */
+.goal-guide-panel {
+    background-color: var(--color-primary-soft);
+    border-radius: var(--radius-sm);
+    padding: 0;
+}
+
+.goal-guide-toggle {
+    color: var(--color-text-muted);
+    font-weight: bold;
+}

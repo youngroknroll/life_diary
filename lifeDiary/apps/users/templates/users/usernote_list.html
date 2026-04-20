@@ -19,7 +19,7 @@
                 <td>{{ note.note|linebreaksbr }}</td>
                 <td><a href="{% url 'users:usernote_update' note.pk %}" class="btn btn-sm btn-warning">수정</a></td>
                 <td>
-                    <form action="{% url 'users:usernote_delete' note.pk %}" method="post" style="display:inline;">
+                    <form action="{% url 'users:usernote_delete' note.pk %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
                     </form>
