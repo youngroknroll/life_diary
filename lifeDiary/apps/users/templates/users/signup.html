@@ -13,7 +13,7 @@
                 </h4>
             </div>
             <div class="card-body">
-                <form method="post">
+                <form id="signupForm" method="post">
                     {% csrf_token %}
                     
                     <div class="mb-3">
@@ -92,7 +92,7 @@
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form[method="post"]');
+    const form = document.getElementById('signupForm');
     if (!form) return;
     form.addEventListener('submit', function() {
         const btn = form.querySelector('button[type="submit"]');
