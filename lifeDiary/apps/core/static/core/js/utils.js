@@ -59,6 +59,29 @@ function showNotification(message, type = 'info', duration = 3000) {
 }
 
 /**
+ * 버튼을 로딩 상태로 전환하고 원래 내용을 반환하는 헬퍼.
+ * @param {HTMLElement} btn - 대상 버튼 엘리먼트
+ * @param {string} text - 로딩 중 표시 텍스트 (기본: '처리 중...')
+ * @returns {string} - 복구용 원래 innerHTML
+ */
+function setButtonLoading(btn, text = '처리 중...') {
+    const original = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${text}`;
+    return original;
+}
+
+/**
+ * 버튼을 로딩 상태에서 원래 상태로 복구하는 헬퍼.
+ * @param {HTMLElement} btn - 대상 버튼 엘리먼트
+ * @param {string} originalHTML - setButtonLoading이 반환한 원래 innerHTML
+ */
+function resetButtonLoading(btn, originalHTML) {
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
+}
+
+/**
  * API 호출을 위한 공통 fetch 래퍼
  * @param {string} url - API 엔드포인트 URL
  * @param {object} options - fetch 옵션
@@ -86,9 +109,7 @@ async function apiCall(url, options = {}) {
     // 로딩 상태 처리
     let originalContent = null;
     if (showLoading && loadingElement) {
-        originalContent = loadingElement.innerHTML;
-        loadingElement.disabled = true;
-        loadingElement.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>처리 중...';
+        originalContent = setButtonLoading(loadingElement);
     }
 
     try {
@@ -115,8 +136,7 @@ async function apiCall(url, options = {}) {
     } finally {
         // 로딩 상태 해제
         if (showLoading && loadingElement && originalContent !== null) {
-            loadingElement.disabled = false;
-            loadingElement.innerHTML = originalContent;
+            resetButtonLoading(loadingElement, originalContent);
         }
     }
 }

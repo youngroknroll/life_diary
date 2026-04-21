@@ -87,4 +87,17 @@
         </div>
     </div>
 </div>
-{% endblock %} 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form[method="post"]');
+    if (!form) return;
+    form.addEventListener('submit', function() {
+        const btn = form.querySelector('button[type="submit"]');
+        if (btn) setButtonLoading(btn);
+    });
+});
+</script>
+{% endblock %}
