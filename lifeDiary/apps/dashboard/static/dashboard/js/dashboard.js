@@ -22,6 +22,8 @@ let selectedSlots = new Set();
 let selectedTag = null;
 let isDragging = false;
 let startSlot = null;
+let isAdditiveDrag = false;
+let dragBaseSelection = new Set();
 let touchStartX = 0, touchStartY = 0, touchDecided = false;
 
 // ── 그리드 칼럼 수 (반응형) ──
@@ -115,13 +117,21 @@ const clearSelection = () => {
 
 // ── 드래그 ──
 
-const startDrag = (slotIndex) => {
+const startDrag = (slotIndex, event) => {
     isDragging = true;
     startSlot = slotIndex;
-    clearSelection();
-    selectedSlots.add(slotIndex);
-    const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
-    if (slotElement) slotElement.classList.add('selected');
+    isAdditiveDrag = !!(event && (event.ctrlKey || event.metaKey));
+
+    if (isAdditiveDrag) {
+        // 기존 선택 유지, 실제 드래그 이동 시 dragOver에서 범위 추가
+        dragBaseSelection = new Set(selectedSlots);
+    } else {
+        dragBaseSelection = new Set();
+        clearSelection();
+        selectedSlots.add(slotIndex);
+        const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
+        if (slotElement) slotElement.classList.add('selected');
+    }
 };
 
 const handleTouchStart = (slotIndex, event) => {
@@ -129,7 +139,15 @@ const handleTouchStart = (slotIndex, event) => {
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
     touchDecided = false;
-    startDrag(slotIndex);
+    startDrag(slotIndex, event);
+};
+
+const restoreBaseSelection = () => {
+    dragBaseSelection.forEach(idx => {
+        selectedSlots.add(idx);
+        const el = document.querySelector(`[data-slot-index="${idx}"]`);
+        if (el) el.classList.add('selected');
+    });
 };
 
 const dragOver = (slotIndex) => {
@@ -137,18 +155,28 @@ const dragOver = (slotIndex) => {
 
     const startPos = slotToRowCol(startSlot);
     const endPos = slotToRowCol(slotIndex);
-    const minRow = Math.min(startPos.row, endPos.row);
-    const maxRow = Math.max(startPos.row, endPos.row);
-    const minCol = Math.min(startPos.col, endPos.col);
-    const maxCol = Math.max(startPos.col, endPos.col);
 
     clearSelection();
-    for (let r = minRow; r <= maxRow; r++) {
-        for (let c = minCol; c <= maxCol; c++) {
-            const idx = rowColToSlot(r, c);
+    if (isAdditiveDrag) restoreBaseSelection();
+
+    if (startPos.col === endPos.col && startPos.row !== endPos.row) {
+        // 순수 세로 드래그: 같은 열의 각 블록만 선택 (중간 시간 비우기)
+        const minRow = Math.min(startPos.row, endPos.row);
+        const maxRow = Math.max(startPos.row, endPos.row);
+        for (let r = minRow; r <= maxRow; r++) {
+            const idx = rowColToSlot(r, startPos.col);
             selectedSlots.add(idx);
-            const slotElement = document.querySelector(`[data-slot-index="${idx}"]`);
-            if (slotElement) slotElement.classList.add('selected');
+            const el = document.querySelector(`[data-slot-index="${idx}"]`);
+            if (el) el.classList.add('selected');
+        }
+    } else {
+        // 대각선/가로 드래그: 시작~끝 슬롯 사이 모든 블록 연속 선택
+        const minIdx = Math.min(startSlot, slotIndex);
+        const maxIdx = Math.max(startSlot, slotIndex);
+        for (let i = minIdx; i <= maxIdx; i++) {
+            selectedSlots.add(i);
+            const el = document.querySelector(`[data-slot-index="${i}"]`);
+            if (el) el.classList.add('selected');
         }
     }
     showSlotInfo(Array.from(selectedSlots));
@@ -159,6 +187,8 @@ const endDrag = () => {
     if (isDragging) {
         isDragging = false;
         startSlot = null;
+        isAdditiveDrag = false;
+        dragBaseSelection = new Set();
         showSlotInfo(Array.from(selectedSlots));
         updateButtons();
     }
@@ -272,6 +302,24 @@ const selectTag = (tagId, tagColor, tagName) => {
 
 // ── 저장/삭제 ──
 
+const showSavingOverlay = (message, icon = 'fa-save') => {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    const text = overlay.querySelector('.loading-text');
+    if (text) {
+        text.innerHTML = `<i class="fas ${icon} me-2"></i>${message}`;
+    }
+    overlay.classList.add('is-visible');
+    overlay.setAttribute('aria-hidden', 'false');
+};
+
+const hideSavingOverlay = () => {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('is-visible');
+    overlay.setAttribute('aria-hidden', 'true');
+};
+
 const saveSlot = async () => {
     if (selectedSlots.size === 0) {
         showNotification('슬롯을 선택해주세요.', 'warning');
@@ -284,6 +332,7 @@ const saveSlot = async () => {
     }
 
     const saveBtn = document.getElementById('saveBtn');
+    showSavingOverlay('저장 중입니다...');
 
     try {
         const memo = document.getElementById('memoInput').value.trim();
@@ -304,6 +353,7 @@ const saveSlot = async () => {
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {
+        hideSavingOverlay();
         showNotification(`저장 실패: ${error.message}`, 'error');
         console.error('Save error:', error);
     }
@@ -328,6 +378,8 @@ const deleteSlot = async () => {
         return;
     }
 
+    showSavingOverlay('삭제 중입니다...', 'fa-trash');
+
     try {
         const date = document.getElementById('dateSelector').value;
 
@@ -343,6 +395,7 @@ const deleteSlot = async () => {
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {
+        hideSavingOverlay();
         showNotification(`삭제 실패: ${error.message}`, 'error');
         console.error('Delete error:', error);
     }
