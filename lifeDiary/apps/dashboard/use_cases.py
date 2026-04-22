@@ -82,4 +82,5 @@ class DeleteTimeBlocksUseCase:
     @transaction.atomic
     def execute(self, cmd: DeleteTimeBlocksCommand, user) -> DeleteResult:
         deleted = self._writer.delete_by_slots(user, cmd.target_date, cmd.slot_indexes)
+        invalidate_stats_cache(cmd.user_id, cmd.target_date)
         return DeleteResult(deleted=deleted, requested=len(cmd.slot_indexes))
