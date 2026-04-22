@@ -101,7 +101,7 @@
                                  title="{{ slot.time_str }} - 빈 슬롯"
                              {% endif %}
                              onclick="selectSlot({{ slot.index }})"
-                             onmousedown="startDrag({{ slot.index }})"
+                             onmousedown="startDrag({{ slot.index }}, event)"
                              onmouseenter="dragOver({{ slot.index }})"
                              onmouseup="endDrag()"
                              ontouchstart="handleTouchStart({{ slot.index }}, event)"
