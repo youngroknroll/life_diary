@@ -89,15 +89,3 @@
 </div>
 {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('signupForm');
-    if (!form) return;
-    form.addEventListener('submit', function() {
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) setButtonLoading(btn);
-    });
-});
-</script>
-{% endblock %}

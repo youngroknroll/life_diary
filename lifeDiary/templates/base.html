@@ -235,6 +235,23 @@
         document.body.addEventListener('htmx:configRequest', (evt) => {
             evt.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
         });
+
+        // 전역: 모든 POST 폼 제출 시 버튼 스피너 적용
+        // - AJAX 폼(preventDefault 호출)은 자체 핸들러가 UI를 관리하므로 스킵
+        // - data-no-loading 속성으로 개별 폼 opt-out 가능
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!(form instanceof HTMLFormElement)) return;
+            if (e.defaultPrevented) return;
+            if ((form.method || '').toLowerCase() !== 'post') return;
+            if (form.hasAttribute('data-no-loading')) return;
+
+            const btn = e.submitter || form.querySelector('button[type="submit"], input[type="submit"]');
+            if (!btn || btn.disabled) return;
+            if (typeof setButtonLoading === 'function') {
+                setButtonLoading(btn);
+            }
+        });
         
         // 다크모드 토글
         (function() {
