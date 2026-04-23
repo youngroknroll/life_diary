@@ -17,13 +17,9 @@
             <tr>
                 <td>{{ note.created_at|date:'Y-m-d H:i' }}</td>
                 <td>{{ note.note|linebreaksbr }}</td>
-                <td><a href="{% url 'users:usernote_update' note.pk %}" class="btn btn-sm btn-warning">수정</a></td>
-                <td>
-                    <form action="{% url 'users:usernote_delete' note.pk %}" method="post" class="d-inline">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete();">삭제</button>
-                    </form>
-                </td>
+                {% url 'users:usernote_update' note.pk as edit_url %}
+                {% url 'users:usernote_delete' note.pk as delete_url %}
+                {% include 'shared/_table_row_actions.html' with edit_class='btn-warning' %}
             </tr>
             {% empty %}
             <tr><td colspan="4" class="text-center">등록된 특이사항이 없습니다.</td></tr>

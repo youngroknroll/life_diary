@@ -25,13 +25,9 @@
                         {% endif %}
                     </td>
                     <td>{{ goal.actual|floatformat:1 }}시간</td>
-                    <td><a href="{% url 'users:usergoal_update' goal.pk %}" class="btn btn-sm btn-outline-primary">수정</a></td>
-                    <td>
-                        <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" class="d-inline">
-                            {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete();">삭제</button>
-                        </form>
-                    </td>
+                    {% url 'users:usergoal_update' goal.pk as edit_url %}
+                    {% url 'users:usergoal_delete' goal.pk as delete_url %}
+                    {% include 'shared/_table_row_actions.html' %}
                 </tr>
             {% endif %}
         {% endfor %}
