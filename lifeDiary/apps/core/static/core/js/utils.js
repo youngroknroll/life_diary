@@ -59,6 +59,16 @@ function showNotification(message, type = 'info', duration = 3000) {
 }
 
 /**
+ * 삭제 확인 다이얼로그 공통 헬퍼.
+ * 향후 네이티브 confirm을 커스텀 모달로 교체할 때 단일 진입점이 된다.
+ * @param {string} message - 커스텀 확인 메시지 (기본: '정말 삭제하시겠습니까?')
+ * @returns {boolean} - 사용자 확인 여부
+ */
+function confirmDelete(message = '정말 삭제하시겠습니까?') {
+    return confirm(message);
+}
+
+/**
  * 버튼을 로딩 상태로 전환하고 원래 내용을 반환하는 헬퍼.
  * @param {HTMLElement} btn - 대상 버튼 엘리먼트
  * @param {string} text - 로딩 중 표시 텍스트 (기본: '처리 중...')
@@ -82,31 +92,43 @@ function resetButtonLoading(btn, originalHTML) {
 }
 
 /**
- * API 호출을 위한 공통 fetch 래퍼
+ * API 호출을 위한 공통 fetch 래퍼.
+ *
  * @param {string} url - API 엔드포인트 URL
- * @param {object} options - fetch 옵션
- * @param {object} options.method - HTTP 메서드
- * @param {object} options.data - 전송할 데이터
- * @param {object} options.headers - 추가 헤더
- * @returns {Promise<object>} - API 응답 결과
+ * @param {object} options
+ * @param {string} [options.method='GET'] - HTTP 메서드
+ * @param {object} [options.data] - JSON 직렬화해서 보낼 데이터
+ * @param {*} [options.body] - 원본 body (FormData 등). 지정 시 data는 무시되고 Content-Type도 자동 지정 안 함
+ * @param {object} [options.headers] - 추가 헤더
+ * @param {boolean} [options.showLoading=true] - 버튼 로딩 표시 여부
+ * @param {HTMLElement} [options.loadingElement] - 로딩 버튼 엘리먼트
+ * @param {'json'|'text'|'none'} [options.responseType='json'] - 응답 파싱 방식
+ *        - 'json' (기본): `.json()`
+ *        - 'text': `.text()` (HTML partial 등)
+ *        - 'none': 본문 파싱 없이 {ok, status} 반환. 204에는 자동 적용됨.
+ * @returns {Promise<*>} - 응답 결과
+ * @throws {Error} - 실패 시 err.status(HTTP), err.data(파싱된 응답) 부착
  */
 async function apiCall(url, options = {}) {
     const {
         method = 'GET',
         data = null,
+        body = null,
         headers = {},
         showLoading = true,
-        loadingElement = null
+        loadingElement = null,
+        responseType = 'json',
     } = options;
 
-    // 기본 헤더 설정
     const defaultHeaders = {
-        'Content-Type': 'application/json',
         'X-CSRFToken': getCookie('csrftoken'),
-        ...headers
+        ...headers,
     };
+    // JSON 직렬화 모드에서만 Content-Type 자동 지정 (FormData면 브라우저가 boundary 포함해 설정)
+    if (body === null && data !== null) {
+        defaultHeaders['Content-Type'] = 'application/json';
+    }
 
-    // 로딩 상태 처리
     let originalContent = null;
     if (showLoading && loadingElement) {
         originalContent = setButtonLoading(loadingElement);
@@ -116,25 +138,42 @@ async function apiCall(url, options = {}) {
         const fetchOptions = {
             method,
             headers: defaultHeaders,
+            credentials: 'same-origin',
         };
 
-        if (data && (method === 'POST' || method === 'PUT' || method === 'PATCH' || method === 'DELETE')) {
+        if (body !== null) {
+            fetchOptions.body = body;
+        } else if (data !== null && method !== 'GET' && method !== 'HEAD') {
             fetchOptions.body = JSON.stringify(data);
         }
 
         const response = await fetch(url, fetchOptions);
-        const result = await response.json();
+
+        // 본문 없는 응답
+        if (response.status === 204 || responseType === 'none') {
+            if (!response.ok) {
+                const err = new Error(`HTTP ${response.status}`);
+                err.status = response.status;
+                throw err;
+            }
+            return { ok: true, status: response.status };
+        }
+
+        const result = responseType === 'text'
+            ? await response.text()
+            : await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || `HTTP ${response.status}`);
+            const message = (responseType === 'json' && result && result.message) || `HTTP ${response.status}`;
+            const err = new Error(message);
+            err.status = response.status;
+            err.data = result;
+            throw err;
         }
 
         return result;
 
-    } catch (error) {
-        throw error;
     } finally {
-        // 로딩 상태 해제
         if (showLoading && loadingElement && originalContent !== null) {
             resetButtonLoading(loadingElement, originalContent);
         }

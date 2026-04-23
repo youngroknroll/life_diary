@@ -1,12 +1,9 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container mt-4">
-    <h2>목표 삭제</h2>
+{% extends 'shared/confirm_delete.html' %}
+
+{% block confirm_title %}목표 삭제{% endblock %}
+
+{% block confirm_body %}
     <p>정말로 <strong>{{ goal.tag.name }}</strong> ({{ goal.get_period_display }}, {{ goal.target_hours }}시간) 목표를 삭제하시겠습니까?</p>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">삭제</button>
-        <a href="{% url 'users:usergoal_list' %}" class="btn btn-secondary">취소</a>
-    </form>
-</div>
-{% endblock %} 
+{% endblock %}
+
+{% block cancel_url %}{% url 'users:usergoal_list' %}{% endblock %}

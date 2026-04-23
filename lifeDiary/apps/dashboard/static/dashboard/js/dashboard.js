@@ -374,7 +374,7 @@ const deleteSlot = async () => {
         return;
     }
 
-    if (!confirm(`${filledSlots.length}개의 기록된 슬롯을 삭제하시겠습니까?`)) {
+    if (!confirmDelete(`${filledSlots.length}개의 기록된 슬롯을 삭제하시겠습니까?`)) {
         return;
     }
 

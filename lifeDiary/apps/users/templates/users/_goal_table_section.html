@@ -29,7 +29,7 @@
                     <td>
                         <form action="{% url 'users:usergoal_delete' goal.pk %}" method="post" class="d-inline">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('정말 삭제하시겠습니까?');">삭제</button>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete();">삭제</button>
                         </form>
                     </td>
                 </tr>

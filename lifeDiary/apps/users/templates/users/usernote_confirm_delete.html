@@ -1,13 +1,10 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container mt-4">
-    <h2>특이사항 삭제</h2>
+{% extends 'shared/confirm_delete.html' %}
+
+{% block confirm_title %}특이사항 삭제{% endblock %}
+
+{% block confirm_body %}
     <p>정말로 아래 특이사항을 삭제하시겠습니까?</p>
     <div class="alert alert-warning">{{ note.note|linebreaksbr }}</div>
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">삭제</button>
-        <a href="{% url 'users:usernote_list' %}" class="btn btn-secondary">취소</a>
-    </form>
-</div>
-{% endblock %} 
+{% endblock %}
+
+{% block cancel_url %}{% url 'users:usernote_list' %}{% endblock %}

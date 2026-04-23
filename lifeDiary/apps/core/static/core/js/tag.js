@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 전역 함수로 태그 삭제 함수 등록 (core utils 사용)
     window.deleteTag = async function(tagId, tagName) {
-        if (!confirm(`'${tagName}' 태그를 정말 삭제하시겠습니까?`)) {
+        if (!confirmDelete(`'${tagName}' 태그를 정말 삭제하시겠습니까?`)) {
             return;
         }
 
