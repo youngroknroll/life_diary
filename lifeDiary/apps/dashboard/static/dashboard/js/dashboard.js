@@ -302,24 +302,6 @@ const selectTag = (tagId, tagColor, tagName) => {
 
 // ── 저장/삭제 ──
 
-const showSavingOverlay = (message, icon = 'fa-save') => {
-    const overlay = document.getElementById('loadingOverlay');
-    if (!overlay) return;
-    const text = overlay.querySelector('.loading-text');
-    if (text) {
-        text.innerHTML = `<i class="fas ${icon} me-2"></i>${message}`;
-    }
-    overlay.classList.add('is-visible');
-    overlay.setAttribute('aria-hidden', 'false');
-};
-
-const hideSavingOverlay = () => {
-    const overlay = document.getElementById('loadingOverlay');
-    if (!overlay) return;
-    overlay.classList.remove('is-visible');
-    overlay.setAttribute('aria-hidden', 'true');
-};
-
 const saveSlot = async () => {
     if (selectedSlots.size === 0) {
         showNotification('슬롯을 선택해주세요.', 'warning');
@@ -332,7 +314,7 @@ const saveSlot = async () => {
     }
 
     const saveBtn = document.getElementById('saveBtn');
-    showSavingOverlay('저장 중입니다...');
+    showOverlay('저장 중입니다...', 'fa-save');
 
     try {
         const memo = document.getElementById('memoInput').value.trim();
@@ -353,7 +335,7 @@ const saveSlot = async () => {
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {
-        hideSavingOverlay();
+        hideOverlay();
         showNotification(`저장 실패: ${error.message}`, 'error');
         console.error('Save error:', error);
     }
@@ -378,7 +360,7 @@ const deleteSlot = async () => {
         return;
     }
 
-    showSavingOverlay('삭제 중입니다...', 'fa-trash');
+    showOverlay('삭제 중입니다...', 'fa-trash');
 
     try {
         const date = document.getElementById('dateSelector').value;
@@ -395,7 +377,7 @@ const deleteSlot = async () => {
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {
-        hideSavingOverlay();
+        hideOverlay();
         showNotification(`삭제 실패: ${error.message}`, 'error');
         console.error('Delete error:', error);
     }

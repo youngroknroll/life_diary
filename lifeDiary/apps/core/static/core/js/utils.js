@@ -59,6 +59,33 @@ function showNotification(message, type = 'info', duration = 3000) {
 }
 
 /**
+ * 전역 로딩 오버레이를 커스텀 메시지로 표시.
+ * base.html의 #loadingOverlay DOM을 재사용한다.
+ * @param {string} message - 표시할 안내 문구
+ * @param {string} [icon='fa-clock'] - Font Awesome 아이콘 클래스
+ */
+function showOverlay(message, icon = 'fa-clock') {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    if (message) {
+        const text = overlay.querySelector('.loading-text');
+        if (text) text.innerHTML = `<i class="fas ${icon} me-2"></i>${message}`;
+    }
+    overlay.classList.add('is-visible');
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+/**
+ * 전역 로딩 오버레이를 숨김.
+ */
+function hideOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (!overlay) return;
+    overlay.classList.remove('is-visible');
+    overlay.setAttribute('aria-hidden', 'true');
+}
+
+/**
  * 삭제 확인 다이얼로그 공통 헬퍼.
  * 향후 네이티브 confirm을 커스텀 모달로 교체할 때 단일 진입점이 된다.
  * @param {string} message - 커스텀 확인 메시지 (기본: '정말 삭제하시겠습니까?')
