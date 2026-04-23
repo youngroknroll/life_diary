@@ -24,18 +24,14 @@
         <div class="mb-3">
           <label for="{{ form.tag.id_for_label }}" class="form-label">{{ form.tag.label }}</label>
           {{ form.tag }}
-          {% if form.tag.errors %}
-            <div class="text-danger">{{ form.tag.errors }}</div>
-          {% endif %}
+          {% include 'shared/_field_errors.html' with field=form.tag %}
         </div>
         
         <!-- 기간 선택 -->
         <div class="mb-3">
           <label for="{{ form.period.id_for_label }}" class="form-label">{{ form.period.label }}</label>
           {{ form.period }}
-          {% if form.period.errors %}
-            <div class="text-danger">{{ form.period.errors }}</div>
-          {% endif %}
+          {% include 'shared/_field_errors.html' with field=form.period %}
         </div>
         
         <!-- 목표 시간 입력 -->
@@ -48,9 +44,7 @@
           {% if form.target_hours.help_text %}
             <div class="form-text">{{ form.target_hours.help_text|safe }}</div>
           {% endif %}
-          {% if form.target_hours.errors %}
-            <div class="text-danger">{{ form.target_hours.errors }}</div>
-          {% endif %}
+          {% include 'shared/_field_errors.html' with field=form.target_hours %}
         </div>
         
         <button type="submit" class="btn btn-success">저장</button>
