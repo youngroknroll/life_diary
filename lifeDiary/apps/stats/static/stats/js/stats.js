@@ -8,6 +8,30 @@
 
 let charts = {};
 
+/**
+ * 차트 canvas 컨텍스트를 가져오고 기존 차트가 있으면 파괴.
+ * @param {string} canvasId - canvas 엘리먼트 id
+ * @param {string} key - charts 맵의 키 (예: 'dailyPie')
+ * @returns {CanvasRenderingContext2D}
+ */
+function prepareChart(canvasId, key) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    if (charts[key]) charts[key].destroy();
+    return ctx;
+}
+
+/**
+ * 데이터가 없을 때 canvas 중앙에 placeholder 문구를 그림.
+ * @param {CanvasRenderingContext2D} ctx
+ * @param {string} [message='데이터가 없습니다']
+ */
+function drawEmptyState(ctx, message = '데이터가 없습니다') {
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '16px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     function parseJsonScript(id) {
         const el = document.getElementById(id);
@@ -39,17 +63,9 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function renderDailyPieChart(tagStats) {
-    const ctx = document.getElementById('dailyPieChart').getContext('2d');
-
-    if (charts.dailyPie) {
-        charts.dailyPie.destroy();
-    }
-
+    const ctx = prepareChart('dailyPieChart', 'dailyPie');
     if (tagStats.length === 0) {
-        ctx.fillStyle = '#6c757d';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('데이터가 없습니다', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        drawEmptyState(ctx);
         return;
     }
 
@@ -87,17 +103,9 @@ function renderDailyPieChart(tagStats) {
 }
 
 function renderHourlyBarChart(hourlyStats, tagStats) {
-    const ctx = document.getElementById('hourlyBarChart').getContext('2d');
-
-    if (charts.hourlyBar) {
-        charts.hourlyBar.destroy();
-    }
-
+    const ctx = prepareChart('hourlyBarChart', 'hourlyBar');
     if (hourlyStats.every(hour => Object.keys(hour).length === 0)) {
-        ctx.fillStyle = '#6c757d';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('데이터가 없습니다', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        drawEmptyState(ctx);
         return;
     }
 
@@ -155,12 +163,7 @@ function renderHourlyBarChart(hourlyStats, tagStats) {
 }
 
 function renderWeeklyLineChart(tagStats, weeklyData) {
-    const ctx = document.getElementById('weeklyLineChart').getContext('2d');
-
-    if (charts.weeklyLine) {
-        charts.weeklyLine.destroy();
-    }
-
+    const ctx = prepareChart('weeklyLineChart', 'weeklyLine');
     const days = weeklyData.map(day => day.day_korean);
 
     charts.weeklyLine = new Chart(ctx, {
@@ -190,12 +193,7 @@ function renderWeeklyLineChart(tagStats, weeklyData) {
 }
 
 function renderWeeklyBarChart(weeklyData) {
-    const ctx = document.getElementById('weeklyBarChart').getContext('2d');
-
-    if (charts.weeklyBar) {
-        charts.weeklyBar.destroy();
-    }
-
+    const ctx = prepareChart('weeklyBarChart', 'weeklyBar');
     charts.weeklyBar = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -222,17 +220,9 @@ function renderWeeklyBarChart(weeklyData) {
 }
 
 function renderMonthlyLineChart(monthlyData) {
-    const ctx = document.getElementById('monthlyLineChart').getContext('2d');
-
-    if (charts.monthlyLine) {
-        charts.monthlyLine.destroy();
-    }
-
+    const ctx = prepareChart('monthlyLineChart', 'monthlyLine');
     if (!monthlyData || !monthlyData.tag_stats || monthlyData.tag_stats.length === 0) {
-        ctx.fillStyle = '#6c757d';
-        ctx.font = '16px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('데이터가 없습니다', ctx.canvas.width / 2, ctx.canvas.height / 2);
+        drawEmptyState(ctx);
         return;
     }
 
@@ -286,12 +276,7 @@ function renderMonthlyLineChart(monthlyData) {
 }
 
 function renderTagTotalChart(tagAnalysis) {
-    const ctx = document.getElementById('tagTotalChart').getContext('2d');
-
-    if (charts.tagTotal) {
-        charts.tagTotal.destroy();
-    }
-
+    const ctx = prepareChart('tagTotalChart', 'tagTotal');
     const top10 = tagAnalysis.slice(0, 10);
 
     charts.tagTotal = new Chart(ctx, {
