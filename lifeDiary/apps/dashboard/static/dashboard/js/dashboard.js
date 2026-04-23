@@ -332,6 +332,8 @@ const saveSlot = async () => {
         });
 
         showNotification(result.message, 'success');
+        // 리로드까지 1초 공백 동안 키보드 Enter로 인한 중복 제출 방지
+        if (saveBtn) saveBtn.disabled = true;
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {
@@ -374,6 +376,9 @@ const deleteSlot = async () => {
         });
 
         showNotification(result.message, 'success');
+        // 리로드까지 1초 공백 동안 선택 상태를 비워 삭제 버튼·저장 버튼 비활성 유지
+        selectedSlots.clear();
+        updateButtons();
         setTimeout(() => location.reload(), 1000);
 
     } catch (error) {

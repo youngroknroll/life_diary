@@ -69,7 +69,11 @@ function showOverlay(message, icon = 'fa-clock') {
     if (!overlay) return;
     if (message) {
         const text = overlay.querySelector('.loading-text');
-        if (text) text.innerHTML = `<i class="fas ${icon} me-2"></i>${message}`;
+        if (text) {
+            // 아이콘은 innerHTML, message는 textNode로 분리해 XSS 소지 제거
+            text.innerHTML = `<i class="fas ${icon} me-2"></i>`;
+            text.appendChild(document.createTextNode(message));
+        }
     }
     overlay.classList.add('is-visible');
     overlay.setAttribute('aria-hidden', 'false');
@@ -176,13 +180,16 @@ async function apiCall(url, options = {}) {
 
         const response = await fetch(url, fetchOptions);
 
-        // 본문 없는 응답
+        // 본문 없는 응답 (204 또는 none)
         if (response.status === 204 || responseType === 'none') {
             if (!response.ok) {
                 const err = new Error(`HTTP ${response.status}`);
                 err.status = response.status;
                 throw err;
             }
+            // responseType별 중립 값 반환 (text는 '', json은 null, none은 상태 객체)
+            if (responseType === 'text') return '';
+            if (responseType === 'json') return null;
             return { ok: true, status: response.status };
         }
 
