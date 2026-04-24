@@ -1,178 +1,231 @@
-# 보안 취약점 수정 계획
+# 대시보드 태그 UX 개선 계획
 
-**작성일**: 2026-04-21  
-**우선순위**: 높음 → 중간 → 중간  
-**대상 파일**: 4개
-
----
-
-## 요구사항 요약
-
-코드 검토를 통해 확인된 3가지 보안 취약점을 수정한다.
-
-1. 저장형 XSS — `stats/index.html` `|safe` + 비이스케이프 JSON
-2. 브루트포스 방어 없음 — 로그인 실패 횟수 제한 없음
-3. CDN SRI 누락 — Chart.js, htmx, Alpine.js 무결성 해시 없음
+**작성일**: 2026-04-24
+**대상**: 대시보드 (`apps/dashboard/`)
+**복잡도**: LOW
 
 ---
 
-## Phase 1 — 저장형 XSS 수정 (높음)
+## 요구사항
 
-**대상 파일**
-- `apps/stats/templates/stats/index.html:340-347`
-- `apps/core/utils.py:27` (필요 시)
+1. **Feature 1 — 하단 범례 태그 클릭 이벤트**
+   그리드 아래 `#tagLegend` 배지를 클릭하면 사이드바 태그 버튼과 **동일한 `selectTag()` 이벤트**가 발생해야 한다. (태그 선택 상태로 전환 → 다음 슬롯 저장 시 사용)
 
-**현재 코드 (취약)**
-```html
-<script id="stats-data" type="application/json">
-{
-    "daily": {{ daily_stats_json|safe }},
-    ...
-}
-</script>
-```
-
-**수정 방법: `json_script` 태그 사용**
-
-Django 내장 `json_script` 필터는 `</script>`, `<!--` 등 위험 문자를 자동으로 유니코드 이스케이프 처리한다.
-
-```html
-{{ daily_stats_json|json_script:"daily-stats-data" }}
-{{ weekly_stats_json|json_script:"weekly-stats-data" }}
-{{ monthly_stats_json|json_script:"monthly-stats-data" }}
-{{ tag_analysis_json|json_script:"tag-analysis-data" }}
-```
-
-JS에서 읽는 방법:
-```javascript
-const daily = JSON.parse(document.getElementById('daily-stats-data').textContent);
-```
-
-**변경 내용**
-- `index.html:340-347` — `<script type="application/json">` 블록 제거, `json_script` 4개로 교체
-- `stats/js/stats.js` — `stats-data` 단일 객체 파싱 → 개별 id 파싱으로 변경
-- `utils.py:serialize_for_js` — context에서 JSON 문자열 대신 원본 dict 전달 가능 (선택)
-
-**리스크**: stats.js의 데이터 접근 방식 변경 필요 → stats.js 확인 후 수정
-
-> ✅ **완료** (2026-04-21)  
-> `index.html` `|safe` 블록 → `json_script` 4개로 교체.  
-> `stats.js` 단일 파싱 → `parseJsonScript(id)` 헬퍼로 개별 파싱 변경.
+2. **Feature 2 — 사이드바 태그 목록 카테고리화**
+   사이드바 `#tagContainer`의 태그 버튼들을 `Category.display_order` 순으로 카테고리별 그룹화하여 출력한다. 카테고리명 헤더 + 그 아래 태그 버튼.
+   (범례 `#tagLegend`는 그대로 flat 유지)
 
 ---
 
-## Phase 2 — 브루트포스 방어 추가 (중간)
+## 현재 상태 요약
 
-**대상 파일**
-- `apps/users/views.py:81-102`
-- `requirements.txt`
+| 위치 | 파일 | 상태 |
+|---|---|---|
+| 범례 SSR | `apps/dashboard/templates/dashboard/index.html:128-139` | `{% tag_badge %}` flat, 클릭 핸들러 없음 |
+| 범례 CSR | `apps/dashboard/static/dashboard/js/dashboard.js:423-432` (`renderTagLegend`) | `<span>` flat, 클릭 핸들러 없음 |
+| 사이드바 SSR | `index.html:199-217` | `<button onclick="selectTag(...)">` flat |
+| 사이드바 CSR | `dashboard.js:403-421` (`renderTagContainer`) | `<button onclick="selectTag(...)">` flat |
+| `selectTag(id, color, name)` | `dashboard.js` (기존 함수) | 그대로 재사용 |
+| `tag_badge` 템플릿태그 | `apps/tags/templatetags/tag_ui.py:17-25` | `<span>` 생성, onclick 속성 없음 |
+| Tag 모델 | `apps/tags/models.py` | `category` FK 존재 (mandatory) |
+| `/api/tags/` 응답 | `apps/tags/views.py:61-77` | `category_id`만 포함 (name/color 없음) |
+| `/api/categories/` 응답 | 이미 존재, dashboard init에서 호출 중 (`dashboard.js:47-50`) | 사용 가능 |
+| Dashboard view context | `apps/dashboard/views.py:61` | `user_tags`는 `find_accessible_ordered` 결과 (is_default → name) |
 
-**방법: `django-axes` 패키지 사용**
+---
 
-외부 패키지 없이 구현하면 코드가 복잡해진다. `django-axes`는 Django 표준 미들웨어로 통합되며, DB 기반 실패 횟수 추적을 제공한다.
+## Phase 1 — Feature 1: 범례 클릭 핸들러 추가
 
-**설치**
-```
-django-axes==7.0.1
-```
+**목표**: 범례 배지 클릭 시 `selectTag(id, color, name)` 호출.
 
-**settings.py 추가**
+**변경 파일**
+1. `apps/dashboard/static/dashboard/js/dashboard.js` — `renderTagLegend()` 수정
+   - `<span>` → `<button>` 또는 `<span role="button" tabindex="0" onclick="...">`
+   - 스타일 유지 (bootstrap `badge` 그대로)
+   - `data-tag-id` 추가 (사이드바 버튼과 동일한 선택 상태 UI 연동용)
+2. `apps/tags/templatetags/tag_ui.py` — `tag_badge` 시그니처 확장
+   - 기존 호출자 호환 유지: `clickable=False`, `tag_id=None` 옵션 파라미터 추가
+   - `clickable=True`일 때 onclick 추가
+3. `apps/dashboard/templates/dashboard/index.html:128-139` — 범례에서 `tag_badge` 호출 시 `clickable=True tag_id=tag.id` 전달
+
+**클릭 시 동작**
+- 기존 `selectTag(id, color, name)` 로직 그대로 호출 → 선택 상태 변경 + 사이드바 버튼 active 표시 연동
+
+**접근성**
+- `<button type="button" class="badge btn-tag-legend" ...>` 로 구현 (키보드 포커스/엔터 지원)
+- 버튼 기본 스타일 리셋 필요 (border 제거, padding 유지)
+
+**리스크**: 없음. 순수 핸들러 추가.
+
+---
+
+## Phase 2 — Feature 2: 사이드바 카테고리 그룹화
+
+**목표**: `#tagContainer` 버튼을 카테고리별 그룹으로 묶어 렌더링.
+
+### 2-1. API 응답 보강
+
+`/api/tags/` 응답에 카테고리 메타 추가:
+
 ```python
-INSTALLED_APPS = [
-    ...
-    'axes',
-]
-
-MIDDLEWARE = [
-    ...
-    'axes.middleware.AxesMiddleware',  # 마지막에 추가
-]
-
-AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesStandaloneBackend',
-    'django.contrib.auth.backends.ModelBackend',
-]
-
-# 5회 실패 시 1시간 잠금
-AXES_FAILURE_LIMIT = 5
-AXES_COOLOFF_TIME = 1  # hours
-AXES_LOCKOUT_CALLABLE = None  # 기본 403 응답
-AXES_RESET_ON_SUCCESS = True
+# apps/tags/views.py:61-77
+{
+    "tags": [...],
+    "categories": [
+        {"id": 1, "name": "수면시간", "color": "#...", "display_order": 1},
+        ...
+    ],
+}
 ```
 
-**마이그레이션**
-```bash
-python manage.py migrate
+- `apps/tags/use_cases.py` — 카테고리 조회 유스케이스 재사용 또는 추가
+- Tag 직렬화에 `category_id`는 이미 있음 (변경 불필요)
+
+**대안**: 기존 `/api/categories/` 별도 호출 유지 후 JS에서 병합 (이미 init에서 호출 중).
+→ **채택**: 대시보드는 이미 둘 다 호출 중이므로 `availableCategories` 모듈 변수에 저장 후 `renderTagContainer`에서 사용. API 변경 최소화.
+
+### 2-2. CSR — `renderTagContainer()` 그룹화
+
+```javascript
+function renderTagContainer(tags) {
+    const container = document.getElementById('tagContainer');
+    if (tags.length === 0) { /* empty state */ return; }
+
+    // availableCategories는 init에서 /api/categories/ 로드 후 저장된 모듈 변수
+    const byCategory = new Map();
+    for (const tag of tags) {
+        const key = tag.category_id;
+        if (!byCategory.has(key)) byCategory.set(key, []);
+        byCategory.get(key).push(tag);
+    }
+
+    const sortedCategories = [...availableCategories]
+        .sort((a, b) => a.display_order - b.display_order);
+
+    container.innerHTML = sortedCategories
+        .filter(cat => byCategory.has(cat.id))
+        .map(cat => `
+            <div class="tag-category-group">
+                <div class="tag-category-header small text-muted fw-bold mt-2">
+                    <span class="category-dot" style="background-color:${cat.color}"></span>
+                    ${escapeHtml(cat.name)}
+                </div>
+                <div class="d-grid gap-1">
+                    ${byCategory.get(cat.id).map(tag => renderTagButton(tag)).join('')}
+                </div>
+            </div>
+        `).join('');
+}
 ```
 
-**리스크**: `django-axes`는 DB 테이블을 생성하므로 마이그레이션 필요. 개발 환경에서 사전 테스트 권장.
+- `renderTagButton(tag)` 헬퍼 추출 → 기존 버튼 HTML 재사용
+- XSS 방어: `escapeHtml()` 사용 (기존 `utils.js`에 있는지 확인, 없으면 추가)
 
-> ✅ **완료** (2026-04-21)  
-> `requirements.txt`, `settings/dev.py` 수정 및 마이그레이션 완료.  
-> **트러블슈팅**: conda 환경(`knou-life-diary`)에 별도 설치 필요했음 → `conda run -n knou-life-diary pip install django-axes==7.0.1`  
-> **테스트 대응**: `conftest.py`에 `AXES_ENABLED = False` 추가 — 테스트 환경에서 axes 비활성화.
+### 2-3. SSR — `index.html:199-217` 그룹화
+
+Django `{% regroup %}` 템플릿 태그 사용:
+
+```django
+{% regroup user_tags by category as tags_by_category %}
+<div class="d-grid gap-2" id="tagContainer">
+    {% if user_tags %}
+        {% for cat_group in tags_by_category %}
+            <div class="tag-category-group">
+                <div class="tag-category-header small text-muted fw-bold mt-2">
+                    {% tag_dot cat_group.grouper.color %}
+                    {{ cat_group.grouper.name }}
+                </div>
+                <div class="d-grid gap-1">
+                    {% for tag in cat_group.list %}
+                        <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
+                                data-tag-id="{{ tag.id }}"
+                                onclick="selectTag({{ tag.id }}, '{{ tag.color }}', '{{ tag.name }}')">
+                            {% tag_dot tag.color %}
+                            {{ tag.name }}
+                            {% if tag.is_default %}<i class="fas fa-star text-warning ms-1" title="기본 태그"></i>{% endif %}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="text-center py-2">
+            <p class="text-muted small">태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.</p>
+        </div>
+    {% endif %}
+</div>
+```
+
+**주의**: `{% regroup %}`은 미리 정렬된 쿼리셋이 필요. `find_accessible_ordered`는 현재 `is_default, name` 순.
+→ `apps/dashboard/views.py:61` 에서 `user_tags`를 `category__display_order, is_default, name` 순으로 재정렬하거나, 뷰에서 파이썬으로 정렬.
+
+### 2-4. 초기 렌더 일관성
+
+- 뷰 컨텍스트에 `categories`도 주입 (`Category.objects.order_by('display_order')`) → 템플릿에서 `{% regroup %}` 그룹 순서를 `display_order`에 맞추기 위해 정렬된 쿼리셋 사용
+- CSR/SSR 출력이 동일하도록 확인
 
 ---
 
-## Phase 3 — CDN SRI Hash 추가 (중간)
+## 변경 파일 목록
 
-**대상 파일**
-- `templates/base.html:30-37`
+| 파일 | Phase | 변경 유형 |
+|------|-------|----------|
+| `apps/dashboard/static/dashboard/js/dashboard.js` | 1, 2 | `renderTagLegend` onclick 추가, `renderTagContainer` 그룹화, `availableCategories` 저장 |
+| `apps/dashboard/templates/dashboard/index.html` | 1, 2 | 범례 `tag_badge clickable=True`, 사이드바 `{% regroup %}` |
+| `apps/tags/templatetags/tag_ui.py` | 1 | `tag_badge`에 `clickable`, `tag_id` 옵션 파라미터 |
+| `apps/dashboard/views.py` | 2 | `user_tags` 정렬 수정 (category__display_order 우선) |
+| `apps/dashboard/static/dashboard/css/dashboard.css` (있으면) or 인라인 | 1, 2 | 범례 버튼 리셋, 카테고리 헤더 스타일 |
 
-**현재 누락 항목 및 계산된 SRI Hash**
+총 4~5개 파일
 
-| 라이브러리 | 버전 | integrity |
-|-----------|------|-----------|
-| Chart.js | 3.9.1 | `sha384-9MhbyIRcBVQiiC7FSd7T38oJNj2Zh+EfxS7/vjhBi4OOT78NlHSnzM31EZRWR1LZ` |
-| chartjs-adapter-date-fns | 2.0.0 | `sha384-Crp3O/636k0LjUK6uxSF2i5herKUb8UIA16lRYz/PGAlkuavAVGFH5v2YlBayW8d` |
-| htmx | 1.9.12 | `sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2` |
-| Alpine.js | **3.14.9** (고정) | `sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F` |
+---
 
-**Alpine.js 버전 변경**: `@3.x.x` (부동) → `@3.14.9` (고정)
+## 테스트 계획
 
-**수정 후 예시**
-```html
-<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"
-        integrity="sha384-9MhbyIRcBVQiiC7FSd7T38oJNj2Zh+EfxS7/vjhBi4OOT78NlHSnzM31EZRWR1LZ"
-        crossorigin="anonymous"></script>
-```
+1. **Feature 1 수동 테스트**
+   - 범례 배지 클릭 → 사이드바 동일 태그가 active 상태가 되는지 확인
+   - 슬롯 선택 후 범례 클릭 → `selectTag` 이벤트로 저장 흐름 정상 동작 확인
+   - 키보드 Tab → 범례 포커스 → Enter로 선택되는지 확인
 
-**리스크**: 없음. 기존 동작에 영향 없이 integrity 속성만 추가.
+2. **Feature 2 수동 테스트**
+   - 5개 카테고리가 `display_order` 순서로 나타나는지
+   - 사용자가 생성한 태그가 올바른 카테고리 아래에 배치되는지
+   - 특정 카테고리에 태그가 0개면 헤더가 숨겨지는지
+   - 태그 생성/삭제 후 리렌더링 시 그룹 유지되는지
 
-> ✅ **완료** (2026-04-21)  
-> `base.html` Chart.js, chartjs-adapter, htmx, Alpine.js 4개에 integrity 추가.  
-> Alpine `@3.x.x` → `@3.14.9` 버전 고정.
+3. **Django 단위 테스트**
+   - `apps/dashboard/tests.py` — 뷰 컨텍스트에 정렬된 `user_tags`가 들어가는지
+   - 기존 `pytest` 55건 통과 유지 확인
+
+4. **회귀**
+   - `tag_badge` 기존 호출 4개 이상 (stats 등 다른 페이지) → 호환성 확인
+
+---
+
+## 리스크
+
+| 리스크 | 완화 |
+|---|---|
+| `tag_badge` 시그니처 변경 시 기존 호출자 깨짐 | 신규 파라미터 모두 optional + 기본값 (기존 동작 유지) |
+| SSR/CSR 초기 렌더 플래시 (flat → 그룹) | 뷰 초기 렌더부터 그룹 구조로 출력 → 플래시 없음 |
+| `availableCategories` 로딩 실패 시 그룹화 불가 | 폴백: 카테고리 로드 실패 시 기존 flat 렌더링 유지 |
+| 범례 `<button>` 변환 시 기존 CSS 영향 | 스타일 격리를 위해 `btn-tag-legend` 전용 클래스 추가 |
 
 ---
 
 ## 실행 순서
 
 ```
-Phase 1 (XSS)       → stats.js 파싱 방식 확인 후 template + JS 수정
-Phase 2 (브루트포스) → requirements.txt 추가 → settings.py 설정 → migrate
-Phase 3 (SRI)       → base.html 4개 스크립트 태그 수정
+Phase 1 (범례 클릭)          → tag_ui.py → dashboard.js renderTagLegend → index.html 범례
+Phase 2 (사이드바 카테고리)  → views.py 정렬 → index.html SSR regroup → dashboard.js renderTagContainer + availableCategories 저장
 ```
-
-## 변경 파일 목록
-
-| 파일 | Phase | 변경 유형 |
-|------|-------|----------|
-| `apps/stats/templates/stats/index.html` | 1 | template 수정 |
-| `apps/stats/static/stats/js/stats.js` | 1 | JS 파싱 수정 |
-| `requirements.txt` | 2 | 패키지 추가 |
-| `lifeDiary/settings/dev.py` | 2 | 설정 추가 |
-| `conftest.py` | 2 | 테스트 환경 axes 비활성화 |
-| `templates/base.html` | 3 | SRI hash 추가 |
-
-총 6개 파일
 
 ---
 
-## 최종 검증 결과
+## 이전 계획
 
-```
-python manage.py check → System check identified no issues (0 silenced)
-pytest               → 55 passed, 0 failed
-```
-
-**완료일**: 2026-04-21
+> 이전 계획은 2026-04-21 보안 취약점 수정 계획이며, **2026-04-21 완료** 되었다. 요약:
+> - Phase 1: 저장형 XSS 수정 (`stats/index.html` `|safe` → `json_script`) ✅
+> - Phase 2: 브루트포스 방어 (`django-axes` 추가) ✅
+> - Phase 3: CDN SRI Hash 추가 (`base.html` Chart.js/htmx/Alpine.js) ✅
+> - 최종 검증: `manage.py check` clean, `pytest` 55 passed
