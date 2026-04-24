@@ -1,4 +1,5 @@
-from django.test import SimpleTestCase
+from django.contrib.auth.models import User
+from django.test import Client, SimpleTestCase, TestCase
 
 from apps.core.utils import UNCLASSIFIED_TAG_COLOR, UNCLASSIFIED_TAG_NAME
 from apps.stats.services import (
@@ -85,3 +86,20 @@ class MostActiveDayTests(SimpleTestCase):
         weekly_data = []
         result = max(weekly_data, key=lambda d: d["total_minutes"]) if weekly_data else None
         self.assertIsNone(result)
+
+
+class StatsIndexDatePreservesTabTests(TestCase):
+    """날짜 변경 시 현재 활성 탭(hash)을 유지하도록 렌더링되는지 검증."""
+
+    def setUp(self):
+        self.user = User.objects.create_user("statuser", password="test1234")
+        self.client = Client()
+        self.client.login(username="statuser", password="test1234")
+
+    def test_date_onchange_preserves_url_hash(self):
+        resp = self.client.get("/stats/")
+        self.assertEqual(resp.status_code, 200)
+        content = resp.content.decode()
+        # dateSelector onchange에 hash 보존 로직 포함
+        self.assertIn('id="dateSelector"', content)
+        self.assertIn("window.location.hash", content)

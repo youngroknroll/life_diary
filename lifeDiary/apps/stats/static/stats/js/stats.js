@@ -32,7 +32,33 @@ function drawEmptyState(ctx, message = '데이터가 없습니다') {
     ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
 }
 
+function initTabHashSync() {
+    const tabsRoot = document.getElementById('statsTabs');
+    if (!tabsRoot || !window.bootstrap) return;
+
+    // 로드 시 URL hash에 해당하는 탭 활성화
+    const hash = window.location.hash;
+    if (hash) {
+        const trigger = tabsRoot.querySelector('[data-bs-target="' + hash + '"]');
+        if (trigger) {
+            try { new bootstrap.Tab(trigger).show(); }
+            catch (e) { console.error('탭 활성화 오류:', e); }
+        }
+    }
+
+    // 탭 전환 시 hash 갱신 (reload 없이)
+    tabsRoot.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(btn) {
+        btn.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target');
+            if (!target) return;
+            history.replaceState(null, '', location.pathname + location.search + target);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    initTabHashSync();
+
     function parseJsonScript(id) {
         const el = document.getElementById(id);
         if (!el) { console.error(id + ' 요소를 찾을 수 없습니다.'); return null; }
