@@ -25,7 +25,9 @@ class TagRepository:
         return Tag.objects.filter(Q(user=user) | Q(is_default=True))
 
     def find_accessible_ordered(self, user):
-        return self.find_accessible(user).order_by("-is_default", "name")
+        return self.find_accessible(user).order_by(
+            "category__display_order", "-is_default", "name"
+        )
 
     def find_by_id_accessible(self, tag_id, user):
         """사용자가 접근 가능한 특정 태그 조회. 없으면 None."""

@@ -130,7 +130,7 @@
                     <div class="d-flex flex-wrap gap-2" id="tagLegend">
                         {% if user_tags %}
                             {% for tag in user_tags %}
-                                {% tag_badge tag.color tag.text_color tag.name %}
+                                {% tag_badge tag.color tag.text_color tag.name clickable=True tag_id=tag.id %}
                             {% endfor %}
                         {% else %}
                             <small class="text-muted">생성된 태그가 없습니다.</small>
@@ -195,19 +195,31 @@
                         </div>
                     </div>
                     
-                    <!-- 태그 목록 -->
+                    <!-- 태그 목록 (카테고리 그룹화) -->
                     <div class="d-grid gap-2" id="tagContainer">
                         {% if user_tags %}
-                            {% for tag in user_tags %}
-                                <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
-                                        data-tag-id="{{ tag.id }}"
-                                        onclick="selectTag({{ tag.id }}, '{{ tag.color }}', '{{ tag.name }}')">
-                                    {% tag_dot tag.color %}
-                                    {{ tag.name }}
-                                    {% if tag.is_default %}
-                                        <i class="fas fa-star text-warning ms-1" title="기본 태그"></i>
-                                    {% endif %}
-                                </button>
+                            {% regroup user_tags by category as tags_by_category %}
+                            {% for cat_group in tags_by_category %}
+                                <div class="tag-category-group">
+                                    <div class="tag-category-header small text-muted fw-bold mt-2 mb-1">
+                                        {% tag_dot cat_group.grouper.color %}
+                                        {{ cat_group.grouper.name }}
+                                    </div>
+                                    <div class="d-grid gap-1">
+                                        {% for tag in cat_group.list %}
+                                            <button type="button" class="btn btn-outline-secondary btn-sm tag-btn text-start"
+                                                    data-tag-id="{{ tag.id }}"
+                                                    data-tag-color="{{ tag.color }}"
+                                                    data-tag-name="{{ tag.name }}">
+                                                {% tag_dot tag.color %}
+                                                {{ tag.name }}
+                                                {% if tag.is_default %}
+                                                    <i class="fas fa-star text-warning ms-1" title="기본 태그"></i>
+                                                {% endif %}
+                                            </button>
+                                        {% endfor %}
+                                    </div>
+                                </div>
                             {% endfor %}
                         {% else %}
                             <div class="text-center py-2">

@@ -1,6 +1,7 @@
 import json
 from types import SimpleNamespace
 
+from django.template import Context, Template
 from django.test import SimpleTestCase, TestCase, Client
 from django.contrib.auth.models import User
 
@@ -169,6 +170,76 @@ class TagRepositoryCategoryTests(TestCase):
         tags = self.repo.find_by_category(self.user, self.cat_invest)
         self.assertEqual(tags.count(), 1)
         self.assertEqual(tags.first().name, "독서")
+
+    def test_find_accessible_ordered_groups_by_category_display_order(self):
+        """태그 목록은 카테고리 display_order → is_default desc → name 순."""
+        cat_basic = Category.objects.get(slug="basic_life")
+        # passive(1) < proactive(2) < investment(3) < basic_life(4)
+        # 이름 알파벳 순과 카테고리 순이 다르도록 의도적으로 선정
+        self.repo.create(
+            user=self.user, name="aaa-basic", color="#111111",
+            is_default=False, category=cat_basic,       # display_order 4
+        )
+        self.repo.create(
+            user=self.user, name="zzz-passive", color="#222222",
+            is_default=False, category=self.cat_passive,  # display_order 1
+        )
+        self.repo.create(
+            user=self.user, name="mmm-invest", color="#333333",
+            is_default=False, category=self.cat_invest,   # display_order 3
+        )
+
+        tags = list(self.repo.find_accessible_ordered(self.user))
+        user_tag_order = [t.name for t in tags if t.user_id == self.user.id]
+        self.assertEqual(
+            user_tag_order,
+            ["zzz-passive", "mmm-invest", "aaa-basic"],
+        )
+
+
+# === Template Tag Tests ===
+
+
+class TagBadgeTemplateTagTests(SimpleTestCase):
+    """tag_badge 템플릿 태그의 clickable 옵션 검증."""
+
+    def _render(self, template_str, context=None):
+        return Template(template_str).render(Context(context or {}))
+
+    def test_tag_badge_default_non_clickable(self):
+        """기존 호출 호환: 3개 인자만 주면 span + onclick 없음."""
+        html = self._render(
+            "{% load tag_ui %}{% tag_badge '#FF0000' '#FFFFFF' '운동' %}"
+        )
+        self.assertIn("<span", html)
+        self.assertIn("운동", html)
+        self.assertNotIn("onclick", html)
+        self.assertNotIn("<button", html)
+
+    def test_tag_badge_clickable_produces_button_with_data_attrs(self):
+        """clickable=True + tag_id → <button> + data-tag-* 속성 (XSS 안전)."""
+        html = self._render(
+            "{% load tag_ui %}"
+            "{% tag_badge '#FF0000' '#FFFFFF' '운동' clickable=True tag_id=42 %}"
+        )
+        self.assertIn("<button", html)
+        self.assertIn('data-tag-id="42"', html)
+        self.assertIn('data-tag-color="#FF0000"', html)
+        self.assertIn('data-tag-name="운동"', html)
+        self.assertIn("운동", html)
+        self.assertIn("badge", html)
+        # 인라인 onclick은 사용하지 않는다 (XSS 방어)
+        self.assertNotIn("onclick", html)
+
+    def test_tag_badge_clickable_escapes_hostile_name(self):
+        """tag name에 '</button>' 같은 공격 문자열이 와도 이스케이프되어야 한다."""
+        html = self._render(
+            "{% load tag_ui %}"
+            "{% tag_badge '#FF0000' '#FFFFFF' name clickable=True tag_id=1 %}",
+            {"name": "</button><script>alert(1)</script>"},
+        )
+        self.assertNotIn("<script>alert(1)</script>", html)
+        self.assertIn("&lt;script&gt;", html)
 
 
 # === Seed Data Migration Tests ===

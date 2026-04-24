@@ -220,6 +220,20 @@ async function apiCall(url, options = {}) {
  * @param {string} hexColor - '#RRGGBB' 형식의 HEX 색상
  * @returns {string} - 밝은 배경이면 '#212529'(어두운 글씨), 어두운 배경이면 '#ffffff'(흰 글씨)
  */
+/**
+ * HTML 문자열 이스케이프 (XSS 방어).
+ * innerHTML에 사용자 입력을 삽입할 때 사용.
+ */
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
 function getContrastTextColor(hexColor) {
     const hex = hexColor.replace('#', '');
     const r = parseInt(hex.substring(0, 2), 16);

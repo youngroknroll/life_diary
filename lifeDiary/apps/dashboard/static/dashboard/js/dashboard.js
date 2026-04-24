@@ -50,12 +50,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }).catch(err => console.error('카테고리 로드 오류:', err));
 
     initializeDashboard();
+    initializeTagSelectDelegation('tagLegend');
+    initializeTagSelectDelegation('tagContainer');
 
     // 태그 업데이트 이벤트 수신 (동적 변경 시에만 API 호출)
     document.addEventListener('tags-updated', function() {
         loadAvailableTags();
     });
 });
+
+function initializeTagSelectDelegation(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    container.addEventListener('click', function(event) {
+        const el = event.target.closest('[data-tag-id]');
+        if (!el || !container.contains(el)) return;
+        const id = parseInt(el.dataset.tagId, 10);
+        const color = el.dataset.tagColor;
+        const name = el.dataset.tagName;
+        if (!Number.isFinite(id) || !color || !name) return;
+        selectTag(id, color, name);
+    });
+}
 
 function initializeDashboard() {
     const dateSelector = document.getElementById('dateSelector');
@@ -400,6 +416,20 @@ async function loadAvailableTags() {
     }
 }
 
+function renderTagButton(tag) {
+    const safeName = escapeHtml(tag.name);
+    const safeColor = escapeHtml(tag.color);
+    return `
+        <button type="button" class="btn btn-outline-secondary btn-sm tag-btn text-start"
+                data-tag-id="${tag.id}"
+                data-tag-color="${safeColor}"
+                data-tag-name="${safeName}">
+            <span class="badge me-2" style="background-color: ${safeColor};">&nbsp;</span>
+            ${safeName}
+            ${tag.is_default ? '<i class="fas fa-star text-warning ms-1" title="기본 태그"></i>' : ''}
+        </button>`;
+}
+
 function renderTagContainer(tags) {
     const tagContainer = document.getElementById('tagContainer');
     if (tags.length === 0) {
@@ -409,15 +439,37 @@ function renderTagContainer(tags) {
         return;
     }
 
-    tagContainer.innerHTML = tags.map(tag => `
-        <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
-                    data-tag-id="${tag.id}"
-                    onclick="selectTag(${tag.id}, '${tag.color}', '${tag.name}')">
-                <span class="badge me-2" style="background-color: ${tag.color};">&nbsp;</span>
-                ${tag.name}
-            ${tag.is_default ? '<i class="fas fa-star text-warning ms-1" title="기본 태그"></i>' : ''}
-            </button>
-    `).join('');
+    const categories = window._categories || [];
+    // 카테고리 메타가 아직 로드되지 않았으면 flat 폴백
+    if (categories.length === 0) {
+        tagContainer.innerHTML = tags.map(renderTagButton).join('');
+        return;
+    }
+
+    const byCategory = new Map();
+    for (const tag of tags) {
+        const key = tag.category_id;
+        if (!byCategory.has(key)) byCategory.set(key, []);
+        byCategory.get(key).push(tag);
+    }
+
+    const sorted = [...categories].sort(
+        (a, b) => a.display_order - b.display_order
+    );
+
+    tagContainer.innerHTML = sorted
+        .filter(cat => byCategory.has(cat.id))
+        .map(cat => `
+            <div class="tag-category-group">
+                <div class="tag-category-header small text-muted fw-bold mt-2 mb-1">
+                    <span class="badge me-2" style="background-color: ${escapeHtml(cat.color)};">&nbsp;</span>
+                    ${escapeHtml(cat.name)}
+                </div>
+                <div class="d-grid gap-1">
+                    ${byCategory.get(cat.id).map(renderTagButton).join('')}
+                </div>
+            </div>
+        `).join('');
 }
 
 function renderTagLegend(tags) {
@@ -426,9 +478,15 @@ function renderTagLegend(tags) {
         tagLegend.innerHTML = '<small class="text-muted">생성된 태그가 없습니다.</small>';
         return;
     }
-    tagLegend.innerHTML = tags.map(tag => `
-        <span class="badge" style="background-color: ${tag.color}; color: ${getContrastTextColor(tag.color)};">${tag.name}</span>
-    `).join('');
+    tagLegend.innerHTML = tags.map(tag => {
+        const textColor = getContrastTextColor(tag.color);
+        return `
+        <button type="button" class="badge btn-tag-legend"
+                data-tag-id="${tag.id}"
+                data-tag-color="${escapeHtml(tag.color)}"
+                data-tag-name="${escapeHtml(tag.name)}"
+                style="background-color: ${escapeHtml(tag.color)}; color: ${textColor}; border: 0;">${escapeHtml(tag.name)}</button>`;
+    }).join('');
 }
 
 function showTagError(message) {
