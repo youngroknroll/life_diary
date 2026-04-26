@@ -26,6 +26,24 @@ class StatsCalculator:
         self.selected_date = selected_date
         self.start_of_month, self.end_of_month = get_month_date_range(selected_date)
         self.start_of_week, self.end_of_week = get_week_date_range(selected_date)
+        self._monthly_blocks = None
+        self._monthly_daily_counts = None
+
+    def get_monthly_blocks(self):
+        """월간 TimeBlock을 1회 fetch 후 캐시. monthly + analysis가 공유."""
+        if self._monthly_blocks is None:
+            self._monthly_blocks = list(
+                _time_block_repo.find_by_month(self.user, self.start_of_month, self.end_of_month)
+            )
+        return self._monthly_blocks
+
+    def get_monthly_daily_counts(self):
+        """월간 날짜별 블록 개수를 1회 fetch 후 캐시. monthly + analysis가 공유."""
+        if self._monthly_daily_counts is None:
+            self._monthly_daily_counts = _time_block_repo.find_daily_counts(
+                self.user, self.start_of_month, self.end_of_month
+            )
+        return self._monthly_daily_counts
 
     def get_tag_info(self, block):
         if block.tag and block.tag.name:
@@ -85,7 +103,7 @@ class StatsCalculator:
             self.add_unclassified_data(tag_weekly_stats, empty_minutes, day_index, data_type="weekly")
 
     def fill_empty_slots_monthly(self, user, daily_tag_stats, daily_totals, total_days):
-        daily_counts = _time_block_repo.find_daily_counts(user, self.start_of_month, self.end_of_month)
+        daily_counts = self.get_monthly_daily_counts()
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
             recorded_blocks = daily_counts.get(current_date, 0)
@@ -100,7 +118,7 @@ class StatsCalculator:
 
     def fill_empty_slots_analysis(self, user, tag_analysis_data):
         total_days = (self.end_of_month - self.start_of_month).days + 1
-        daily_counts = _time_block_repo.find_daily_counts(user, self.start_of_month, self.end_of_month)
+        daily_counts = self.get_monthly_daily_counts()
         for day_index in range(total_days):
             current_date = self.start_of_month + timedelta(days=day_index)
             recorded_blocks = daily_counts.get(current_date, 0)

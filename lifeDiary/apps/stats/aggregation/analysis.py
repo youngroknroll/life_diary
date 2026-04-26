@@ -1,14 +1,9 @@
 from apps.core.utils import MINUTES_PER_SLOT, UNCLASSIFIED_TAG_NAME
-from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.services import minutes_to_hours
-
-_time_block_repo = TimeBlockRepository()
 
 
 def get_tag_analysis_data(user, selected_date, calculator):
-    monthly_blocks = _time_block_repo.find_by_month(
-        user, calculator.start_of_month, calculator.end_of_month
-    )
+    monthly_blocks = calculator.get_monthly_blocks()
     tag_analysis_data = {}
 
     def process_block(block, tag_info):

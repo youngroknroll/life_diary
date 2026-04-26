@@ -1,13 +1,8 @@
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT, UNCLASSIFIED_TAG_NAME
-from apps.dashboard.repositories import TimeBlockRepository
-
-_time_block_repo = TimeBlockRepository()
 
 
 def get_monthly_stats_data(user, selected_date, calculator):
-    monthly_blocks = _time_block_repo.find_by_month(
-        user, calculator.start_of_month, calculator.end_of_month
-    )
+    monthly_blocks = calculator.get_monthly_blocks()
     total_days = (calculator.end_of_month - calculator.start_of_month).days + 1
     daily_tag_stats = {}
     daily_totals = [0] * total_days
