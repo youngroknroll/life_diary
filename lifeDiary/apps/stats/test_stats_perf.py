@@ -21,8 +21,8 @@ from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
 from apps.tags.models import Category, Tag
 
-# 베이스라인(2026-04-26) 측정치 10에서 중복 2건 제거가 목표.
-TARGET_MAX_QUERIES = 8
+# 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6.
+TARGET_MAX_QUERIES = 6
 
 
 @pytest.fixture

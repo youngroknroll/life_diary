@@ -60,9 +60,10 @@ def get_stats_context(user, selected_date):
         },
     }
 
-    user_goals_daily = _goal_repo.find_by_period(user, "daily")
-    user_goals_weekly = _goal_repo.find_by_period(user, "weekly")
-    user_goals_monthly = _goal_repo.find_by_period(user, "monthly")
+    grouped_goals = _goal_repo.find_grouped_by_period(user)
+    user_goals_daily = grouped_goals["daily"]
+    user_goals_weekly = grouped_goals["weekly"]
+    user_goals_monthly = grouped_goals["monthly"]
     context["user_goals_daily"] = user_goals_daily
     context["user_goals_weekly"] = user_goals_weekly
     context["user_goals_monthly"] = user_goals_monthly

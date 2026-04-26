@@ -12,6 +12,14 @@ class GoalRepository:
     def find_by_period(self, user, period):
         return UserGoal.objects.filter(user=user, period=period).select_related("tag")
 
+    def find_grouped_by_period(self, user):
+        """사용자의 모든 UserGoal을 1쿼리로 fetch 후 period별 분리."""
+        grouped = {"daily": [], "weekly": [], "monthly": []}
+        for goal in UserGoal.objects.filter(user=user).select_related("tag"):
+            if goal.period in grouped:
+                grouped[goal.period].append(goal)
+        return grouped
+
     def get_or_404(self, pk, user):
         return get_object_or_404(UserGoal, pk=pk, user=user)
 
