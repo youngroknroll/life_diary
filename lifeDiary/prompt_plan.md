@@ -1,231 +1,252 @@
-# 대시보드 태그 UX 개선 계획
+# 한→영 i18n + 코드+파라미터 아키텍처 구현 계획
 
-**작성일**: 2026-04-24
-**대상**: 대시보드 (`apps/dashboard/`)
-**복잡도**: LOW
-
----
-
-## 요구사항
-
-1. **Feature 1 — 하단 범례 태그 클릭 이벤트**
-   그리드 아래 `#tagLegend` 배지를 클릭하면 사이드바 태그 버튼과 **동일한 `selectTag()` 이벤트**가 발생해야 한다. (태그 선택 상태로 전환 → 다음 슬롯 저장 시 사용)
-
-2. **Feature 2 — 사이드바 태그 목록 카테고리화**
-   사이드바 `#tagContainer`의 태그 버튼들을 `Category.display_order` 순으로 카테고리별 그룹화하여 출력한다. 카테고리명 헤더 + 그 아래 태그 버튼.
-   (범례 `#tagLegend`는 그대로 flat 유지)
+**작성일**: 2026-04-27
+**대상**: 전체 앱 (`apps/core`, `apps/dashboard`, `apps/tags`, `apps/users`, `apps/stats`)
+**복잡도**: HIGH
+**총 예상**: 22–25h
 
 ---
 
-## 현재 상태 요약
+## 확정 사항
 
-| 위치 | 파일 | 상태 |
-|---|---|---|
-| 범례 SSR | `apps/dashboard/templates/dashboard/index.html:128-139` | `{% tag_badge %}` flat, 클릭 핸들러 없음 |
-| 범례 CSR | `apps/dashboard/static/dashboard/js/dashboard.js:423-432` (`renderTagLegend`) | `<span>` flat, 클릭 핸들러 없음 |
-| 사이드바 SSR | `index.html:199-217` | `<button onclick="selectTag(...)">` flat |
-| 사이드바 CSR | `dashboard.js:403-421` (`renderTagContainer`) | `<button onclick="selectTag(...)">` flat |
-| `selectTag(id, color, name)` | `dashboard.js` (기존 함수) | 그대로 재사용 |
-| `tag_badge` 템플릿태그 | `apps/tags/templatetags/tag_ui.py:17-25` | `<span>` 생성, onclick 속성 없음 |
-| Tag 모델 | `apps/tags/models.py` | `category` FK 존재 (mandatory) |
-| `/api/tags/` 응답 | `apps/tags/views.py:61-77` | `category_id`만 포함 (name/color 없음) |
-| `/api/categories/` 응답 | 이미 존재, dashboard init에서 호출 중 (`dashboard.js:47-50`) | 사용 가능 |
-| Dashboard view context | `apps/dashboard/views.py:61` | `user_tags`는 `find_accessible_ordered` 결과 (is_default → name) |
+- **범위**: 이번 작업은 ko→en 만. 일본어/기타는 구조만 준비 (실제 번역 X)
+- **반환 타입**: 사용자 메시지는 모두 `LocalizableMessage` (code + params + severity)
+- **렌더링**: Django 템플릿 (현재) + DRF Serializer (향후 B 하이브리드 대비)
+- **확장성 목표**: 일본어 추가 시 `.po` 파일 + 톤 가이드만 추가, 코드 변경 0
+- **JS 전략**: Django `JavaScriptCatalog` 뷰 (단일 .po 소스)
+- **Phase 0 완료 (2026-04-18)**: i18n 인프라(LANGUAGES/LOCALE_PATHS/LocaleMiddleware/언어 토글) 설치됨
 
 ---
 
-## Phase 1 — Feature 1: 범례 클릭 핸들러 추가
+## 설계 표준
 
-**목표**: 범례 배지 클릭 시 `selectTag(id, color, name)` 호출.
-
-**변경 파일**
-1. `apps/dashboard/static/dashboard/js/dashboard.js` — `renderTagLegend()` 수정
-   - `<span>` → `<button>` 또는 `<span role="button" tabindex="0" onclick="...">`
-   - 스타일 유지 (bootstrap `badge` 그대로)
-   - `data-tag-id` 추가 (사이드바 버튼과 동일한 선택 상태 UI 연동용)
-2. `apps/tags/templatetags/tag_ui.py` — `tag_badge` 시그니처 확장
-   - 기존 호출자 호환 유지: `clickable=False`, `tag_id=None` 옵션 파라미터 추가
-   - `clickable=True`일 때 onclick 추가
-3. `apps/dashboard/templates/dashboard/index.html:128-139` — 범례에서 `tag_badge` 호출 시 `clickable=True tag_id=tag.id` 전달
-
-**클릭 시 동작**
-- 기존 `selectTag(id, color, name)` 로직 그대로 호출 → 선택 상태 변경 + 사이드바 버튼 active 표시 연동
-
-**접근성**
-- `<button type="button" class="badge btn-tag-legend" ...>` 로 구현 (키보드 포커스/엔터 지원)
-- 버튼 기본 스타일 리셋 필요 (border 제거, padding 유지)
-
-**리스크**: 없음. 순수 핸들러 추가.
-
----
-
-## Phase 2 — Feature 2: 사이드바 카테고리 그룹화
-
-**목표**: `#tagContainer` 버튼을 카테고리별 그룹으로 묶어 렌더링.
-
-### 2-1. API 응답 보강
-
-`/api/tags/` 응답에 카테고리 메타 추가:
+### 1. 표준 타입 (`apps/core/messages.py`)
 
 ```python
-# apps/tags/views.py:61-77
-{
-    "tags": [...],
-    "categories": [
-        {"id": 1, "name": "수면시간", "color": "#...", "display_order": 1},
-        ...
-    ],
+from dataclasses import dataclass, field
+from typing import Literal
+
+Severity = Literal["positive", "info", "warning", "error"]
+
+@dataclass(frozen=True)
+class LocalizableMessage:
+    code: str
+    params: dict = field(default_factory=dict)
+    severity: Severity = "info"
+
+    def to_dict(self) -> dict:
+        return {"code": self.code, "params": self.params, "severity": self.severity}
+```
+
+### 2. 카탈로그 위치
+
+- 앱별 `messages.py`에 모음 (전역 카탈로그 X)
+- 코드 네임스페이스: `{app}.{domain}.{action}` 예: `stats.feedback.goal_achieved`
+
+```python
+# apps/stats/messages.py
+from django.utils.translation import gettext_lazy as _
+
+CATALOG = {
+    "stats.feedback.goal_achieved": _(
+        "%(period)s '%(name)s' 목표(%(hours)s시간)를 이미 달성했습니다!"
+    ),
+    ...
+}
+
+PERIOD_LABELS = {
+    "daily": _("오늘"),
+    "weekly": _("이번주"),
+    "monthly": _("이번 달"),
 }
 ```
 
-- `apps/tags/use_cases.py` — 카테고리 조회 유스케이스 재사용 또는 추가
-- Tag 직렬화에 `category_id`는 이미 있음 (변경 불필요)
+### 3. 렌더링 헬퍼 (`apps/core/templatetags/i18n_messages.py`)
 
-**대안**: 기존 `/api/categories/` 별도 호출 유지 후 JS에서 병합 (이미 init에서 호출 중).
-→ **채택**: 대시보드는 이미 둘 다 호출 중이므로 `availableCategories` 모듈 변수에 저장 후 `renderTagContainer`에서 사용. API 변경 최소화.
-
-### 2-2. CSR — `renderTagContainer()` 그룹화
-
-```javascript
-function renderTagContainer(tags) {
-    const container = document.getElementById('tagContainer');
-    if (tags.length === 0) { /* empty state */ return; }
-
-    // availableCategories는 init에서 /api/categories/ 로드 후 저장된 모듈 변수
-    const byCategory = new Map();
-    for (const tag of tags) {
-        const key = tag.category_id;
-        if (!byCategory.has(key)) byCategory.set(key, []);
-        byCategory.get(key).push(tag);
-    }
-
-    const sortedCategories = [...availableCategories]
-        .sort((a, b) => a.display_order - b.display_order);
-
-    container.innerHTML = sortedCategories
-        .filter(cat => byCategory.has(cat.id))
-        .map(cat => `
-            <div class="tag-category-group">
-                <div class="tag-category-header small text-muted fw-bold mt-2">
-                    <span class="category-dot" style="background-color:${cat.color}"></span>
-                    ${escapeHtml(cat.name)}
-                </div>
-                <div class="d-grid gap-1">
-                    ${byCategory.get(cat.id).map(tag => renderTagButton(tag)).join('')}
-                </div>
-            </div>
-        `).join('');
-}
+```python
+@register.simple_tag
+def render_message(msg):
+    code = msg["code"] if isinstance(msg, dict) else msg.code
+    params = dict(msg["params"] if isinstance(msg, dict) else msg.params)
+    template = _resolve_template(code)
+    params = _resolve_enum_params(params)
+    return template % params
 ```
 
-- `renderTagButton(tag)` 헬퍼 추출 → 기존 버튼 HTML 재사용
-- XSS 방어: `escapeHtml()` 사용 (기존 `utils.js`에 있는지 확인, 없으면 추가)
+### 4. 비즈니스 로직 변경 패턴
 
-### 2-3. SSR — `index.html:199-217` 그룹화
+```python
+# Before
+feedback.append(_fb(f"{period_label} '{goal.tag.name}' 목표(...)를 달성...", POSITIVE))
 
-Django `{% regroup %}` 템플릿 태그 사용:
-
-```django
-{% regroup user_tags by category as tags_by_category %}
-<div class="d-grid gap-2" id="tagContainer">
-    {% if user_tags %}
-        {% for cat_group in tags_by_category %}
-            <div class="tag-category-group">
-                <div class="tag-category-header small text-muted fw-bold mt-2">
-                    {% tag_dot cat_group.grouper.color %}
-                    {{ cat_group.grouper.name }}
-                </div>
-                <div class="d-grid gap-1">
-                    {% for tag in cat_group.list %}
-                        <button class="btn btn-outline-secondary btn-sm tag-btn text-start"
-                                data-tag-id="{{ tag.id }}"
-                                onclick="selectTag({{ tag.id }}, '{{ tag.color }}', '{{ tag.name }}')">
-                            {% tag_dot tag.color %}
-                            {{ tag.name }}
-                            {% if tag.is_default %}<i class="fas fa-star text-warning ms-1" title="기본 태그"></i>{% endif %}
-                        </button>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
-    {% else %}
-        <div class="text-center py-2">
-            <p class="text-muted small">태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.</p>
-        </div>
-    {% endif %}
-</div>
+# After
+feedback.append(LocalizableMessage(
+    code="stats.feedback.goal_achieved",
+    params={"period": period, "name": goal.tag.name, "hours": goal.target_hours},
+    severity="positive",
+))
 ```
 
-**주의**: `{% regroup %}`은 미리 정렬된 쿼리셋이 필요. `find_accessible_ordered`는 현재 `is_default, name` 순.
-→ `apps/dashboard/views.py:61` 에서 `user_tags`를 `category__display_order, is_default, name` 순으로 재정렬하거나, 뷰에서 파이썬으로 정렬.
+→ `period`는 한국어 문자열 X, **enum 키** ("daily"/"weekly"/"monthly").
 
-### 2-4. 초기 렌더 일관성
+### 5. 일본어 이식 대비 규칙 (지금부터 강제)
 
-- 뷰 컨텍스트에 `categories`도 주입 (`Category.objects.order_by('display_order')`) → 템플릿에서 `{% regroup %}` 그룹 순서를 `display_order`에 맞추기 위해 정렬된 쿼리셋 사용
-- CSR/SSR 출력이 동일하도록 확인
-
----
-
-## 변경 파일 목록
-
-| 파일 | Phase | 변경 유형 |
-|------|-------|----------|
-| `apps/dashboard/static/dashboard/js/dashboard.js` | 1, 2 | `renderTagLegend` onclick 추가, `renderTagContainer` 그룹화, `availableCategories` 저장 |
-| `apps/dashboard/templates/dashboard/index.html` | 1, 2 | 범례 `tag_badge clickable=True`, 사이드바 `{% regroup %}` |
-| `apps/tags/templatetags/tag_ui.py` | 1 | `tag_badge`에 `clickable`, `tag_id` 옵션 파라미터 |
-| `apps/dashboard/views.py` | 2 | `user_tags` 정렬 수정 (category__display_order 우선) |
-| `apps/dashboard/static/dashboard/css/dashboard.css` (있으면) or 인라인 | 1, 2 | 범례 버튼 리셋, 카테고리 헤더 스타일 |
-
-총 4~5개 파일
+| 규칙 | 이유 |
+|------|------|
+| msgid에 단위까지 포함: `"%(hours)s시간"` | ja「時間」, en "hours" 위치 다름 |
+| 조사 결합 금지: `"%(name)s를"` X → 문장 통째 번역 | ja 조사 동일 문제 |
+| 카운트 메시지는 `ngettext` 강제 | 한/일 단수만, 영어 복수 분기 |
+| `gettext_lazy`만 모듈 레벨 사용 | 첫 요청 locale 고정 방지 |
+| f-string 금지 | makemessages 추출 실패 |
+| `gettext`는 별칭 X (요청 컨텍스트 grep 용이) | 모듈/요청 구분 명확화 |
 
 ---
 
-## 테스트 계획
+## Phase별 작업
 
-1. **Feature 1 수동 테스트**
-   - 범례 배지 클릭 → 사이드바 동일 태그가 active 상태가 되는지 확인
-   - 슬롯 선택 후 범례 클릭 → `selectTag` 이벤트로 저장 흐름 정상 동작 확인
-   - 키보드 Tab → 범례 포커스 → Enter로 선택되는지 확인
+| Phase | 작업 | 의존 | 시간 |
+|-------|------|------|------|
+| **0.5** | 인프라: `LocalizableMessage` 타입 + `render_message` 태그 + `apps/core/messages.py` | — | 2h |
+| **1** | base/core: `utils.py`, `base.html`, `index.html`, `utils.js`, JS catalog 배선 | 0.5 | 4–5h |
+| **2** | dashboard | 1 | 3–4h |
+| **3** | tags | 1 | 3h |
+| **4** | users | 1 | 4–5h |
+| **5** | stats: `life_feedback.py` 전면 코드+파라미터 변환 | 1, 0.5 | 5–6h |
 
-2. **Feature 2 수동 테스트**
-   - 5개 카테고리가 `display_order` 순서로 나타나는지
-   - 사용자가 생성한 태그가 올바른 카테고리 아래에 배치되는지
-   - 특정 카테고리에 태그가 0개면 헤더가 숨겨지는지
-   - 태그 생성/삭제 후 리렌더링 시 그룹 유지되는지
+### Phase 0.5 — 인프라
 
-3. **Django 단위 테스트**
-   - `apps/dashboard/tests.py` — 뷰 컨텍스트에 정렬된 `user_tags`가 들어가는지
-   - 기존 `pytest` 55건 통과 유지 확인
+**신규 파일**
+- `apps/core/messages.py` — `LocalizableMessage` 타입, `Severity` Literal
+- `apps/core/templatetags/__init__.py` (없으면)
+- `apps/core/templatetags/i18n_messages.py` — `render_message` 태그
+- `apps/core/tests_messages.py` — 타입/태그 단위 테스트
 
-4. **회귀**
-   - `tag_badge` 기존 호출 4개 이상 (stats 등 다른 페이지) → 호환성 확인
+**검증**
+- pytest: `LocalizableMessage` 직렬화/불변성, `render_message` 다양한 입력 (dict/객체/missing code) 처리
+- 더미 카탈로그로 영어 locale 출력 확인
+
+### Phase 1 — base/core (모든 후속 차단)
+
+**파일**
+- `lifeDiary/urls.py` — `path("jsi18n/", JavaScriptCatalog.as_view(packages=[...]), name="javascript-catalog")`
+- `apps/core/utils.py` (51) — `gettext_lazy as _` 래핑
+- `templates/base.html` (31) — `{% load i18n %}` + 토글/네비/푸터 `{% trans %}` + `<script src="{% url 'javascript-catalog' %}">`
+- `templates/index.html` (28)
+- `templates/shared/*.html`
+- `apps/core/static/core/js/utils.js` (29) — `gettext()` / `interpolate()`
+- `apps/core/static/core/js/tag.js`
+
+**검증**
+- `conda run -n knou-life-diary django-admin makemessages -l en --ignore=.venv --ignore=staticfiles`
+- `conda run -n knou-life-diary django-admin makemessages -d djangojs -l en --ignore=.venv --ignore=staticfiles`
+- `.po` 영문 입력 → `compilemessages -l en`
+- 네비 토글 → `/` 영문 확인 + `jsi18n/` 200 OK
+- pytest `@override_settings(LANGUAGE_CODE='en')` 스모크
+
+### Phase 2 — dashboard
+
+**파일**
+- `apps/dashboard/views.py` (35), `models.py`
+- `apps/dashboard/templates/dashboard/index.html`, `_tag_image_modal.html`
+- `apps/dashboard/static/dashboard/js/dashboard.js` (38) — 카운트는 `ngettext`
+
+### Phase 3 — tags
+
+**파일**
+- `apps/tags/models.py` (35), `views.py` (34), `domain_services.py` (12)
+- `apps/tags/templatetags/` — 함수 본문에서 `_()` 호출 (모듈 레벨 X)
+- `apps/tags/templates/tags/index.html`, `_tag_modal.html`
+
+### Phase 4 — users
+
+**파일**
+- `apps/users/forms.py` (11) — `gettext_lazy`로 labels/error_messages/help_text
+- `apps/users/views.py` (13), `domain_services.py` (6)
+- `apps/users/templates/users/*.html` (~60)
+- `apps/users/static/users/js/goals.js` (5)
+- 비고: `axes` 패키지 메시지는 기본 영어, 별도 작업 X
+
+### Phase 5 — stats (코드+파라미터 본격 적용)
+
+**파일**
+- `apps/stats/messages.py` (신규) — `CATALOG`, `PERIOD_LABELS`
+- `apps/stats/life_feedback.py` — `_fb` 시그니처 변경:
+  ```python
+  def _fb(code: str, params: dict, severity: str = "info") -> LocalizableMessage:
+      return LocalizableMessage(code=code, params=params, severity=severity)
+  ```
+- `apps/stats/views.py` (26), `use_cases.py`
+- `apps/stats/templates/stats/index.html` (~70), `life_feedback.html` (~23)
+  - `{{ fb.message }}` → `{% render_message fb %}` 일괄 치환
+- `apps/stats/static/stats/js/stats.js` (20)
+
+**life_feedback 메시지 코드 매핑 (예시)**
+
+| 기존 메시지 | 코드 |
+|------------|------|
+| 목표 달성 | `stats.feedback.goal_achieved` |
+| 목표 진행 중 | `stats.feedback.goal_in_progress` |
+| 태그 불균형 (60%+) | `stats.feedback.tag_imbalance` |
+| 리듬 붕괴 (CV>=0.7) | `stats.feedback.tag_volatility` |
+| 휴식 과다 | `stats.feedback.rest_excess` |
+| 미분류 과다 | `stats.feedback.unclassified_excess` |
 
 ---
 
-## 리스크
+## 명시적 범위 밖 (이번 작업 제외)
+
+- 일본어 추가 (구조만 준비, `.po` 파일 X)
+- DRF API 엔드포인트 신설 (B 하이브리드 준비만, 실제 추가 X)
+- 캐시 키 locale 분리 (영어만일 때 영향 미미, 일본어 추가 시점에 일괄)
+- Chart.js locale 설정
+- AI/LLM (현재 코드에 없음)
+
+---
+
+## 리스크 및 완화
 
 | 리스크 | 완화 |
-|---|---|
-| `tag_badge` 시그니처 변경 시 기존 호출자 깨짐 | 신규 파라미터 모두 optional + 기본값 (기존 동작 유지) |
-| SSR/CSR 초기 렌더 플래시 (flat → 그룹) | 뷰 초기 렌더부터 그룹 구조로 출력 → 플래시 없음 |
-| `availableCategories` 로딩 실패 시 그룹화 불가 | 폴백: 카테고리 로드 실패 시 기존 flat 렌더링 유지 |
-| 범례 `<button>` 변환 시 기존 CSS 영향 | 스타일 격리를 위해 `btn-tag-legend` 전용 클래스 추가 |
+|--------|------|
+| f-string이 makemessages에 추출 안 됨 | PR 체크리스트 + grep 검사 (`grep -rn 'f"' apps/`) |
+| 영어 글자 폭 팽창 (한 100자 → 영 ~120자) | Phase 1 base.html 작업 시 주요 카드/버튼 max-width 점검 |
+| `messages.py` 카탈로그-사용 코드 불일치 | 단위 테스트: 모든 사용 코드가 카탈로그에 존재 검증 |
+| 템플릿이 `LocalizableMessage` 객체 직접 출력 | Phase 5 시 `{{ fb.message }}` grep → `{% render_message fb %}` 일괄 치환 |
+| 모듈 레벨 `gettext` 잘못 사용 → 첫 요청 locale 고정 | `gettext_lazy as _` 만 모듈 레벨 import 강제 (코드 리뷰 항목) |
+| 커스텀 템플릿 태그 문자열 발견 누락 | 함수 본문 `_()` 사용 강제 + makemessages 후 .po 결과 검증 |
+
+---
+
+## 검증 체크리스트 (각 Phase 공통)
+
+```bash
+# 1. 메시지 추출
+conda run -n knou-life-diary django-admin makemessages -l en --ignore=.venv --ignore=staticfiles
+conda run -n knou-life-diary django-admin makemessages -d djangojs -l en --ignore=.venv --ignore=staticfiles
+
+# 2. .po 파일 영문 입력 후 컴파일
+conda run -n knou-life-diary django-admin compilemessages -l en
+
+# 3. 단위 테스트
+conda run -n knou-life-diary pytest apps/{app}/ -v
+
+# 4. 수동 확인
+conda run -n knou-life-diary python manage.py runserver
+# → 네비 언어 토글 → 해당 앱 주요 URL 클릭 통과
+```
 
 ---
 
 ## 실행 순서
 
 ```
-Phase 1 (범례 클릭)          → tag_ui.py → dashboard.js renderTagLegend → index.html 범례
-Phase 2 (사이드바 카테고리)  → views.py 정렬 → index.html SSR regroup → dashboard.js renderTagContainer + availableCategories 저장
+Phase 0.5 (인프라)
+  → Phase 1 (base/core, 후속 차단)
+    → Phase 2/3/4/5 (병렬 가능)
+      → 통합 검증 (전체 pytest + 수동 토글 회귀)
 ```
 
 ---
 
 ## 이전 계획
 
-> 이전 계획은 2026-04-21 보안 취약점 수정 계획이며, **2026-04-21 완료** 되었다. 요약:
-> - Phase 1: 저장형 XSS 수정 (`stats/index.html` `|safe` → `json_script`) ✅
-> - Phase 2: 브루트포스 방어 (`django-axes` 추가) ✅
-> - Phase 3: CDN SRI Hash 추가 (`base.html` Chart.js/htmx/Alpine.js) ✅
-> - 최종 검증: `manage.py check` clean, `pytest` 55 passed
+> 2026-04-24 작성된 "대시보드 태그 UX 개선 계획" (Feature 1: 범례 클릭 핸들러, Feature 2: 사이드바 카테고리 그룹화). 완료 여부는 git log로 확인 필요.
