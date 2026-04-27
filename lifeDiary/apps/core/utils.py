@@ -9,6 +9,7 @@ import json
 from datetime import datetime, date, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+from django.utils.translation import gettext
 
 # 공통 상수
 UNCLASSIFIED_TAG_NAME = "미분류"
@@ -163,13 +164,13 @@ def format_time_display(hours, minutes):
         str: 포맷팅된 시간 문자열
     """
     if hours > 0 and minutes > 0:
-        return f"{hours}시간 {minutes}분"
+        return gettext("%(hours)s시간 %(minutes)s분") % {"hours": hours, "minutes": minutes}
     elif hours > 0:
-        return f"{hours}시간"
+        return gettext("%(hours)s시간") % {"hours": hours}
     elif minutes > 0:
-        return f"{minutes}분"
+        return gettext("%(minutes)s분") % {"minutes": minutes}
     else:
-        return "0분"
+        return gettext("0분")
 
 
 

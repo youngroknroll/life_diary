@@ -1,0 +1,220 @@
+# English translation for lifeDiary.
+# Copyright (C) 2026
+# This file is distributed under the same license as the lifeDiary package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lifeDiary 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-27 19:21+0900\n"
+"PO-Revision-Date: 2026-04-27 19:30+0900\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/core/templatetags/i18n_messages.py:42
+#, python-format
+msgid "[missing message: %(code)s]"
+msgstr "[missing message: %(code)s]"
+
+#: apps/core/utils.py:167
+#, python-format
+msgid "%(hours)s시간 %(minutes)s분"
+msgstr "%(hours)sh %(minutes)sm"
+
+#: apps/core/utils.py:169
+#, python-format
+msgid "%(hours)s시간"
+msgstr "%(hours)sh"
+
+#: apps/core/utils.py:171
+#, python-format
+msgid "%(minutes)s분"
+msgstr "%(minutes)sm"
+
+#: apps/core/utils.py:173
+msgid "0분"
+msgstr "0m"
+
+#: templates/base.html:17 templates/base.html:70
+msgid "라이프 다이어리"
+msgstr "Life Diary"
+
+#: templates/base.html:60
+msgid "페이지를 불러오는 중입니다..."
+msgstr "Loading the page..."
+
+#: templates/base.html:87
+msgid "테마 전환"
+msgstr "Toggle theme"
+
+#: templates/base.html:99
+msgid "홈"
+msgstr "Home"
+
+#: templates/base.html:104
+msgid "대시보드"
+msgstr "Dashboard"
+
+#: templates/base.html:109
+msgid "통계"
+msgstr "Stats"
+
+#: templates/base.html:114
+msgid "태그 관리"
+msgstr "Tags"
+
+#: templates/base.html:127
+msgid "관리자"
+msgstr "Admin"
+
+#: templates/base.html:131
+msgid "마이페이지"
+msgstr "My page"
+
+#: templates/base.html:136
+msgid "로그아웃"
+msgstr "Log out"
+
+#: templates/base.html:145
+msgid "로그인"
+msgstr "Log in"
+
+#: templates/base.html:150 templates/index.html:238
+msgid "회원가입"
+msgstr "Sign up"
+
+#: templates/base.html:178
+msgid "라이프 다이어리 &copy; 2025 songyeongrok all rights reserved."
+msgstr "Life Diary &copy; 2025 songyeongrok all rights reserved."
+
+#: templates/index.html:215
+msgid "하루를 단순하게 기록하세요"
+msgstr "Capture your day, simply."
+
+#: templates/index.html:217
+msgid "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다."
+msgstr "Pick activities, log the flow of your day, then look back."
+
+#: templates/index.html:224 templates/index.html:354
+msgid "오늘 기록하기"
+msgstr "Log today"
+
+#: templates/index.html:229
+msgid "관리자 패널"
+msgstr "Admin panel"
+
+#: templates/index.html:235
+msgid "로그인하고 기록 시작"
+msgstr "Log in and start"
+
+#: templates/index.html:244
+msgid "복잡한 정리 없이 이어지는 기록"
+msgstr "Steady journaling without the overhead"
+
+#: templates/index.html:251
+msgid "기록하기"
+msgstr "Log"
+
+#: templates/index.html:252
+msgid "오늘 한 일을 가볍게 남깁니다."
+msgstr "Jot down what you did today."
+
+#: templates/index.html:260
+msgid "정리하기"
+msgstr "Organize"
+
+#: templates/index.html:261
+msgid "태그로 하루의 흐름을 구분합니다."
+msgstr "Use tags to outline your day."
+
+#: templates/index.html:269
+msgid "돌아보기"
+msgstr "Reflect"
+
+#: templates/index.html:270
+msgid "쌓인 기록에서 패턴을 확인합니다."
+msgstr "Spot patterns in your accumulated entries."
+
+#: templates/index.html:282
+msgid "오늘의 기록"
+msgstr "Today's log"
+
+#: templates/index.html:283
+msgid "가볍게 남긴 하루"
+msgstr "A day, lightly logged"
+
+#: templates/index.html:289 templates/index.html:335
+msgid "소비시간의 분류"
+msgstr "How time is spent"
+
+#: templates/index.html:295
+msgid "소비시간의 분류 이미지 크게 보기"
+msgstr "View the time-usage diagram in full size"
+
+#: templates/index.html:297
+msgid "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
+msgstr "Sample screen explaining how to categorize time usage with tags"
+
+#: templates/index.html:299
+msgid "클릭해서 크게 볼 수 있습니다."
+msgstr "Click to view full size."
+
+#: templates/index.html:302
+msgid "하루 기록 예시"
+msgstr "Sample of a daily log"
+
+#: templates/index.html:322
+msgid "오늘의 한 줄"
+msgstr "One line for today"
+
+#: templates/index.html:323
+msgid "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
+msgstr "Captured both focus time and rest time at a glance."
+
+#: templates/index.html:336
+msgid "닫기"
+msgstr "Close"
+
+#: templates/index.html:339
+msgid "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
+msgstr "Larger sample screen showing how to categorize time usage with tags"
+
+#: templates/index.html:350
+#, python-format
+msgid "%(username)s님, 오늘 기록을 이어가세요"
+msgstr "%(username)s, keep today's log going"
+
+#: templates/index.html:351
+msgid "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
+msgstr "The small notes you leave now become the rhythm of your life."
+
+#: templates/shared/_date_selector.html:9
+msgid "오늘"
+msgstr "Today"
+
+#: templates/shared/_date_selector.html:13
+msgid "목표 확인"
+msgstr "View goals"
+
+#: templates/shared/_table_row_actions.html:2
+msgid "수정"
+msgstr "Edit"
+
+#: templates/shared/_table_row_actions.html:6
+#: templates/shared/confirm_delete.html:5
+#: templates/shared/confirm_delete.html:11
+msgid "삭제"
+msgstr "Delete"
+
+#: templates/shared/confirm_delete.html:7
+msgid "정말로 삭제하시겠습니까?"
+msgstr "Are you sure you want to delete?"
+
+#: templates/shared/confirm_delete.html:12
+msgid "취소"
+msgstr "Cancel"

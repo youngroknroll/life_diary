@@ -95,8 +95,8 @@ function hideOverlay() {
  * @param {string} message - 커스텀 확인 메시지 (기본: '정말 삭제하시겠습니까?')
  * @returns {boolean} - 사용자 확인 여부
  */
-function confirmDelete(message = '정말 삭제하시겠습니까?') {
-    return confirm(message);
+function confirmDelete(message) {
+    return confirm(message || gettext('정말 삭제하시겠습니까?'));
 }
 
 /**
@@ -105,10 +105,11 @@ function confirmDelete(message = '정말 삭제하시겠습니까?') {
  * @param {string} text - 로딩 중 표시 텍스트 (기본: '처리 중...')
  * @returns {string} - 복구용 원래 innerHTML
  */
-function setButtonLoading(btn, text = '처리 중...') {
+function setButtonLoading(btn, text) {
+    const label = text || gettext('처리 중...');
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${text}`;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${label}`;
     return original;
 }
 

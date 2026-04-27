@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function populateCategorySelect(selectedCategoryId) {
         const select = document.getElementById('tagFormCategory');
         if (!select || !window._categories) return;
-        select.innerHTML = '<option value="">카테고리를 선택하세요</option>';
+        select.innerHTML = `<option value="">${gettext('카테고리를 선택하세요')}</option>`;
         window._categories.forEach(cat => {
             const option = document.createElement('option');
             option.value = cat.id;
@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (tag) {
             // 태그 수정
-            titleEl.textContent = '태그 수정';
+            titleEl.textContent = gettext('태그 수정');
             tagIdInput.value = tag.id;
             nameInput.value = tag.name;
             colorInput.value = tag.color;
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             // 새 태그 생성
-            titleEl.textContent = '새 태그 생성';
+            titleEl.textContent = gettext('새 태그 생성');
             tagIdInput.value = '';
             const defaultColor = '#007bff';
             colorInput.value = defaultColor;
@@ -94,12 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const category_id = categorySelect ? parseInt(categorySelect.value) : null;
 
         if (!name) {
-            showNotification('태그명을 입력해주세요.', 'warning');
+            showNotification(gettext('태그명을 입력해주세요.'), 'warning');
             return;
         }
 
         if (!category_id) {
-            showNotification('카테고리를 선택해주세요.', 'warning');
+            showNotification(gettext('카테고리를 선택해주세요.'), 'warning');
             return;
         }
 
@@ -121,13 +121,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('태그 저장 오류:', error);
-            showNotification(`태그 저장 실패: ${error.message}`, 'error');
+            showNotification(interpolate(gettext('태그 저장 실패: %s'), [error.message]), 'error');
         }
     });
 
     // 전역 함수로 태그 삭제 함수 등록 (core utils 사용)
     window.deleteTag = async function(tagId, tagName) {
-        if (!confirmDelete(`'${tagName}' 태그를 정말 삭제하시겠습니까?`)) {
+        if (!confirmDelete(interpolate(gettext("'%s' 태그를 정말 삭제하시겠습니까?"), [tagName]))) {
             return;
         }
 
@@ -135,14 +135,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const result = await apiCall(`/api/tags/${tagId}/`, {
                 method: 'DELETE'
             });
-            
+
             showNotification(result.message, 'success');
             // 태그 목록 업데이트가 필요하다는 이벤트를 발생시킴
             document.dispatchEvent(new CustomEvent('tags-updated'));
-            
+
         } catch (error) {
             console.error('태그 삭제 오류:', error);
-            showNotification(`태그 삭제 실패: ${error.message}`, 'error');
+            showNotification(interpolate(gettext('태그 삭제 실패: %s'), [error.message]), 'error');
         }
     };
 }); 

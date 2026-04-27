@@ -1,7 +1,8 @@
-<td><a href="{{ edit_url }}" class="btn btn-sm {{ edit_class|default:'btn-outline-primary' }}">수정</a></td>
+{% load i18n %}
+<td><a href="{{ edit_url }}" class="btn btn-sm {{ edit_class|default:'btn-outline-primary' }}">{% trans "수정" %}</a></td>
 <td>
     <form action="{{ delete_url }}" method="post" class="d-inline">
         {% csrf_token %}
-        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete();">삭제</button>
+        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete();">{% trans "삭제" %}</button>
     </form>
 </td>

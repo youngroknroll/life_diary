@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="d-flex gap-2 flex-wrap date-selector">
     <input type="date"
            class="form-control form-control-sm date-input-sm"
@@ -5,11 +6,11 @@
            value="{{ selected_date|date:'Y-m-d' }}"
            {% if ds_onchange %}onchange="{{ ds_onchange }}"{% endif %}>
     <button class="btn btn-sm btn-outline-primary" onclick="goToToday()">
-        <i class="fas fa-home"></i> 오늘
+        <i class="fas fa-home"></i> {% trans "오늘" %}
     </button>
     {% if user.is_authenticated and not user.is_superuser %}
     <a href="{% url 'users:mypage' %}" class="btn btn-sm btn-outline-primary fw-bold">
-        <i class="fas fa-bullseye"></i> {{ ds_mypage_label|default:"목표 확인" }}
+        <i class="fas fa-bullseye"></i> {{ ds_mypage_label|default:_("목표 확인") }}
     </a>
     {% endif %}
 </div>

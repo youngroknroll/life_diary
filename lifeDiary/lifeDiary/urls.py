@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import user_passes_test
+from django.views.i18n import JavaScriptCatalog
 from . import views
 
 # 관리자만 admin 패널 접근 가능하도록 제한
@@ -27,6 +28,19 @@ admin.site.login = user_passes_test(lambda u: u.is_superuser, login_url="/")(
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
+    path(
+        "jsi18n/",
+        JavaScriptCatalog.as_view(
+            packages=[
+                "apps.core",
+                "apps.dashboard",
+                "apps.stats",
+                "apps.tags",
+                "apps.users",
+            ]
+        ),
+        name="javascript-catalog",
+    ),
     path("admin/", admin.site.urls),
     path("", views.index, name="home"),
     # Page URLs

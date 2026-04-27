@@ -220,8 +220,8 @@ feedback.append(LocalizableMessage(
 
 ```bash
 # 1. 메시지 추출
-conda run -n knou-life-diary django-admin makemessages -l en --ignore=.venv --ignore=staticfiles
-conda run -n knou-life-diary django-admin makemessages -d djangojs -l en --ignore=.venv --ignore=staticfiles
+conda run -n knou-life-diary django-admin makemessages -l en --ignore=.venv --ignore=staticfiles --ignore='apps/*/tests*.py' --ignore='apps/*/test_*.py'
+conda run -n knou-life-diary django-admin makemessages -d djangojs -l en --ignore=.venv --ignore=staticfiles --ignore='apps/*/tests*.py' --ignore='apps/*/test_*.py'
 
 # 2. .po 파일 영문 입력 후 컴파일
 conda run -n knou-life-diary django-admin compilemessages -l en

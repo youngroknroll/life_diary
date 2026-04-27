@@ -1,0 +1,60 @@
+# English JS translation for lifeDiary.
+# Copyright (C) 2026
+# This file is distributed under the same license as the lifeDiary package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: lifeDiary 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-27 19:09+0900\n"
+"PO-Revision-Date: 2026-04-27 19:30+0900\n"
+"Last-Translator: \n"
+"Language-Team: English\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/core/static/core/js/tag.js:35
+msgid "카테고리를 선택하세요"
+msgstr "Select a category"
+
+#: apps/core/static/core/js/tag.js:61
+msgid "태그 수정"
+msgstr "Edit tag"
+
+#: apps/core/static/core/js/tag.js:72
+msgid "새 태그 생성"
+msgstr "Create new tag"
+
+#: apps/core/static/core/js/tag.js:97
+msgid "태그명을 입력해주세요."
+msgstr "Please enter a tag name."
+
+#: apps/core/static/core/js/tag.js:102
+msgid "카테고리를 선택해주세요."
+msgstr "Please select a category."
+
+#: apps/core/static/core/js/tag.js:124
+#, javascript-format
+msgid "태그 저장 실패: %s"
+msgstr "Failed to save tag: %s"
+
+#: apps/core/static/core/js/tag.js:130
+#, javascript-format
+msgid "'%s' 태그를 정말 삭제하시겠습니까?"
+msgstr "Are you sure you want to delete the '%s' tag?"
+
+#: apps/core/static/core/js/tag.js:145
+#, javascript-format
+msgid "태그 삭제 실패: %s"
+msgstr "Failed to delete tag: %s"
+
+#: apps/core/static/core/js/utils.js:99
+msgid "정말 삭제하시겠습니까?"
+msgstr "Are you sure you want to delete?"
+
+#: apps/core/static/core/js/utils.js:109
+msgid "처리 중..."
+msgstr "Processing..."
