@@ -1,21 +1,22 @@
 {% load static %}
+{% load i18n %}
 <!-- 태그 설명 이미지 모달 -->
 <div class="modal fade" id="tagImageModal" tabindex="-1" aria-labelledby="tagImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="tagImageModalLabel">
-                    <i class="fas fa-image me-2"></i>태그 사용법 이미지
+                    <i class="fas fa-image me-2"></i>{% trans "태그 사용법 이미지" %}
                 </h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans 'Close' %}"></button>
             </div>
             <div class="modal-body text-center">
-                
-                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="img-fluid" alt="태그 사용법">
+
+                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="img-fluid" alt="{% trans '태그 사용법' %}">
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "닫기" %}</button>
             </div>
         </div>
     </div>
-</div> 
+</div>

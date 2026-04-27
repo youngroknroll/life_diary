@@ -241,7 +241,8 @@ const showSlotInfo = (slotIndexes) => {
     if (!inlineEl) return;
 
     if (!slotIndexes || slotIndexes.length === 0) {
-        inlineEl.innerHTML = '<small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택하세요</small>';
+        const promptText = gettext('그리드에서 시간을 선택하세요');
+        inlineEl.innerHTML = `<small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>${promptText}</small>`;
         return;
     }
 
@@ -256,7 +257,7 @@ const showSlotInfo = (slotIndexes) => {
         if (!slotElement) return;
 
         const timeRange = slotElement.getAttribute('title').split(' - ')[0];
-        let tagName = '빈 슬롯';
+        let tagName = gettext('빈 슬롯');
         let memo = '';
 
         if (slotElement.classList.contains('filled')) {
@@ -271,30 +272,43 @@ const showSlotInfo = (slotIndexes) => {
                     tagName = tagAndMemo;
                 }
             } else {
-                tagName = '알 수 없음';
+                tagName = gettext('알 수 없음');
             }
         }
 
+        const labelTime = gettext('시간:');
+        const labelStatus = gettext('상태:');
+        const deleteLabel = gettext('삭제');
         infoHTML = `<div class="d-flex justify-content-between align-items-start">
             <div>
-                <div class="text-muted"><strong>시간:</strong> ${timeRange}</div>
-                <div class="text-muted"><strong>상태:</strong> ${tagName}</div>
+                <div class="text-muted"><strong>${labelTime}</strong> ${timeRange}</div>
+                <div class="text-muted"><strong>${labelStatus}</strong> ${tagName}</div>
                 ${memo ? `<div class="text-muted small">${memo}</div>` : ''}
             </div>
-            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
+            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
         </div>`;
     } else {
         const sortedSlots = slotIndexes.slice().sort((a, b) => a - b);
         const startTime = slotIndexToTime(sortedSlots[0]);
         const endTime = slotIndexToTime(sortedSlots[sortedSlots.length - 1] + 1);
         const duration = slotIndexes.length * 10;
+        const slotsLabel = interpolate(
+            ngettext('%s개 슬롯', '%s개 슬롯', slotIndexes.length),
+            [slotIndexes.length]
+        );
+        const durationLabel = interpolate(
+            gettext('%(h)s시간 %(m)s분'),
+            { h: Math.floor(duration / 60), m: duration % 60 },
+            true
+        );
+        const deleteLabel = gettext('삭제');
 
         infoHTML = `<div class="d-flex justify-content-between align-items-start">
             <div>
-                <div class="text-muted"><strong>${slotIndexes.length}개 슬롯</strong> ${startTime} - ${endTime}</div>
-                <div class="text-muted small">${Math.floor(duration/60)}시간 ${duration%60}분</div>
+                <div class="text-muted"><strong>${slotsLabel}</strong> ${startTime} - ${endTime}</div>
+                <div class="text-muted small">${durationLabel}</div>
             </div>
-            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>삭제</button>` : ''}
+            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
         </div>`;
     }
 
@@ -320,17 +334,17 @@ const selectTag = (tagId, tagColor, tagName) => {
 
 const saveSlot = async () => {
     if (selectedSlots.size === 0) {
-        showNotification('슬롯을 선택해주세요.', 'warning');
+        showNotification(gettext('슬롯을 선택해주세요.'), 'warning');
         return;
     }
 
     if (!selectedTag) {
-        showNotification('태그를 선택해주세요.', 'warning');
+        showNotification(gettext('태그를 선택해주세요.'), 'warning');
         return;
     }
 
     const saveBtn = document.getElementById('saveBtn');
-    showOverlay('저장 중입니다...', 'fa-save');
+    showOverlay(gettext('저장 중입니다...'), 'fa-save');
 
     try {
         const memo = document.getElementById('memoInput').value.trim();
@@ -354,14 +368,14 @@ const saveSlot = async () => {
 
     } catch (error) {
         hideOverlay();
-        showNotification(`저장 실패: ${error.message}`, 'error');
+        showNotification(interpolate(gettext('저장 실패: %s'), [error.message]), 'error');
         console.error('Save error:', error);
     }
 };
 
 const deleteSlot = async () => {
     if (selectedSlots.size === 0) {
-        showNotification('삭제할 슬롯을 선택해주세요.', 'warning');
+        showNotification(gettext('삭제할 슬롯을 선택해주세요.'), 'warning');
         return;
     }
 
@@ -370,15 +384,23 @@ const deleteSlot = async () => {
     );
 
     if (filledSlots.length === 0) {
-        showNotification('삭제할 기록이 없습니다.', 'warning');
+        showNotification(gettext('삭제할 기록이 없습니다.'), 'warning');
         return;
     }
 
-    if (!confirmDelete(`${filledSlots.length}개의 기록된 슬롯을 삭제하시겠습니까?`)) {
+    const confirmMsg = interpolate(
+        ngettext(
+            '%s개의 기록된 슬롯을 삭제하시겠습니까?',
+            '%s개의 기록된 슬롯을 삭제하시겠습니까?',
+            filledSlots.length
+        ),
+        [filledSlots.length]
+    );
+    if (!confirmDelete(confirmMsg)) {
         return;
     }
 
-    showOverlay('삭제 중입니다...', 'fa-trash');
+    showOverlay(gettext('삭제 중입니다...'), 'fa-trash');
 
     try {
         const date = document.getElementById('dateSelector').value;
@@ -399,7 +421,7 @@ const deleteSlot = async () => {
 
     } catch (error) {
         hideOverlay();
-        showNotification(`삭제 실패: ${error.message}`, 'error');
+        showNotification(interpolate(gettext('삭제 실패: %s'), [error.message]), 'error');
         console.error('Delete error:', error);
     }
 };
@@ -412,7 +434,7 @@ async function loadAvailableTags() {
         renderTagContainer(result.tags);
         renderTagLegend(result.tags);
     } catch (error) {
-        showTagError('태그 로드 중 오류가 발생했습니다.');
+        showTagError(gettext('태그 로드 중 오류가 발생했습니다.'));
     }
 }
 
@@ -426,15 +448,16 @@ function renderTagButton(tag) {
                 data-tag-name="${safeName}">
             <span class="badge me-2" style="background-color: ${safeColor};">&nbsp;</span>
             ${safeName}
-            ${tag.is_default ? '<i class="fas fa-star text-warning ms-1" title="기본 태그"></i>' : ''}
+            ${tag.is_default ? `<i class="fas fa-star text-warning ms-1" title="${gettext('기본 태그')}"></i>` : ''}
         </button>`;
 }
 
 function renderTagContainer(tags) {
     const tagContainer = document.getElementById('tagContainer');
     if (tags.length === 0) {
+        const emptyHtml = gettext("태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.");
         tagContainer.innerHTML = `<div class="text-center py-2">
-            <p class="text-muted small">태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.</p>
+            <p class="text-muted small">${emptyHtml}</p>
         </div>`;
         return;
     }
@@ -475,7 +498,7 @@ function renderTagContainer(tags) {
 function renderTagLegend(tags) {
     const tagLegend = document.getElementById('tagLegend');
     if (tags.length === 0) {
-        tagLegend.innerHTML = '<small class="text-muted">생성된 태그가 없습니다.</small>';
+        tagLegend.innerHTML = `<small class="text-muted">${gettext('생성된 태그가 없습니다.')}</small>`;
         return;
     }
     tagLegend.innerHTML = tags.map(tag => {

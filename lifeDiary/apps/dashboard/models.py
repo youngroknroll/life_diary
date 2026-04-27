@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from apps.tags.models import Tag
 from apps.core.utils import UNCLASSIFIED_TAG_NAME
 
@@ -15,33 +16,33 @@ class TimeBlock(models.Model):
     - 각 슬롯은 10분 단위 (00:00~00:10 = 슬롯 0, 00:10~00:20 = 슬롯 1, ...)
     """
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="사용자")
-    date = models.DateField(verbose_name="날짜")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("사용자"))
+    date = models.DateField(verbose_name=_("날짜"))
     slot_index = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(143)],
-        verbose_name="슬롯 인덱스",
-        help_text="0~143 (0: 00:00-00:10, 143: 23:50-24:00)",
+        verbose_name=_("슬롯 인덱스"),
+        help_text=_("0~143 (0: 00:00-00:10, 143: 23:50-24:00)"),
     )
     tag = models.ForeignKey(
-        Tag, on_delete=models.SET_NULL, null=True, verbose_name="태그"
+        Tag, on_delete=models.SET_NULL, null=True, verbose_name=_("태그")
     )
     memo = models.CharField(
         blank=True,
         max_length=500,
-        verbose_name="메모",
-        help_text="최대 500자까지 입력 가능",
+        verbose_name=_("메모"),
+        help_text=_("최대 500자까지 입력 가능"),
     )
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="생성일")
-    updated_at = models.DateTimeField(auto_now=True, verbose_name="수정일")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("생성일"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("수정일"))
 
     class Meta:
-        verbose_name = "시간 블록"
-        verbose_name_plural = "시간 블록들"
+        verbose_name = _("시간 블록")
+        verbose_name_plural = _("시간 블록들")
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "date", "slot_index"],
                 name="unique_user_date_slot",
-                violation_error_message="해당 시간대에 이미 기록이 존재합니다.",
+                violation_error_message=_("해당 시간대에 이미 기록이 존재합니다."),
             )
         ]
         ordering = ["date", "slot_index"]
@@ -84,4 +85,4 @@ class TimeBlock(models.Model):
             and not self.tag.is_default
             and self.tag.user != self.user
         ):
-            raise ValidationError({"tag": "다른 사용자의 태그는 사용할 수 없습니다."})
+            raise ValidationError({"tag": _("다른 사용자의 태그는 사용할 수 없습니다.")})

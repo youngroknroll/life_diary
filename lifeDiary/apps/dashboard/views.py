@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext, ngettext
 from django.views.decorators.http import require_http_methods, require_GET
 
 import json
@@ -64,7 +65,7 @@ def dashboard_view(request):
     stats = calculate_time_statistics(len(slot_data))
 
     context = {
-        "page_title": "대시보드",
+        "page_title": gettext("대시보드"),
         "selected_date": selected_date,
         "slots": slots,
         "user_tags": user_tags,
@@ -90,7 +91,7 @@ def time_block_api(request):
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return error_response("올바른 JSON 형식이 아닙니다.", "INVALID_JSON")
+        return error_response(gettext("올바른 JSON 형식이 아닙니다."), "INVALID_JSON")
 
     if request.method == "POST":
         return _handle_upsert(request, data)
@@ -116,10 +117,15 @@ def _handle_upsert(request, data):
         return error_response(str(exc), "TAG_NOT_FOUND", 404)
     except Exception:
         logger.exception("시간 블록 저장 중 오류")
-        return error_response("저장 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+        return error_response(gettext("저장 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
+    saved_count = len(cmd.slot_indexes)
     return success_response(
-        f"{len(cmd.slot_indexes)}개의 슬롯이 저장되었습니다.",
+        ngettext(
+            "%(count)d개의 슬롯이 저장되었습니다.",
+            "%(count)d개의 슬롯이 저장되었습니다.",
+            saved_count,
+        ) % {"count": saved_count},
         {
             "created_count": result.created,
             "updated_count": result.updated,
@@ -145,12 +151,16 @@ def _handle_delete(request, data):
         result = _delete_use_case.execute(cmd, request.user)
     except Exception:
         logger.exception("시간 블록 삭제 중 오류")
-        return error_response("삭제 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+        return error_response(gettext("삭제 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
     if result.deleted == 0 and result.requested > 0:
-        return error_response("삭제할 기록이 없습니다.", "NO_BLOCKS_FOUND", 404)
+        return error_response(gettext("삭제할 기록이 없습니다."), "NO_BLOCKS_FOUND", 404)
 
     return success_response(
-        f"{result.deleted}개의 슬롯이 삭제되었습니다.",
+        ngettext(
+            "%(count)d개의 슬롯이 삭제되었습니다.",
+            "%(count)d개의 슬롯이 삭제되었습니다.",
+            result.deleted,
+        ) % {"count": result.deleted},
         {"deleted_count": result.deleted, "requested_count": result.requested},
     )
