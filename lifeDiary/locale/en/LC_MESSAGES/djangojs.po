@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 19:09+0900\n"
+"POT-Creation-Date: 2026-04-27 19:28+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -58,3 +58,93 @@ msgstr "Are you sure you want to delete?"
 #: apps/core/static/core/js/utils.js:109
 msgid "처리 중..."
 msgstr "Processing..."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:244
+msgid "그리드에서 시간을 선택하세요"
+msgstr "Pick a time on the grid"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:260
+msgid "빈 슬롯"
+msgstr "Empty slot"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:275
+msgid "알 수 없음"
+msgstr "Unknown"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:279
+msgid "시간:"
+msgstr "Time:"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:280
+msgid "상태:"
+msgstr "Status:"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:281
+#: apps/dashboard/static/dashboard/js/dashboard.js:304
+msgid "삭제"
+msgstr "Delete"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:296
+#, javascript-format
+msgid "%s개 슬롯"
+msgid_plural "%s개 슬롯"
+msgstr[0] "%s slot"
+msgstr[1] "%s slots"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:300
+msgid "%(h)s시간 %(m)s분"
+msgstr "%(h)sh %(m)sm"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:337
+msgid "슬롯을 선택해주세요."
+msgstr "Please select a slot."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:342
+msgid "태그를 선택해주세요."
+msgstr "Please select a tag."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:347
+msgid "저장 중입니다..."
+msgstr "Saving..."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:371
+msgid "저장 실패: %s"
+msgstr "Save failed: %s"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:378
+msgid "삭제할 슬롯을 선택해주세요."
+msgstr "Please select a slot to delete."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:387
+msgid "삭제할 기록이 없습니다."
+msgstr "No records to delete."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:393
+msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
+msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
+msgstr[0] "Delete %s logged slot?"
+msgstr[1] "Delete %s logged slots?"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:403
+msgid "삭제 중입니다..."
+msgstr "Deleting..."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:424
+msgid "삭제 실패: %s"
+msgstr "Delete failed: %s"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:437
+msgid "태그 로드 중 오류가 발생했습니다."
+msgstr "An error occurred while loading tags."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:451
+msgid "기본 태그"
+msgstr "Default tag"
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:458
+msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
+msgstr "No tags.<br>Add one with the 'New tag' button."
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:501
+msgid "생성된 태그가 없습니다."
+msgstr "No tags yet."

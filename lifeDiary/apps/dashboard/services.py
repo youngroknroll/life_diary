@@ -1,3 +1,5 @@
+from django.utils.translation import gettext
+
 from apps.core.utils import TOTAL_SLOTS_PER_DAY
 
 
@@ -6,7 +8,7 @@ SLOT_END_MINUTES = [10, 20, 30, 40, 50, 60]
 
 def build_time_headers(slot_end_minutes=None):
     minutes = slot_end_minutes or SLOT_END_MINUTES
-    return [f"{minute}분" for minute in minutes * 2]
+    return [gettext("%(minute)s분") % {"minute": minute} for minute in minutes * 2]
 
 
 def validate_slot_indexes(slot_indexes):

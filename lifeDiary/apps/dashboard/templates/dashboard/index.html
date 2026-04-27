@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load tag_ui %}
+{% load i18n %}
 
-{% block title %}대시보드 - {{ selected_date|date:"Y년 m월 d일" }} | 라이프 다이어리{% endblock %}
+{% block title %}{% blocktrans with d=selected_date|date:"DATE_FORMAT" %}대시보드 - {{ d }} | 라이프 다이어리{% endblocktrans %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -20,9 +21,10 @@
             <div class="card-header dashboard-date-header">
                 <h5 class="mb-0 dashboard-date-title">
                     <i class="fas fa-calendar-day me-2"></i>
-                    {{ selected_date|date:"Y년 m월 d일 (l)" }}
+                    {{ selected_date|date:"DATE_FORMAT" }} ({{ selected_date|date:"l" }})
                 </h5>
-                {% include "shared/_date_selector.html" with ds_mypage_label="목표 추가" %}
+                {% trans "목표 추가" as add_goal_label %}
+                {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
             </div>
             <div class="card-body">
                 <div class="row text-center dashboard-stats">
@@ -31,7 +33,7 @@
                             <i class="fas fa-clock text-primary me-2"></i>
                             <div>
                                 <div class="fw-bold">{{ total_slots }}</div>
-                                <small class="text-muted">총 슬롯</small>
+                                <small class="text-muted">{% trans "총 슬롯" %}</small>
                             </div>
                         </div>
                     </div>
@@ -40,7 +42,7 @@
                             <i class="fas fa-check-circle text-success me-2"></i>
                             <div>
                                 <div class="fw-bold">{{ filled_slots }}</div>
-                                <small class="text-muted">기록된 슬롯</small>
+                                <small class="text-muted">{% trans "기록된 슬롯" %}</small>
                             </div>
                         </div>
                     </div>
@@ -49,7 +51,7 @@
                             <i class="fas fa-chart-pie text-info me-2"></i>
                             <div>
                                 <div class="fw-bold">{{ fill_percentage }}%</div>
-                                <small class="text-muted">기록률</small>
+                                <small class="text-muted">{% trans "기록률" %}</small>
                             </div>
                         </div>
                     </div>
@@ -57,8 +59,8 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-hourglass-half text-warning me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ total_hours }}시간 {{ remaining_minutes }}분</div>
-                                <small class="text-muted">총 기록 시간</small>
+                                <div class="fw-bold">{% blocktrans with h=total_hours m=remaining_minutes %}{{ h }}시간 {{ m }}분{% endblocktrans %}</div>
+                                <small class="text-muted">{% trans "총 기록 시간" %}</small>
                             </div>
                         </div>
                     </div>
@@ -75,7 +77,7 @@
             <div class="card-header">
                 <h6 class="mb-0">
                     <i class="fas fa-th me-2"></i>
-                    시간 그리드 (10분 단위)
+                    {% trans "시간 그리드 (10분 단위)" %}
                 </h6>
             </div>
             <div class="card-body">
@@ -98,7 +100,7 @@
                                  style="background-color: {{ slot.data.tag.color }};"
                                  title="{{ slot.time_str }} - {{ slot.data.tag.name }}{% if slot.data.memo %}: {{ slot.data.memo }}{% endif %}"
                              {% else %}
-                                 title="{{ slot.time_str }} - 빈 슬롯"
+                                 title="{% blocktrans with t=slot.time_str %}{{ t }} - 빈 슬롯{% endblocktrans %}"
                              {% endif %}
                              onclick="selectSlot({{ slot.index }})"
                              onmousedown="startDrag({{ slot.index }}, event)"
@@ -133,7 +135,7 @@
                                 {% tag_badge tag.color tag.text_color tag.name clickable=True tag_id=tag.id %}
                             {% endfor %}
                         {% else %}
-                            <small class="text-muted">생성된 태그가 없습니다.</small>
+                            <small class="text-muted">{% trans "생성된 태그가 없습니다." %}</small>
                         {% endif %}
                     </div>
                 </div>
@@ -147,21 +149,21 @@
             <div class="card-header rounded-top-3">
                 <small class="mb-0 ms-2">
                     <i class="fas fa-edit me-2"></i>
-                    입력정보
+                    {% trans "입력정보" %}
                 </small>
             </div>
             <div class="card-body">
                 <!-- 선택된 슬롯 정보 (인라인) -->
                 <div id="slotInfoInline" class="mb-3 p-2 border rounded-3 bg-light">
-                    <small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!</small>
+                    <small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>{% trans "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!" %}</small>
                 </div>
 
                 <div class="mb-3">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <label class="form-label mb-0">태그 선택</label>
+                        <label class="form-label mb-0">{% trans "태그 선택" %}</label>
                         <div>
                             <button type="button" class="btn btn-sm btn-outline-success me-1" id="createNewTagBtn">
-                                <i class="fas fa-plus"></i> 새 태그
+                                <i class="fas fa-plus"></i> {% trans "새 태그" %}
                             </button>
                             <button type="button" class="btn btn-sm btn-outline-primary me-1" id="manageTagsBtn">
                                 <i class="fas fa-cog"></i>
@@ -176,19 +178,19 @@
                         <div class="card border-info mt-2">
                             <div class="card-body bg-light py-2">
                                 <small class="text-info">
-                                    <i class="fas fa-info-circle me-1"></i><strong>사용법:</strong><br>
-                                    • <strong>단일 선택:</strong> 슬롯 클릭<br>
-                                    • <strong>드래그 선택:</strong> 마우스로 드래그<br>
-                                    • <strong>다중 선택:</strong> Ctrl/Cmd + 클릭<br>
-                                    • <strong>터치:</strong> 터치 후 드래그<br>
-                                    • <strong>슬롯을 선택했다면?!</strong> 해당하는 태그 선택 후 저장 버튼 클릭!<br><br>
+                                    <i class="fas fa-info-circle me-1"></i><strong>{% trans "사용법:" %}</strong><br>
+                                    • <strong>{% trans "단일 선택:" %}</strong> {% trans "슬롯 클릭" %}<br>
+                                    • <strong>{% trans "드래그 선택:" %}</strong> {% trans "마우스로 드래그" %}<br>
+                                    • <strong>{% trans "다중 선택:" %}</strong> {% trans "Ctrl/Cmd + 클릭" %}<br>
+                                    • <strong>{% trans "터치:" %}</strong> {% trans "터치 후 드래그" %}<br>
+                                    • <strong>{% trans "슬롯을 선택했다면?!" %}</strong> {% trans "해당하는 태그 선택 후 저장 버튼 클릭!" %}<br><br>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">💡 이 도움말은 ? 버튼을 다시 클릭하면 닫힙니다.</small>
+                                        <small class="text-muted">{% trans "💡 이 도움말은 ? 버튼을 다시 클릭하면 닫힙니다." %}</small>
                                         <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#tagImageModal">
-                                            <i class="fas fa-image me-1"></i>태그 카테고리 설명
+                                            <i class="fas fa-image me-1"></i>{% trans "태그 카테고리 설명" %}
                                         </button>
                                     </div>
-                                    
+
                                 </small>
                             </div>
                         </div>
@@ -214,7 +216,7 @@
                                                 {% tag_dot tag.color %}
                                                 {{ tag.name }}
                                                 {% if tag.is_default %}
-                                                    <i class="fas fa-star text-warning ms-1" title="기본 태그"></i>
+                                                    <i class="fas fa-star text-warning ms-1" title="{% trans '기본 태그' %}"></i>
                                                 {% endif %}
                                             </button>
                                         {% endfor %}
@@ -223,21 +225,21 @@
                             {% endfor %}
                         {% else %}
                             <div class="text-center py-2">
-                                <p class="text-muted small">태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.</p>
+                                <p class="text-muted small">{% blocktrans %}태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.{% endblocktrans %}</p>
                             </div>
                         {% endif %}
                     </div>
                 </div>
                 
                 <div class="mb-3">
-                    <label for="memoInput" class="form-label">메모 (선택사항)</label>
-                    <textarea class="form-control" id="memoInput" rows="3" placeholder="메모를 입력하세요..."></textarea>
+                    <label for="memoInput" class="form-label">{% trans "메모 (선택사항)" %}</label>
+                    <textarea class="form-control" id="memoInput" rows="3" placeholder="{% trans '메모를 입력하세요...' %}"></textarea>
                 </div>
-                
+
                 <div class="d-grid gap-2">
                     <button class="btn btn-primary" onclick="saveSlot()" disabled id="saveBtn">
                         <i class="fas fa-save me-1"></i>
-                        저장
+                        {% trans "저장" %}
                     </button>
                 </div>
             </div>
