@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 22:44+0900\n"
+"POT-Creation-Date: 2026-04-27 23:46+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -40,7 +40,7 @@ msgstr "%(minutes)sm"
 msgid "0분"
 msgstr "0m"
 
-#: apps/dashboard/models.py:19
+#: apps/dashboard/models.py:19 apps/tags/models.py:55
 msgid "사용자"
 msgstr "User"
 
@@ -56,7 +56,7 @@ msgstr "Slot index"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0–143 (0: 00:00–00:10, 143: 23:50–24:00)"
 
-#: apps/dashboard/models.py:27
+#: apps/dashboard/models.py:27 apps/tags/models.py:83
 msgid "태그"
 msgstr "Tag"
 
@@ -68,11 +68,11 @@ msgstr "Memo"
 msgid "최대 500자까지 입력 가능"
 msgstr "Up to 500 characters"
 
-#: apps/dashboard/models.py:35
+#: apps/dashboard/models.py:35 apps/tags/models.py:28 apps/tags/models.py:79
 msgid "생성일"
 msgstr "Created at"
 
-#: apps/dashboard/models.py:36
+#: apps/dashboard/models.py:36 apps/tags/models.py:80
 msgid "수정일"
 msgstr "Updated at"
 
@@ -225,7 +225,7 @@ msgstr "💡 Click ? again to close this tip."
 msgid "태그 카테고리 설명"
 msgstr "Tag category guide"
 
-#: apps/dashboard/templates/dashboard/index.html:219
+#: apps/dashboard/templates/dashboard/index.html:219 apps/tags/models.py:76
 msgid "기본 태그"
 msgstr "Default tag"
 
@@ -242,6 +242,7 @@ msgid "메모를 입력하세요..."
 msgstr "Enter a memo..."
 
 #: apps/dashboard/templates/dashboard/index.html:242
+#: apps/tags/templates/tags/_tag_modal.html:50
 msgid "저장"
 msgstr "Save"
 
@@ -279,9 +280,195 @@ msgid_plural "%(count)d개의 슬롯이 삭제되었습니다."
 msgstr[0] "%(count)d slot was deleted."
 msgstr[1] "%(count)d slots were deleted."
 
-#: templates/base.html:17 templates/base.html:70
+#: apps/tags/domain_services.py:35
+msgid "기본 태그 설정 변경은 관리자만 할 수 있습니다."
+msgstr "Only admins can change the default-tag setting."
+
+#: apps/tags/domain_services.py:40
+msgid "기본 태그는 관리자만 생성할 수 있습니다."
+msgstr "Only admins can create default tags."
+
+#: apps/tags/models.py:14
+msgid "카테고리명"
+msgstr "Category name"
+
+#: apps/tags/models.py:15
+msgid "슬러그"
+msgstr "Slug"
+
+#: apps/tags/models.py:16
+msgid "설명"
+msgstr "Description"
+
+#: apps/tags/models.py:22 apps/tags/models.py:68
+msgid "올바른 HEX 색상 코드를 입력하세요 (예: #FF5733)"
+msgstr "Enter a valid HEX color code (e.g. #FF5733)"
+
+#: apps/tags/models.py:25 apps/tags/models.py:71
+#: apps/tags/templates/tags/_tag_modal.html:28
+msgid "색상"
+msgstr "Color"
+
+#: apps/tags/models.py:27
+msgid "표시 순서"
+msgstr "Display order"
+
+#: apps/tags/models.py:31 apps/tags/models.py:50
+#: apps/tags/templates/tags/_tag_modal.html:18
+msgid "카테고리"
+msgstr "Category"
+
+#: apps/tags/models.py:32
+msgid "카테고리들"
+msgstr "Categories"
+
+#: apps/tags/models.py:58
+msgid "null이면 기본 태그 (모든 사용자 공용)"
+msgstr "If null, this is a default tag (shared by all users)"
+
+#: apps/tags/models.py:61 apps/tags/templates/tags/_tag_modal.html:24
+msgid "태그명"
+msgstr "Tag name"
+
+#: apps/tags/models.py:61
+msgid "최대 50자까지 입력 가능"
+msgstr "Up to 500 characters"
+
+#: apps/tags/models.py:72
+msgid "HEX 색상 코드 (예: #FF5733)"
+msgstr "HEX color code (e.g. #FF5733)"
+
+#: apps/tags/models.py:77
+msgid "관리자가 등록한 모든 사용자 공용 태그"
+msgstr "Default tag created by an admin and shared by all users"
+
+#: apps/tags/models.py:84
+msgid "태그들"
+msgstr "Tags"
+
+#: apps/tags/models.py:89 apps/tags/use_cases.py:59 apps/tags/use_cases.py:76
+msgid "이미 같은 이름의 태그가 존재합니다."
+msgstr "A tag with the same name already exists."
+
+#: apps/tags/models.py:95
+msgid "이미 같은 이름의 기본 태그가 존재합니다."
+msgstr "A default tag with the same name already exists."
+
+#: apps/tags/models.py:120
+msgid "태그명은 공백일 수 없습니다."
+msgstr "Tag name cannot be blank."
+
+#: apps/tags/templates/tags/_tag_modal.html:11
+#: apps/tags/templates/tags/index.html:20
+msgid "새 태그 생성"
+msgstr "Create new tag"
+
+#: apps/tags/templates/tags/_tag_modal.html:20
+msgid "카테고리를 선택하세요"
+msgstr "Select a category"
+
+#: apps/tags/templates/tags/_tag_modal.html:40
+msgid "기본 태그로 설정 (모든 사용자가 사용 가능)"
+msgstr "Set as default tag (available to all users)"
+
+#: apps/tags/templates/tags/_tag_modal.html:43
+msgid "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
+msgstr "Default tags can only be edited/deleted by admins."
+
+#: apps/tags/templates/tags/_tag_modal.html:49
+#: templates/shared/confirm_delete.html:12
+msgid "취소"
+msgstr "Cancel"
+
+#: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:13
+#: templates/base.html:114
+msgid "태그 관리"
+msgstr "Tags"
+
+#: apps/tags/templates/tags/index.html:4 templates/base.html:17
+#: templates/base.html:70
 msgid "라이프 다이어리"
 msgstr "Life Diary"
+
+#: apps/tags/templates/tags/index.html:15 templates/base.html:127
+msgid "관리자"
+msgstr "Admin"
+
+#: apps/tags/templates/tags/index.html:27
+msgid "로딩 중"
+msgstr "Loading"
+
+#: apps/tags/templates/tags/index.html:29
+msgid "태그 목록 불러오는 중..."
+msgstr "Loading tags..."
+
+#: apps/tags/templates/tags/index.html:35
+msgid "등록된 태그가 없습니다."
+msgstr "No tags yet."
+
+#: apps/tags/templates/tags/index.html:36
+msgid "새 태그를 생성하여 시간 기록을 시작해보세요."
+msgstr "Create a new tag to start logging time."
+
+#: apps/tags/use_cases.py:49 apps/tags/use_cases.py:73
+msgid "태그명과 색상을 입력해주세요."
+msgstr "Please enter a tag name and color."
+
+#: apps/tags/use_cases.py:52
+msgid "카테고리를 선택해주세요."
+msgstr "Please select a category."
+
+#: apps/tags/use_cases.py:56 apps/tags/use_cases.py:81
+msgid "존재하지 않는 카테고리입니다."
+msgstr "No such category."
+
+#: apps/tags/use_cases.py:97
+msgid "이 기본 태그는 사용 중이어서 삭제할 수 없습니다."
+msgstr "This default tag is in use and cannot be deleted."
+
+#: apps/tags/views.py:36
+msgid "카테고리 목록"
+msgstr "Category list"
+
+#: apps/tags/views.py:53
+msgid "카테고리 조회 중 오류가 발생했습니다."
+msgstr "An error occurred while loading categories."
+
+#: apps/tags/views.py:63
+msgid "태그 목록"
+msgstr "Tag list"
+
+#: apps/tags/views.py:81
+msgid "태그 조회 중 오류가 발생했습니다."
+msgstr "An error occurred while loading tags."
+
+#: apps/tags/views.py:86 apps/tags/views.py:115
+msgid "잘못된 형식의 요청입니다."
+msgstr "Malformed request."
+
+#: apps/tags/views.py:96
+msgid "태그가 생성되었습니다."
+msgstr "Tag created."
+
+#: apps/tags/views.py:105
+msgid "태그 생성 중 오류가 발생했습니다."
+msgstr "An error occurred while creating the tag."
+
+#: apps/tags/views.py:126
+msgid "태그가 수정되었습니다."
+msgstr "Tag updated."
+
+#: apps/tags/views.py:135
+msgid "태그 수정 중 오류가 발생했습니다."
+msgstr "An error occurred while updating the tag."
+
+#: apps/tags/views.py:140
+msgid "\"%(name)s\" 태그가 삭제되었습니다."
+msgstr "%(count)d slot was deleted."
+
+#: apps/tags/views.py:148
+msgid "태그 삭제 중 오류가 발생했습니다."
+msgstr "An error occurred while deleting the tag."
 
 #: templates/base.html:60
 msgid "페이지를 불러오는 중입니다..."
@@ -298,14 +485,6 @@ msgstr "Home"
 #: templates/base.html:109
 msgid "통계"
 msgstr "Stats"
-
-#: templates/base.html:114
-msgid "태그 관리"
-msgstr "Tags"
-
-#: templates/base.html:127
-msgid "관리자"
-msgstr "Admin"
 
 #: templates/base.html:131
 msgid "마이페이지"
@@ -445,7 +624,3 @@ msgstr "Delete"
 #: templates/shared/confirm_delete.html:7
 msgid "정말로 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete?"
-
-#: templates/shared/confirm_delete.html:12
-msgid "취소"
-msgstr "Cancel"

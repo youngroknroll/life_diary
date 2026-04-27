@@ -3,6 +3,7 @@ import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.utils.translation import gettext
 from django.views.decorators.http import require_http_methods, require_GET
 
 from apps.core.utils import success_response, error_response
@@ -32,7 +33,7 @@ def category_list(request):
     try:
         categories = _category_repo.find_all()
         return success_response(
-            "카테고리 목록",
+            gettext("카테고리 목록"),
             {
                 "categories": [
                     {
@@ -49,7 +50,7 @@ def category_list(request):
         )
     except Exception:
         logging.getLogger(__name__).exception("카테고리 조회 중 오류")
-        return error_response("카테고리 조회 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+        return error_response(gettext("카테고리 조회 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
 
 @login_required
@@ -59,7 +60,7 @@ def tag_list_create(request):
         try:
             tags = _list_tags.execute(request.user)
             return success_response(
-                "태그 목록",
+                gettext("태그 목록"),
                 {
                     "tags": [
                         {
@@ -77,12 +78,12 @@ def tag_list_create(request):
             )
         except Exception:
             logging.getLogger(__name__).exception("태그 조회 중 오류")
-            return error_response("태그 조회 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+            return error_response(gettext("태그 조회 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
     try:
         data = json.loads(request.body)
     except json.JSONDecodeError:
-        return error_response("잘못된 형식의 요청입니다.", "INVALID_JSON")
+        return error_response(gettext("잘못된 형식의 요청입니다."), "INVALID_JSON")
 
     try:
         tag = _create_tag.execute(
@@ -92,7 +93,7 @@ def tag_list_create(request):
             is_default=data.get("is_default", False),
             category_id=data.get("category_id"),
         )
-        return success_response("태그가 생성되었습니다.", {"tag": tag}, 201)
+        return success_response(gettext("태그가 생성되었습니다."), {"tag": tag}, 201)
     except PermissionError as exc:
         return error_response(str(exc), "FORBIDDEN", 403)
     except LookupError as exc:
@@ -101,7 +102,7 @@ def tag_list_create(request):
         return error_response(str(exc), "VALIDATION_ERROR")
     except Exception:
         logging.getLogger(__name__).exception("태그 생성 중 오류")
-        return error_response("태그 생성 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+        return error_response(gettext("태그 생성 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
 
 @login_required
@@ -111,7 +112,7 @@ def tag_detail_update_delete(request, tag_id):
         try:
             data = json.loads(request.body)
         except json.JSONDecodeError:
-            return error_response("잘못된 형식의 요청입니다.", "INVALID_JSON")
+            return error_response(gettext("잘못된 형식의 요청입니다."), "INVALID_JSON")
 
         try:
             tag = _update_tag.execute(
@@ -122,7 +123,7 @@ def tag_detail_update_delete(request, tag_id):
                 is_default=data.get("is_default", False),
                 category_id=data.get("category_id"),
             )
-            return success_response("태그가 수정되었습니다.", {"tag": tag})
+            return success_response(gettext("태그가 수정되었습니다."), {"tag": tag})
         except PermissionError as exc:
             return error_response(str(exc), "FORBIDDEN", 403)
         except LookupError as exc:
@@ -131,15 +132,17 @@ def tag_detail_update_delete(request, tag_id):
             return error_response(str(exc), "VALIDATION_ERROR")
         except Exception:
             logging.getLogger(__name__).exception("태그 수정 중 오류")
-            return error_response("태그 수정 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+            return error_response(gettext("태그 수정 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
     try:
         tag_name = _delete_tag.execute(user=request.user, tag_id=tag_id)
-        return success_response(f'"{tag_name}" 태그가 삭제되었습니다.')
+        return success_response(
+            gettext('"%(name)s" 태그가 삭제되었습니다.') % {"name": tag_name}
+        )
     except PermissionError as exc:
         return error_response(str(exc), "FORBIDDEN", 403)
     except ValueError as exc:
         return error_response(str(exc), "VALIDATION_ERROR")
     except Exception:
         logging.getLogger(__name__).exception("태그 삭제 중 오류")
-        return error_response("태그 삭제 중 오류가 발생했습니다.", "SERVER_ERROR", 500)
+        return error_response(gettext("태그 삭제 중 오류가 발생했습니다."), "SERVER_ERROR", 500)

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from django.utils.translation import gettext
+
 from .domain_services import _tag_policy_service
 from .repositories import CategoryRepository, TagRepository
 from apps.dashboard.repositories import TimeBlockRepository
@@ -44,17 +46,17 @@ class CreateTagUseCase:
         _tag_policy_service.validate_create_default(user, is_default)
 
         if not name or not color:
-            raise ValueError("태그명과 색상을 입력해주세요.")
+            raise ValueError(gettext("태그명과 색상을 입력해주세요."))
 
         if not category_id:
-            raise ValueError("카테고리를 선택해주세요.")
+            raise ValueError(gettext("카테고리를 선택해주세요."))
 
         category = _category_repo.find_by_id(category_id)
         if not category:
-            raise LookupError("존재하지 않는 카테고리입니다.")
+            raise LookupError(gettext("존재하지 않는 카테고리입니다."))
 
         if _tag_repo.exists_duplicate(user, name):
-            raise ValueError("이미 같은 이름의 태그가 존재합니다.")
+            raise ValueError(gettext("이미 같은 이름의 태그가 존재합니다."))
 
         tag = _tag_repo.create(user, name, color, is_default, category=category)
         return {"id": tag.id, "name": tag.name, "color": tag.color,
@@ -68,15 +70,15 @@ class UpdateTagUseCase:
         _tag_policy_service.validate_default_flip(user, tag, is_default)
 
         if not name or not color:
-            raise ValueError("태그명과 색상을 입력해주세요.")
+            raise ValueError(gettext("태그명과 색상을 입력해주세요."))
 
         if _tag_repo.exists_duplicate(user, name, exclude_id=tag.id):
-            raise ValueError("이미 같은 이름의 태그가 존재합니다.")
+            raise ValueError(gettext("이미 같은 이름의 태그가 존재합니다."))
 
         if category_id:
             category = _category_repo.find_by_id(category_id)
             if not category:
-                raise LookupError("존재하지 않는 카테고리입니다.")
+                raise LookupError(gettext("존재하지 않는 카테고리입니다."))
             tag.category = category
 
         tag.name = name
@@ -92,7 +94,7 @@ class DeleteTagUseCase:
     def execute(self, user, tag_id: int) -> str:
         tag = _tag_repo.get_for_owner_or_404(tag_id, user)
         if tag.is_default and _time_block_repo.is_tag_in_use(tag):
-            raise ValueError("이 기본 태그는 사용 중이어서 삭제할 수 없습니다.")
+            raise ValueError(gettext("이 기본 태그는 사용 중이어서 삭제할 수 없습니다."))
         tag_name = tag.name
         _tag_repo.delete(tag)
         return tag_name

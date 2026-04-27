@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}태그 관리 | 라이프 다이어리{% endblock %}
+{% block title %}{% trans "태그 관리" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
 <div class="row">
@@ -9,30 +10,30 @@
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0">
                     <i class="fas fa-tags me-2"></i>
-                    태그 관리
+                    {% trans "태그 관리" %}
                     {% if user.is_superuser %}
-                        <small class="badge bg-warning text-dark ms-2">관리자</small>
+                        <small class="badge bg-warning text-dark ms-2">{% trans "관리자" %}</small>
                     {% endif %}
                 </h5>
                 <button type="button" class="btn btn-primary btn-sm" onclick="openTagFormModal()">
                     <i class="fas fa-plus me-1"></i>
-                    새 태그 생성
+                    {% trans "새 태그 생성" %}
                 </button>
             </div>
             <div class="card-body">
                 <div id="tagListContainer">
                     <div class="text-center py-4">
                         <div class="spinner-border text-primary me-2" role="status">
-                            <span class="visually-hidden">로딩 중</span>
+                            <span class="visually-hidden">{% trans "로딩 중" %}</span>
                         </div>
-                        <span class="text-muted">태그 목록 불러오는 중...</span>
+                        <span class="text-muted">{% trans "태그 목록 불러오는 중..." %}</span>
                     </div>
                 </div>
 
                 <div id="tagEmptyState" class="text-center py-4" style="display: none;">
                     <i class="fas fa-tags text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h5 class="text-muted">등록된 태그가 없습니다.</h5>
-                    <p class="text-muted">새 태그를 생성하여 시간 기록을 시작해보세요.</p>
+                    <h5 class="text-muted">{% trans "등록된 태그가 없습니다." %}</h5>
+                    <p class="text-muted">{% trans "새 태그를 생성하여 시간 기록을 시작해보세요." %}</p>
                 </div>
             </div>
         </div>
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <span class="badge me-2" style="background-color: ${tag.color}; color: ${getContrastTextColor(tag.color)}; font-size: 0.85em;">
                                 ${escapeHTML(tag.name)}
                             </span>
-                            ${tag.is_default ? '<small class="badge bg-warning text-dark" style="font-size: 0.75em;">기본</small>' : ''}
+                            ${tag.is_default ? `<small class="badge bg-warning text-dark" style="font-size: 0.75em;">${gettext('기본')}</small>` : ''}
                         </div>
                         <small class="text-muted">${tag.color}</small>
                     </div>
@@ -76,12 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             ${canEdit ? `
                                 <button class="btn btn-outline-primary btn-sm flex-fill py-0"
                                         onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}, category_id: ${tag.category_id}})">
-                                    <i class="fas fa-edit me-1 d-none d-md-inline"></i>수정
+                                    <i class="fas fa-edit me-1 d-none d-md-inline"></i>${gettext('수정')}
                                 </button>` : ''}
                             ${canDelete ? `
                                 <button class="btn btn-outline-danger btn-sm flex-fill py-0"
                                         onclick="deleteTag(${tag.id}, '${escapeHTML(tag.name)}')">
-                                    <i class="fas fa-trash me-1 d-none d-md-inline"></i>삭제
+                                    <i class="fas fa-trash me-1 d-none d-md-inline"></i>${gettext('삭제')}
                                 </button>` : ''}
                         </div>
                     </div>
@@ -124,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             let html = `
                 <div class="mb-4">
                     <h6 class="mb-3 text-muted">
-                        <i class="fas fa-question-circle me-1"></i>미분류
+                        <i class="fas fa-question-circle me-1"></i>${gettext('미분류')}
                         <small class="text-muted ms-1">(${uncategorized.length})</small>
                     </h6>
                     <div class="row">`;
@@ -149,7 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error('태그 로드 오류:', error);
             document.getElementById('tagListContainer').innerHTML =
-                `<div class="alert alert-danger">태그를 불러오는 중 오류가 발생했습니다.</div>`;
+                `<div class="alert alert-danger">${gettext('태그를 불러오는 중 오류가 발생했습니다.')}</div>`;
         }
     }
 

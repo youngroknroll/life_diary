@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 19:28+0900\n"
+"POT-Creation-Date: 2026-04-27 23:46+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -108,6 +108,7 @@ msgid "저장 중입니다..."
 msgstr "Saving..."
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:371
+#, javascript-format
 msgid "저장 실패: %s"
 msgstr "Save failed: %s"
 
@@ -120,6 +121,7 @@ msgid "삭제할 기록이 없습니다."
 msgstr "No records to delete."
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:393
+#, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[0] "Delete %s logged slot?"
@@ -130,6 +132,7 @@ msgid "삭제 중입니다..."
 msgstr "Deleting..."
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:424
+#, javascript-format
 msgid "삭제 실패: %s"
 msgstr "Delete failed: %s"
 
