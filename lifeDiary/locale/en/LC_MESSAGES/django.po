@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 23:46+0900\n"
+"POT-Creation-Date: 2026-04-28 11:41+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -56,7 +56,8 @@ msgstr "Slot index"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0–143 (0: 00:00–00:10, 143: 23:50–24:00)"
 
-#: apps/dashboard/models.py:27 apps/tags/models.py:83
+#: apps/dashboard/models.py:27 apps/tags/models.py:83 apps/users/forms.py:11
+#: apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr "Tag"
 
@@ -120,6 +121,9 @@ msgid "대시보드 - %(d)s | 라이프 다이어리"
 msgstr "Dashboard - %(d)s | Life Diary"
 
 #: apps/dashboard/templates/dashboard/index.html:26
+#: apps/users/templates/users/mypage.html:29
+#: apps/users/templates/users/mypage.html:70
+#: apps/users/templates/users/usergoal_form.html:12
 msgid "목표 추가"
 msgstr "Add goal"
 
@@ -243,6 +247,8 @@ msgstr "Enter a memo..."
 
 #: apps/dashboard/templates/dashboard/index.html:242
 #: apps/tags/templates/tags/_tag_modal.html:50
+#: apps/users/templates/users/usergoal_form.html:51
+#: apps/users/templates/users/usernote_form.html:13
 msgid "저장"
 msgstr "Save"
 
@@ -385,7 +391,9 @@ msgstr "Cancel"
 msgid "태그 관리"
 msgstr "Tags"
 
-#: apps/tags/templates/tags/index.html:4 templates/base.html:17
+#: apps/tags/templates/tags/index.html:4
+#: apps/users/templates/users/login.html:4
+#: apps/users/templates/users/signup.html:4 templates/base.html:17
 #: templates/base.html:70
 msgid "라이프 다이어리"
 msgstr "Life Diary"
@@ -470,6 +478,270 @@ msgstr "%(count)d slot was deleted."
 msgid "태그 삭제 중 오류가 발생했습니다."
 msgstr "An error occurred while deleting the tag."
 
+#: apps/users/forms.py:12
+msgid "기간"
+msgstr "Period"
+
+#: apps/users/forms.py:13 apps/users/templates/users/_goal_table_section.html:8
+msgid "목표 시간"
+msgstr "Target hours"
+
+#: apps/users/forms.py:18 apps/users/models.py:16
+msgid "일간"
+msgstr "Daily"
+
+#: apps/users/forms.py:18 apps/users/models.py:16
+msgid "주간"
+msgstr "Weekly"
+
+#: apps/users/forms.py:18 apps/users/models.py:16
+msgid "월간"
+msgstr "Monthly"
+
+#: apps/users/forms.py:24
+msgid "주간/월간은 해당 기간의 총 목표 시간입니다."
+msgstr "Weekly/monthly values are the total for that period."
+
+#: apps/users/forms.py:41 apps/users/templates/users/usernote_list.html:11
+msgid "내용"
+msgstr "Content"
+
+#: apps/users/forms.py:45
+msgid "특이사항을 입력하세요."
+msgstr "Enter your note."
+
+#: apps/users/models.py:33
+msgid "일간 목표는 24시간을 초과할 수 없습니다."
+msgstr "Daily goal cannot exceed 24 hours."
+
+#: apps/users/models.py:38
+msgid "주간 목표는 100시간을 초과할 수 없습니다."
+msgstr "Weekly goal cannot exceed 100 hours."
+
+#: apps/users/models.py:43
+msgid "월간 목표는 300시간을 초과할 수 없습니다."
+msgstr "Monthly goal cannot exceed 300 hours."
+
+#: apps/users/templates/users/_goal_table_section.html:9
+msgid "달성률"
+msgstr "Progress"
+
+#: apps/users/templates/users/_goal_table_section.html:10
+msgid "실제 기록"
+msgstr "Actual"
+
+#: apps/users/templates/users/_goal_table_section.html:11
+#: apps/users/templates/users/usernote_list.html:12
+#: templates/shared/_table_row_actions.html:2
+msgid "수정"
+msgstr "Edit"
+
+#: apps/users/templates/users/_goal_table_section.html:12
+#: apps/users/templates/users/usernote_list.html:13
+#: templates/shared/_table_row_actions.html:6
+#: templates/shared/confirm_delete.html:5
+#: templates/shared/confirm_delete.html:11
+msgid "삭제"
+msgstr "Delete"
+
+#: apps/users/templates/users/_goal_table_section.html:20
+#: apps/users/templates/users/_goal_table_section.html:28
+msgid "%(h)s시간"
+msgstr "%(h)sh"
+
+#: apps/users/templates/users/login.html:4
+#: apps/users/templates/users/login.html:13
+#: apps/users/templates/users/login.html:49
+#: apps/users/templates/users/signup.html:83 apps/users/views.py:109
+#: templates/base.html:145
+msgid "로그인"
+msgstr "Log in"
+
+#: apps/users/templates/users/login.html:21
+#: apps/users/templates/users/signup.html:21
+msgid "사용자명"
+msgstr "Username"
+
+#: apps/users/templates/users/login.html:31
+#: apps/users/templates/users/signup.html:35
+msgid "비밀번호"
+msgstr "Password"
+
+#: apps/users/templates/users/login.html:57
+msgid "계정이 없으신가요?"
+msgstr "Don't have an account?"
+
+#: apps/users/templates/users/login.html:59
+#: apps/users/templates/users/signup.html:4
+#: apps/users/templates/users/signup.html:13
+#: apps/users/templates/users/signup.html:73 apps/users/views.py:84
+#: templates/base.html:150 templates/index.html:238
+msgid "회원가입"
+msgstr "Sign up"
+
+#: apps/users/templates/users/mypage.html:17 templates/base.html:131
+msgid "마이페이지"
+msgstr "My page"
+
+#: apps/users/templates/users/mypage.html:37
+msgid "목표 시간 입력 안내"
+msgstr "Target-hours input guide"
+
+#: apps/users/templates/users/mypage.html:41
+msgid ""
+"• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
+"                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
+"                        • 월간: 한 달 총 목표 시간 (최대 300시간)"
+msgstr ""
+"• Daily: hours per day (max 24)<br>\n"
+"                        • Weekly: total hours per week (max 100)<br>\n"
+"                        • Monthly: total hours per month (max 300)"
+
+#: apps/users/templates/users/mypage.html:62
+#: apps/users/templates/users/usergoal_form.html:43
+msgid "시간"
+msgstr "h"
+
+#: apps/users/templates/users/mypage.html:71
+msgid "저장완료!"
+msgstr "Saved!"
+
+#: apps/users/templates/users/mypage.html:82
+msgid "나의 목표 목록"
+msgstr "My goals"
+
+#: apps/users/templates/users/signup.html:29
+msgid "150자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgstr "150 characters or fewer. Letters, digits and @/./+/-/_ only."
+
+#: apps/users/templates/users/signup.html:43
+msgid ""
+"• 8자 이상이어야 합니다<br>\n"
+"                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
+"<br>\n"
+"                                • 숫자로만 구성될 수 없습니다"
+msgstr ""
+"• At least 8 characters<br>\n"
+"                                • Cannot be a commonly-used password<br>\n"
+"                                • Cannot be entirely numeric"
+
+#: apps/users/templates/users/signup.html:51
+msgid "비밀번호 확인"
+msgstr "Confirm password"
+
+#: apps/users/templates/users/signup.html:59
+msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
+msgstr "Enter the same password again to confirm."
+
+#: apps/users/templates/users/signup.html:81
+msgid "이미 계정이 있으신가요?"
+msgstr "Already have an account?"
+
+#: apps/users/templates/users/usergoal_confirm_delete.html:4
+msgid "목표 삭제"
+msgstr "Delete goal"
+
+#: apps/users/templates/users/usergoal_confirm_delete.html:7
+#, python-format
+msgid ""
+"정말로 <strong>%(name)s</strong> (%(period)s, %(hours)s시간) 목표를 삭제하시"
+"겠습니까?"
+msgstr "Delete the goal for <strong>%(name)s</strong> (%(period)s, %(hours)sh)?"
+
+#: apps/users/templates/users/usergoal_form.html:12
+msgid "목표 수정"
+msgstr "Edit goal"
+
+#: apps/users/templates/users/usergoal_form.html:15
+msgid "목표 시간 입력 안내:"
+msgstr "Target-hours guide:"
+
+#: apps/users/templates/users/usergoal_form.html:16
+msgid ""
+"• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
+"        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
+"        • 월간: 한 달 총 목표 시간 (최대 300시간)"
+msgstr ""
+"• Daily: hours per day (max 24)<br>\n"
+"        • Weekly: total hours per week (max 100)<br>\n"
+"        • Monthly: total hours per month (max 300)"
+
+#: apps/users/templates/users/usergoal_form.html:52
+#: apps/users/templates/users/usernote_form.html:14
+msgid "목록으로"
+msgstr "Back to list"
+
+#: apps/users/templates/users/usergoal_list.html:20
+msgid "일간 목표"
+msgstr "Daily goals"
+
+#: apps/users/templates/users/usergoal_list.html:21
+msgid "주간 목표"
+msgstr "Weekly goals"
+
+#: apps/users/templates/users/usergoal_list.html:22
+msgid "월간 목표"
+msgstr "Monthly goals"
+
+#: apps/users/templates/users/usergoal_list.html:23
+msgid "하루 목표 시간"
+msgstr "hours per day"
+
+#: apps/users/templates/users/usergoal_list.html:24
+msgid "일주일 총 목표 시간"
+msgstr "total hours per week"
+
+#: apps/users/templates/users/usergoal_list.html:25
+msgid "한 달 총 목표 시간"
+msgstr "total hours per month"
+
+#: apps/users/templates/users/usernote_confirm_delete.html:4
+msgid "특이사항 삭제"
+msgstr "Delete note"
+
+#: apps/users/templates/users/usernote_confirm_delete.html:7
+msgid "정말로 아래 특이사항을 삭제하시겠습니까?"
+msgstr "Delete this note?"
+
+#: apps/users/templates/users/usernote_form.html:5
+#: apps/users/templates/users/usernote_list.html:6
+msgid "특이사항 추가"
+msgstr "Add note"
+
+#: apps/users/templates/users/usernote_form.html:5
+msgid "특이사항 수정"
+msgstr "Edit note"
+
+#: apps/users/templates/users/usernote_list.html:5
+msgid "나의 특이사항 목록"
+msgstr "My notes"
+
+#: apps/users/templates/users/usernote_list.html:10
+msgid "작성일"
+msgstr "Created at"
+
+#: apps/users/templates/users/usernote_list.html:26
+msgid "등록된 특이사항이 없습니다."
+msgstr "No notes yet."
+
+#: apps/users/use_cases.py:71
+msgid "접근할 수 없는 태그입니다."
+msgstr "You cannot access this tag."
+
+#: apps/users/views.py:57
+msgid "성공적으로 로그아웃되었습니다."
+msgstr "Successfully logged out."
+
+#: apps/users/views.py:72
+#, python-format
+msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
+msgstr "Welcome, %(username)s! Your account has been created."
+
+#: apps/users/views.py:99
+#, python-format
+msgid "%(username)s님, 환영합니다!"
+msgstr "Welcome, %(username)s!"
+
 #: templates/base.html:60
 msgid "페이지를 불러오는 중입니다..."
 msgstr "Loading the page..."
@@ -486,21 +758,9 @@ msgstr "Home"
 msgid "통계"
 msgstr "Stats"
 
-#: templates/base.html:131
-msgid "마이페이지"
-msgstr "My page"
-
 #: templates/base.html:136
 msgid "로그아웃"
 msgstr "Log out"
-
-#: templates/base.html:145
-msgid "로그인"
-msgstr "Log in"
-
-#: templates/base.html:150 templates/index.html:238
-msgid "회원가입"
-msgstr "Sign up"
 
 #: templates/base.html:178
 msgid "라이프 다이어리 &copy; 2025 songyeongrok all rights reserved."
@@ -610,16 +870,6 @@ msgstr "Today"
 #: templates/shared/_date_selector.html:13
 msgid "목표 확인"
 msgstr "View goals"
-
-#: templates/shared/_table_row_actions.html:2
-msgid "수정"
-msgstr "Edit"
-
-#: templates/shared/_table_row_actions.html:6
-#: templates/shared/confirm_delete.html:5
-#: templates/shared/confirm_delete.html:11
-msgid "삭제"
-msgstr "Delete"
 
 #: templates/shared/confirm_delete.html:7
 msgid "정말로 삭제하시겠습니까?"

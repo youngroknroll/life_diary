@@ -15,7 +15,10 @@ function updateTargetHoursMax() {
     const maxValue = maxByPeriod[periodSelect.value] || 24;
 
     targetHoursInput.max = maxValue;
-    targetHoursInput.placeholder = `최대 ${maxValue}시간까지 입력 가능`;
+    targetHoursInput.placeholder = interpolate(
+        gettext('최대 %s시간까지 입력 가능'),
+        [maxValue]
+    );
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -57,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             e.preventDefault();
             submitBtn.disabled = true;
-            setStatus('저장중...', 'text-muted');
+            setStatus(gettext('저장중...'), 'text-muted');
 
             try {
                 await apiCall(goalForm.action || window.location.pathname, {
@@ -77,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 goalForm.reset();
                 updateTargetHoursMax();
 
-                setStatus('저장완료!', 'text-success');
+                setStatus(gettext('저장완료!'), 'text-success');
                 resetStatus(2500);
             } catch (err) {
                 console.error('목표 저장 오류:', err);
@@ -85,9 +88,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (err.data && err.data.errors) {
                     msg = Object.values(err.data.errors).flat().join(' / ');
                 } else if (err.status) {
-                    msg = '저장 실패';
+                    msg = gettext('저장 실패');
                 } else {
-                    msg = '저장 실패 - 네트워크 오류';
+                    msg = gettext('저장 실패 - 네트워크 오류');
                 }
                 setStatus(msg, 'text-danger');
                 resetStatus(4000);
@@ -97,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    if (statusEl && statusEl.textContent.trim() === '저장완료!') {
+    if (statusEl && statusEl.textContent.trim() === gettext('저장완료!')) {
         setTimeout(function() {
             statusEl.textContent = '';
             if (history.replaceState) {

@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block content %}
 <div class="container mt-4">
-    <h2>{% if mode == 'create' %}특이사항 추가{% else %}특이사항 수정{% endif %}</h2>
+    <h2>{% if mode == 'create' %}{% trans "특이사항 추가" %}{% else %}{% trans "특이사항 수정" %}{% endif %}</h2>
     <form method="post">
         {% csrf_token %}
         <div class="mb-3">
@@ -9,8 +10,8 @@
             {{ form.note }}
             {% include 'shared/_field_errors.html' with field=form.note %}
         </div>
-        <button type="submit" class="btn btn-success">저장</button>
-        <a href="{% url 'users:usernote_list' %}" class="btn btn-secondary">목록으로</a>
+        <button type="submit" class="btn btn-success">{% trans "저장" %}</button>
+        <a href="{% url 'users:usernote_list' %}" class="btn btn-secondary">{% trans "목록으로" %}</a>
     </form>
 </div>
-{% endblock %} 
+{% endblock %}

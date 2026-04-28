@@ -4,6 +4,7 @@ import datetime
 from dataclasses import dataclass
 
 from django.db import transaction
+from django.utils.translation import gettext
 
 from apps.stats.logic import (
     StatsCalculator,
@@ -67,7 +68,7 @@ class SaveGoalUseCase:
     @transaction.atomic
     def execute(self, data: GoalData, user, goal_id: int | None = None) -> UserGoal:
         if self._tags.find_by_id_accessible(data.tag_id, user) is None:
-            raise LookupError("접근할 수 없는 태그입니다.")
+            raise LookupError(gettext("접근할 수 없는 태그입니다."))
         if goal_id is not None:
             goal = _goal_repo.get_or_404(goal_id, user)
         else:

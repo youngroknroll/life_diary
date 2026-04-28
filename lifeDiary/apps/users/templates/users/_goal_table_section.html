@@ -1,14 +1,15 @@
+{% load i18n %}
 <h6 class="mt-3"><i class="fas {{ section_icon }} me-1"></i>{{ section_heading }} <small class="text-muted">({{ section_subtext }})</small></h6>
 <div class="table-responsive">
 <table class="table table-bordered {{ section_mb }} goal-table">
     <thead>
         <tr>
-            <th>태그</th>
-            <th>목표 시간</th>
-            <th>달성률</th>
-            <th>실제 기록</th>
-            <th>수정</th>
-            <th>삭제</th>
+            <th>{% trans "태그" %}</th>
+            <th>{% trans "목표 시간" %}</th>
+            <th>{% trans "달성률" %}</th>
+            <th>{% trans "실제 기록" %}</th>
+            <th>{% trans "수정" %}</th>
+            <th>{% trans "삭제" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -16,7 +17,7 @@
             {% if goal.period == section_period %}
                 <tr>
                     <td>{{ goal.tag.name }}</td>
-                    <td>{{ goal.target_hours }}시간</td>
+                    <td>{% blocktrans with h=goal.target_hours %}{{ h }}시간{% endblocktrans %}</td>
                     <td>
                         {% if goal.percent is not None %}
                             <span class="fw-bold">{{ goal.percent }}%</span>
@@ -24,7 +25,7 @@
                             <span class="text-muted">-</span>
                         {% endif %}
                     </td>
-                    <td>{{ goal.actual|floatformat:1 }}시간</td>
+                    <td>{% blocktrans with h=goal.actual|floatformat:1 %}{{ h }}시간{% endblocktrans %}</td>
                     {% url 'users:usergoal_update' goal.pk as edit_url %}
                     {% url 'users:usergoal_delete' goal.pk as delete_url %}
                     {% include 'shared/_table_row_actions.html' %}

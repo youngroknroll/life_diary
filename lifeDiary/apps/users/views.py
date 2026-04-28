@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.utils.translation import gettext
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -53,7 +54,7 @@ def logout_view(request):
     사용자 로그아웃 (POST 요청만 허용)
     """
     logout(request)
-    messages.success(request, "성공적으로 로그아웃되었습니다.")
+    messages.success(request, gettext("성공적으로 로그아웃되었습니다."))
     return redirect("home")
 
 
@@ -66,7 +67,11 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            messages.success(request, f"{user.username}님, 환영합니다! 회원가입이 완료되었습니다.")
+            messages.success(
+                request,
+                gettext("%(username)s님, 환영합니다! 회원가입이 완료되었습니다.")
+                % {"username": user.username},
+            )
             return redirect("home")
     else:
         form = UserCreationForm()
@@ -76,7 +81,7 @@ def signup_view(request):
         field.widget.attrs.update({"class": "form-control"})
 
     return render(
-        request, "users/signup.html", {"form": form, "page_title": "회원가입"}
+        request, "users/signup.html", {"form": form, "page_title": gettext("회원가입")}
     )
 
 
@@ -89,7 +94,10 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            messages.success(request, f"{user.username}님, 환영합니다!")
+            messages.success(
+                request,
+                gettext("%(username)s님, 환영합니다!") % {"username": user.username},
+            )
             return redirect("home")
     else:
         form = AuthenticationForm()
@@ -98,7 +106,7 @@ def login_view(request):
     for field in form.fields.values():
         field.widget.attrs.update({"class": "form-control"})
 
-    return render(request, "users/login.html", {"form": form, "page_title": "로그인"})
+    return render(request, "users/login.html", {"form": form, "page_title": gettext("로그인")})
 
 
 @login_required

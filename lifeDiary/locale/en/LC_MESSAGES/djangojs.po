@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-27 23:46+0900\n"
+"POT-Creation-Date: 2026-04-28 11:41+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -151,3 +151,25 @@ msgstr "No tags.<br>Add one with the 'New tag' button."
 #: apps/dashboard/static/dashboard/js/dashboard.js:501
 msgid "생성된 태그가 없습니다."
 msgstr "No tags yet."
+
+#: apps/users/static/users/js/goals.js:19
+#, javascript-format
+msgid "최대 %s시간까지 입력 가능"
+msgstr "Up to %sh"
+
+#: apps/users/static/users/js/goals.js:63
+msgid "저장중..."
+msgstr "Saving..."
+
+#: apps/users/static/users/js/goals.js:83
+#: apps/users/static/users/js/goals.js:103
+msgid "저장완료!"
+msgstr "Saved!"
+
+#: apps/users/static/users/js/goals.js:91
+msgid "저장 실패"
+msgstr "Save failed"
+
+#: apps/users/static/users/js/goals.js:93
+msgid "저장 실패 - 네트워크 오류"
+msgstr "Save failed - network error"

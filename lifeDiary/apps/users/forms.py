@@ -1,4 +1,5 @@
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import UserGoal, UserNote
 
 
@@ -7,20 +8,20 @@ class UserGoalForm(forms.ModelForm):
         model = UserGoal
         fields = ["tag", "period", "target_hours"]
         labels = {
-            "tag": "태그",
-            "period": "기간",
-            "target_hours": "목표 시간",
+            "tag": _("태그"),
+            "period": _("기간"),
+            "target_hours": _("목표 시간"),
         }
         widgets = {
             "tag": forms.Select(attrs={"class": "form-select", "style": "width: 50%"}),
             "period": forms.Select(
-                choices=[("daily", "일간"), ("weekly", "주간"), ("monthly", "월간")],
+                choices=[("daily", _("일간")), ("weekly", _("주간")), ("monthly", _("월간"))],
                 attrs={"class": "form-select", "style": "width: 50%"},
             ),
             "target_hours": forms.NumberInput(attrs={"step": 0.5, "min": 0, "class": "form-control"}),
         }
         help_texts = {
-            "target_hours": "주간/월간은 해당 기간의 총 목표 시간입니다.",
+            "target_hours": _("주간/월간은 해당 기간의 총 목표 시간입니다."),
         }
 
     def __init__(self, *args, **kwargs):
@@ -36,8 +37,11 @@ class UserNoteForm(forms.ModelForm):
     class Meta:
         model = UserNote
         fields = ["note"]
+        labels = {
+            "note": _("내용"),
+        }
         widgets = {
             "note": forms.Textarea(
-                attrs={"rows": 4, "placeholder": "특이사항을 입력하세요.", "class": "form-control"}
+                attrs={"rows": 4, "placeholder": _("특이사항을 입력하세요."), "class": "form-control"}
             ),
         }

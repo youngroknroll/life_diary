@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}로그인 | 라이프 다이어리{% endblock %}
+{% block title %}{% trans "로그인" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -9,15 +10,15 @@
             <div class="card-header text-center">
                 <h4 class="mb-0">
                     <i class="fas fa-sign-in-alt me-2"></i>
-                    로그인
+                    {% trans "로그인" %}
                 </h4>
             </div>
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">사용자명</label>
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{% trans "사용자명" %}</label>
                         {{ form.username }} TestID: test3
                         {% if form.username.errors %}
                             <div class="text-danger small">
@@ -25,9 +26,9 @@
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label for="{{ form.password.id_for_label }}" class="form-label">비밀번호</label>
+                        <label for="{{ form.password.id_for_label }}" class="form-label">{% trans "비밀번호" %}</label>
                         {{ form.password }} TestPWD: tttt1234
                         {% if form.password.errors %}
                             <div class="text-danger small">
@@ -35,27 +36,27 @@
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
                             {{ form.non_field_errors }}
                         </div>
                     {% endif %}
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt me-1"></i>
-                            로그인
+                            {% trans "로그인" %}
                         </button>
                     </div>
                 </form>
-                
+
                 <hr>
                 <div class="text-center">
                     <p class="mb-0">
-                        계정이 없으신가요? 
+                        {% trans "계정이 없으신가요?" %}
                         <a href="{% url 'users:signup' %}" class="text-decoration-none">
-                            회원가입
+                            {% trans "회원가입" %}
                         </a>
                     </p>
                 </div>
@@ -68,7 +69,7 @@
 {% block extra_js %}
 <script>
 document.querySelector('.auth-card form').addEventListener('submit', function () {
-    showOverlay('로그인 중입니다...', 'fa-sign-in-alt');
+    showOverlay(gettext('로그인 중입니다...'), 'fa-sign-in-alt');
 });
 </script>
 {% endblock %}

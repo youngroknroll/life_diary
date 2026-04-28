@@ -1,9 +1,10 @@
 {% extends 'shared/confirm_delete.html' %}
+{% load i18n %}
 
-{% block confirm_title %}목표 삭제{% endblock %}
+{% block confirm_title %}{% trans "목표 삭제" %}{% endblock %}
 
 {% block confirm_body %}
-    <p>정말로 <strong>{{ goal.tag.name }}</strong> ({{ goal.get_period_display }}, {{ goal.target_hours }}시간) 목표를 삭제하시겠습니까?</p>
+    <p>{% blocktrans with name=goal.tag.name period=goal.get_period_display hours=goal.target_hours %}정말로 <strong>{{ name }}</strong> ({{ period }}, {{ hours }}시간) 목표를 삭제하시겠습니까?{% endblocktrans %}</p>
 {% endblock %}
 
 {% block cancel_url %}{% url 'users:usergoal_list' %}{% endblock %}

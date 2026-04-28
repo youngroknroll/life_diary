@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load i18n %}
 
-{% block title %}회원가입 | 라이프 다이어리{% endblock %}
+{% block title %}{% trans "회원가입" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
 <div class="row justify-content-center">
@@ -9,15 +10,15 @@
             <div class="card-header text-center">
                 <h4 class="mb-0">
                     <i class="fas fa-user-plus me-2"></i>
-                    회원가입
+                    {% trans "회원가입" %}
                 </h4>
             </div>
             <div class="card-body">
                 <form id="signupForm" method="post">
                     {% csrf_token %}
-                    
+
                     <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">사용자명</label>
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{% trans "사용자명" %}</label>
                         {{ form.username }}
                         {% if form.username.errors %}
                             <div class="text-danger small">
@@ -25,13 +26,13 @@
                             </div>
                         {% else %}
                             <div class="form-text">
-                                150자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다.
+                                {% trans "150자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다." %}
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label for="{{ form.password1.id_for_label }}" class="form-label">비밀번호</label>
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">{% trans "비밀번호" %}</label>
                         {{ form.password1 }}
                         {% if form.password1.errors %}
                             <div class="text-danger small">
@@ -39,15 +40,15 @@
                             </div>
                         {% else %}
                             <div class="form-text">
-                                • 8자 이상이어야 합니다<br>
+                                {% blocktrans %}• 8자 이상이어야 합니다<br>
                                 • 너무 일반적인 비밀번호는 사용할 수 없습니다<br>
-                                • 숫자로만 구성될 수 없습니다
+                                • 숫자로만 구성될 수 없습니다{% endblocktrans %}
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     <div class="mb-3">
-                        <label for="{{ form.password2.id_for_label }}" class="form-label">비밀번호 확인</label>
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">{% trans "비밀번호 확인" %}</label>
                         {{ form.password2 }}
                         {% if form.password2.errors %}
                             <div class="text-danger small">
@@ -55,31 +56,31 @@
                             </div>
                         {% else %}
                             <div class="form-text">
-                                확인을 위해 동일한 비밀번호를 입력해주세요.
+                                {% trans "확인을 위해 동일한 비밀번호를 입력해주세요." %}
                             </div>
                         {% endif %}
                     </div>
-                    
+
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
                             {{ form.non_field_errors }}
                         </div>
                     {% endif %}
-                    
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-user-plus me-1"></i>
-                            회원가입
+                            {% trans "회원가입" %}
                         </button>
                     </div>
                 </form>
-                
+
                 <hr>
                 <div class="text-center">
                     <p class="mb-0">
-                        이미 계정이 있으신가요? 
+                        {% trans "이미 계정이 있으신가요?" %}
                         <a href="{% url 'users:login' %}" class="text-decoration-none">
-                            로그인
+                            {% trans "로그인" %}
                         </a>
                     </p>
                 </div>
@@ -88,4 +89,3 @@
     </div>
 </div>
 {% endblock %}
-

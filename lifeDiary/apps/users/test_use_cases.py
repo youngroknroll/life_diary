@@ -58,5 +58,6 @@ class TestSaveGoalUseCaseAuthz:
 
         data = GoalData(tag_id=999, period="daily", target_hours=2.0)
 
-        with pytest.raises(LookupError, match="접근할 수 없는 태그"):
+        # 메시지는 active locale에 따라 한/영 다름 → 예외 종류만 검증
+        with pytest.raises(LookupError):
             use_case.execute(data, user=object())

@@ -1,9 +1,10 @@
 {% extends 'shared/confirm_delete.html' %}
+{% load i18n %}
 
-{% block confirm_title %}특이사항 삭제{% endblock %}
+{% block confirm_title %}{% trans "특이사항 삭제" %}{% endblock %}
 
 {% block confirm_body %}
-    <p>정말로 아래 특이사항을 삭제하시겠습니까?</p>
+    <p>{% trans "정말로 아래 특이사항을 삭제하시겠습니까?" %}</p>
     <div class="alert alert-warning">{{ note.note|linebreaksbr }}</div>
 {% endblock %}
 

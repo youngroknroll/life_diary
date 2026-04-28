@@ -1,3 +1,4 @@
+{% load i18n %}
 <style>
 .goal-table th,
 .goal-table td {
@@ -16,6 +17,13 @@
 }
 </style>
 
-{% include "users/_goal_table_section.html" with section_period="daily" section_heading="일간 목표" section_icon="fa-calendar-day" section_subtext="하루 목표 시간" section_mb="mb-4" %}
-{% include "users/_goal_table_section.html" with section_period="weekly" section_heading="주간 목표" section_icon="fa-calendar-week" section_subtext="일주일 총 목표 시간" section_mb="mb-4" %}
-{% include "users/_goal_table_section.html" with section_period="monthly" section_heading="월간 목표" section_icon="fa-calendar-alt" section_subtext="한 달 총 목표 시간" section_mb="" %}
+{% trans "일간 목표" as daily_heading %}
+{% trans "주간 목표" as weekly_heading %}
+{% trans "월간 목표" as monthly_heading %}
+{% trans "하루 목표 시간" as daily_subtext %}
+{% trans "일주일 총 목표 시간" as weekly_subtext %}
+{% trans "한 달 총 목표 시간" as monthly_subtext %}
+
+{% include "users/_goal_table_section.html" with section_period="daily" section_heading=daily_heading section_icon="fa-calendar-day" section_subtext=daily_subtext section_mb="mb-4" %}
+{% include "users/_goal_table_section.html" with section_period="weekly" section_heading=weekly_heading section_icon="fa-calendar-week" section_subtext=weekly_subtext section_mb="mb-4" %}
+{% include "users/_goal_table_section.html" with section_period="monthly" section_heading=monthly_heading section_icon="fa-calendar-alt" section_subtext=monthly_subtext section_mb="" %}
