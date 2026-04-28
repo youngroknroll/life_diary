@@ -1,119 +1,86 @@
-"""Phase 4 (users) i18n 검증 테스트 — TDD RED 먼저 작성."""
+"""Phase 4 (users) i18n 검증 테스트 — pytest 스타일."""
 
-from django.contrib.auth import get_user_model
-from django.test import TestCase
+import pytest
 from django.urls import reverse
 
 
-class UsersAuthEnglishTests(TestCase):
-    def setUp(self):
-        self.client.defaults["HTTP_ACCEPT_LANGUAGE"] = "en"
+@pytest.mark.django_db
+class TestUsersAuthEnglish:
+    def test_login_page_renders_english(self, en_client):
+        response = en_client.get(reverse("users:login"))
+        body = response.content.decode()
+        assert "Log in" in body
+        assert "Username" in body
+        assert "Password" in body
+        assert "Don't have an account?" in body
+        assert "Sign up" in body
+        assert "사용자명" not in body
+        assert "비밀번호" not in body
 
-    def test_login_page_renders_english(self):
-        response = self.client.get(reverse("users:login"))
-        self.assertContains(response, "Log in")  # H4 헤더
-        self.assertContains(response, "Username")  # 라벨
-        self.assertContains(response, "Password")
-        self.assertContains(response, "Don't have an account?")  # 안내 문구
-        self.assertContains(response, "Sign up")  # 링크
-        self.assertNotContains(response, "사용자명")
-        self.assertNotContains(response, "비밀번호")
-
-    def test_signup_page_renders_english(self):
-        response = self.client.get(reverse("users:signup"))
-        self.assertContains(response, "Sign up")
-        self.assertContains(response, "Username")
-        self.assertContains(response, "Password")
-        self.assertContains(response, "Confirm password")
-        self.assertContains(response, "Already have an account?")
-        self.assertNotContains(response, "회원가입")
-        self.assertNotContains(response, "비밀번호 확인")
-
-
-class MypageEnglishTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            username="user-en-mypage", password="testpass-Long-9!"
-        )
-
-    def setUp(self):
-        self.client.defaults["HTTP_ACCEPT_LANGUAGE"] = "en"
-        self.client.force_login(self.user)
-
-    def test_mypage_renders_english(self):
-        response = self.client.get(reverse("users:mypage"))
-        self.assertContains(response, "My page")
-        self.assertContains(response, "Add goal")
-        self.assertContains(response, "My goals")
-        # 폼 라벨
-        self.assertContains(response, "Tag")
-        self.assertContains(response, "Period")
-        self.assertContains(response, "Target hours")
-        self.assertNotContains(response, "마이페이지")
-        self.assertNotContains(response, "목표 추가")
-
-    def test_mypage_period_choices_english(self):
-        response = self.client.get(reverse("users:mypage"))
-        # period select 옵션
-        self.assertContains(response, "Daily")
-        self.assertContains(response, "Weekly")
-        self.assertContains(response, "Monthly")
+    def test_signup_page_renders_english(self, en_client):
+        response = en_client.get(reverse("users:signup"))
+        body = response.content.decode()
+        assert "Sign up" in body
+        assert "Username" in body
+        assert "Password" in body
+        assert "Confirm password" in body
+        assert "Already have an account?" in body
+        assert "회원가입" not in body
+        assert "비밀번호 확인" not in body
 
 
-class UserGoalFormEnglishTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            username="user-en-goal", password="testpass-Long-9!"
-        )
+@pytest.mark.django_db
+class TestMypageEnglish:
+    def test_mypage_renders_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:mypage"))
+        body = response.content.decode()
+        assert "My page" in body
+        assert "Add goal" in body
+        assert "My goals" in body
+        assert "Tag" in body
+        assert "Period" in body
+        assert "Target hours" in body
+        assert "마이페이지" not in body
+        assert "목표 추가" not in body
 
-    def setUp(self):
-        self.client.defaults["HTTP_ACCEPT_LANGUAGE"] = "en"
-        self.client.force_login(self.user)
-
-    def test_usergoal_create_form_english(self):
-        response = self.client.get(reverse("users:usergoal_create"))
-        self.assertContains(response, "Add goal")
-        self.assertContains(response, "Save")
-        self.assertContains(response, "Back to list")
-        self.assertNotContains(response, "목록으로")
-
-
-class UserNoteEnglishTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            username="user-en-note", password="testpass-Long-9!"
-        )
-
-    def setUp(self):
-        self.client.defaults["HTTP_ACCEPT_LANGUAGE"] = "en"
-        self.client.force_login(self.user)
-
-    def test_usernote_list_english(self):
-        response = self.client.get(reverse("users:usernote_list"))
-        self.assertContains(response, "My notes")
-        self.assertContains(response, "Add note")
-        self.assertContains(response, "No notes yet.")
-        self.assertNotContains(response, "특이사항")
-
-    def test_usernote_create_form_english(self):
-        response = self.client.get(reverse("users:usernote_create"))
-        self.assertContains(response, "Add note")
-        self.assertContains(response, "Save")
+    def test_mypage_period_choices_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:mypage"))
+        body = response.content.decode()
+        assert "Daily" in body
+        assert "Weekly" in body
+        assert "Monthly" in body
 
 
-class LogoutMessageEnglishTests(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.user = get_user_model().objects.create_user(
-            username="user-en-logout", password="testpass-Long-9!"
-        )
+@pytest.mark.django_db
+class TestUserGoalFormEnglish:
+    def test_usergoal_create_form_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:usergoal_create"))
+        body = response.content.decode()
+        assert "Add goal" in body
+        assert "Save" in body
+        assert "Back to list" in body
+        assert "목록으로" not in body
 
-    def test_logout_success_message_english(self):
-        self.client.defaults["HTTP_ACCEPT_LANGUAGE"] = "en"
-        self.client.force_login(self.user)
-        response = self.client.post(reverse("users:logout"), follow=True)
-        # 메시지가 영문으로 렌더링됐는지 (홈 페이지 응답에 alert 메시지 포함)
-        self.assertContains(response, "Successfully logged out.")
+
+@pytest.mark.django_db
+class TestUserNoteEnglish:
+    def test_usernote_list_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:usernote_list"))
+        body = response.content.decode()
+        assert "My notes" in body
+        assert "Add note" in body
+        assert "No notes yet." in body
+        assert "특이사항" not in body
+
+    def test_usernote_create_form_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:usernote_create"))
+        body = response.content.decode()
+        assert "Add note" in body
+        assert "Save" in body
+
+
+@pytest.mark.django_db
+class TestLogoutMessageEnglish:
+    def test_logout_success_message_english(self, auth_en_client):
+        response = auth_en_client.post(reverse("users:logout"), follow=True)
+        assert "Successfully logged out." in response.content.decode()

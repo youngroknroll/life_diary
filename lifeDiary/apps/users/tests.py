@@ -1,7 +1,7 @@
 from types import SimpleNamespace
 
-from django.contrib.auth.models import User
-from django.test import SimpleTestCase, TestCase, override_settings
+import pytest
+from django.test import override_settings
 from django.urls import reverse
 
 from apps.tags.models import Category, Tag
@@ -9,7 +9,7 @@ from apps.users.domain_services import GoalProgressService
 from apps.users.models import UserGoal
 
 
-class GoalProgressServiceTests(SimpleTestCase):
+class TestGoalProgressService:
     def test_get_actual_hours_from_daily_stats(self):
         service = GoalProgressService()
         goal = SimpleNamespace(
@@ -17,13 +17,11 @@ class GoalProgressServiceTests(SimpleTestCase):
             tag=SimpleNamespace(name="운동"),
             target_hours=2,
         )
-
         actual = service.get_actual_hours(
             goal,
             daily_stats={"tag_stats": [{"name": "운동", "hours": 1.5}]},
         )
-
-        self.assertEqual(actual, 1.5)
+        assert actual == 1.5
 
     def test_get_actual_hours_from_weekly_stats(self):
         service = GoalProgressService()
@@ -32,57 +30,55 @@ class GoalProgressServiceTests(SimpleTestCase):
             tag=SimpleNamespace(name="공부"),
             target_hours=8,
         )
-
         actual = service.get_actual_hours(
             goal,
             weekly_stats={"tag_weekly_stats": [{"name": "공부", "total_hours": 6.5}]},
         )
+        assert actual == 6.5
 
-        self.assertEqual(actual, 6.5)
+
+@pytest.fixture
+def alice_bob_with_bob_tag(make_user):
+    alice = make_user(username="alice")
+    bob = make_user(username="bob")
+    category = Category.objects.create(name="일반", slug="general", color="#000000")
+    bob_tag = Tag.objects.create(
+        user=bob,
+        name="bob_only",
+        color="#123456",
+        is_default=False,
+        category=category,
+    )
+    return alice, bob, bob_tag
 
 
-class UserGoalTagOwnershipTests(TestCase):
-    """IDOR 회귀 방지: 타 사용자 태그 ID로 목표를 생성/수정할 수 없어야 한다."""
-
-    def setUp(self):
-        self.alice = User.objects.create_user("alice", password="pw")
-        self.bob = User.objects.create_user("bob", password="pw")
-        self.category = Category.objects.create(name="일반", slug="general", color="#000000")
-        self.bob_tag = Tag.objects.create(
-            user=self.bob,
-            name="bob_only",
-            color="#123456",
-            is_default=False,
-            category=self.category,
-        )
-
-    def test_create_rejects_other_users_tag(self):
-        self.client.force_login(self.alice)
-        resp = self.client.post(
+@pytest.mark.django_db
+class TestUserGoalTagOwnership:
+    def test_create_rejects_other_users_tag(self, client, alice_bob_with_bob_tag):
+        alice, _, bob_tag = alice_bob_with_bob_tag
+        client.force_login(alice)
+        resp = client.post(
             reverse("users:usergoal_create"),
-            data={"tag": self.bob_tag.id, "period": "daily", "target_hours": 1.0},
+            data={"tag": bob_tag.id, "period": "daily", "target_hours": 1.0},
         )
-        self.assertEqual(resp.status_code, 200)
-        self.assertFalse(
-            UserGoal.objects.filter(user=self.alice, tag=self.bob_tag).exists()
-        )
+        assert resp.status_code == 200
+        assert not UserGoal.objects.filter(user=alice, tag=bob_tag).exists()
 
-    def test_mypage_rejects_other_users_tag(self):
-        self.client.force_login(self.alice)
-        resp = self.client.post(
+    def test_mypage_rejects_other_users_tag(self, client, alice_bob_with_bob_tag):
+        alice, _, bob_tag = alice_bob_with_bob_tag
+        client.force_login(alice)
+        resp = client.post(
             reverse("users:mypage"),
-            data={"tag": self.bob_tag.id, "period": "monthly", "target_hours": 10.0},
+            data={"tag": bob_tag.id, "period": "monthly", "target_hours": 10.0},
         )
-        self.assertEqual(resp.status_code, 200)
-        self.assertFalse(
-            UserGoal.objects.filter(user=self.alice, tag=self.bob_tag).exists()
-        )
+        assert resp.status_code == 200
+        assert not UserGoal.objects.filter(user=alice, tag=bob_tag).exists()
 
 
-class LoginViewTests(TestCase):
-    def test_login_succeeds_with_axes_backend_enabled(self):
-        User.objects.create_user("login-user", password="pw123456!!")
-
+@pytest.mark.django_db
+class TestLoginView:
+    def test_login_succeeds_with_axes_backend_enabled(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
         with override_settings(
             AXES_ENABLED=True,
             AUTHENTICATION_BACKENDS=[
@@ -90,10 +86,9 @@ class LoginViewTests(TestCase):
                 "django.contrib.auth.backends.ModelBackend",
             ],
         ):
-            response = self.client.post(
+            response = client.post(
                 reverse("users:login"),
                 data={"username": "login-user", "password": "pw123456!!"},
             )
-
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.url, reverse("home"))
+        assert response.status_code == 302
+        assert response.url == reverse("home")
