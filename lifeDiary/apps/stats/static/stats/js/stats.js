@@ -25,8 +25,9 @@ function prepareChart(canvasId, key) {
  * @param {CanvasRenderingContext2D} ctx
  * @param {string} [message='데이터가 없습니다']
  */
-function drawEmptyState(ctx, message = '데이터가 없습니다') {
+function drawEmptyState(ctx, message) {
     ctx.fillStyle = '#6c757d';
+    if (!message) message = gettext('데이터가 없습니다');
     ctx.font = '16px Arial';
     ctx.textAlign = 'center';
     ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
@@ -119,7 +120,11 @@ function renderDailyPieChart(tagStats) {
                             const hours = context.parsed;
                             const total = context.dataset.data.reduce((a, b) => a + b, 0);
                             const percentage = ((hours / total) * 100).toFixed(1);
-                            return `${context.label}: ${hours}시간 (${percentage}%)`;
+                            return interpolate(
+                                gettext('%(label)s: %(h)sh (%(p)s%%)'),
+                                {label: context.label, h: hours, p: percentage},
+                                true
+                            );
                         }
                     }
                 }
@@ -135,7 +140,7 @@ function renderHourlyBarChart(hourlyStats, tagStats) {
         return;
     }
 
-    const hours = Array.from({length: 24}, (_, i) => `${i}시`);
+    const hours = Array.from({length: 24}, (_, i) => interpolate(gettext('%s:00'), [i]));
 
     const allTags = {};
     if (tagStats) {
@@ -169,7 +174,7 @@ function renderHourlyBarChart(hourlyStats, tagStats) {
                     max: 60,
                     ticks: {
                         callback: function(value) {
-                            return value + '분';
+                            return interpolate(gettext('%s min'), [value]);
                         }
                     }
                 }
@@ -179,7 +184,11 @@ function renderHourlyBarChart(hourlyStats, tagStats) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label || ''}: ${context.raw}분`;
+                            return interpolate(
+                                gettext('%(label)s: %(m)s min'),
+                                {label: context.dataset.label || '', m: context.raw},
+                                true
+                            );
                         }
                     }
                 }
@@ -225,7 +234,7 @@ function renderWeeklyBarChart(weeklyData) {
         data: {
             labels: weeklyData.map(day => day.day_korean),
             datasets: [{
-                label: '활동 시간',
+                label: gettext('Active hours'),
                 data: weeklyData.map(day => day.total_hours),
                 backgroundColor: 'rgba(75, 192, 192, 0.6)',
                 borderColor: 'rgba(75, 192, 192, 1)',
@@ -271,14 +280,14 @@ function renderMonthlyLineChart(monthlyData) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { title: { display: true, text: '날짜' } },
+                x: { title: { display: true, text: gettext('Date') } },
                 y: {
                     beginAtZero: true,
                     max: 24,
-                    title: { display: true, text: '시간 (시)' },
+                    title: { display: true, text: gettext('Hours') },
                     ticks: {
                         callback: function(value) {
-                            return value + '시간';
+                            return interpolate(gettext('%sh'), [value]);
                         }
                     }
                 }
@@ -288,7 +297,11 @@ function renderMonthlyLineChart(monthlyData) {
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return `${context.dataset.label}: ${context.parsed.y}시간`;
+                            return interpolate(
+                                gettext('%(label)s: %(h)sh'),
+                                {label: context.dataset.label, h: context.parsed.y},
+                                true
+                            );
                         }
                     }
                 }
@@ -310,7 +323,7 @@ function renderTagTotalChart(tagAnalysis) {
         data: {
             labels: top10.map(tag => tag.name),
             datasets: [{
-                label: '총 시간 (시간)',
+                label: gettext('Total hours'),
                 data: top10.map(tag => tag.total_hours),
                 backgroundColor: top10.map(tag => tag.color),
                 borderWidth: 1

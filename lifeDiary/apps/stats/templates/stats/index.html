@@ -1,7 +1,8 @@
 {% extends 'base.html' %}
 {% load tag_ui %}
+{% load i18n %}
 
-{% block title %}통계 | 라이프 다이어리{% endblock %}
+{% block title %}{% trans "통계" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
 <div class="row mb-4">
@@ -10,9 +11,10 @@
             <div class="card-header dashboard-date-header">
                 <h5 class="mb-0 dashboard-date-title">
                     <i class="fas fa-chart-bar me-2"></i>
-                    {{ selected_date|date:"Y년 m월 d일 (l)" }} 통계 분석
+                    {% blocktrans with d=selected_date|date:"DATE_FORMAT" wd=selected_date|date:"l" %}{{ d }} ({{ wd }}) stats analysis{% endblocktrans %}
                 </h5>
-                {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label="목표 확인" %}
+                {% trans "목표 확인" as view_goals_label %}
+                {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label=view_goals_label %}
             </div>
             <div class="card-body">
                 <div class="row text-center dashboard-stats">
@@ -20,8 +22,8 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-clock text-primary me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ total_hours }}시간</div>
-                                <small class="text-muted">{{ selected_date|date:"Y년 m월" }} 기록 시간</small>
+                                <div class="fw-bold">{% blocktrans with h=total_hours %}{{ h }}h{% endblocktrans %}</div>
+                                <small class="text-muted">{% blocktrans with m=selected_date|date:"YEAR_MONTH_FORMAT" %}{{ m }} logged hours{% endblocktrans %}</small>
                             </div>
                         </div>
                     </div>
@@ -29,8 +31,8 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-calendar-check text-success me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ monthly_stats.active_days }}일</div>
-                                <small class="text-muted">{{ selected_date|date:"Y년 m월" }} 활동한 날</small>
+                                <div class="fw-bold">{% blocktrans with d=monthly_stats.active_days %}{{ d }} days{% endblocktrans %}</div>
+                                <small class="text-muted">{% blocktrans with m=selected_date|date:"YEAR_MONTH_FORMAT" %}{{ m }} active days{% endblocktrans %}</small>
                             </div>
                         </div>
                     </div>
@@ -39,7 +41,7 @@
                             <i class="fas fa-chart-pie text-info me-2"></i>
                             <div>
                                 <div class="fw-bold">{{ daily_stats.fill_percentage }}%</div>
-                                <small class="text-muted">오늘 기록률</small>
+                                <small class="text-muted">{% trans "Today's logged rate" %}</small>
                             </div>
                         </div>
                     </div>
@@ -47,8 +49,8 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-chart-line text-warning me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ daily_stats.active_hours }}시간</div>
-                                <small class="text-muted">오늘 활동 시간</small>
+                                <div class="fw-bold">{% blocktrans with h=daily_stats.active_hours %}{{ h }}h{% endblocktrans %}</div>
+                                <small class="text-muted">{% trans "Today's active hours" %}</small>
                             </div>
                         </div>
                     </div>
@@ -58,7 +60,7 @@
     </div>
 </div>
 
-<!-- 통계 탭 -->
+
 <div class="row">
     <div class="col-12">
         <div class="card">
@@ -66,39 +68,39 @@
                 <ul class="nav nav-tabs card-header-tabs" id="statsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
-                            <i class="fas fa-calendar-day me-1"></i>일별 통계
+                            <i class="fas fa-calendar-day me-1"></i>{% trans "Daily stats" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
-                            <i class="fas fa-calendar-week me-1"></i>주간 통계
+                            <i class="fas fa-calendar-week me-1"></i>{% trans "Weekly stats" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
-                            <i class="fas fa-calendar-alt me-1"></i>월간 통계
+                            <i class="fas fa-calendar-alt me-1"></i>{% trans "Monthly stats" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="tags-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab">
-                            <i class="fas fa-tags me-1"></i>태그 분석
+                            <i class="fas fa-tags me-1"></i>{% trans "Tag analysis" %}
                         </button>
                     </li>
                 </ul>
             </div>
             <div class="card-body">
                 <div class="tab-content" id="statsTabContent">
-                    <!-- 일별 통계 -->
+                    
                     <div class="tab-pane fade show active" id="daily" role="tabpanel">
                         <div class="row">
                             <div class="col-lg-6">
-                                <h6 class="mb-3">태그별 시간 분포</h6>
+                                <h6 class="mb-3">{% trans "Tag time distribution" %}</h6>
                                 <div class="text-center chart-container">
                                     <canvas id="dailyPieChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-6">
-                                <h6 class="mb-3">시간대별 활동</h6>
+                                <h6 class="mb-3">{% trans "Activity by hour" %}</h6>
                                 <div class="text-center chart-container">
                                     <canvas id="hourlyBarChart"></canvas>
                                 </div>
@@ -106,25 +108,25 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-12">
-                                <h6 class="mb-3">일별 요약</h6>
+                                <h6 class="mb-3">{% trans "Daily summary" %}</h6>
                                 <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
                                     {% if daily_stats.total_blocks == 0 %}
-                                        <i class="fas fa-info-circle me-2"></i>선택한 날짜에 기록된 데이터가 없습니다.
+                                        <i class="fas fa-info-circle me-2"></i>{% trans "No data logged on the selected date." %}
                                     {% else %}
                                         <div class="row">
                                             <div class="col-md-4">
-                                                <strong>총 기록 시간:</strong> {{ daily_stats.total_hours }}시간<br>
-                                                <strong>기록률:</strong> {{ daily_stats.fill_percentage }}%<br>
-                                                <strong>사용된 태그:</strong> {{ daily_stats.tag_stats|length }}개<br>
+                                                <strong>{% trans "Total logged time:" %}</strong> {% blocktrans with h=daily_stats.total_hours %}{{ h }}h{% endblocktrans %}<br>
+                                                <strong>{% trans "Logged rate:" %}</strong> {{ daily_stats.fill_percentage }}%<br>
+                                                <strong>{% trans "Tags used:" %}</strong> {% blocktrans with c=daily_stats.tag_stats|length %}{{ c }} tags{% endblocktrans %}<br>
                                                 {% if daily_stats.top_tag %}
-                                                    <strong>최다 사용 태그:</strong> {{ daily_stats.top_tag.name }} ({{ daily_stats.top_tag.hours }}시간)<br>
+                                                    <strong>{% trans "Top tag:" %}</strong> {{ daily_stats.top_tag.name }} ({% blocktrans with h=daily_stats.top_tag.hours %}{{ h }}h{% endblocktrans %})<br>
                                                 {% endif %}
                                                 {% if daily_stats.peak_hour != -1 %}
-                                                    <strong>가장 활발한 시간:</strong> {{ daily_stats.peak_hour }}시~{{ daily_stats.peak_hour|add:1 }}시 ({{ daily_stats.max_minutes }}분)
+                                                    <strong>{% trans "Peak hour:" %}</strong> {% blocktrans with start=daily_stats.peak_hour end=daily_stats.peak_hour|add:1 m=daily_stats.max_minutes %}{{ start }}:00–{{ end }}:00 ({{ m }} min){% endblocktrans %}
                                                 {% endif %}
                                             </div>
                                             <div class="col-md-8">
-                                                <h6 class="mb-2">태그별 시간 사용량</h6>
+                                                <h6 class="mb-2">{% trans "Tag time usage" %}</h6>
                                                 <div class="tag-stats-list">
                                                     {% for tag in daily_stats.tag_stats %}
                                                         {% with percentage=tag.hours|floatformat:1 %}
@@ -134,7 +136,7 @@
                                                                     <span>{{ tag.name }}</span>
                                                                 </div>
                                                                 <div class="text-end">
-                                                                    <strong>{{ tag.hours }}시간</strong>
+                                                                    <strong>{% blocktrans with h=tag.hours %}{{ h }}h{% endblocktrans %}</strong>
                                                                     <small class="text-muted">({% widthratio tag.hours 24 100 %}%)</small>
                                                                 </div>
                                                             </div>
@@ -149,17 +151,17 @@
                         </div>
                     </div>
 
-                    <!-- 주간 통계 -->
+                    
                     <div class="tab-pane fade" id="weekly" role="tabpanel">
                         <div class="row">
                             <div class="col-lg-8">
-                                <h6 class="mb-3">주간 태그별 트렌드</h6>
+                                <h6 class="mb-3">{% trans "Weekly tag trend" %}</h6>
                                 <div class="chart-container">
                                     <canvas id="weeklyLineChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <h6 class="mb-3">요일별 활동량</h6>
+                                <h6 class="mb-3">{% trans "Activity by weekday" %}</h6>
                                 <div class="chart-container">
                                     <canvas id="weeklyBarChart"></canvas>
                                 </div>
@@ -167,31 +169,31 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-12">
-                                <h6 class="mb-3">주간 요약</h6>
+                                <h6 class="mb-3">{% trans "Weekly summary" %}</h6>
                                 <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
                                     {% with most_active_day=weekly_stats.most_active_day %}
                                         <div class="row">
                                             <div class="col-md-6">
-                                                <strong>주간 총 시간:</strong> {{ weekly_stats.week_total_hours }}시간<br>
-                                                <strong>일평균 시간:</strong> {% widthratio weekly_stats.week_total_hours 7 1 %}시간<br>
-                                                <strong>활동 요일:</strong> {{ weekly_stats.active_days }}/7일
+                                                <strong>{% trans "Weekly total:" %}</strong> {% blocktrans with h=weekly_stats.week_total_hours %}{{ h }}h{% endblocktrans %}<br>
+                                                <strong>{% trans "Daily average:" %}</strong> {% widthratio weekly_stats.week_total_hours 7 1 %}h<br>
+                                                <strong>{% trans "Active weekdays:" %}</strong> {{ weekly_stats.active_days }}/7
                                             </div>
                                             <div class="col-md-6">
-                                                <strong>가장 활발한 요일:</strong> {{ most_active_day.day_korean }}요일 ({{ most_active_day.total_hours }}시간)<br>
-                                                <strong>주간 기간:</strong> {{ weekly_stats.start_date|date:"Y-m-d" }} ~ {{ weekly_stats.end_date|date:"Y-m-d" }}<br>
-                                                <strong>태그 종류:</strong> {{ weekly_stats.tag_weekly_stats|length }}개
+                                                <strong>{% trans "Most active day:" %}</strong> {{ most_active_day.day_korean }} ({% blocktrans with h=most_active_day.total_hours %}{{ h }}h{% endblocktrans %})<br>
+                                                <strong>{% trans "Week range:" %}</strong> {{ weekly_stats.start_date|date:"Y-m-d" }} ~ {{ weekly_stats.end_date|date:"Y-m-d" }}<br>
+                                                <strong>{% trans "Tag count:" %}</strong> {% blocktrans with c=weekly_stats.tag_weekly_stats|length %}{{ c }} tags{% endblocktrans %}
                                             </div>
                                         </div>
                                         <hr class="my-3">
                                         <div class="row">
                                             <div class="col-12">
-                                                <h6 class="mb-2">태그별 평균시간 (활동한 요일 기준)</h6>
+                                                <h6 class="mb-2">{% trans "Average hours per tag (by active weekdays)" %}</h6>
                                                 <div class="row">
                                                     {% for tag in weekly_stats.tag_weekly_stats %}
                                                     <div class="col-md-4 col-sm-6 mb-2">
                                                         <div class="d-flex align-items-center">
                                                             {% tag_dot tag.color %}
-                                                            <span class="small">{{ tag.name }}: <strong>{{ tag.avg_hours }}시간</strong></span>
+                                                            <span class="small">{{ tag.name }}: <strong>{% blocktrans with h=tag.avg_hours %}{{ h }}h{% endblocktrans %}</strong></span>
                                                         </div>
                                                     </div>
                                                     {% endfor %}
@@ -204,11 +206,11 @@
                         </div>
                     </div>
 
-                    <!-- 월간 통계 -->
+                    
                     <div class="tab-pane fade" id="monthly" role="tabpanel">
                         <div class="row">
                             <div class="col-12">
-                                <h6 class="mb-3">월간 태그별 일별 사용량 트렌드</h6>
+                                <h6 class="mb-3">{% trans "Monthly daily usage trend by tag" %}</h6>
                                 <div class="chart-container-lg">
                                     <canvas id="monthlyLineChart"></canvas>
                                 </div>
@@ -216,47 +218,47 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-12">
-                                <h6 class="mb-3">월간 요약</h6>
+                                <h6 class="mb-3">{% trans "Monthly summary" %}</h6>
                                 <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
                                     <div class="row">
                                         <div class="col-md-4">
-                                            <strong>월간 총 시간:</strong> {{ monthly_stats.total_hours }}시간<br>
-                                            <strong>활동 일수:</strong> {{ monthly_stats.active_days }}/{{ monthly_stats.total_days }}일 ({% widthratio monthly_stats.active_days monthly_stats.total_days 100 %}%)<br>
-                                            <strong>일평균 시간:</strong> {{ monthly_stats.avg_daily_hours }}시간
+                                            <strong>{% trans "Monthly total:" %}</strong> {% blocktrans with h=monthly_stats.total_hours %}{{ h }}h{% endblocktrans %}<br>
+                                            <strong>{% trans "Active days:" %}</strong> {{ monthly_stats.active_days }}/{{ monthly_stats.total_days }} ({% widthratio monthly_stats.active_days monthly_stats.total_days 100 %}%)<br>
+                                            <strong>{% trans "Daily average:" %}</strong> {% blocktrans with h=monthly_stats.avg_daily_hours %}{{ h }}h{% endblocktrans %}
                                         </div>
                                         <div class="col-md-4">
-                                            <strong>사용된 태그:</strong> {{ monthly_stats.tag_stats|length }}개<br>
-                                            <strong>월간 기간:</strong> {{ monthly_stats.start_date|date:"Y-m-d" }} ~ {{ monthly_stats.end_date|date:"Y-m-d" }}<br>
-                                            <strong>가장 활발한 태그:</strong> 
+                                            <strong>{% trans "Tags used:" %}</strong> {% blocktrans with c=monthly_stats.tag_stats|length %}{{ c }} tags{% endblocktrans %}<br>
+                                            <strong>{% trans "Month range:" %}</strong> {{ monthly_stats.start_date|date:"Y-m-d" }} ~ {{ monthly_stats.end_date|date:"Y-m-d" }}<br>
+                                            <strong>{% trans "Most active tag:" %}</strong>
                                             {% if monthly_stats.tag_stats %}
-                                                {{ monthly_stats.tag_stats.0.name }} ({{ monthly_stats.tag_stats.0.total_hours }}시간)
+                                                {{ monthly_stats.tag_stats.0.name }} ({% blocktrans with h=monthly_stats.tag_stats.0.total_hours %}{{ h }}h{% endblocktrans %})
                                             {% else %}
-                                                없음
+                                                {% trans "None" %}
                                             {% endif %}
                                         </div>
                                         <div class="col-md-4">
-                                            <strong>최고 기록일:</strong> 
+                                            <strong>{% trans "Peak day:" %}</strong>
                                             {% with max_hours=monthly_stats.daily_totals|first %}
                                                 {% for hours in monthly_stats.daily_totals %}
                                                     {% if hours > max_hours %}{% with max_hours=hours %}{% endwith %}{% endif %}
                                                 {% endfor %}
-                                                {{ max_hours }}시간
+                                                {% blocktrans with h=max_hours %}{{ h }}h{% endblocktrans %}
                                             {% endwith %}<br>
-                                            <strong>월간 기간:</strong> {{ monthly_stats.month }}<br>
-                                            <strong>총 일수:</strong> {{ monthly_stats.total_days }}일
+                                            <strong>{% trans "Month:" %}</strong> {{ monthly_stats.month }}<br>
+                                            <strong>{% trans "Total days:" %}</strong> {% blocktrans with d=monthly_stats.total_days %}{{ d }} days{% endblocktrans %}
                                         </div>
                                     </div>
                                     <hr class="my-3">
                                     <div class="row">
                                         <div class="col-12">
-                                            <h6 class="mb-2">태그별 평균시간 (활동한 일 기준)</h6>
+                                            <h6 class="mb-2">{% trans "Average hours per tag (by active days)" %}</h6>
                                             <div class="row">
                                                 {% for tag in monthly_stats.tag_stats %}
                                                 {% if tag.name != '미분류' %}
                                                 <div class="col-md-3 col-sm-6 mb-2">
                                                     <div class="d-flex align-items-center">
                                                         {% tag_dot tag.color %}
-                                                        <span class="small">{{ tag.name }}: <strong>{{ tag.avg_hours }}시간</strong></span>
+                                                        <span class="small">{{ tag.name }}: <strong>{% blocktrans with h=tag.avg_hours %}{{ h }}h{% endblocktrans %}</strong></span>
                                                     </div>
                                                 </div>
                                                 {% endif %}
@@ -269,17 +271,17 @@
                         </div>
                     </div>
 
-                    <!-- 태그 분석 -->
+                    
                     <div class="tab-pane fade" id="tags" role="tabpanel">
                         <div class="row">
                             <div class="col-lg-8">
-                                <h6 class="mb-3">태그별 총 사용 시간</h6>
+                                <h6 class="mb-3">{% trans "Total time per tag" %}</h6>
                                 <div class="chart-container">
                                     <canvas id="tagTotalChart"></canvas>
                                 </div>
                             </div>
                             <div class="col-lg-4">
-                                <h6 class="mb-3">상위 태그 목록</h6>
+                                <h6 class="mb-3">{% trans "Top tags" %}</h6>
                                 <div class="tag-analysis-scroll">
                                     {% for tag in tag_analysis|slice:":10" %}
                                     {% if tag.name != '미분류' %}
@@ -289,8 +291,8 @@
                                                 <span>{{ tag.name }}</span>
                                             </div>
                                             <div class="text-end">
-                                                <strong>{{ tag.total_hours }}시간</strong><br>
-                                                <small class="text-muted">{{ tag.total_blocks }}블록</small>
+                                                <strong>{% blocktrans with h=tag.total_hours %}{{ h }}h{% endblocktrans %}</strong><br>
+                                                <small class="text-muted">{% blocktrans with b=tag.total_blocks %}{{ b }} blocks{% endblocktrans %}</small>
                                             </div>
                                         </div>
                                     {% endif %}
@@ -300,14 +302,14 @@
                         </div>
                         <div class="row mt-4">
                             <div class="col-12">
-                                <h6 class="mb-3">태그별 상세 분석</h6>
+                                <h6 class="mb-3">{% trans "Tag detail analysis" %}</h6>
                                 <div class="table-responsive">
                                     <table class="table table-hover">
                                         <thead>
                                             <tr>
-                                                <th>태그</th>
-                                                <th>총 시간</th>
-                                                <th>총 블록 수</th>
+                                                <th>{% trans "Tag" %}</th>
+                                                <th>{% trans "Total time" %}</th>
+                                                <th>{% trans "Total blocks" %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -317,8 +319,8 @@
                                                     <td>
                                                         {% tag_dot tag.color %}{{ tag.name }}
                                                     </td>
-                                                    <td><strong>{{ tag.total_hours }}시간</strong></td>
-                                                    <td>{{ tag.total_blocks }}개</td>
+                                                    <td><strong>{% blocktrans with h=tag.total_hours %}{{ h }}h{% endblocktrans %}</strong></td>
+                                                    <td>{% blocktrans with c=tag.total_blocks %}{{ c }} blocks{% endblocktrans %}</td>
                                                 </tr>
                                             {% endif %}
                                             {% endfor %}
