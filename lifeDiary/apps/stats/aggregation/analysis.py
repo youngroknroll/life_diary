@@ -1,4 +1,4 @@
-from apps.core.utils import MINUTES_PER_SLOT, UNCLASSIFIED_TAG_NAME
+from apps.core.utils import MINUTES_PER_SLOT
 from apps.stats.services import minutes_to_hours
 
 

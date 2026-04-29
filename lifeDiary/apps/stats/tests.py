@@ -1,4 +1,5 @@
 import pytest
+from django.utils import translation
 
 from apps.core.utils import UNCLASSIFIED_TAG_COLOR, UNCLASSIFIED_TAG_NAME
 from apps.stats.services import (
@@ -12,39 +13,49 @@ from apps.stats.services import (
 
 class TestStatsServices:
     def test_build_unclassified_daily_entry(self):
-        assert build_unclassified_daily_entry() == {
-            "name": UNCLASSIFIED_TAG_NAME,
-            "color": UNCLASSIFIED_TAG_COLOR,
-            "minutes": 0,
-            "blocks": 0,
-            "is_unclassified": True,
-        }
+        with translation.override("ko"):
+            assert build_unclassified_daily_entry() == {
+                "name": UNCLASSIFIED_TAG_NAME,
+                "color": UNCLASSIFIED_TAG_COLOR,
+                "minutes": 0,
+                "blocks": 0,
+                "is_unclassified": True,
+            }
 
     def test_build_unclassified_weekly_entry(self):
-        assert build_unclassified_weekly_entry() == {
-            "name": UNCLASSIFIED_TAG_NAME,
-            "color": UNCLASSIFIED_TAG_COLOR,
-            "daily_minutes": [0] * 7,
-            "is_unclassified": True,
-        }
+        with translation.override("ko"):
+            assert build_unclassified_weekly_entry() == {
+                "name": UNCLASSIFIED_TAG_NAME,
+                "color": UNCLASSIFIED_TAG_COLOR,
+                "daily_minutes": [0] * 7,
+                "is_unclassified": True,
+            }
 
     def test_build_unclassified_monthly_entry(self):
-        assert build_unclassified_monthly_entry(3) == {
-            "name": UNCLASSIFIED_TAG_NAME,
-            "color": UNCLASSIFIED_TAG_COLOR,
-            "daily_hours": [0] * 3,
-            "total_hours": 0,
-            "is_unclassified": True,
-        }
+        with translation.override("ko"):
+            assert build_unclassified_monthly_entry(3) == {
+                "name": UNCLASSIFIED_TAG_NAME,
+                "color": UNCLASSIFIED_TAG_COLOR,
+                "daily_hours": [0] * 3,
+                "total_hours": 0,
+                "is_unclassified": True,
+            }
 
     def test_build_unclassified_analysis_entry(self):
-        assert build_unclassified_analysis_entry() == {
-            "name": UNCLASSIFIED_TAG_NAME,
-            "color": UNCLASSIFIED_TAG_COLOR,
-            "total_minutes": 0,
-            "total_blocks": 0,
-            "is_unclassified": True,
-        }
+        with translation.override("ko"):
+            assert build_unclassified_analysis_entry() == {
+                "name": UNCLASSIFIED_TAG_NAME,
+                "color": UNCLASSIFIED_TAG_COLOR,
+                "total_minutes": 0,
+                "total_blocks": 0,
+                "is_unclassified": True,
+            }
+
+    def test_unclassified_entry_translates_to_english(self):
+        with translation.override("en"):
+            entry = build_unclassified_daily_entry()
+        assert entry["name"] == "Unclassified"
+        assert entry["is_unclassified"] is True
 
     def test_minutes_to_hours(self):
         assert minutes_to_hours(30) == 0.5

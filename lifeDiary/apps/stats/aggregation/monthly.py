@@ -1,4 +1,4 @@
-from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT, UNCLASSIFIED_TAG_NAME
+from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
 
 
 def get_monthly_stats_data(user, selected_date, calculator):

@@ -3,7 +3,7 @@
 import statistics
 
 from apps.core.messages import LocalizableMessage
-from apps.core.utils import SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME
+from apps.core.utils import SLEEP_TAG_NAME
 
 # 피드백 타입 상수 (severity)
 POSITIVE = "positive"
