@@ -695,7 +695,7 @@ msgstr "Tag name"
 
 #: apps/tags/models.py:61
 msgid "최대 50자까지 입력 가능"
-msgstr "Up to 500 characters"
+msgstr "Up to 50 characters"
 
 #: apps/tags/models.py:72
 msgid "HEX 색상 코드 (예: #FF5733)"
@@ -822,7 +822,7 @@ msgstr "An error occurred while updating the tag."
 
 #: apps/tags/views.py:140
 msgid "\"%(name)s\" 태그가 삭제되었습니다."
-msgstr "%(count)d slot was deleted."
+msgstr "Tag \"%(name)s\" has been deleted."
 
 #: apps/tags/views.py:148
 msgid "태그 삭제 중 오류가 발생했습니다."
