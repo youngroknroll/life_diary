@@ -254,7 +254,7 @@
                                             <h6 class="mb-2">{% trans "Average hours per tag (by active days)" %}</h6>
                                             <div class="row">
                                                 {% for tag in monthly_stats.tag_stats %}
-                                                {% if tag.name != '미분류' %}
+                                                {% if not tag.is_unclassified %}
                                                 <div class="col-md-3 col-sm-6 mb-2">
                                                     <div class="d-flex align-items-center">
                                                         {% tag_dot tag.color %}
@@ -284,7 +284,7 @@
                                 <h6 class="mb-3">{% trans "Top tags" %}</h6>
                                 <div class="tag-analysis-scroll">
                                     {% for tag in tag_analysis|slice:":10" %}
-                                    {% if tag.name != '미분류' %}
+                                    {% if not tag.is_unclassified %}
                                         <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
                                             <div>
                                                 {% tag_dot tag.color %}
@@ -314,7 +314,7 @@
                                         </thead>
                                         <tbody>
                                             {% for tag in tag_analysis %}
-                                            {% if tag.name != '미분류' %}
+                                            {% if not tag.is_unclassified %}
                                                 <tr>
                                                     <td>
                                                         {% tag_dot tag.color %}{{ tag.name }}

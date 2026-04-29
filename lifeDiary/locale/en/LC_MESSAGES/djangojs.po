@@ -199,6 +199,18 @@ msgstr "%(label)s: %(h)sh"
 msgid "Total hours"
 msgstr "Total hours"
 
+#: apps/tags/templates/tags/index.html:71
+msgid "기본"
+msgstr "Default"
+
+#: apps/tags/templates/tags/index.html:80
+msgid "수정"
+msgstr "Edit"
+
+#: apps/tags/templates/tags/index.html:128
+msgid "미분류"
+msgstr "Unclassified"
+
 #: apps/users/static/users/js/goals.js:19
 #, javascript-format
 msgid "최대 %s시간까지 입력 가능"

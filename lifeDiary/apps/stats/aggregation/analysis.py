@@ -28,6 +28,6 @@ def get_tag_analysis_data(user, selected_date, calculator):
             "total_blocks": d["total_blocks"],
         }
         for d in tag_analysis_data.values()
-        if d["name"] != UNCLASSIFIED_TAG_NAME
+        if not d.get("is_unclassified")
     ]
     return sorted(analysis_list, key=lambda x: x["total_hours"], reverse=True)

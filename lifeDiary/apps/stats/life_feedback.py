@@ -55,7 +55,8 @@ def generate_feedback(context):
     # 2. 불균형/과다/부족 경고 + 4. 리듬 붕괴(변동성) 피드백 (월간)
     for tag in context["monthly_stats"]["tag_stats"]:
         if (
-            tag["name"] not in [UNCLASSIFIED_TAG_NAME, SLEEP_TAG_NAME]
+            not tag.get("is_unclassified")
+            and tag["name"] != SLEEP_TAG_NAME
             and tag["total_hours"] > 0
             and context["monthly_stats"]["total_hours"] > 0
         ):
@@ -105,7 +106,7 @@ def generate_feedback(context):
         (
             tag
             for tag in context["monthly_stats"]["tag_stats"]
-            if tag["name"] == UNCLASSIFIED_TAG_NAME
+            if tag.get("is_unclassified")
         ),
         None,
     )

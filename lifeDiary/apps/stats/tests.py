@@ -17,6 +17,7 @@ class TestStatsServices:
             "color": UNCLASSIFIED_TAG_COLOR,
             "minutes": 0,
             "blocks": 0,
+            "is_unclassified": True,
         }
 
     def test_build_unclassified_weekly_entry(self):
@@ -24,6 +25,7 @@ class TestStatsServices:
             "name": UNCLASSIFIED_TAG_NAME,
             "color": UNCLASSIFIED_TAG_COLOR,
             "daily_minutes": [0] * 7,
+            "is_unclassified": True,
         }
 
     def test_build_unclassified_monthly_entry(self):
@@ -32,6 +34,7 @@ class TestStatsServices:
             "color": UNCLASSIFIED_TAG_COLOR,
             "daily_hours": [0] * 3,
             "total_hours": 0,
+            "is_unclassified": True,
         }
 
     def test_build_unclassified_analysis_entry(self):
@@ -40,6 +43,7 @@ class TestStatsServices:
             "color": UNCLASSIFIED_TAG_COLOR,
             "total_minutes": 0,
             "total_blocks": 0,
+            "is_unclassified": True,
         }
 
     def test_minutes_to_hours(self):

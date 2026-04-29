@@ -32,7 +32,7 @@ def get_monthly_stats_data(user, selected_date, calculator):
 
     daily_totals = [round(h, 1) for h in daily_totals]
     tag_list = sorted(daily_tag_stats.values(), key=lambda x: x["total_hours"], reverse=True)
-    tag_list = [t for t in tag_list if t["name"] != UNCLASSIFIED_TAG_NAME]
+    tag_list = [t for t in tag_list if not t.get("is_unclassified")]
 
     total_hours = sum(t["total_hours"] for t in tag_list)
     active_days = sum(

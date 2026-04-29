@@ -21,6 +21,10 @@ msgstr ""
 msgid "[missing message: %(code)s]"
 msgstr "[missing message: %(code)s]"
 
+#: apps/stats/services.py:11
+msgid "미분류"
+msgstr "Unclassified"
+
 #: apps/core/utils.py:167
 #, python-format
 msgid "%(hours)s시간 %(minutes)s분"

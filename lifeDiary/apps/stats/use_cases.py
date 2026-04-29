@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 from django.core.cache import cache
+from django.utils.translation import get_language
 
 from .logic import get_stats_context
 
@@ -10,8 +11,9 @@ _PAST_TTL = 60 * 60 * 24   # 과거 날짜: 24시간
 _TODAY_TTL = 60 * 5         # 오늘: 5분
 
 
-def _cache_key(user_id: int, target_date: date) -> str:
-    return f"stats:{user_id}:{target_date.isoformat()}"
+def _cache_key(user_id: int, target_date: date, language: str | None = None) -> str:
+    lang = language or get_language() or "default"
+    return f"stats:{user_id}:{target_date.isoformat()}:{lang}"
 
 
 class GetStatsContextUseCase:
@@ -28,4 +30,5 @@ class GetStatsContextUseCase:
 
 
 def invalidate_stats_cache(user_id: int, target_date: date) -> None:
-    cache.delete(_cache_key(user_id, target_date))
+    for lang in ("ko", "en", "default"):
+        cache.delete(_cache_key(user_id, target_date, language=lang))
