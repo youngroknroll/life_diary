@@ -1,0 +1,224 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-01 19:27+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/core/static/core/js/tag.js:35
+msgid "카테고리를 선택하세요"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:61
+msgid "태그 수정"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:72
+msgid "새 태그 생성"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:97
+msgid "태그명을 입력해주세요."
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:102
+msgid "카테고리를 선택해주세요."
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:124
+#, javascript-format
+msgid "태그 저장 실패: %s"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:130
+#, javascript-format
+msgid "'%s' 태그를 정말 삭제하시겠습니까?"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:145
+#, javascript-format
+msgid "태그 삭제 실패: %s"
+msgstr ""
+
+#: apps/core/static/core/js/utils.js:99
+msgid "정말 삭제하시겠습니까?"
+msgstr ""
+
+#: apps/core/static/core/js/utils.js:109
+msgid "처리 중..."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:244
+msgid "그리드에서 시간을 선택하세요"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:260
+msgid "빈 슬롯"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:275
+msgid "알 수 없음"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:279
+msgid "시간:"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:280
+msgid "상태:"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:281
+#: apps/dashboard/static/dashboard/js/dashboard.js:304
+msgid "삭제"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:296
+#, javascript-format
+msgid "%s개 슬롯"
+msgid_plural "%s개 슬롯"
+msgstr[0] ""
+msgstr[1] ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:300
+msgid "%(h)s시간 %(m)s분"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:337
+msgid "슬롯을 선택해주세요."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:342
+msgid "태그를 선택해주세요."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:347
+msgid "저장 중입니다..."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:371
+#, javascript-format
+msgid "저장 실패: %s"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:378
+msgid "삭제할 슬롯을 선택해주세요."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:387
+msgid "삭제할 기록이 없습니다."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:393
+#, javascript-format
+msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
+msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
+msgstr[0] ""
+msgstr[1] ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:403
+msgid "삭제 중입니다..."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:424
+#, javascript-format
+msgid "삭제 실패: %s"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:437
+msgid "태그 로드 중 오류가 발생했습니다."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:451
+msgid "기본 태그"
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:458
+msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
+msgstr ""
+
+#: apps/dashboard/static/dashboard/js/dashboard.js:501
+msgid "생성된 태그가 없습니다."
+msgstr ""
+
+#: apps/stats/static/stats/js/stats.js:30
+msgid "데이터가 없습니다"
+msgstr ""
+
+#: apps/stats/static/stats/js/stats.js:124
+msgid "%(label)s: %(h)sh (%(p)s%%)"
+msgstr "%(label)s: %(h)s시간 (%(p)s%%)"
+
+#: apps/stats/static/stats/js/stats.js:143
+#, javascript-format
+msgid "%s:00"
+msgstr "%s:00"
+
+#: apps/stats/static/stats/js/stats.js:177
+#, javascript-format
+msgid "%s min"
+msgstr "%s분"
+
+#: apps/stats/static/stats/js/stats.js:188
+msgid "%(label)s: %(m)s min"
+msgstr "%(label)s: %(m)s분"
+
+#: apps/stats/static/stats/js/stats.js:237
+msgid "Active hours"
+msgstr "활동 시간"
+
+#: apps/stats/static/stats/js/stats.js:283
+msgid "Date"
+msgstr "날짜"
+
+#: apps/stats/static/stats/js/stats.js:287
+msgid "Hours"
+msgstr "시간"
+
+#: apps/stats/static/stats/js/stats.js:290
+#, javascript-format
+msgid "%sh"
+msgstr "%s시간"
+
+#: apps/stats/static/stats/js/stats.js:301
+msgid "%(label)s: %(h)sh"
+msgstr "%(label)s: %(h)s시간"
+
+#: apps/stats/static/stats/js/stats.js:326
+msgid "Total hours"
+msgstr "총 시간"
+
+#: apps/users/static/users/js/goals.js:19
+#, javascript-format
+msgid "최대 %s시간까지 입력 가능"
+msgstr ""
+
+#: apps/users/static/users/js/goals.js:63
+msgid "저장중..."
+msgstr ""
+
+#: apps/users/static/users/js/goals.js:83
+#: apps/users/static/users/js/goals.js:103
+msgid "저장완료!"
+msgstr ""
+
+#: apps/users/static/users/js/goals.js:91
+msgid "저장 실패"
+msgstr ""
+
+#: apps/users/static/users/js/goals.js:93
+msgid "저장 실패 - 네트워크 오류"
+msgstr ""

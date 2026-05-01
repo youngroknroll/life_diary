@@ -38,9 +38,9 @@ def category_list(request):
                 "categories": [
                     {
                         "id": cat.id,
-                        "name": cat.name,
+                        "name": cat.display_name,
                         "slug": cat.slug,
-                        "description": cat.description,
+                        "description": cat.display_description,
                         "color": cat.color,
                         "display_order": cat.display_order,
                     }

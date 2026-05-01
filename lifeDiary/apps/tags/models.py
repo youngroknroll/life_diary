@@ -2,7 +2,24 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
+
+
+# DB-stored Category 이름/설명을 makemessages가 수집하도록 등록.
+# Why: 카테고리는 DB에 한국어로 저장되며 표시 시점에 gettext로 번역된다.
+# How to apply: 새 카테고리를 추가하면 이 튜플에도 포함시켜야 en 번역 가능.
+_CATEGORY_I18N_REGISTRY = (
+    _("수동적 소비시간"),
+    _("주도적 사용시간"),
+    _("투자시간"),
+    _("기초 생활시간"),
+    _("수면시간"),
+    _("비계획적이고 예정되지 않은 방식으로 소비되어버린 시간"),
+    _("계획과 통제 안에서 내가 주도적으로 사용한 시간"),
+    _("성과를 얻길 바라는 목표 영역에 대한 투자시간"),
+    _("일정과 일정 사이의 기초적인 준비시간"),
+    _("잠, 낮잠"),
+)
 
 
 class Category(models.Model):
@@ -31,6 +48,14 @@ class Category(models.Model):
         verbose_name = _("카테고리")
         verbose_name_plural = _("카테고리들")
         ordering = ["display_order"]
+
+    @property
+    def display_name(self):
+        return gettext(self.name)
+
+    @property
+    def display_description(self):
+        return gettext(self.description) if self.description else ""
 
     def __str__(self):
         return self.name
