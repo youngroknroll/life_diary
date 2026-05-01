@@ -159,3 +159,7 @@ CACHES = {
         "OPTIONS": {"MAX_ENTRIES": 500},
     }
 }
+
+# Email (development: print to console)
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@lifediary.local")

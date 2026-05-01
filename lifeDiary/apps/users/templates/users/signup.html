@@ -26,7 +26,21 @@
                             </div>
                         {% else %}
                             <div class="form-text">
-                                {% trans "150자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다." %}
+                                {% trans "10자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다." %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">{% trans "이메일" %}</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                            <div class="text-danger small">
+                                {{ form.email.errors }}
+                            </div>
+                        {% else %}
+                            <div class="form-text">
+                                {% trans "아이디/비밀번호 찾기에 사용됩니다." %}
                             </div>
                         {% endif %}
                     </div>

@@ -1,0 +1,11 @@
+{% load i18n %}{% blocktrans %}안녕하세요,{% endblocktrans %}
+
+{% blocktrans %}라이프 다이어리 계정 아이디 찾기를 요청하셨습니다. 이 이메일에 연결된 아이디는 다음과 같습니다.{% endblocktrans %}
+
+{% for username in usernames %}- {{ username }}
+{% endfor %}
+{% blocktrans %}로그인 페이지로 이동: {% endblocktrans %}{{ protocol }}://{{ domain }}{% url 'users:login' %}
+
+{% blocktrans %}본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다.{% endblocktrans %}
+
+{% blocktrans %}— 라이프 다이어리{% endblocktrans %}

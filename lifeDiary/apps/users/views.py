@@ -2,12 +2,16 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import login, logout
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import get_user_model
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
 from django.utils.translation import gettext
 from django.views.decorators.http import require_POST, require_http_methods
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from .forms import UserGoalForm, UserNoteForm
+from django.conf import settings
+from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
 from .repositories import GoalRepository, NoteRepository
 from apps.tags.repositories import TagRepository
 from .use_cases import (
@@ -63,7 +67,7 @@ def signup_view(request):
     사용자 회원가입
     """
     if request.method == "POST":
-        form = UserCreationForm(request.POST)
+        form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
@@ -74,7 +78,7 @@ def signup_view(request):
             )
             return redirect("home")
     else:
-        form = UserCreationForm()
+        form = SignupForm()
 
     # Bootstrap 클래스 추가
     for field in form.fields.values():
@@ -107,6 +111,58 @@ def login_view(request):
         field.widget.attrs.update({"class": "form-control"})
 
     return render(request, "users/login.html", {"form": form, "page_title": gettext("로그인")})
+
+
+def _send_username_recovery_email(request, email):
+    """이메일과 일치하는 모든 계정의 username을 메일로 발송한다.
+
+    Why: 한 이메일에 여러 계정이 있을 수 있으므로 모두 안내.
+    """
+    User = get_user_model()
+    users = list(User.objects.filter(email__iexact=email, is_active=True))
+    if not users:
+        return
+    context = {
+        "usernames": [u.get_username() for u in users],
+        "domain": request.get_host(),
+        "protocol": "https" if request.is_secure() else "http",
+    }
+    subject = render_to_string("users/recovery/username_recovery_subject.txt").strip()
+    body = render_to_string("users/recovery/username_recovery_email.txt", context)
+    send_mail(
+        subject=subject,
+        message=body,
+        from_email=settings.DEFAULT_FROM_EMAIL,
+        recipient_list=[email],
+        fail_silently=False,
+    )
+
+
+def username_recovery_view(request):
+    """아이디(username) 찾기.
+
+    Why: 등록 여부 노출 방지를 위해 결과 페이지는 항상 동일.
+    """
+    if request.method == "POST":
+        form = UsernameRecoveryForm(request.POST)
+        if form.is_valid():
+            _send_username_recovery_email(request, form.cleaned_data["email"])
+            return redirect("users:username_recovery_done")
+    else:
+        form = UsernameRecoveryForm()
+    return render(
+        request,
+        "users/recovery/username_recovery_form.html",
+        {"form": form, "page_title": gettext("아이디 찾기")},
+    )
+
+
+def username_recovery_done_view(request):
+    return render(
+        request,
+        "users/recovery/username_recovery_done.html",
+        {"page_title": gettext("아이디 찾기")},
+    )
 
 
 @login_required

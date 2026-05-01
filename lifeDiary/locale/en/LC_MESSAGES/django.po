@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-28 11:58+0900\n"
+"POT-Creation-Date: 2026-05-01 14:58+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -21,9 +21,29 @@ msgstr ""
 msgid "[missing message: %(code)s]"
 msgstr "[missing message: %(code)s]"
 
-#: apps/stats/services.py:11
-msgid "미분류"
-msgstr "Unclassified"
+#: apps/core/test_messages.py:57 apps/core/test_messages.py:62
+#, python-format
+msgid "안녕 %(name)s"
+msgstr ""
+
+#: apps/core/test_messages.py:67
+#, python-format
+msgid "%(period)s 요약입니다"
+msgstr ""
+
+#: apps/core/test_messages.py:68 apps/stats/messages.py:33
+#: templates/shared/_date_selector.html:9
+msgid "오늘"
+msgstr "today"
+
+#: apps/core/test_messages.py:68 apps/stats/messages.py:34
+msgid "이번주"
+msgstr "this week"
+
+#: apps/core/test_messages.py:82 apps/core/test_messages.py:90
+#, python-format
+msgid "Hi %(name)s"
+msgstr ""
 
 #: apps/core/utils.py:167
 #, python-format
@@ -60,7 +80,7 @@ msgstr "Slot index"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0–143 (0: 00:00–00:10, 143: 23:50–24:00)"
 
-#: apps/dashboard/models.py:27 apps/tags/models.py:83 apps/users/forms.py:11
+#: apps/dashboard/models.py:27 apps/tags/models.py:83 apps/users/forms.py:63
 #: apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr "Tag"
@@ -301,14 +321,17 @@ msgstr "Already hit your %(period)s '%(name)s' goal of %(hours)sh!"
 msgid ""
 "%(period)s '%(name)s' 목표(%(hours)s시간) 중 %(actual).1f시간을 달성했습니"
 "다. %(remain).1f시간만 더 해보세요!"
-msgstr "%(period)s '%(name)s' goal (%(hours)sh): %(actual).1fh logged, %(remain).1fh more to go!"
+msgstr ""
+"%(period)s '%(name)s' goal (%(hours)sh): %(actual).1fh logged, %(remain).1fh "
+"more to go!"
 
 #: apps/stats/messages.py:18
 #, python-format
 msgid ""
 "'%(name)s' 시간이 전체의 %(percent)d%%를 차지합니다. 활동의 균형을 점검해보세"
 "요."
-msgstr "'%(name)s' takes up %(percent)d%% of the total. Check your activity balance."
+msgstr ""
+"'%(name)s' takes up %(percent)d%% of the total. Check your activity balance."
 
 #: apps/stats/messages.py:21
 #, python-format
@@ -326,19 +349,17 @@ msgstr "Rest takes %(percent)d%% of the total. Try increasing active time."
 msgid ""
 "기록되지 않은 시간이 전체의 %(percent)d%%입니다. 하루를 더 꼼꼼히 기록해보세"
 "요."
-msgstr "Unlogged time is %(percent)d%% of the total. Try logging your day more carefully."
-
-#: apps/stats/messages.py:33 templates/shared/_date_selector.html:9
-msgid "오늘"
-msgstr "today"
-
-#: apps/stats/messages.py:34
-msgid "이번주"
-msgstr "this week"
+msgstr ""
+"Unlogged time is %(percent)d%% of the total. Try logging your day more "
+"carefully."
 
 #: apps/stats/messages.py:35
 msgid "이번 달"
 msgstr "this month"
+
+#: apps/stats/services.py:12
+msgid "미분류"
+msgstr "Unclassified"
 
 #: apps/stats/templates/stats/index.html:5 templates/base.html:109
 msgid "통계"
@@ -347,6 +368,12 @@ msgstr "Stats"
 #: apps/stats/templates/stats/index.html:5
 #: apps/tags/templates/tags/index.html:4
 #: apps/users/templates/users/login.html:4
+#: apps/users/templates/users/password/password_reset_complete.html:4
+#: apps/users/templates/users/password/password_reset_confirm.html:4
+#: apps/users/templates/users/password/password_reset_done.html:4
+#: apps/users/templates/users/password/password_reset_form.html:4
+#: apps/users/templates/users/recovery/username_recovery_done.html:4
+#: apps/users/templates/users/recovery/username_recovery_form.html:4
 #: apps/users/templates/users/signup.html:4 templates/base.html:17
 #: templates/base.html:70
 msgid "라이프 다이어리"
@@ -825,6 +852,7 @@ msgid "태그 수정 중 오류가 발생했습니다."
 msgstr "An error occurred while updating the tag."
 
 #: apps/tags/views.py:140
+#, python-format
 msgid "\"%(name)s\" 태그가 삭제되었습니다."
 msgstr "Tag \"%(name)s\" has been deleted."
 
@@ -832,35 +860,58 @@ msgstr "Tag \"%(name)s\" has been deleted."
 msgid "태그 삭제 중 오류가 발생했습니다."
 msgstr "An error occurred while deleting the tag."
 
-#: apps/users/forms.py:12
+#: apps/users/forms.py:14 apps/users/forms.py:53
+#: apps/users/templates/users/password/password_reset_form.html:23
+#: apps/users/templates/users/recovery/username_recovery_form.html:20
+#: apps/users/templates/users/signup.html:35
+msgid "이메일"
+msgstr "Email"
+
+#: apps/users/forms.py:15 apps/users/templates/users/signup.html:43
+msgid "아이디/비밀번호 찾기에 사용됩니다."
+msgstr "Used for username/password recovery."
+
+#: apps/users/forms.py:27 apps/users/templates/users/signup.html:29
+msgid "10자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgstr "10 characters or fewer. Letters, digits and @/./+/-/_ only."
+
+#: apps/users/forms.py:33
+msgid "사용자명은 10자 이하여야 합니다."
+msgstr "Username must be 10 characters or fewer."
+
+#: apps/users/forms.py:39
+msgid "이미 사용 중인 이메일입니다."
+msgstr "This email is already in use."
+
+#: apps/users/forms.py:64
 msgid "기간"
 msgstr "Period"
 
-#: apps/users/forms.py:13 apps/users/templates/users/_goal_table_section.html:8
+#: apps/users/forms.py:65 apps/users/templates/users/_goal_table_section.html:8
 msgid "목표 시간"
 msgstr "Target hours"
 
-#: apps/users/forms.py:18 apps/users/models.py:16
+#: apps/users/forms.py:70 apps/users/models.py:16
 msgid "일간"
 msgstr "Daily"
 
-#: apps/users/forms.py:18 apps/users/models.py:16
+#: apps/users/forms.py:70 apps/users/models.py:16
 msgid "주간"
 msgstr "Weekly"
 
-#: apps/users/forms.py:18 apps/users/models.py:16
+#: apps/users/forms.py:70 apps/users/models.py:16
 msgid "월간"
 msgstr "Monthly"
 
-#: apps/users/forms.py:24
+#: apps/users/forms.py:76
 msgid "주간/월간은 해당 기간의 총 목표 시간입니다."
 msgstr "Weekly/monthly values are the total for that period."
 
-#: apps/users/forms.py:41 apps/users/templates/users/usernote_list.html:11
+#: apps/users/forms.py:93 apps/users/templates/users/usernote_list.html:11
 msgid "내용"
 msgstr "Content"
 
-#: apps/users/forms.py:45
+#: apps/users/forms.py:97
 msgid "특이사항을 입력하세요."
 msgstr "Enter your note."
 
@@ -907,7 +958,8 @@ msgstr "%(h)sh"
 #: apps/users/templates/users/login.html:4
 #: apps/users/templates/users/login.html:13
 #: apps/users/templates/users/login.html:49
-#: apps/users/templates/users/signup.html:83 apps/users/views.py:109
+#: apps/users/templates/users/password/password_reset_complete.html:14
+#: apps/users/templates/users/signup.html:97 apps/users/views.py:113
 #: templates/base.html:145
 msgid "로그인"
 msgstr "Log in"
@@ -918,18 +970,32 @@ msgid "사용자명"
 msgstr "Username"
 
 #: apps/users/templates/users/login.html:31
-#: apps/users/templates/users/signup.html:35
+#: apps/users/templates/users/signup.html:49
 msgid "비밀번호"
 msgstr "Password"
 
-#: apps/users/templates/users/login.html:57
+#: apps/users/templates/users/login.html:58
+#: apps/users/templates/users/recovery/username_recovery_done.html:4
+#: apps/users/templates/users/recovery/username_recovery_form.html:4
+#: apps/users/templates/users/recovery/username_recovery_form.html:11
+#: apps/users/views.py:156 apps/users/views.py:164
+msgid "아이디 찾기"
+msgstr "Find username"
+
+#: apps/users/templates/users/login.html:62
+#: apps/users/templates/users/password/password_reset_form.html:4
+#: apps/users/templates/users/password/password_reset_form.html:13
+msgid "비밀번호 찾기"
+msgstr "Reset password"
+
+#: apps/users/templates/users/login.html:66
 msgid "계정이 없으신가요?"
 msgstr "Don't have an account?"
 
-#: apps/users/templates/users/login.html:59
+#: apps/users/templates/users/login.html:68
 #: apps/users/templates/users/signup.html:4
 #: apps/users/templates/users/signup.html:13
-#: apps/users/templates/users/signup.html:73 apps/users/views.py:84
+#: apps/users/templates/users/signup.html:87 apps/users/views.py:88
 #: templates/base.html:150 templates/index.html:238
 msgid "회원가입"
 msgstr "Sign up"
@@ -965,11 +1031,146 @@ msgstr "Saved!"
 msgid "나의 목표 목록"
 msgstr "My goals"
 
-#: apps/users/templates/users/signup.html:29
-msgid "150자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
-msgstr "150 characters or fewer. Letters, digits and @/./+/-/_ only."
+#: apps/users/templates/users/password/password_reset_complete.html:4
+msgid "비밀번호 변경 완료"
+msgstr "Password changed"
 
-#: apps/users/templates/users/signup.html:43
+#: apps/users/templates/users/password/password_reset_complete.html:12
+msgid "비밀번호가 변경되었습니다"
+msgstr "Your password has been changed"
+
+#: apps/users/templates/users/password/password_reset_complete.html:13
+msgid "새 비밀번호로 로그인하실 수 있습니다."
+msgstr "You can now sign in with your new password."
+
+#: apps/users/templates/users/password/password_reset_confirm.html:4
+#: apps/users/templates/users/password/password_reset_confirm.html:11
+msgid "새 비밀번호 설정"
+msgstr "Set new password"
+
+#: apps/users/templates/users/password/password_reset_confirm.html:18
+msgid "새 비밀번호"
+msgstr "New password"
+
+#: apps/users/templates/users/password/password_reset_confirm.html:25
+msgid "새 비밀번호 확인"
+msgstr "Confirm new password"
+
+#: apps/users/templates/users/password/password_reset_confirm.html:32
+msgid "비밀번호 변경"
+msgstr "Change password"
+
+#: apps/users/templates/users/password/password_reset_confirm.html:37
+msgid "재설정 링크가 유효하지 않거나 이미 사용되었습니다. 다시 요청해주세요."
+msgstr ""
+"The reset link is invalid or has already been used. Please request a new one."
+
+#: apps/users/templates/users/password/password_reset_confirm.html:40
+msgid "다시 요청하기"
+msgstr "Request again"
+
+#: apps/users/templates/users/password/password_reset_done.html:4
+msgid "비밀번호 재설정 메일 발송"
+msgstr "Reset email sent"
+
+#: apps/users/templates/users/password/password_reset_done.html:12
+#: apps/users/templates/users/recovery/username_recovery_done.html:12
+msgid "메일을 확인해주세요"
+msgstr "Please check your email"
+
+#: apps/users/templates/users/password/password_reset_done.html:14
+msgid ""
+"입력하신 이메일이 등록되어 있다면, 비밀번호 재설정 링크가 발송되었습니다. 메"
+"일이 보이지 않으면 스팸함을 확인해주세요."
+msgstr ""
+"If the email you entered is registered, a password reset link has been sent. "
+"Check your spam folder if you don't see it."
+
+#: apps/users/templates/users/password/password_reset_done.html:16
+#: apps/users/templates/users/password/password_reset_form.html:37
+#: apps/users/templates/users/recovery/username_recovery_done.html:16
+#: apps/users/templates/users/recovery/username_recovery_form.html:32
+msgid "로그인으로 돌아가기"
+msgstr "Back to login"
+
+#: apps/users/templates/users/password/password_reset_email.txt:1
+#: apps/users/templates/users/recovery/username_recovery_email.txt:1
+msgid "안녕하세요,"
+msgstr "Hello,"
+
+#: apps/users/templates/users/password/password_reset_email.txt:3
+msgid ""
+"라이프 다이어리 계정의 비밀번호 재설정을 요청하셨습니다. 아래 링크를 눌러 새 "
+"비밀번호를 설정해주세요."
+msgstr ""
+"You requested a password reset for your Life Diary account. Click the link "
+"below to set a new password."
+
+#: apps/users/templates/users/password/password_reset_email.txt:7
+msgid "계정 사용자명: "
+msgstr "Account username: "
+
+#: apps/users/templates/users/password/password_reset_email.txt:9
+#: apps/users/templates/users/recovery/username_recovery_email.txt:9
+msgid "본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다."
+msgstr "If you did not request this, you can safely ignore this email."
+
+#: apps/users/templates/users/password/password_reset_email.txt:11
+#: apps/users/templates/users/recovery/username_recovery_email.txt:11
+msgid "— 라이프 다이어리"
+msgstr "— Life Diary"
+
+#: apps/users/templates/users/password/password_reset_form.html:18
+msgid ""
+"가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
+msgstr ""
+"Enter the email you registered with. We will send you a password reset link."
+
+#: apps/users/templates/users/password/password_reset_form.html:31
+msgid "재설정 링크 받기"
+msgstr "Send reset link"
+
+#: apps/users/templates/users/password/password_reset_subject.txt:1
+msgid "[라이프 다이어리] 비밀번호 재설정 안내"
+msgstr "[Life Diary] Password reset"
+
+#: apps/users/templates/users/recovery/username_recovery_done.html:14
+msgid ""
+"입력하신 이메일이 등록되어 있다면, 해당 계정의 아이디가 발송되었습니다. 메일"
+"이 보이지 않으면 스팸함을 확인해주세요."
+msgstr ""
+"If the email you entered is registered, your username has been sent. Check "
+"your spam folder if you don't see it."
+
+#: apps/users/templates/users/recovery/username_recovery_email.txt:3
+msgid ""
+"라이프 다이어리 계정 아이디 찾기를 요청하셨습니다. 이 이메일에 연결된 아이디"
+"는 다음과 같습니다."
+msgstr ""
+"You requested username recovery for your Life Diary account. The username(s) "
+"linked to this email are:"
+
+#: apps/users/templates/users/recovery/username_recovery_email.txt:7
+msgid "로그인 페이지로 이동: "
+msgstr "Go to login page: "
+
+#: apps/users/templates/users/recovery/username_recovery_form.html:15
+msgid ""
+"가입 시 등록한 이메일을 입력하세요. 해당 이메일로 아이디(사용자명)를 보내드립"
+"니다."
+msgstr ""
+"Enter the email you registered with. We will send your username to that "
+"email."
+
+#: apps/users/templates/users/recovery/username_recovery_form.html:27
+msgid "아이디 받기"
+msgstr "Send username"
+
+#: apps/users/templates/users/recovery/username_recovery_subject.txt:1
+msgid "[라이프 다이어리] 아이디 찾기 안내"
+msgstr "[Life Diary] Username recovery"
+
+#: apps/users/templates/users/signup.html:57
 msgid ""
 "• 8자 이상이어야 합니다<br>\n"
 "                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
@@ -980,15 +1181,15 @@ msgstr ""
 "                                • Cannot be a commonly-used password<br>\n"
 "                                • Cannot be entirely numeric"
 
-#: apps/users/templates/users/signup.html:51
+#: apps/users/templates/users/signup.html:65
 msgid "비밀번호 확인"
 msgstr "Confirm password"
 
-#: apps/users/templates/users/signup.html:59
+#: apps/users/templates/users/signup.html:73
 msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
 msgstr "Enter the same password again to confirm."
 
-#: apps/users/templates/users/signup.html:81
+#: apps/users/templates/users/signup.html:95
 msgid "이미 계정이 있으신가요?"
 msgstr "Already have an account?"
 
@@ -1084,16 +1285,16 @@ msgstr "No notes yet."
 msgid "접근할 수 없는 태그입니다."
 msgstr "You cannot access this tag."
 
-#: apps/users/views.py:57
+#: apps/users/views.py:61
 msgid "성공적으로 로그아웃되었습니다."
 msgstr "Successfully logged out."
 
-#: apps/users/views.py:72
+#: apps/users/views.py:76
 #, python-format
 msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
 msgstr "Welcome, %(username)s! Your account has been created."
 
-#: apps/users/views.py:99
+#: apps/users/views.py:103
 #, python-format
 msgid "%(username)s님, 환영합니다!"
 msgstr "Welcome, %(username)s!"
