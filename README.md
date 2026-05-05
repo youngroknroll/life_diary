@@ -117,3 +117,4 @@ gunicorn lifeDiary.wsgi --workers=2 --threads=4 --worker-class=gthread --bind 0.
 ## 이 프로젝트를 한 문장으로 설명하면
 
 Life Diary는 생활 기록을 많이 쓰지 않고도 남길 수 있게 하고, 그 기록을 다시 목표와 통계, 피드백으로 돌려주는 구조화된 회고 서비스입니다.
+
