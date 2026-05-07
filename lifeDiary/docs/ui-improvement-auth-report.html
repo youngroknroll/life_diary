@@ -202,11 +202,11 @@
   </div>
   <div class="summary-card">
     <div class="num">4</div>
-    <div class="label">권장 (Medium) · ⏳ 4 대기</div>
+    <div class="label">권장 (Medium) · ✅ 1 완료 / ⏳ 3 대기</div>
   </div>
   <div class="summary-card ok">
-    <div class="num">3 / 10</div>
-    <div class="label">진행률 (30%)</div>
+    <div class="num">4 / 10</div>
+    <div class="label">진행률 (40%)</div>
   </div>
 </div>
 
@@ -462,12 +462,12 @@
       <td><span class="effort s">S · 1시간</span></td>
       <td><span class="status done">✅ 완료 · 2026-05-07</span></td>
     </tr>
-    <tr>
+    <tr class="row-done">
       <td>5</td>
-      <td>사용자명 10자 → 30자 완화 + form/모델 마이그레이션</td>
+      <td>사용자명 10자 → 30자 완화 (마이그레이션 불요: 기본 User.username 150자)</td>
       <td>가입 가능 폭 ↑</td>
-      <td><span class="effort m">M · 3시간</span></td>
-      <td><span class="status todo">⏳ 대기</span></td>
+      <td><span class="effort s">S · 30분</span></td>
+      <td><span class="status done">✅ 완료 · 2026-05-07</span></td>
     </tr>
     <tr>
       <td>6</td>
@@ -501,12 +501,12 @@
   <li>✅ <strong>#1</strong> 테스트 계정 평문 제거 — 커밋 <code>8bab90d</code></li>
   <li>✅ <strong>#2</strong> 비밀번호 👁 토글 + Caps Lock 안내 — <code>auth-enhance.js</code> · 회귀 테스트 2건</li>
   <li>✅ <strong>#4</strong> 비밀번호 강도 인디케이터 — <code>password-strength.js</code> (자체 구현 ~3KB) · 회귀 테스트 2건</li>
+  <li>✅ <strong>#5</strong> 사용자명 10자 → 30자 완화 — forms.py + signup.html · 회귀 테스트 3건 갱신/추가 (마이그레이션 불요)</li>
 </ul>
 
 <h3>대기 (우선순위 순)</h3>
 <ol>
   <li><strong>#3</strong> Remember me 체크박스 — 가장 빠른 잔여 작업 (2h, 이번 주)</li>
-  <li><strong>#5</strong> 사용자명 30자 완화 — 모델 변경 + 마이그레이션 (3h)</li>
   <li><strong>#8</strong> auth-card split layout — 디자인 토큰 활용, 비교적 간단 (4h)</li>
   <li><strong>#6</strong> 소셜 로그인 (카카오/Google) — django-allauth 도입, 키 발급 선행 (1주)</li>
   <li><strong>#7</strong> 환영 화면 + "첫 일기 쓰기" CTA — 시안 필요 (3-5일)</li>
