@@ -71,12 +71,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            messages.success(
-                request,
-                gettext("%(username)s님, 환영합니다! 회원가입이 완료되었습니다.")
-                % {"username": user.username},
-            )
-            return redirect("home")
+            return redirect("users:welcome")
     else:
         form = SignupForm()
 
@@ -170,6 +165,20 @@ def username_recovery_done_view(request):
         request,
         "users/recovery/username_recovery_done.html",
         {"page_title": gettext("아이디 찾기")},
+    )
+
+
+@login_required
+def welcome_view(request):
+    """회원가입 직후 1회 노출되는 환영 화면.
+
+    Why: 가입 직후 빈 대시보드로 떨어지면 첫날 이탈률이 높음.
+    가치 제안 + 단일 CTA로 첫 행동(시간 기록)을 유도.
+    """
+    return render(
+        request,
+        "users/welcome.html",
+        {"page_title": gettext("환영합니다")},
     )
 
 

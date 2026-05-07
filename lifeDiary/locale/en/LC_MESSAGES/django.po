@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:47+0900\n"
+"POT-Creation-Date: 2026-05-07 17:23+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -957,19 +957,49 @@ msgstr "Created at"
 msgid "등록된 특이사항이 없습니다."
 msgstr "No notes yet."
 
+msgid "환영합니다"
+msgstr "Welcome"
+
+#, python-format
+msgid "%(username)s님, 환영합니다!"
+msgstr "Welcome, %(username)s!"
+
+msgid ""
+"라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
+"도록 돕습니다."
+msgstr ""
+"Life Diary helps you record how you spend each day, spot patterns, and design "
+"a better tomorrow."
+
+msgid "시간 블록 기록"
+msgstr "Track time blocks"
+
+msgid "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
+msgstr "Divide your day into 30-minute slots and check off what you did."
+
+msgid "태그로 분류"
+msgstr "Organize with tags"
+
+msgid "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
+msgstr "Group time by your own tags — study, workout, rest — to see patterns."
+
+msgid "통계와 목표"
+msgstr "Stats and goals"
+
+msgid "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
+msgstr "Check weekly and monthly stats and your goal achievement at a glance."
+
+msgid "오늘 첫 기록 시작하기"
+msgstr "Start your first entry"
+
+msgid "나중에 하기"
+msgstr "Maybe later"
+
 msgid "접근할 수 없는 태그입니다."
 msgstr "You cannot access this tag."
 
 msgid "성공적으로 로그아웃되었습니다."
 msgstr "Successfully logged out."
-
-#, python-format
-msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
-msgstr "Welcome, %(username)s! Your account has been created."
-
-#, python-format
-msgid "%(username)s님, 환영합니다!"
-msgstr "Welcome, %(username)s!"
 
 msgid "페이지를 불러오는 중입니다..."
 msgstr "Loading the page..."
@@ -1061,3 +1091,7 @@ msgstr "The small notes you leave now become the rhythm of your life."
 
 msgid "정말로 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete?"
+
+#, python-format
+#~ msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
+#~ msgstr "Welcome, %(username)s! Your account has been created."

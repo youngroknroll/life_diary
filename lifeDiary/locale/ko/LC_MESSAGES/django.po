@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:47+0900\n"
+"POT-Creation-Date: 2026-05-07 17:23+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -932,18 +932,46 @@ msgstr ""
 msgid "등록된 특이사항이 없습니다."
 msgstr ""
 
-msgid "접근할 수 없는 태그입니다."
-msgstr ""
-
-msgid "성공적으로 로그아웃되었습니다."
-msgstr ""
-
-#, python-format
-msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
+msgid "환영합니다"
 msgstr ""
 
 #, python-format
 msgid "%(username)s님, 환영합니다!"
+msgstr ""
+
+msgid ""
+"라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
+"도록 돕습니다."
+msgstr ""
+
+msgid "시간 블록 기록"
+msgstr ""
+
+msgid "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
+msgstr ""
+
+msgid "태그로 분류"
+msgstr ""
+
+msgid "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
+msgstr ""
+
+msgid "통계와 목표"
+msgstr ""
+
+msgid "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
+msgstr ""
+
+msgid "오늘 첫 기록 시작하기"
+msgstr ""
+
+msgid "나중에 하기"
+msgstr ""
+
+msgid "접근할 수 없는 태그입니다."
+msgstr ""
+
+msgid "성공적으로 로그아웃되었습니다."
 msgstr ""
 
 msgid "페이지를 불러오는 중입니다..."
