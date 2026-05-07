@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-02 00:03+0900\n"
+"POT-Creation-Date: 2026-05-07 16:17+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -912,12 +912,12 @@ msgid "아이디/비밀번호 찾기에 사용됩니다."
 msgstr "Used for username/password recovery."
 
 #: apps/users/forms.py:27 apps/users/templates/users/signup.html:29
-msgid "10자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
-msgstr "10 characters or fewer. Letters, digits and @/./+/-/_ only."
+msgid "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgstr "30 characters or fewer. Letters, digits and @/./+/-/_ only."
 
 #: apps/users/forms.py:33
-msgid "사용자명은 10자 이하여야 합니다."
-msgstr "Username must be 10 characters or fewer."
+msgid "사용자명은 30자 이하여야 합니다."
+msgstr "Username must be 30 characters or fewer."
 
 #: apps/users/forms.py:39
 msgid "이미 사용 중인 이메일입니다."

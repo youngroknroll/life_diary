@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 19:27+0900\n"
+"POT-Creation-Date: 2026-05-07 16:17+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgstr ""
 msgid "0분"
 msgstr ""
 
-#: apps/dashboard/models.py:19 apps/tags/models.py:55
+#: apps/dashboard/models.py:19 apps/tags/models.py:80
 msgid "사용자"
 msgstr ""
 
@@ -82,7 +82,7 @@ msgstr ""
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr ""
 
-#: apps/dashboard/models.py:27 apps/tags/models.py:83 apps/users/forms.py:63
+#: apps/dashboard/models.py:27 apps/tags/models.py:108 apps/users/forms.py:63
 #: apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr ""
@@ -95,11 +95,11 @@ msgstr ""
 msgid "최대 500자까지 입력 가능"
 msgstr ""
 
-#: apps/dashboard/models.py:35 apps/tags/models.py:28 apps/tags/models.py:79
+#: apps/dashboard/models.py:35 apps/tags/models.py:45 apps/tags/models.py:104
 msgid "생성일"
 msgstr ""
 
-#: apps/dashboard/models.py:36 apps/tags/models.py:80
+#: apps/dashboard/models.py:36 apps/tags/models.py:105
 msgid "수정일"
 msgstr ""
 
@@ -256,7 +256,7 @@ msgstr ""
 msgid "태그 카테고리 설명"
 msgstr ""
 
-#: apps/dashboard/templates/dashboard/index.html:219 apps/tags/models.py:76
+#: apps/dashboard/templates/dashboard/index.html:219 apps/tags/models.py:101
 msgid "기본 태그"
 msgstr ""
 
@@ -679,73 +679,113 @@ msgstr ""
 msgid "기본 태그는 관리자만 생성할 수 있습니다."
 msgstr ""
 
+#: apps/tags/models.py:12
+msgid "수동적 소비시간"
+msgstr ""
+
+#: apps/tags/models.py:13
+msgid "주도적 사용시간"
+msgstr ""
+
 #: apps/tags/models.py:14
-msgid "카테고리명"
+msgid "투자시간"
 msgstr ""
 
 #: apps/tags/models.py:15
-msgid "슬러그"
+msgid "기초 생활시간"
 msgstr ""
 
 #: apps/tags/models.py:16
+msgid "수면시간"
+msgstr ""
+
+#: apps/tags/models.py:17
+msgid "비계획적이고 예정되지 않은 방식으로 소비되어버린 시간"
+msgstr ""
+
+#: apps/tags/models.py:18
+msgid "계획과 통제 안에서 내가 주도적으로 사용한 시간"
+msgstr ""
+
+#: apps/tags/models.py:19
+msgid "성과를 얻길 바라는 목표 영역에 대한 투자시간"
+msgstr ""
+
+#: apps/tags/models.py:20
+msgid "일정과 일정 사이의 기초적인 준비시간"
+msgstr ""
+
+#: apps/tags/models.py:21
+msgid "잠, 낮잠"
+msgstr ""
+
+#: apps/tags/models.py:31
+msgid "카테고리명"
+msgstr ""
+
+#: apps/tags/models.py:32
+msgid "슬러그"
+msgstr ""
+
+#: apps/tags/models.py:33
 msgid "설명"
 msgstr ""
 
-#: apps/tags/models.py:22 apps/tags/models.py:68
+#: apps/tags/models.py:39 apps/tags/models.py:93
 msgid "올바른 HEX 색상 코드를 입력하세요 (예: #FF5733)"
 msgstr ""
 
-#: apps/tags/models.py:25 apps/tags/models.py:71
+#: apps/tags/models.py:42 apps/tags/models.py:96
 #: apps/tags/templates/tags/_tag_modal.html:28
 msgid "색상"
 msgstr ""
 
-#: apps/tags/models.py:27
+#: apps/tags/models.py:44
 msgid "표시 순서"
 msgstr ""
 
-#: apps/tags/models.py:31 apps/tags/models.py:50
+#: apps/tags/models.py:48 apps/tags/models.py:75
 #: apps/tags/templates/tags/_tag_modal.html:18
 msgid "카테고리"
 msgstr ""
 
-#: apps/tags/models.py:32
+#: apps/tags/models.py:49
 msgid "카테고리들"
 msgstr ""
 
-#: apps/tags/models.py:58
+#: apps/tags/models.py:83
 msgid "null이면 기본 태그 (모든 사용자 공용)"
 msgstr ""
 
-#: apps/tags/models.py:61 apps/tags/templates/tags/_tag_modal.html:24
+#: apps/tags/models.py:86 apps/tags/templates/tags/_tag_modal.html:24
 msgid "태그명"
 msgstr ""
 
-#: apps/tags/models.py:61
+#: apps/tags/models.py:86
 msgid "최대 50자까지 입력 가능"
 msgstr ""
 
-#: apps/tags/models.py:72
+#: apps/tags/models.py:97
 msgid "HEX 색상 코드 (예: #FF5733)"
 msgstr ""
 
-#: apps/tags/models.py:77
+#: apps/tags/models.py:102
 msgid "관리자가 등록한 모든 사용자 공용 태그"
 msgstr ""
 
-#: apps/tags/models.py:84
+#: apps/tags/models.py:109
 msgid "태그들"
 msgstr ""
 
-#: apps/tags/models.py:89 apps/tags/use_cases.py:59 apps/tags/use_cases.py:76
+#: apps/tags/models.py:114 apps/tags/use_cases.py:59 apps/tags/use_cases.py:76
 msgid "이미 같은 이름의 태그가 존재합니다."
 msgstr ""
 
-#: apps/tags/models.py:95
+#: apps/tags/models.py:120
 msgid "이미 같은 이름의 기본 태그가 존재합니다."
 msgstr ""
 
-#: apps/tags/models.py:120
+#: apps/tags/models.py:145
 msgid "태그명은 공백일 수 없습니다."
 msgstr ""
 
@@ -869,11 +909,11 @@ msgid "아이디/비밀번호 찾기에 사용됩니다."
 msgstr ""
 
 #: apps/users/forms.py:27 apps/users/templates/users/signup.html:29
-msgid "10자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgid "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
 msgstr ""
 
 #: apps/users/forms.py:33
-msgid "사용자명은 10자 이하여야 합니다."
+msgid "사용자명은 30자 이하여야 합니다."
 msgstr ""
 
 #: apps/users/forms.py:39
