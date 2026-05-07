@@ -7,7 +7,10 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import gettext
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_http_methods, require_GET
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
+import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -166,6 +169,52 @@ def username_recovery_done_view(request):
         "users/recovery/username_recovery_done.html",
         {"page_title": gettext("아이디 찾기")},
     )
+
+
+_USERNAME_RE = re.compile(r"^[\w.@+\-]+$")
+_USERNAME_MAX_LENGTH = 30
+
+
+@require_GET
+def check_username_view(request):
+    """signup blur 시 username 중복/형식 비동기 검증."""
+    username = (request.GET.get("username") or "").strip()
+    if not username:
+        return JsonResponse({"available": False, "message": gettext("사용자명을 입력해주세요.")})
+    if len(username) > _USERNAME_MAX_LENGTH:
+        return JsonResponse(
+            {"available": False, "message": gettext("사용자명은 30자 이하여야 합니다.")}
+        )
+    if not _USERNAME_RE.match(username):
+        return JsonResponse(
+            {"available": False, "message": gettext("영문자, 숫자, @/./+/-/_ 만 가능합니다.")}
+        )
+    User = get_user_model()
+    if User.objects.filter(username__iexact=username).exists():
+        return JsonResponse(
+            {"available": False, "message": gettext("이미 사용 중인 사용자명입니다.")}
+        )
+    return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
+
+
+@require_GET
+def check_email_view(request):
+    """signup blur 시 email 형식/중복 비동기 검증."""
+    email = (request.GET.get("email") or "").strip()
+    if not email:
+        return JsonResponse({"available": False, "message": gettext("이메일을 입력해주세요.")})
+    try:
+        validate_email(email)
+    except DjangoValidationError:
+        return JsonResponse(
+            {"available": False, "message": gettext("올바른 이메일 형식이 아닙니다.")}
+        )
+    User = get_user_model()
+    if User.objects.filter(email__iexact=email).exists():
+        return JsonResponse(
+            {"available": False, "message": gettext("이미 사용 중인 이메일입니다.")}
+        )
+    return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
 
 
 @login_required

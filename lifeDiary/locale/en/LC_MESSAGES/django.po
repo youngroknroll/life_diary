@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 17:23+0900\n"
+"POT-Creation-Date: 2026-05-07 18:37+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -968,8 +968,8 @@ msgid ""
 "라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
 "도록 돕습니다."
 msgstr ""
-"Life Diary helps you record how you spend each day, spot patterns, and design "
-"a better tomorrow."
+"Life Diary helps you record how you spend each day, spot patterns, and "
+"design a better tomorrow."
 
 msgid "시간 블록 기록"
 msgstr "Track time blocks"
@@ -1000,6 +1000,24 @@ msgstr "You cannot access this tag."
 
 msgid "성공적으로 로그아웃되었습니다."
 msgstr "Successfully logged out."
+
+msgid "사용자명을 입력해주세요."
+msgstr "Please enter a username."
+
+msgid "영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgstr "Only letters, digits and @/./+/-/_ are allowed."
+
+msgid "이미 사용 중인 사용자명입니다."
+msgstr "This username is already taken."
+
+msgid "사용 가능합니다."
+msgstr "Available."
+
+msgid "이메일을 입력해주세요."
+msgstr "Please enter an email."
+
+msgid "올바른 이메일 형식이 아닙니다."
+msgstr "Invalid email format."
 
 msgid "페이지를 불러오는 중입니다..."
 msgstr "Loading the page..."

@@ -20,7 +20,10 @@
             </h3>
         </div>
         <div class="card-body">
-                <form id="signupForm" method="post">
+                <form id="signupForm" method="post"
+                      data-check-username-url="{% url 'users:check_username' %}"
+                      data-check-email-url="{% url 'users:check_email' %}"
+                      novalidate>
                     {% csrf_token %}
 
                     <div class="mb-3">
@@ -113,4 +116,5 @@
 {% load static %}
 <script src="{% static 'users/js/auth-enhance.js' %}" defer></script>
 <script src="{% static 'users/js/password-strength.js' %}" defer></script>
+<script src="{% static 'users/js/signup-validate.js' %}" defer></script>
 {% endblock %}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 17:23+0900\n"
+"POT-Creation-Date: 2026-05-07 18:37+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -972,6 +972,24 @@ msgid "접근할 수 없는 태그입니다."
 msgstr ""
 
 msgid "성공적으로 로그아웃되었습니다."
+msgstr ""
+
+msgid "사용자명을 입력해주세요."
+msgstr ""
+
+msgid "영문자, 숫자, @/./+/-/_ 만 가능합니다."
+msgstr ""
+
+msgid "이미 사용 중인 사용자명입니다."
+msgstr ""
+
+msgid "사용 가능합니다."
+msgstr ""
+
+msgid "이메일을 입력해주세요."
+msgstr ""
+
+msgid "올바른 이메일 형식이 아닙니다."
 msgstr ""
 
 msgid "페이지를 불러오는 중입니다..."

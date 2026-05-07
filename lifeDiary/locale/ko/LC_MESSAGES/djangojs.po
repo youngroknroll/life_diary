@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:08+0900\n"
+"POT-Creation-Date: 2026-05-07 18:37+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,240 +18,469 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/core/static/core/js/tag.js:35
 msgid "카테고리를 선택하세요"
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:61
 msgid "태그 수정"
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:72
 msgid "새 태그 생성"
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:97
 msgid "태그명을 입력해주세요."
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:102
 msgid "카테고리를 선택해주세요."
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:124
 #, javascript-format
 msgid "태그 저장 실패: %s"
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:130
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:145
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr ""
 
-#: apps/core/static/core/js/utils.js:99
 msgid "정말 삭제하시겠습니까?"
 msgstr ""
 
-#: apps/core/static/core/js/utils.js:109
 msgid "처리 중..."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:244
 msgid "그리드에서 시간을 선택하세요"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:260
 msgid "빈 슬롯"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:275
 msgid "알 수 없음"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:279
 msgid "시간:"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:280
 msgid "상태:"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:281
-#: apps/dashboard/static/dashboard/js/dashboard.js:304
 msgid "삭제"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:296
 #, javascript-format
 msgid "%s개 슬롯"
 msgid_plural "%s개 슬롯"
 msgstr[0] ""
 msgstr[1] ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:300
 msgid "%(h)s시간 %(m)s분"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:337
 msgid "슬롯을 선택해주세요."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:342
 msgid "태그를 선택해주세요."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:347
 msgid "저장 중입니다..."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:371
 #, javascript-format
 msgid "저장 실패: %s"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:378
 msgid "삭제할 슬롯을 선택해주세요."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:387
 msgid "삭제할 기록이 없습니다."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:393
 #, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[0] ""
 msgstr[1] ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:403
 msgid "삭제 중입니다..."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:424
 #, javascript-format
 msgid "삭제 실패: %s"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:437
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:451
 msgid "기본 태그"
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:458
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 msgstr ""
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:501
 msgid "생성된 태그가 없습니다."
 msgstr ""
 
-#: apps/stats/static/stats/js/stats.js:30
 msgid "데이터가 없습니다"
 msgstr ""
 
-#: apps/stats/static/stats/js/stats.js:124
 msgid "%(label)s: %(h)sh (%(p)s%%)"
 msgstr "%(label)s: %(h)s시간 (%(p)s%%)"
 
-#: apps/stats/static/stats/js/stats.js:143
 #, javascript-format
 msgid "%s:00"
 msgstr "%s:00"
 
-#: apps/stats/static/stats/js/stats.js:177
 #, javascript-format
 msgid "%s min"
 msgstr "%s분"
 
-#: apps/stats/static/stats/js/stats.js:188
 msgid "%(label)s: %(m)s min"
 msgstr "%(label)s: %(m)s분"
 
-#: apps/stats/static/stats/js/stats.js:237
 msgid "Active hours"
 msgstr "활동 시간"
 
-#: apps/stats/static/stats/js/stats.js:283
 msgid "Date"
 msgstr "날짜"
 
-#: apps/stats/static/stats/js/stats.js:287
 msgid "Hours"
 msgstr "시간"
 
-#: apps/stats/static/stats/js/stats.js:290
 #, javascript-format
 msgid "%sh"
 msgstr "%s시간"
 
-#: apps/stats/static/stats/js/stats.js:301
 msgid "%(label)s: %(h)sh"
 msgstr "%(label)s: %(h)s시간"
 
-#: apps/stats/static/stats/js/stats.js:326
 msgid "Total hours"
 msgstr "총 시간"
 
-#: apps/users/static/users/js/auth-enhance.js:10
-#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 표시"
 msgstr ""
 
-#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 숨기기"
 msgstr ""
 
-#: apps/users/static/users/js/auth-enhance.js:34
 msgid "Caps Lock이 켜져 있습니다"
 msgstr ""
 
-#: apps/users/static/users/js/goals.js:19
 #, javascript-format
 msgid "최대 %s시간까지 입력 가능"
 msgstr ""
 
-#: apps/users/static/users/js/goals.js:63
 msgid "저장중..."
 msgstr ""
 
-#: apps/users/static/users/js/goals.js:83
-#: apps/users/static/users/js/goals.js:103
 msgid "저장완료!"
 msgstr ""
 
-#: apps/users/static/users/js/goals.js:91
 msgid "저장 실패"
 msgstr ""
 
-#: apps/users/static/users/js/goals.js:93
 msgid "저장 실패 - 네트워크 오류"
 msgstr ""
 
-#: apps/users/static/users/js/password-strength.js:7
 msgid "너무 짧음"
 msgstr ""
 
-#: apps/users/static/users/js/password-strength.js:8
 msgid "약함"
 msgstr ""
 
-#: apps/users/static/users/js/password-strength.js:9
 msgid "보통"
 msgstr ""
 
-#: apps/users/static/users/js/password-strength.js:10
 msgid "좋음"
 msgstr ""
 
-#: apps/users/static/users/js/password-strength.js:11
 msgid "강함"
+msgstr ""
+
+msgid "비밀번호가 일치합니다."
+msgstr ""
+
+msgid "비밀번호가 일치하지 않습니다."
+msgstr ""
+
+#, javascript-format
+msgid "Available %s"
+msgstr ""
+
+#, javascript-format
+msgid ""
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
+msgstr ""
+
+#, javascript-format
+msgid "Type into this box to filter down the list of available %s."
+msgstr ""
+
+msgid "Filter"
+msgstr ""
+
+#, javascript-format
+msgid "Choose all %s"
+msgstr ""
+
+#, javascript-format
+msgid "Choose selected %s"
+msgstr ""
+
+#, javascript-format
+msgid "Remove selected %s"
+msgstr ""
+
+#, javascript-format
+msgid "Chosen %s"
+msgstr ""
+
+#, javascript-format
+msgid ""
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
+msgstr ""
+
+#, javascript-format
+msgid "Type into this box to filter down the list of selected %s."
+msgstr ""
+
+msgid "(click to clear)"
+msgstr ""
+
+#, javascript-format
+msgid "Remove all %s"
+msgstr ""
+
+#, javascript-format
+msgid "%s selected option not visible"
+msgid_plural "%s selected options not visible"
+msgstr[0] ""
+
+msgid "%(sel)s of %(cnt)s selected"
+msgid_plural "%(sel)s of %(cnt)s selected"
+msgstr[0] ""
+
+msgid ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
+msgstr ""
+
+msgid ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
+msgstr ""
+
+msgid ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
+msgstr ""
+
+msgid "Now"
+msgstr ""
+
+msgid "Midnight"
+msgstr ""
+
+msgid "6 a.m."
+msgstr ""
+
+msgid "Noon"
+msgstr ""
+
+msgid "6 p.m."
+msgstr ""
+
+#, javascript-format
+msgid "Note: You are %s hour ahead of server time."
+msgid_plural "Note: You are %s hours ahead of server time."
+msgstr[0] ""
+
+#, javascript-format
+msgid "Note: You are %s hour behind server time."
+msgid_plural "Note: You are %s hours behind server time."
+msgstr[0] ""
+
+msgid "Choose a Time"
+msgstr ""
+
+msgid "Choose a time"
+msgstr ""
+
+msgid "Cancel"
+msgstr ""
+
+msgid "Today"
+msgstr ""
+
+msgid "Choose a Date"
+msgstr ""
+
+msgid "Yesterday"
+msgstr ""
+
+msgid "Tomorrow"
+msgstr ""
+
+msgid "January"
+msgstr ""
+
+msgid "February"
+msgstr ""
+
+msgid "March"
+msgstr ""
+
+msgid "April"
+msgstr ""
+
+msgid "May"
+msgstr ""
+
+msgid "June"
+msgstr ""
+
+msgid "July"
+msgstr ""
+
+msgid "August"
+msgstr ""
+
+msgid "September"
+msgstr ""
+
+msgid "October"
+msgstr ""
+
+msgid "November"
+msgstr ""
+
+msgid "December"
+msgstr ""
+
+msgctxt "abbrev. month January"
+msgid "Jan"
+msgstr ""
+
+msgctxt "abbrev. month February"
+msgid "Feb"
+msgstr ""
+
+msgctxt "abbrev. month March"
+msgid "Mar"
+msgstr ""
+
+msgctxt "abbrev. month April"
+msgid "Apr"
+msgstr ""
+
+msgctxt "abbrev. month May"
+msgid "May"
+msgstr ""
+
+msgctxt "abbrev. month June"
+msgid "Jun"
+msgstr ""
+
+msgctxt "abbrev. month July"
+msgid "Jul"
+msgstr ""
+
+msgctxt "abbrev. month August"
+msgid "Aug"
+msgstr ""
+
+msgctxt "abbrev. month September"
+msgid "Sep"
+msgstr ""
+
+msgctxt "abbrev. month October"
+msgid "Oct"
+msgstr ""
+
+msgctxt "abbrev. month November"
+msgid "Nov"
+msgstr ""
+
+msgctxt "abbrev. month December"
+msgid "Dec"
+msgstr ""
+
+msgid "Sunday"
+msgstr ""
+
+msgid "Monday"
+msgstr ""
+
+msgid "Tuesday"
+msgstr ""
+
+msgid "Wednesday"
+msgstr ""
+
+msgid "Thursday"
+msgstr ""
+
+msgid "Friday"
+msgstr ""
+
+msgid "Saturday"
+msgstr ""
+
+msgctxt "abbrev. day Sunday"
+msgid "Sun"
+msgstr ""
+
+msgctxt "abbrev. day Monday"
+msgid "Mon"
+msgstr ""
+
+msgctxt "abbrev. day Tuesday"
+msgid "Tue"
+msgstr ""
+
+msgctxt "abbrev. day Wednesday"
+msgid "Wed"
+msgstr ""
+
+msgctxt "abbrev. day Thursday"
+msgid "Thur"
+msgstr ""
+
+msgctxt "abbrev. day Friday"
+msgid "Fri"
+msgstr ""
+
+msgctxt "abbrev. day Saturday"
+msgid "Sat"
+msgstr ""
+
+msgctxt "one letter Sunday"
+msgid "S"
+msgstr ""
+
+msgctxt "one letter Monday"
+msgid "M"
+msgstr ""
+
+msgctxt "one letter Tuesday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Wednesday"
+msgid "W"
+msgstr ""
+
+msgctxt "one letter Thursday"
+msgid "T"
+msgstr ""
+
+msgctxt "one letter Friday"
+msgid "F"
+msgstr ""
+
+msgctxt "one letter Saturday"
+msgid "S"
 msgstr ""
