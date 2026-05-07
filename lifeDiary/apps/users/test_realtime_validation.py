@@ -5,8 +5,12 @@
 - signup.html: data 속성 + 스크립트 로드
 """
 import json
+import secrets
 import pytest
 from django.urls import reverse
+
+# Test-only password generated per run (no real credential).
+_TEST_PASSWORD = secrets.token_urlsafe(16)
 
 
 def _get_json(client, url, **params):
@@ -32,12 +36,12 @@ class TestCheckUsername:
         assert data["available"] is False
 
     def test_taken(self, client, make_user):
-        make_user(username="taken_one", password="Strong-9!pwd")
+        make_user(username="taken_one", password=_TEST_PASSWORD)
         _, data = _get_json(client, reverse("users:check_username"), username="taken_one")
         assert data["available"] is False
 
     def test_taken_case_insensitive(self, client, make_user):
-        make_user(username="MixedCase", password="Strong-9!pwd")
+        make_user(username="MixedCase", password=_TEST_PASSWORD)
         _, data = _get_json(client, reverse("users:check_username"), username="mixedcase")
         assert data["available"] is False
 
@@ -60,7 +64,7 @@ class TestCheckEmail:
         make_user(
             username="user_email_taken",
             email="taken@example.com",
-            password="Strong-9!pwd",
+            password=_TEST_PASSWORD,
         )
         _, data = _get_json(client, reverse("users:check_email"), email="taken@example.com")
         assert data["available"] is False
@@ -69,7 +73,7 @@ class TestCheckEmail:
         make_user(
             username="case_email_user",
             email="Case@Example.com",
-            password="Strong-9!pwd",
+            password=_TEST_PASSWORD,
         )
         _, data = _get_json(client, reverse("users:check_email"), email="case@example.com")
         assert data["available"] is False
