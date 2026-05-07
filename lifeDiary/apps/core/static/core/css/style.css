@@ -49,6 +49,15 @@
     --radius-md: 8px;
     --radius-lg: 15px;
 
+    /* Responsive heights — clamp(min, viewport, max).
+       모든 차트·스크롤 패널 공용. 한 곳에서만 조정. */
+    --panel-h-sm: clamp(160px, 25vh, 220px);
+    --panel-h-md: clamp(180px, 35vh, 320px);
+    --panel-h-lg: clamp(220px, 45vh, 420px);
+    --chart-cap-sm: clamp(180px, 30vh, 280px);
+    --chart-cap-md: clamp(220px, 35vh, 320px);
+    --chart-cap-lg: clamp(260px, 45vh, 420px);
+
     /* Typography */
     --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -522,28 +531,60 @@ footer {
 }
 
 /* =========================================================
-   Stats — 모바일에서 4개 탭 버튼을 한 줄에 (텍스트·마진 압축)
+   Stats — 4개 탭 버튼: 반응형 한 줄 + 명확한 클릭 영역
    ========================================================= */
-@media (max-width: 767.98px) {
-    #statsTabs.nav-tabs {
-        flex-wrap: nowrap;
-    }
-    #statsTabs .nav-item {
-        flex: 1 1 0;
-        min-width: 0;
-    }
+/* 공통: 4개 균등 분배 + 명확한 hover/active 경계 */
+#statsTabs.nav-tabs {
+    flex-wrap: nowrap;
+}
+#statsTabs .nav-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+#statsTabs .nav-link {
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+#statsTabs .nav-link:hover:not(.active) {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-border-soft);
+}
+#statsTabs .nav-link.active {
+    border-color: var(--color-border);
+    border-bottom-color: var(--color-surface);
+    font-weight: 600;
+}
+#statsTabs .nav-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+/* 태블릿(768~991px): 텍스트 크기 약간 축소 */
+@media (min-width: 768px) and (max-width: 991.98px) {
     #statsTabs .nav-link {
-        padding: 0.4rem 0.25rem;
-        font-size: 0.75rem;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        text-align: center;
+        padding: 0.5rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* 모바일(<768px): 아이콘 위·라벨 아래 2단 배치 */
+@media (max-width: 767.98px) {
+    #statsTabs .nav-link {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.7rem;
+        line-height: 1.1;
+        min-height: 44px;
     }
     #statsTabs .nav-link i {
         display: block;
-        margin: 0 0 0.15rem 0 !important;
-        font-size: 0.95rem;
+        margin: 0 0 0.2rem 0 !important;
+        font-size: 1rem;
     }
 }
 
@@ -877,31 +918,83 @@ footer {
     width: 150px;
 }
 
-/* Chart canvas 컨테이너 */
+/* =========================================================
+   Stats — 차트 / 스크롤 패널 공통 (반응형)
+   토큰: --chart-cap-{sm,md,lg}, --panel-h-{sm,md,lg}
+   ========================================================= */
+
+/* 공유 reset — :where()는 0 specificity라 override 친화적 */
+:where(.chart-container, .chart-container-lg) {
+    width: 100%;
+    height: auto;
+}
+:where(.tag-stats-list, .tag-analysis-scroll, #tags .table-responsive) {
+    overflow-y: auto;
+}
+
+/* 차트 변형 */
 .chart-container {
-    height: 300px;
+    aspect-ratio: 4 / 3;
+    max-height: var(--chart-cap-md);
 }
-
 .chart-container-lg {
-    height: 400px;
+    aspect-ratio: 16 / 9;
+    max-height: var(--chart-cap-lg);
 }
 
-/* 태그 통계 스크롤 목록 */
+/* 스크롤 패널 변형 */
 .tag-stats-list {
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: var(--panel-h-sm);
 }
 
-/* 태그 분석 스크롤 패널 */
-.tag-analysis-scroll {
-    height: 300px;
-    overflow-y: auto;
+/* #tags 탭 — 차트와 Top tags(.tag-analysis-scroll)를 같은 캡으로 통일.
+   .tag-analysis-scroll은 현재 #tags 내부에서만 쓰이므로 base 규칙 없이
+   여기서 직접 정의. 다른 곳에서 재사용 시 base로 승격 가능. */
+#tags .chart-container,
+#tags .tag-analysis-scroll {
+    height: auto;
+    max-height: var(--chart-cap-sm);
 }
 
-/* Life Feedback 카드 */
+/* Top tags 항목 압축 + 구분선 */
+#tags .tag-analysis-scroll > div {
+    padding: 0.4rem 0.5rem !important;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid var(--color-border-soft);
+}
+#tags .tag-analysis-scroll > div:last-child {
+    border-bottom: none;
+}
+#tags .tag-analysis-scroll small {
+    font-size: 0.7rem;
+}
+
+/* 상세 분석 테이블 — 컴팩트 셀 + sticky 헤더 */
+#tags .table-responsive {
+    max-height: var(--panel-h-lg);
+}
+#tags .table-responsive table {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+#tags .table-responsive th,
+#tags .table-responsive td {
+    padding: 0.4rem 0.6rem;
+    vertical-align: middle;
+}
+#tags .table-responsive thead th {
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 1;
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* Life Feedback 카드 — 좁은 화면에서 overflow 방지 */
 .life-feedback-card {
-    min-width: 350px;
-    max-width: 400px;
+    min-width: 0;
+    width: 100%;
+    max-width: min(400px, 100%);
 }
 
 /* 목표 안내 패널 (mypage) */
