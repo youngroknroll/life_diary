@@ -89,6 +89,9 @@ def signup_view(request):
     )
 
 
+REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 30  # 30 days
+
+
 def login_view(request):
     """
     사용자 로그인
@@ -98,6 +101,11 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            # Remember me: 체크 시 30일 유지, 미체크 시 브라우저 종료 시 만료
+            if request.POST.get("remember_me"):
+                request.session.set_expiry(REMEMBER_ME_DURATION_SECONDS)
+            else:
+                request.session.set_expiry(0)
             messages.success(
                 request,
                 gettext("%(username)s님, 환영합니다!") % {"username": user.username},

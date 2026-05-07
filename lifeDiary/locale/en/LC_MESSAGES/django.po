@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 16:17+0900\n"
+"POT-Creation-Date: 2026-05-07 16:22+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -997,9 +997,9 @@ msgstr "%(h)sh"
 
 #: apps/users/templates/users/login.html:4
 #: apps/users/templates/users/login.html:13
-#: apps/users/templates/users/login.html:49
+#: apps/users/templates/users/login.html:56
 #: apps/users/templates/users/password/password_reset_complete.html:14
-#: apps/users/templates/users/signup.html:97 apps/users/views.py:113
+#: apps/users/templates/users/signup.html:97 apps/users/views.py:121
 #: templates/base.html:145
 msgid "로그인"
 msgstr "Log in"
@@ -1014,25 +1014,29 @@ msgstr "Username"
 msgid "비밀번호"
 msgstr "Password"
 
-#: apps/users/templates/users/login.html:58
+#: apps/users/templates/users/login.html:49
+msgid "로그인 상태 유지"
+msgstr "Keep me signed in"
+
+#: apps/users/templates/users/login.html:65
 #: apps/users/templates/users/recovery/username_recovery_done.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:11
-#: apps/users/views.py:156 apps/users/views.py:164
+#: apps/users/views.py:164 apps/users/views.py:172
 msgid "아이디 찾기"
 msgstr "Find username"
 
-#: apps/users/templates/users/login.html:62
+#: apps/users/templates/users/login.html:69
 #: apps/users/templates/users/password/password_reset_form.html:4
 #: apps/users/templates/users/password/password_reset_form.html:13
 msgid "비밀번호 찾기"
 msgstr "Reset password"
 
-#: apps/users/templates/users/login.html:66
+#: apps/users/templates/users/login.html:73
 msgid "계정이 없으신가요?"
 msgstr "Don't have an account?"
 
-#: apps/users/templates/users/login.html:68
+#: apps/users/templates/users/login.html:75
 #: apps/users/templates/users/signup.html:4
 #: apps/users/templates/users/signup.html:13
 #: apps/users/templates/users/signup.html:87 apps/users/views.py:88
@@ -1334,7 +1338,7 @@ msgstr "Successfully logged out."
 msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
 msgstr "Welcome, %(username)s! Your account has been created."
 
-#: apps/users/views.py:103
+#: apps/users/views.py:111
 #, python-format
 msgid "%(username)s님, 환영합니다!"
 msgstr "Welcome, %(username)s!"

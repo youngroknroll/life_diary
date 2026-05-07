@@ -43,6 +43,13 @@
                         </div>
                     {% endif %}
 
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me" value="1">
+                        <label class="form-check-label" for="remember_me">
+                            {% trans "로그인 상태 유지" %}
+                        </label>
+                    </div>
+
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="fas fa-sign-in-alt me-1"></i>
