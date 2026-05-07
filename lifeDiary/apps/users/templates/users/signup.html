@@ -103,3 +103,8 @@
     </div>
 </div>
 {% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'users/js/auth-enhance.js' %}" defer></script>
+{% endblock %}

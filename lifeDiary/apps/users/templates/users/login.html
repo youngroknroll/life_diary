@@ -76,6 +76,8 @@
 {% endblock %}
 
 {% block extra_js %}
+{% load static %}
+<script src="{% static 'users/js/auth-enhance.js' %}" defer></script>
 <script>
 document.querySelector('.auth-card form').addEventListener('submit', function () {
     showOverlay(gettext('로그인 중입니다...'), 'fa-sign-in-alt');

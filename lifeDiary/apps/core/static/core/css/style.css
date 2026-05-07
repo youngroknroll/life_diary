@@ -290,6 +290,45 @@ footer {
     color: var(--color-text-muted);
 }
 
+/* Password field with show/hide toggle */
+.auth-card .password-field {
+    position: relative;
+}
+
+.auth-card .password-field input {
+    padding-right: 44px;
+}
+
+.auth-card .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    padding: 6px 10px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm, 6px);
+    line-height: 1;
+}
+
+.auth-card .password-toggle:hover,
+.auth-card .password-toggle:focus-visible {
+    color: var(--color-primary);
+    background: rgba(47, 125, 79, 0.08);
+    outline: none;
+}
+
+.auth-card .caps-lock-warning {
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    color: var(--color-warning, #d97706);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 /* =========================================================
    Loading Overlay (plain div — body 스크롤 락 없음)
    ========================================================= */
