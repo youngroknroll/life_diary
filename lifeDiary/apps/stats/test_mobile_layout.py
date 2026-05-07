@@ -1,36 +1,39 @@
 """통계 페이지 모바일 레이아웃 회귀 테스트.
 
-데스크톱은 nav-tabs 그대로, 모바일에서는 4개 섹션이 모두 보이도록
-CSS-only 변경. 템플릿 차원에서는 4개의 .mobile-section-title 헤더가
-각 .tab-pane 안에 존재하는지 확인.
+탭 동작은 그대로 유지(클릭 시 pane 전환). 모바일에서는 4개 탭 버튼이
+세로로 wrap되지 않고 한 줄에 압축 표시되도록 CSS만 조정.
+템플릿 차원에서는 4개 nav-link가 동일 ul 안에 그대로 있는지 확인.
 """
+import re
 import pytest
 from django.urls import reverse
 
 
 @pytest.mark.django_db
-class TestStatsMobileLayout:
-    def test_mobile_section_titles_present(self, auth_client):
+class TestStatsTabsStructure:
+    def test_nav_tabs_present(self, auth_client):
         response = auth_client.get(reverse("stats:index"))
         assert response.status_code == 200
         h = response.content.decode()
-        # 4개 섹션마다 한 번씩 모바일 헤더 노드
-        assert h.count("mobile-section-title") == 4
-
-    def test_each_tab_pane_has_mobile_header(self, auth_client):
-        response = auth_client.get(reverse("stats:index"))
-        h = response.content.decode()
-        # 각 .tab-pane 안에 mobile-section-title이 있는지 (id 직후 헤더)
-        for pane_id in ("daily", "weekly", "monthly", "tags"):
-            marker = f'id="{pane_id}"'
-            idx = h.find(marker)
-            assert idx >= 0, f"pane {pane_id} not found"
-            # 다음 1500자 안에 mobile-section-title 등장
-            assert "mobile-section-title" in h[idx:idx + 1500]
-
-    def test_nav_tabs_still_present_for_desktop(self, auth_client):
-        response = auth_client.get(reverse("stats:index"))
-        h = response.content.decode()
-        # 데스크톱용 탭 바는 그대로 유지
         assert 'id="statsTabs"' in h
         assert 'data-bs-toggle="tab"' in h
+
+    def test_four_tab_buttons_present(self, auth_client):
+        response = auth_client.get(reverse("stats:index"))
+        h = response.content.decode()
+        for target in ("#daily", "#weekly", "#monthly", "#tags"):
+            assert f'data-bs-target="{target}"' in h, f"{target} 탭 버튼 누락"
+
+    def test_four_tab_panes_present(self, auth_client):
+        response = auth_client.get(reverse("stats:index"))
+        h = response.content.decode()
+        for pane_id in ("daily", "weekly", "monthly", "tags"):
+            assert f'id="{pane_id}"' in h, f"pane {pane_id} 누락"
+
+    def test_only_daily_active_by_default(self, auth_client):
+        response = auth_client.get(reverse("stats:index"))
+        h = response.content.decode()
+        # 첫 번째 pane만 active+show
+        assert 'id="daily" role="tabpanel"' in h
+        m = re.search(r'class="([^"]+)" id="daily"', h)
+        assert m and "show active" in m.group(1)

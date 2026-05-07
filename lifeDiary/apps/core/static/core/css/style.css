@@ -502,32 +502,48 @@ footer {
 }
 
 /* =========================================================
-   Stats — 모바일에서 4개 탭을 일렬(스크롤) 표시
+   Goal accordion — 일/주/월 목표 진행 토글
+   ========================================================= */
+.goal-accordion .accordion-button {
+    font-weight: 600;
+}
+
+.goal-accordion .accordion-button .badge {
+    font-size: 0.75rem;
+}
+
+.goal-accordion .goal-empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+}
+
+/* =========================================================
+   Stats — 모바일에서 4개 탭 버튼을 한 줄에 (텍스트·마진 압축)
    ========================================================= */
 @media (max-width: 767.98px) {
-    /* 탭 바 자체와 그 부모 card-header를 함께 숨겨 빈 막대 잔상 제거 */
-    #statsTabs,
-    .card-header:has(> #statsTabs) {
-        display: none;
+    #statsTabs.nav-tabs {
+        flex-wrap: nowrap;
     }
-    #statsTabContent .tab-pane {
-        display: block !important;
-        opacity: 1 !important;
-        visibility: visible !important;
+    #statsTabs .nav-item {
+        flex: 1 1 0;
+        min-width: 0;
     }
-    #statsTabContent .tab-pane + .tab-pane {
-        margin-top: 2rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid var(--color-border);
+    #statsTabs .nav-link {
+        padding: 0.4rem 0.25rem;
+        font-size: 0.75rem;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        text-align: center;
     }
-    .mobile-section-title {
-        display: flex !important;
-        align-items: center;
-        gap: 0.5rem;
-        font-size: 1.05rem;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        color: var(--color-primary);
+    #statsTabs .nav-link i {
+        display: block;
+        margin: 0 0 0.15rem 0 !important;
+        font-size: 0.95rem;
     }
 }
 
