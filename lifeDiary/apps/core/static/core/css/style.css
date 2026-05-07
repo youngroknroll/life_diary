@@ -700,6 +700,19 @@ footer {
     box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
 }
 
+/* signup 실시간 검증: password 인풋은 토글 버튼과 시각 충돌 방지를 위해
+   Bootstrap is-valid/is-invalid background 아이콘 숨김. 색 테두리는 유지. */
+.auth-card .password-field input.is-valid,
+.auth-card .password-field input.is-invalid {
+    background-image: none;
+    padding-right: 44px;
+}
+
+/* 실시간 피드백이 표시되면 같은 행의 정적 form-text 도움말 숨김 (시각 정리) */
+.mb-3:has(.realtime-feedback.d-block) > .form-text {
+    display: none;
+}
+
 /* Auth split: dark theme */
 [data-theme="dark"] .auth-split__brand {
     background: linear-gradient(135deg, #1f5d3a 0%, #143d27 100%);
