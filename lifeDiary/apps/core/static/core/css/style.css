@@ -256,6 +256,89 @@ footer {
 }
 
 /* =========================================================
+   Auth Split — 좌측 브랜드 / 우측 폼 (login/signup)
+   ========================================================= */
+.auth-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 880px;
+    margin: 3rem auto;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-card-bg, #fff);
+}
+
+.auth-split__brand {
+    background: linear-gradient(135deg, #2f7d4f 0%, #1f5d3a 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+}
+
+.auth-split__brand-inner {
+    text-align: center;
+    max-width: 280px;
+}
+
+.auth-split__logo {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.auth-split__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.auth-split__tagline {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.auth-split .auth-card.auth-split__panel {
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.auth-split .auth-card.auth-split__panel .card-header {
+    border-radius: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .auth-split {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+    .auth-split__brand {
+        padding: 1.25rem 1.5rem;
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+    .auth-split__brand-inner {
+        text-align: left;
+        max-width: none;
+    }
+    .auth-split__logo {
+        font-size: 1.75rem;
+        margin-bottom: 0;
+    }
+    .auth-split__title {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+    }
+    .auth-split__tagline {
+        display: none;
+    }
+}
+
+/* =========================================================
    Auth Card — login/signup 공통
    ========================================================= */
 .auth-card {
@@ -487,6 +570,14 @@ footer {
     border-color: var(--color-primary);
     color: var(--color-text);
     box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
+}
+
+/* Auth split: dark theme */
+[data-theme="dark"] .auth-split {
+    background: var(--color-card-bg);
+}
+[data-theme="dark"] .auth-split__brand {
+    background: linear-gradient(135deg, #1f5d3a 0%, #143d27 100%);
 }
 
 /* Auth-card extras: dark theme overrides for password toggle, caps lock, strength meter */
