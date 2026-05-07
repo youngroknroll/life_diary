@@ -13,7 +13,7 @@
           {% trans "등록된 일간 목표가 없거나 기록이 없습니다." as daily_empty %}
           {% trans "등록된 주간 목표가 없거나 기록이 없습니다." as weekly_empty %}
           {% trans "등록된 월간 목표가 없거나 기록이 없습니다." as monthly_empty %}
-          <div class="accordion goal-accordion" id="goalAccordion">
+          <div class="row g-3">
             {% include "stats/_goal_accordion_item.html" with section_id="goalDaily" icon="fa-calendar-day" title=daily_title goals=user_goals_daily empty_msg=daily_empty expanded=False %}
             {% include "stats/_goal_accordion_item.html" with section_id="goalWeekly" icon="fa-calendar-week" title=weekly_title goals=user_goals_weekly empty_msg=weekly_empty expanded=True %}
             {% include "stats/_goal_accordion_item.html" with section_id="goalMonthly" icon="fa-calendar-alt" title=monthly_title goals=user_goals_monthly empty_msg=monthly_empty expanded=False %}

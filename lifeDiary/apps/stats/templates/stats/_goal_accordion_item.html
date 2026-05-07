@@ -1,52 +1,53 @@
 {% load i18n %}
 {% comment %}
-목표 진행 accordion 항목 (daily/weekly/monthly 공통).
+목표 진행 카드 (daily/weekly/monthly 공통).
 필요 변수: section_id, icon, title, goals, empty_msg, expanded(bool)
+3개 카드를 가로 배치(col-md-4)로 두되 각 카드는 독립적으로 토글된다.
 {% endcomment %}
-<div class="accordion-item">
-    <h2 class="accordion-header">
-        <button class="accordion-button {% if not expanded %}collapsed{% endif %}"
-                type="button" data-bs-toggle="collapse"
+<div class="col-md-4">
+    <div class="card border-primary h-100 goal-card">
+        <button type="button"
+                class="card-header goal-card__header text-start w-100 {% if not expanded %}collapsed{% endif %}"
+                data-bs-toggle="collapse"
                 data-bs-target="#{{ section_id }}"
                 aria-expanded="{% if expanded %}true{% else %}false{% endif %}"
                 aria-controls="{{ section_id }}">
             <i class="fas {{ icon }} me-2" aria-hidden="true"></i>
-            {{ title }}
+            <span class="fw-bold">{{ title }}</span>
             <span class="badge {% if goals %}bg-primary{% else %}bg-secondary{% endif %} ms-2">
                 {{ goals|length }}
             </span>
+            <i class="fas fa-chevron-down goal-card__chevron ms-auto" aria-hidden="true"></i>
         </button>
-    </h2>
-    <div id="{{ section_id }}"
-         class="accordion-collapse collapse {% if expanded %}show{% endif %}"
-         data-bs-parent="#goalAccordion">
-        <div class="accordion-body">
-            {% if goals %}
-                <ul class="list-group list-group-flush">
-                    {% for goal in goals %}
-                        <li class="list-group-item">
-                            <div class="fw-bold">{{ goal.tag.name }}</div>
-                            <div>
-                                {% trans "목표:" %} <span class="text-secondary">{{ goal.target_hours|floatformat:1 }}h</span>
-                                / {% trans "실제:" %} <span class="text-info">{{ goal.actual|floatformat:1 }}h</span>
-                            </div>
-                            <div>
-                                {% trans "달성률:" %}
-                                <span class="fw-bold">
-                                    {% if goal.percent is not None %}{{ goal.percent }}%{% else %}-{% endif %}
-                                </span>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <div class="goal-empty">
-                    <span class="text-muted">{{ empty_msg }}</span>
-                    <a href="{% url 'users:usergoal_create' %}" class="btn btn-sm btn-outline-primary ms-2">
-                        <i class="fas fa-plus me-1" aria-hidden="true"></i>{% trans "추가하기" %}
-                    </a>
-                </div>
-            {% endif %}
+        <div id="{{ section_id }}" class="collapse {% if expanded %}show{% endif %}">
+            <div class="card-body">
+                {% if goals %}
+                    <ul class="list-group list-group-flush">
+                        {% for goal in goals %}
+                            <li class="list-group-item px-0">
+                                <div class="fw-bold">{{ goal.tag.name }}</div>
+                                <div class="small">
+                                    {% trans "목표:" %} <span class="text-secondary">{{ goal.target_hours|floatformat:1 }}h</span>
+                                    / {% trans "실제:" %} <span class="text-info">{{ goal.actual|floatformat:1 }}h</span>
+                                </div>
+                                <div class="small">
+                                    {% trans "달성률:" %}
+                                    <span class="fw-bold">
+                                        {% if goal.percent is not None %}{{ goal.percent }}%{% else %}-{% endif %}
+                                    </span>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="goal-empty">
+                        <span class="text-muted small">{{ empty_msg }}</span>
+                        <a href="{% url 'users:usergoal_create' %}" class="btn btn-sm btn-outline-primary">
+                            <i class="fas fa-plus me-1" aria-hidden="true"></i>{% trans "추가하기" %}
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

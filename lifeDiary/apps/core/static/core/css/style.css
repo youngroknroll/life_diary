@@ -511,23 +511,48 @@ footer {
 }
 
 /* =========================================================
-   Goal accordion — 일/주/월 목표 진행 토글
+   Goal cards — 일/주/월 목표 진행 (3카드 가로 + 카드별 토글)
    ========================================================= */
-.goal-accordion .accordion-button {
-    font-weight: 600;
+.goal-card__header {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0.6rem 0.85rem;
+    color: inherit;
 }
 
-.goal-accordion .accordion-button .badge {
+.goal-card__header:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+.goal-card__header .badge {
     font-size: 0.75rem;
 }
 
-.goal-accordion .goal-empty {
+.goal-card__chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.goal-card__header.collapsed .goal-card__chevron {
+    transform: rotate(-90deg);
+}
+
+.goal-card .card-body {
+    padding: 0.5rem 0.85rem 0.75rem;
+}
+
+.goal-empty {
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding: 0.5rem 0;
+    padding: 0.25rem 0;
 }
 
 /* =========================================================
