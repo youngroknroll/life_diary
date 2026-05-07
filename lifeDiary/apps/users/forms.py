@@ -21,16 +21,16 @@ class SignupForm(UserCreationForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["username"].max_length = 10
-        self.fields["username"].widget.attrs["maxlength"] = 10
+        self.fields["username"].max_length = 30
+        self.fields["username"].widget.attrs["maxlength"] = 30
         self.fields["username"].help_text = _(
-            "10자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
+            "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
         )
 
     def clean_username(self):
         username = self.cleaned_data["username"]
-        if len(username) > 10:
-            raise forms.ValidationError(_("사용자명은 10자 이하여야 합니다."))
+        if len(username) > 30:
+            raise forms.ValidationError(_("사용자명은 30자 이하여야 합니다."))
         return username
 
     def clean_email(self):

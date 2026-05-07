@@ -7,73 +7,16 @@
       <div class="card shadow-sm">
         <div class="card-body">
           <h5 class="card-title mb-3">{% trans "Goal progress" %}</h5>
+          {% trans "Daily goals" as daily_title %}
+          {% trans "Weekly goals" as weekly_title %}
+          {% trans "Monthly goals" as monthly_title %}
+          {% trans "등록된 일간 목표가 없거나 기록이 없습니다." as daily_empty %}
+          {% trans "등록된 주간 목표가 없거나 기록이 없습니다." as weekly_empty %}
+          {% trans "등록된 월간 목표가 없거나 기록이 없습니다." as monthly_empty %}
           <div class="row g-3">
-            <!-- 일간 목표 달성률 카드 -->
-            <div class="col-md-4">
-              <div class="card border-primary h-100">
-                <div class="card-body">
-                  <h6 class="card-subtitle mb-2 text-dark"><i class="fas fa-calendar-day me-1"></i>{% trans "Daily goals" %}</h6>
-                  {% if user_goals_daily %}
-                    <ul class="list-group list-group-flush">
-                      {% for goal in user_goals_daily %}
-                        <li class="list-group-item">
-                          <div class="fw-bold">{{ goal.tag.name }}</div>
-                          <div>{% trans "목표:" %} <span class="text-secondary">{{ goal.target_hours|floatformat:1 }}h</span>
-                          / {% trans "실제:" %} <span class="text-info">{{ goal.actual|floatformat:1 }}h</span></div>
-                          <div>{% trans "달성률:" %} <span class="fw-bold">{% if goal.percent is not None %}{{ goal.percent }}%{% else %}-{% endif %}</span></div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <div class="text-muted">{% trans "등록된 일간 목표가 없거나 기록이 없습니다." %}</div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            <!-- 주간 목표 달성률 카드 -->
-            <div class="col-md-4">
-              <div class="card border-primary h-100">
-                <div class="card-body">
-                  <h6 class="card-subtitle mb-2 text-dark"><i class="fas fa-calendar-week me-1"></i>{% trans "Weekly goals" %}</h6>
-                  {% if user_goals_weekly %}
-                    <ul class="list-group list-group-flush">
-                      {% for goal in user_goals_weekly %}
-                        <li class="list-group-item">
-                          <div class="fw-bold">{{ goal.tag.name }}</div>
-                          <div>{% trans "목표:" %} <span class="text-secondary">{{ goal.target_hours|floatformat:1 }}h</span>
-                          / {% trans "실제:" %} <span class="text-info">{{ goal.actual|floatformat:1 }}h</span></div>
-                          <div>{% trans "달성률:" %} <span class="fw-bold">{% if goal.percent is not None %}{{ goal.percent }}%{% else %}-{% endif %}</span></div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <div class="text-muted">{% trans "등록된 주간 목표가 없거나 기록이 없습니다." %}</div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
-            <!-- 월간 목표 달성률 카드 -->
-            <div class="col-md-4">
-              <div class="card border-primary h-100">
-                <div class="card-body">
-                  <h6 class="card-subtitle mb-2 text-dark"><i class="fas fa-calendar-alt me-1"></i>{% trans "Monthly goals" %}</h6>
-                  {% if user_goals_monthly %}
-                    <ul class="list-group list-group-flush">
-                      {% for goal in user_goals_monthly %}
-                        <li class="list-group-item">
-                          <div class="fw-bold">{{ goal.tag.name }}</div>
-                          <div>{% trans "목표:" %} <span class="text-secondary">{{ goal.target_hours|floatformat:1 }}h</span>
-                          / {% trans "실제:" %} <span class="text-info">{{ goal.actual|floatformat:1 }}h</span></div>
-                          <div>{% trans "달성률:" %} <span class="fw-bold">{% if goal.percent is not None %}{{ goal.percent }}%{% else %}-{% endif %}</span></div>
-                        </li>
-                      {% endfor %}
-                    </ul>
-                  {% else %}
-                    <div class="text-muted">{% trans "등록된 월간 목표가 없거나 기록이 없습니다." %}</div>
-                  {% endif %}
-                </div>
-              </div>
-            </div>
+            {% include "stats/_goal_accordion_item.html" with section_id="goalDaily" icon="fa-calendar-day" title=daily_title goals=user_goals_daily empty_msg=daily_empty expanded=False %}
+            {% include "stats/_goal_accordion_item.html" with section_id="goalWeekly" icon="fa-calendar-week" title=weekly_title goals=user_goals_weekly empty_msg=weekly_empty expanded=True %}
+            {% include "stats/_goal_accordion_item.html" with section_id="goalMonthly" icon="fa-calendar-alt" title=monthly_title goals=user_goals_monthly empty_msg=monthly_empty expanded=False %}
           </div>
 
           {% if user_note %}

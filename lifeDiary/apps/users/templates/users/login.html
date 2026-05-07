@@ -4,22 +4,28 @@
 {% block title %}{% trans "로그인" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-        <div class="card auth-card shadow">
-            <div class="card-header text-center">
-                <h4 class="mb-0">
-                    <i class="fas fa-sign-in-alt me-2"></i>
-                    {% trans "로그인" %}
-                </h4>
-            </div>
-            <div class="card-body">
+<div class="auth-split shadow">
+    <aside class="auth-split__brand" aria-labelledby="auth-brand-title">
+        <div class="auth-split__brand-inner">
+            <i class="fas fa-book-open auth-split__logo" aria-hidden="true"></i>
+            <h2 id="auth-brand-title" class="auth-split__title">{% trans "라이프 다이어리" %}</h2>
+            <p class="auth-split__tagline">{% trans "오늘의 하루를 기록하고, 내일의 나를 만들어가세요." %}</p>
+        </div>
+    </aside>
+    <div class="card auth-card auth-split__panel">
+        <div class="card-header text-center">
+            <h3 class="mb-0 h4">
+                <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>
+                {% trans "로그인" %}
+            </h3>
+        </div>
+        <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
 
                     <div class="mb-3">
                         <label for="{{ form.username.id_for_label }}" class="form-label">{% trans "사용자명" %}</label>
-                        {{ form.username }} TestID: test3
+                        {{ form.username }}
                         {% if form.username.errors %}
                             <div class="text-danger small">
                                 {{ form.username.errors }}
@@ -29,7 +35,7 @@
 
                     <div class="mb-3">
                         <label for="{{ form.password.id_for_label }}" class="form-label">{% trans "비밀번호" %}</label>
-                        {{ form.password }} TestPWD: tttt1234
+                        {{ form.password }}
                         {% if form.password.errors %}
                             <div class="text-danger small">
                                 {{ form.password.errors }}
@@ -42,6 +48,13 @@
                             {{ form.non_field_errors }}
                         </div>
                     {% endif %}
+
+                    <div class="form-check mb-3">
+                        <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me" value="1">
+                        <label class="form-check-label" for="remember_me">
+                            {% trans "로그인 상태 유지" %}
+                        </label>
+                    </div>
 
                     <div class="d-grid gap-2">
                         <button type="submit" class="btn btn-primary">
@@ -69,13 +82,14 @@
                         </a>
                     </p>
                 </div>
-            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+{% load static %}
+<script src="{% static 'users/js/auth-enhance.js' %}" defer></script>
 <script>
 document.querySelector('.auth-card form').addEventListener('submit', function () {
     showOverlay(gettext('로그인 중입니다...'), 'fa-sign-in-alt');

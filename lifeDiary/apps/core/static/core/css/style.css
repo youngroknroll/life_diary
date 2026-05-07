@@ -49,6 +49,15 @@
     --radius-md: 8px;
     --radius-lg: 15px;
 
+    /* Responsive heights — clamp(min, viewport, max).
+       모든 차트·스크롤 패널 공용. 한 곳에서만 조정. */
+    --panel-h-sm: clamp(160px, 25vh, 220px);
+    --panel-h-md: clamp(180px, 35vh, 320px);
+    --panel-h-lg: clamp(220px, 45vh, 420px);
+    --chart-cap-sm: clamp(180px, 30vh, 280px);
+    --chart-cap-md: clamp(220px, 35vh, 320px);
+    --chart-cap-lg: clamp(260px, 45vh, 420px);
+
     /* Typography */
     --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -256,6 +265,217 @@ footer {
 }
 
 /* =========================================================
+   Welcome Screen — 회원가입 직후 환영 화면
+   ========================================================= */
+.welcome-screen {
+    max-width: 720px;
+    margin: 3rem auto;
+    padding: 0 1rem;
+}
+
+.welcome-screen__inner {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    padding: 3rem 2.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.welcome-screen__hero {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.welcome-screen__logo {
+    font-size: 2.75rem;
+    color: var(--color-primary);
+    margin-bottom: 1rem;
+}
+
+.welcome-screen__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.welcome-screen__lead {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+}
+
+.welcome-screen__features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2.5rem;
+    display: grid;
+    gap: 1.25rem;
+}
+
+.welcome-screen__feature {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: rgba(47, 125, 79, 0.05);
+}
+
+.welcome-screen__feature-icon {
+    flex: 0 0 auto;
+    font-size: 1.5rem;
+    color: var(--color-primary);
+    width: 2.5rem;
+    height: 2.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-surface);
+    border-radius: 50%;
+}
+
+.welcome-screen__feature-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.welcome-screen__feature-desc {
+    font-size: 0.875rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.welcome-screen__cta {
+    text-align: center;
+}
+
+.welcome-screen__cta-btn {
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+}
+
+.welcome-screen__skip {
+    display: block;
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-size: 0.875rem;
+}
+
+.welcome-screen__skip:hover,
+.welcome-screen__skip:focus {
+    color: var(--color-text);
+    text-decoration: underline;
+}
+
+@media (max-width: 576px) {
+    .welcome-screen__inner {
+        padding: 2rem 1.25rem;
+    }
+    .welcome-screen__title {
+        font-size: 1.4rem;
+    }
+    .welcome-screen__feature {
+        padding: 0.75rem;
+    }
+}
+
+[data-theme="dark"] .welcome-screen__inner {
+    box-shadow: none;
+    border: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .welcome-screen__feature {
+    background: var(--color-surface-soft);
+}
+
+/* =========================================================
+   Auth Split — 좌측 브랜드 / 우측 폼 (login/signup)
+   ========================================================= */
+.auth-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    max-width: 880px;
+    margin: 3rem auto;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--color-surface);
+}
+
+.auth-split__brand {
+    background: linear-gradient(135deg, #2f7d4f 0%, #1f5d3a 100%);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+}
+
+.auth-split__brand-inner {
+    text-align: center;
+    max-width: 280px;
+}
+
+.auth-split__logo {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.95;
+}
+
+.auth-split__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.auth-split__tagline {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    opacity: 0.9;
+    margin-bottom: 0;
+}
+
+.auth-split .auth-card.auth-split__panel {
+    margin-top: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.auth-split .auth-card.auth-split__panel .card-header {
+    border-radius: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .auth-split {
+        grid-template-columns: 1fr;
+        max-width: 420px;
+    }
+    .auth-split__brand {
+        padding: 1.25rem 1.5rem;
+        flex-direction: row;
+        gap: 0.75rem;
+    }
+    .auth-split__brand-inner {
+        text-align: left;
+        max-width: none;
+    }
+    .auth-split__logo {
+        font-size: 1.75rem;
+        margin-bottom: 0;
+    }
+    .auth-split__title {
+        font-size: 1.25rem;
+        margin-bottom: 0;
+    }
+    .auth-split__tagline {
+        display: none;
+    }
+}
+
+/* =========================================================
    Auth Card — login/signup 공통
    ========================================================= */
 .auth-card {
@@ -289,6 +509,193 @@ footer {
     font-size: 0.875rem;
     color: var(--color-text-muted);
 }
+
+/* =========================================================
+   Goal cards — 일/주/월 목표 진행 (3카드 가로 + 카드별 토글)
+   ========================================================= */
+.goal-card__header {
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    padding: 0.6rem 0.85rem;
+    color: inherit;
+}
+
+.goal-card__header:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+.goal-card__header .badge {
+    font-size: 0.75rem;
+}
+
+.goal-card__chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.goal-card__header.collapsed .goal-card__chevron {
+    transform: rotate(-90deg);
+}
+
+.goal-card .card-body {
+    padding: 0.5rem 0.85rem 0.75rem;
+}
+
+.goal-empty {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.25rem 0;
+}
+
+/* =========================================================
+   Stats — 4개 탭 버튼: 반응형 한 줄 + 명확한 클릭 영역
+   ========================================================= */
+/* 공통: 4개 균등 분배 + 명확한 hover/active 경계 */
+#statsTabs.nav-tabs {
+    flex-wrap: nowrap;
+}
+#statsTabs .nav-item {
+    flex: 1 1 0;
+    min-width: 0;
+}
+#statsTabs .nav-link {
+    width: 100%;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border: 1px solid transparent;
+    border-bottom: none;
+    transition: background-color 0.15s, border-color 0.15s;
+}
+#statsTabs .nav-link:hover:not(.active) {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-border-soft);
+}
+#statsTabs .nav-link.active {
+    border-color: var(--color-border);
+    border-bottom-color: var(--color-surface);
+    font-weight: 600;
+}
+#statsTabs .nav-link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+/* 태블릿(768~991px): 텍스트 크기 약간 축소 */
+@media (min-width: 768px) and (max-width: 991.98px) {
+    #statsTabs .nav-link {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.875rem;
+    }
+}
+
+/* 모바일(<768px): 아이콘 위·라벨 아래 2단 배치 */
+@media (max-width: 767.98px) {
+    #statsTabs .nav-link {
+        padding: 0.5rem 0.25rem;
+        font-size: 0.7rem;
+        line-height: 1.1;
+        min-height: 44px;
+    }
+    #statsTabs .nav-link i {
+        display: block;
+        margin: 0 0 0.2rem 0 !important;
+        font-size: 1rem;
+    }
+}
+
+/* Password field with show/hide toggle */
+.auth-card .password-field {
+    position: relative;
+}
+
+.auth-card .password-field input {
+    padding-right: 44px;
+}
+
+.auth-card .password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 0;
+    padding: 6px 10px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm, 6px);
+    line-height: 1;
+}
+
+.auth-card .password-toggle:hover,
+.auth-card .password-toggle:focus-visible {
+    color: var(--color-primary);
+    background: rgba(47, 125, 79, 0.08);
+    outline: none;
+}
+
+.auth-card .caps-lock-warning {
+    margin-top: 6px;
+    font-size: 0.8125rem;
+    color: var(--color-warning, #d97706);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Password strength meter */
+.auth-card .password-strength {
+    margin-top: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.auth-card .password-strength__bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.auth-card .password-strength__fill {
+    height: 100%;
+    width: 0;
+    transition: width 0.2s ease, background-color 0.2s ease;
+    background: #9ca3af;
+}
+
+.auth-card .password-strength__label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    min-width: 56px;
+    text-align: right;
+    color: var(--color-text-muted);
+}
+
+.auth-card .password-strength.is-veryweak .password-strength__fill,
+.auth-card .password-strength.is-weak .password-strength__fill { background: #dc2626; }
+.auth-card .password-strength.is-veryweak .password-strength__label,
+.auth-card .password-strength.is-weak .password-strength__label { color: #dc2626; }
+
+.auth-card .password-strength.is-fair .password-strength__fill { background: #d97706; }
+.auth-card .password-strength.is-fair .password-strength__label { color: #d97706; }
+
+.auth-card .password-strength.is-good .password-strength__fill { background: #2563eb; }
+.auth-card .password-strength.is-good .password-strength__label { color: #2563eb; }
+
+.auth-card .password-strength.is-strong .password-strength__fill { background: #059669; }
+.auth-card .password-strength.is-strong .password-strength__label { color: #059669; }
 
 /* =========================================================
    Loading Overlay (plain div — body 스크롤 락 없음)
@@ -405,6 +812,53 @@ footer {
     box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
 }
 
+/* signup 실시간 검증: password 인풋은 토글 버튼과 시각 충돌 방지를 위해
+   Bootstrap is-valid/is-invalid background 아이콘 숨김. 색 테두리는 유지. */
+.auth-card .password-field input.is-valid,
+.auth-card .password-field input.is-invalid {
+    background-image: none;
+    padding-right: 44px;
+}
+
+/* 실시간 피드백이 표시되면 같은 행의 정적 form-text 도움말 숨김 (시각 정리) */
+.mb-3:has(.realtime-feedback.d-block) > .form-text {
+    display: none;
+}
+
+/* Auth split: dark theme */
+[data-theme="dark"] .auth-split__brand {
+    background: linear-gradient(135deg, #1f5d3a 0%, #143d27 100%);
+}
+
+/* Auth-card extras: dark theme overrides for password toggle, caps lock, strength meter */
+[data-theme="dark"] .auth-card .password-toggle {
+    color: var(--color-text-muted);
+}
+[data-theme="dark"] .auth-card .password-toggle:hover,
+[data-theme="dark"] .auth-card .password-toggle:focus-visible {
+    color: var(--color-primary);
+    background: rgba(74, 166, 109, 0.15);
+}
+[data-theme="dark"] .auth-card .caps-lock-warning {
+    color: #fbbf24;
+}
+[data-theme="dark"] .auth-card .password-strength__bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .auth-card .password-strength__label {
+    color: var(--color-text-muted);
+}
+[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__fill,
+[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__fill { background: #f87171; }
+[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__label,
+[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__label { color: #f87171; }
+[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__fill { background: #fbbf24; }
+[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__label { color: #fbbf24; }
+[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__fill { background: #60a5fa; }
+[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__label { color: #60a5fa; }
+[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
+[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
+
 [data-theme="dark"] .btn.btn-outline-primary,
 [data-theme="dark"] .btn-outline-primary {
     color: var(--color-text-muted) !important;
@@ -489,31 +943,83 @@ footer {
     width: 150px;
 }
 
-/* Chart canvas 컨테이너 */
+/* =========================================================
+   Stats — 차트 / 스크롤 패널 공통 (반응형)
+   토큰: --chart-cap-{sm,md,lg}, --panel-h-{sm,md,lg}
+   ========================================================= */
+
+/* 공유 reset — :where()는 0 specificity라 override 친화적 */
+:where(.chart-container, .chart-container-lg) {
+    width: 100%;
+    height: auto;
+}
+:where(.tag-stats-list, .tag-analysis-scroll, #tags .table-responsive) {
+    overflow-y: auto;
+}
+
+/* 차트 변형 */
 .chart-container {
-    height: 300px;
+    aspect-ratio: 4 / 3;
+    max-height: var(--chart-cap-md);
 }
-
 .chart-container-lg {
-    height: 400px;
+    aspect-ratio: 16 / 9;
+    max-height: var(--chart-cap-lg);
 }
 
-/* 태그 통계 스크롤 목록 */
+/* 스크롤 패널 변형 */
 .tag-stats-list {
-    max-height: 200px;
-    overflow-y: auto;
+    max-height: var(--panel-h-sm);
 }
 
-/* 태그 분석 스크롤 패널 */
-.tag-analysis-scroll {
-    height: 300px;
-    overflow-y: auto;
+/* #tags 탭 — 차트와 Top tags(.tag-analysis-scroll)를 같은 캡으로 통일.
+   .tag-analysis-scroll은 현재 #tags 내부에서만 쓰이므로 base 규칙 없이
+   여기서 직접 정의. 다른 곳에서 재사용 시 base로 승격 가능. */
+#tags .chart-container,
+#tags .tag-analysis-scroll {
+    height: auto;
+    max-height: var(--chart-cap-sm);
 }
 
-/* Life Feedback 카드 */
+/* Top tags 항목 압축 + 구분선 */
+#tags .tag-analysis-scroll > div {
+    padding: 0.4rem 0.5rem !important;
+    margin-bottom: 0 !important;
+    border-bottom: 1px solid var(--color-border-soft);
+}
+#tags .tag-analysis-scroll > div:last-child {
+    border-bottom: none;
+}
+#tags .tag-analysis-scroll small {
+    font-size: 0.7rem;
+}
+
+/* 상세 분석 테이블 — 컴팩트 셀 + sticky 헤더 */
+#tags .table-responsive {
+    max-height: var(--panel-h-lg);
+}
+#tags .table-responsive table {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+}
+#tags .table-responsive th,
+#tags .table-responsive td {
+    padding: 0.4rem 0.6rem;
+    vertical-align: middle;
+}
+#tags .table-responsive thead th {
+    position: sticky;
+    top: 0;
+    background: var(--color-surface);
+    z-index: 1;
+    border-bottom: 2px solid var(--color-border);
+}
+
+/* Life Feedback 카드 — 좁은 화면에서 overflow 방지 */
 .life-feedback-card {
-    min-width: 350px;
-    max-width: 400px;
+    min-width: 0;
+    width: 100%;
+    max-width: min(400px, 100%);
 }
 
 /* 목표 안내 패널 (mypage) */

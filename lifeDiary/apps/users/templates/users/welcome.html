@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "환영합니다" %} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<div class="welcome-screen">
+    <div class="welcome-screen__inner">
+        <div class="welcome-screen__hero">
+            <i class="fas fa-book-open welcome-screen__logo" aria-hidden="true"></i>
+            <h1 class="welcome-screen__title">
+                {% blocktrans with username=user.username %}{{ username }}님, 환영합니다!{% endblocktrans %}
+            </h1>
+            <p class="welcome-screen__lead">
+                {% trans "라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하도록 돕습니다." %}
+            </p>
+        </div>
+
+        <ul class="welcome-screen__features" role="list">
+            <li class="welcome-screen__feature">
+                <i class="fas fa-clock welcome-screen__feature-icon" aria-hidden="true"></i>
+                <div>
+                    <h2 class="welcome-screen__feature-title">{% trans "시간 블록 기록" %}</h2>
+                    <p class="welcome-screen__feature-desc">{% trans "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다." %}</p>
+                </div>
+            </li>
+            <li class="welcome-screen__feature">
+                <i class="fas fa-tags welcome-screen__feature-icon" aria-hidden="true"></i>
+                <div>
+                    <h2 class="welcome-screen__feature-title">{% trans "태그로 분류" %}</h2>
+                    <p class="welcome-screen__feature-desc">{% trans "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다." %}</p>
+                </div>
+            </li>
+            <li class="welcome-screen__feature">
+                <i class="fas fa-chart-line welcome-screen__feature-icon" aria-hidden="true"></i>
+                <div>
+                    <h2 class="welcome-screen__feature-title">{% trans "통계와 목표" %}</h2>
+                    <p class="welcome-screen__feature-desc">{% trans "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다." %}</p>
+                </div>
+            </li>
+        </ul>
+
+        <div class="welcome-screen__cta">
+            <a href="{% url 'dashboard:index' %}" class="btn btn-primary btn-lg welcome-screen__cta-btn">
+                <i class="fas fa-pen me-2" aria-hidden="true"></i>
+                {% trans "오늘 첫 기록 시작하기" %}
+            </a>
+            <a href="{% url 'home' %}" class="welcome-screen__skip">
+                {% trans "나중에 하기" %}
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

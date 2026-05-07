@@ -7,7 +7,10 @@ from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import gettext
-from django.views.decorators.http import require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_http_methods, require_GET
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError as DjangoValidationError
+import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -71,12 +74,7 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-            messages.success(
-                request,
-                gettext("%(username)s님, 환영합니다! 회원가입이 완료되었습니다.")
-                % {"username": user.username},
-            )
-            return redirect("home")
+            return redirect("users:welcome")
     else:
         form = SignupForm()
 
@@ -89,6 +87,9 @@ def signup_view(request):
     )
 
 
+REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 30  # 30 days
+
+
 def login_view(request):
     """
     사용자 로그인
@@ -98,6 +99,11 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            # Remember me: 체크 시 30일 유지, 미체크 시 브라우저 종료 시 만료
+            if request.POST.get("remember_me"):
+                request.session.set_expiry(REMEMBER_ME_DURATION_SECONDS)
+            else:
+                request.session.set_expiry(0)
             messages.success(
                 request,
                 gettext("%(username)s님, 환영합니다!") % {"username": user.username},
@@ -162,6 +168,66 @@ def username_recovery_done_view(request):
         request,
         "users/recovery/username_recovery_done.html",
         {"page_title": gettext("아이디 찾기")},
+    )
+
+
+_USERNAME_RE = re.compile(r"^[\w.@+\-]+$")
+_USERNAME_MAX_LENGTH = 30
+
+
+@require_GET
+def check_username_view(request):
+    """signup blur 시 username 중복/형식 비동기 검증."""
+    username = (request.GET.get("username") or "").strip()
+    if not username:
+        return JsonResponse({"available": False, "message": gettext("사용자명을 입력해주세요.")})
+    if len(username) > _USERNAME_MAX_LENGTH:
+        return JsonResponse(
+            {"available": False, "message": gettext("사용자명은 30자 이하여야 합니다.")}
+        )
+    if not _USERNAME_RE.match(username):
+        return JsonResponse(
+            {"available": False, "message": gettext("영문자, 숫자, @/./+/-/_ 만 가능합니다.")}
+        )
+    User = get_user_model()
+    if User.objects.filter(username__iexact=username).exists():
+        return JsonResponse(
+            {"available": False, "message": gettext("이미 사용 중인 사용자명입니다.")}
+        )
+    return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
+
+
+@require_GET
+def check_email_view(request):
+    """signup blur 시 email 형식/중복 비동기 검증."""
+    email = (request.GET.get("email") or "").strip()
+    if not email:
+        return JsonResponse({"available": False, "message": gettext("이메일을 입력해주세요.")})
+    try:
+        validate_email(email)
+    except DjangoValidationError:
+        return JsonResponse(
+            {"available": False, "message": gettext("올바른 이메일 형식이 아닙니다.")}
+        )
+    User = get_user_model()
+    if User.objects.filter(email__iexact=email).exists():
+        return JsonResponse(
+            {"available": False, "message": gettext("이미 사용 중인 이메일입니다.")}
+        )
+    return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
+
+
+@login_required
+def welcome_view(request):
+    """회원가입 직후 1회 노출되는 환영 화면.
+
+    Why: 가입 직후 빈 대시보드로 떨어지면 첫날 이탈률이 높음.
+    가치 제안 + 단일 CTA로 첫 행동(시간 기록)을 유도.
+    """
+    return render(
+        request,
+        "users/welcome.html",
+        {"page_title": gettext("환영합니다")},
     )
 
 
