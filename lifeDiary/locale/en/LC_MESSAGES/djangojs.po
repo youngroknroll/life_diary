@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-28 11:58+0900\n"
+"POT-Creation-Date: 2026-05-07 16:08+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -199,17 +199,18 @@ msgstr "%(label)s: %(h)sh"
 msgid "Total hours"
 msgstr "Total hours"
 
-#: apps/tags/templates/tags/index.html:71
-msgid "기본"
-msgstr "Default"
+#: apps/users/static/users/js/auth-enhance.js:10
+#: apps/users/static/users/js/auth-enhance.js:18
+msgid "비밀번호 표시"
+msgstr "Show password"
 
-#: apps/tags/templates/tags/index.html:80
-msgid "수정"
-msgstr "Edit"
+#: apps/users/static/users/js/auth-enhance.js:18
+msgid "비밀번호 숨기기"
+msgstr "Hide password"
 
-#: apps/tags/templates/tags/index.html:128
-msgid "미분류"
-msgstr "Unclassified"
+#: apps/users/static/users/js/auth-enhance.js:34
+msgid "Caps Lock이 켜져 있습니다"
+msgstr "Caps Lock is on"
 
 #: apps/users/static/users/js/goals.js:19
 #, javascript-format
@@ -232,3 +233,32 @@ msgstr "Save failed"
 #: apps/users/static/users/js/goals.js:93
 msgid "저장 실패 - 네트워크 오류"
 msgstr "Save failed - network error"
+
+#: apps/users/static/users/js/password-strength.js:7
+msgid "너무 짧음"
+msgstr "Too short"
+
+#: apps/users/static/users/js/password-strength.js:8
+msgid "약함"
+msgstr "Weak"
+
+#: apps/users/static/users/js/password-strength.js:9
+msgid "보통"
+msgstr "Fair"
+
+#: apps/users/static/users/js/password-strength.js:10
+msgid "좋음"
+msgstr "Good"
+
+#: apps/users/static/users/js/password-strength.js:11
+msgid "강함"
+msgstr "Strong"
+
+#~ msgid "기본"
+#~ msgstr "Default"
+
+#~ msgid "수정"
+#~ msgstr "Edit"
+
+#~ msgid "미분류"
+#~ msgstr "Unclassified"

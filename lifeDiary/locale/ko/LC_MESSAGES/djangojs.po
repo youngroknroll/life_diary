@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-01 19:27+0900\n"
+"POT-Creation-Date: 2026-05-07 16:08+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -201,6 +201,19 @@ msgstr "%(label)s: %(h)s시간"
 msgid "Total hours"
 msgstr "총 시간"
 
+#: apps/users/static/users/js/auth-enhance.js:10
+#: apps/users/static/users/js/auth-enhance.js:18
+msgid "비밀번호 표시"
+msgstr ""
+
+#: apps/users/static/users/js/auth-enhance.js:18
+msgid "비밀번호 숨기기"
+msgstr ""
+
+#: apps/users/static/users/js/auth-enhance.js:34
+msgid "Caps Lock이 켜져 있습니다"
+msgstr ""
+
 #: apps/users/static/users/js/goals.js:19
 #, javascript-format
 msgid "최대 %s시간까지 입력 가능"
@@ -221,4 +234,24 @@ msgstr ""
 
 #: apps/users/static/users/js/goals.js:93
 msgid "저장 실패 - 네트워크 오류"
+msgstr ""
+
+#: apps/users/static/users/js/password-strength.js:7
+msgid "너무 짧음"
+msgstr ""
+
+#: apps/users/static/users/js/password-strength.js:8
+msgid "약함"
+msgstr ""
+
+#: apps/users/static/users/js/password-strength.js:9
+msgid "보통"
+msgstr ""
+
+#: apps/users/static/users/js/password-strength.js:10
+msgid "좋음"
+msgstr ""
+
+#: apps/users/static/users/js/password-strength.js:11
+msgid "강함"
 msgstr ""

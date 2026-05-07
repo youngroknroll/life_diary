@@ -489,6 +489,35 @@ footer {
     box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
 }
 
+/* Auth-card extras: dark theme overrides for password toggle, caps lock, strength meter */
+[data-theme="dark"] .auth-card .password-toggle {
+    color: var(--color-text-muted);
+}
+[data-theme="dark"] .auth-card .password-toggle:hover,
+[data-theme="dark"] .auth-card .password-toggle:focus-visible {
+    color: var(--color-primary);
+    background: rgba(74, 166, 109, 0.15);
+}
+[data-theme="dark"] .auth-card .caps-lock-warning {
+    color: #fbbf24;
+}
+[data-theme="dark"] .auth-card .password-strength__bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .auth-card .password-strength__label {
+    color: var(--color-text-muted);
+}
+[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__fill,
+[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__fill { background: #f87171; }
+[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__label,
+[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__label { color: #f87171; }
+[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__fill { background: #fbbf24; }
+[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__label { color: #fbbf24; }
+[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__fill { background: #60a5fa; }
+[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__label { color: #60a5fa; }
+[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
+[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
+
 [data-theme="dark"] .btn.btn-outline-primary,
 [data-theme="dark"] .btn-outline-primary {
     color: var(--color-text-muted) !important;

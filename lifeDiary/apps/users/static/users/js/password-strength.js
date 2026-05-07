@@ -1,14 +1,14 @@
 (function () {
     'use strict';
 
-    const T = (typeof gettext === 'function') ? gettext : (s) => s;
-
+    // Relies on Django JavaScriptCatalog (base.html line 187) for global gettext().
+    // Labels are evaluated at module load time so xgettext can extract them.
     const LEVELS = [
-        { key: 'too-short', labelKey: '너무 짧음',   pct: 5,   cls: 'is-veryweak' },
-        { key: 'weak',      labelKey: '약함',         pct: 25,  cls: 'is-weak' },
-        { key: 'fair',      labelKey: '보통',         pct: 50,  cls: 'is-fair' },
-        { key: 'good',      labelKey: '좋음',         pct: 75,  cls: 'is-good' },
-        { key: 'strong',    labelKey: '강함',         pct: 100, cls: 'is-strong' },
+        { key: 'too-short', label: gettext('너무 짧음'), pct: 5,   cls: 'is-veryweak' },
+        { key: 'weak',      label: gettext('약함'),       pct: 25,  cls: 'is-weak' },
+        { key: 'fair',      label: gettext('보통'),       pct: 50,  cls: 'is-fair' },
+        { key: 'good',      label: gettext('좋음'),       pct: 75,  cls: 'is-good' },
+        { key: 'strong',    label: gettext('강함'),       pct: 100, cls: 'is-strong' },
     ];
 
     function score(pwd) {
@@ -58,7 +58,7 @@
         LEVELS.forEach((l) => meter.classList.remove(l.cls));
         meter.classList.add(level.cls);
         fill.style.width = level.pct + '%';
-        label.textContent = T(level.labelKey);
+        label.textContent = level.label;
         meter.setAttribute('data-level', level.key);
     }
 
