@@ -501,6 +501,36 @@ footer {
     color: var(--color-text-muted);
 }
 
+/* =========================================================
+   Stats — 모바일에서 4개 탭을 일렬(스크롤) 표시
+   ========================================================= */
+@media (max-width: 767.98px) {
+    /* 탭 바 자체와 그 부모 card-header를 함께 숨겨 빈 막대 잔상 제거 */
+    #statsTabs,
+    .card-header:has(> #statsTabs) {
+        display: none;
+    }
+    #statsTabContent .tab-pane {
+        display: block !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    #statsTabContent .tab-pane + .tab-pane {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--color-border);
+    }
+    .mobile-section-title {
+        display: flex !important;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        color: var(--color-primary);
+    }
+}
+
 /* Password field with show/hide toggle */
 .auth-card .password-field {
     position: relative;
