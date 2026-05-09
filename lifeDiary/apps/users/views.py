@@ -1,3 +1,7 @@
+import logging
+import re
+from smtplib import SMTPException
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
@@ -10,7 +14,6 @@ from django.utils.translation import gettext
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError as DjangoValidationError
-import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -26,6 +29,8 @@ from .use_cases import (
     SaveGoalUseCase,
     SaveNoteUseCase,
 )
+
+logger = logging.getLogger(__name__)
 
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
@@ -135,13 +140,16 @@ def _send_username_recovery_email(request, email):
     }
     subject = render_to_string("users/recovery/username_recovery_subject.txt").strip()
     body = render_to_string("users/recovery/username_recovery_email.txt", context)
-    send_mail(
-        subject=subject,
-        message=body,
-        from_email=settings.DEFAULT_FROM_EMAIL,
-        recipient_list=[email],
-        fail_silently=False,
-    )
+    try:
+        send_mail(
+            subject=subject,
+            message=body,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+    except (SMTPException, OSError):
+        logger.exception("Failed to send username recovery email")
 
 
 def username_recovery_view(request):
