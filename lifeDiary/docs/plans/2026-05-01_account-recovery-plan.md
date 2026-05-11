@@ -22,8 +22,34 @@
 | 아이디 찾기 방식 | 이메일로 username 발송 | 화면 표시는 enumeration 위험 |
 | 비밀번호 재설정 방식 | Django 내장 `PasswordResetView` (토큰 링크) | 검증된 흐름, 임시비번보다 안전 |
 | 메일 백엔드 (dev) | `console.EmailBackend` | 실제 발송 없이 터미널 출력 |
-| 메일 백엔드 (prod) | SMTP, `.env` 자격증명 | 시크릿 분리 |
+| 메일 백엔드 (prod) | Resend HTTPS API, `.env` 자격증명 | Render의 SMTP 프로토콜/포트 제한을 피하고 HTTP 기반 발송으로 운영 안정성 확보 |
 | 소셜 로그인 | 본 범위 제외 | allauth 도입 결정과 분리하여 단계 진행 |
+
+### 2.1 운영 메일 발송 방식 변경 기록
+
+- 변경일: 2026-05-11
+- 기존 방식: Django SMTP EmailBackend + `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+- 변경 방식: Django 커스텀 EmailBackend + Resend HTTPS API
+
+Render 배포 환경에서는 SMTP 프로토콜 또는 SMTP 포트 사용이 제한될 수 있다. 계정 복구 메일은 비밀번호 재설정과 아이디 찾기에 직접 연결되므로, SMTP 연결 실패가 곧 사용자 복구 실패로 이어진다. 따라서 운영 메일 발송은 SMTP 서버에 직접 연결하지 않고, Render에서 허용되는 일반 HTTPS outbound 요청으로 Resend API를 호출하도록 변경한다.
+
+애플리케이션 코드는 계속 Django의 `send_mail()` / `PasswordResetView` 흐름을 사용한다. 변경 지점은 메일 전송 인프라에 한정한다.
+
+```
+Django send_mail()
+→ apps.core.email_backends.ResendEmailBackend
+→ POST https://api.resend.com/emails
+→ Resend가 인증된 발신 도메인으로 메일 발송
+```
+
+이 방식의 장점은 다음과 같다.
+
+- Render의 SMTP 제한과 무관하게 HTTPS API로 발송할 수 있다.
+- `send_mail()` 호출부를 유지하므로 계정 복구 뷰와 Django 내장 password reset 흐름을 크게 바꾸지 않는다.
+- 운영 시크릿은 `RESEND_API_KEY` 하나로 단순화된다.
+- 향후 다른 메일 제공자로 이전해도 Django EmailBackend 구현만 교체하면 된다.
+
+운영 전제는 Resend에서 발신 도메인을 인증하고, Render 환경변수에 `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`을 설정하는 것이다. `DEFAULT_FROM_EMAIL`은 Resend에서 인증된 도메인의 주소여야 한다.
 
 ## 3. Phase 별 작업
 
@@ -31,8 +57,9 @@
 
 **파일**
 - `lifeDiary/settings/dev.py`: `EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"`, `DEFAULT_FROM_EMAIL = "noreply@lifediary.local"`
-- `lifeDiary/settings/prod.py`: SMTP 설정을 `os.getenv`로 (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`, `EMAIL_USE_TLS`, `DEFAULT_FROM_EMAIL`)
-- `.env.example`: 위 변수 자리표시자 추가
+- `apps/core/email_backends.py`: Resend HTTPS API를 호출하는 커스텀 Django EmailBackend
+- `lifeDiary/settings/prod.py`: `EMAIL_BACKEND = "apps.core.email_backends.ResendEmailBackend"`, `RESEND_API_KEY`, `DEFAULT_FROM_EMAIL`
+- `.env.example`: `RESEND_API_KEY`, 인증 도메인 기반 `DEFAULT_FROM_EMAIL` 자리표시자 추가
 
 **검증**: `python manage.py shell -c "from django.core.mail import send_mail; send_mail('t','b','a@a','b@b'.split())"` → dev 콘솔 출력 확인.
 
@@ -117,6 +144,7 @@ username-recovery/done/   → username_recovery_done_view
 - `apps/users/forms.py`
 - `apps/users/views.py`
 - `apps/users/urls.py`
+- `apps/core/email_backends.py`
 - `lifeDiary/settings/dev.py`
 - `lifeDiary/settings/prod.py`
 - `templates/users/signup.html`
@@ -126,7 +154,7 @@ username-recovery/done/   → username_recovery_done_view
 
 **신규 템플릿** (11개): password_reset 5종(html) + email 2종 + subject 1종 + username_recovery 2종(html) + email 1종 + subject 1종
 
-**신규 테스트**: 3 파일
+**신규 테스트**: 4 파일 (`apps/core/test_email_backends.py` 포함)
 
 ## 5. 보안 고려
 
@@ -136,7 +164,8 @@ username-recovery/done/   → username_recovery_done_view
 | 토큰 탈취 | Django 기본 토큰 + 만료 (필요시 `PASSWORD_RESET_TIMEOUT` 단축 검토) |
 | 메일 본문 노출 | 토큰 URL은 단발성, 사용 후 무효화 (Django 내장) |
 | 폼 자동화 공격 | 본 PR 범위 외 — `django-axes`는 `/login/`만 보호. 후속으로 복구 엔드포인트 rate-limit 검토 |
-| 시크릿 노출 | SMTP 자격증명은 `.env`만, 리포지토리 커밋 금지 |
+| 시크릿 노출 | Resend API Key는 `.env`/Render 환경변수만 사용, 리포지토리 커밋 금지 |
+| 발신 도메인 위조/스팸 판정 | Resend에서 인증된 도메인의 `DEFAULT_FROM_EMAIL`만 운영에 사용 |
 
 ## 6. 비범위 (후속 이슈로 분리)
 
