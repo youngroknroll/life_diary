@@ -1,6 +1,7 @@
 import pytest
 from django.core import mail
 from django.urls import reverse
+from smtplib import SMTPServerDisconnected
 
 
 @pytest.mark.django_db
@@ -43,3 +44,20 @@ class TestUsernameRecovery:
         )
         assert response.status_code == 302
         assert len(mail.outbox) == 1
+
+    def test_mail_server_disconnect_still_returns_done(
+        self, client, make_user, monkeypatch
+    ):
+        make_user(username="alice", email="alice@example.com")
+
+        def raise_disconnect(*args, **kwargs):
+            raise SMTPServerDisconnected("please run connect() first")
+
+        monkeypatch.setattr("apps.users.views.send_mail", raise_disconnect)
+
+        response = client.post(
+            reverse("users:username_recovery"), {"email": "alice@example.com"}
+        )
+
+        assert response.status_code == 302
+        assert response.url == reverse("users:username_recovery_done")
