@@ -22,6 +22,23 @@ jobs:
         run: |
           set -euo pipefail
 
+          retry() {
+            local attempt
+            for attempt in 1 2 3; do
+              if "$@"; then
+                return 0
+              fi
+
+              if [ "${attempt}" -lt 3 ]; then
+                echo "Attempt ${attempt} failed. Retrying in 5 seconds..."
+                sleep 5
+              fi
+            done
+
+            echo "Command failed after 3 attempts: $*"
+            return 1
+          }
+
           git fetch origin production
 
           DIFF_COUNT=$(git rev-list --count origin/production..origin/main)
@@ -30,7 +47,7 @@ jobs:
             exit 0
           fi
 
-          EXISTING=$(gh pr list --base production --head main --state open --json number --jq '.[0].number // empty')
+          EXISTING=$(retry gh pr list --base production --head main --state open --json number --jq '.[0].number // empty')
 
           COMMITS=$(git log origin/production..origin/main --pretty=format:'- %s (%h)' | head -50)
 
@@ -53,14 +70,14 @@ jobs:
           TITLE="Deploy: main -> production (${DIFF_COUNT} commits)"
 
           if [ -z "${EXISTING}" ]; then
-            gh pr create \
+            retry gh pr create \
               --base production \
               --head main \
               --title "${TITLE}" \
               --body "${BODY}"
             echo "Created new deploy PR."
           else
-            gh pr edit "${EXISTING}" \
+            retry gh pr edit "${EXISTING}" \
               --title "${TITLE}" \
               --body "${BODY}"
             echo "Updated existing deploy PR #${EXISTING}."
