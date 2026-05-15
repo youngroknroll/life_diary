@@ -30,25 +30,34 @@
   </div>
 </div>
 
-<!-- 라이프 피드백 메시지 토스트 알림 -->
+<!-- 라이프 피드백 목록 -->
 {% if feedback_list %}
-  <div class="d-flex flex-row flex-wrap justify-content-center gap-1 mt-3 w-100">
-    {% for fb in feedback_list %}
-      <div class="toast align-items-center border-0 show mb-3 life-feedback-card
-                  {% if fb.severity == 'positive' %}text-bg-primary
-                  {% elif fb.severity == 'warning' %}text-bg-warning
-                  {% else %}text-bg-info{% endif %}"
-           role="alert" aria-live="assertive" aria-atomic="true">
-        <div class="d-flex">
-          <div class="toast-body">
-            <i class="fas fa-robot me-2"></i><strong>{% trans "라이프 피드백" %}</strong>
-            <div class="mt-2">{% render_message fb %}</div>
-          </div>
-          <button type="button" class="btn-close btn-close-white me-2 m-auto"
-                  data-bs-dismiss="toast" aria-label="{% trans 'Close' %}"></button>
-        </div>
-      </div>
-    {% endfor %}
-  </div>
+  <section class="life-feedback-panel mt-3" aria-labelledby="lifeFeedbackHeading">
+    <button type="button"
+            class="life-feedback-toggle collapsed"
+            data-bs-toggle="collapse"
+            data-bs-target="#lifeFeedbackList"
+            aria-expanded="false"
+            aria-controls="lifeFeedbackList">
+      <span id="lifeFeedbackHeading" class="life-feedback-toggle__title">
+        <i class="fas fa-robot me-2" aria-hidden="true"></i>{% trans "라이프 피드백" %}
+      </span>
+      <span class="badge bg-primary-subtle text-primary-emphasis ms-2">{{ feedback_list|length }}</span>
+      <i class="fas fa-chevron-down life-feedback-toggle__chevron ms-auto" aria-hidden="true"></i>
+    </button>
+    <div id="lifeFeedbackList" class="collapse">
+      <ul class="life-feedback-list list-unstyled mb-0">
+        {% for fb in feedback_list %}
+          <li class="life-feedback-card
+                    {% if fb.severity == 'positive' %}life-feedback-card--positive
+                    {% elif fb.severity == 'warning' %}life-feedback-card--warning
+                    {% else %}life-feedback-card--info{% endif %}">
+            <div class="fw-bold">{% trans "라이프 피드백" %}</div>
+            <div class="mt-1">{% render_message fb %}</div>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
 {% endif %}
 {% endblock %}
