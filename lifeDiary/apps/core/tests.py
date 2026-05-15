@@ -1,4 +1,5 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
 
 
@@ -14,6 +15,22 @@ class TestHomePage:
         assert 'data-bs-target="#homePreviewImageModal"' in body
         assert 'id="homePreviewImageModal"' in body
         assert "10분 단위" not in body
+
+    def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
+        ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
+        response = ko_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert "/static/core/img/tag_usage_guide.png" in body
+        assert "/static/core/img/tag_usage_guide_en.png" not in body
+
+    def test_home_page_uses_english_tag_usage_guide_for_english_language(self, en_client):
+        en_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        response = en_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert "/static/core/img/tag_usage_guide_en.png" in body
+        assert "/static/core/img/tag_usage_guide.png" not in body
 
     def test_home_page_invites_authenticated_user_to_record_today(self, ko_client, make_user):
         user = make_user(username="daily-user")

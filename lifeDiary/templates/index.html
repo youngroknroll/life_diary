@@ -207,6 +207,12 @@
 {% endblock %}
 
 {% block content %}
+{% get_current_language as LANGUAGE_CODE %}
+{% if LANGUAGE_CODE == "en" %}
+    {% static 'core/img/tag_usage_guide_en.png' as tag_usage_guide_src %}
+{% else %}
+    {% static 'core/img/tag_usage_guide.png' as tag_usage_guide_src %}
+{% endif %}
 <section class="home-hero mb-3">
     <div class="row g-0 align-items-stretch">
         <div class="col-lg-7">
@@ -294,7 +300,7 @@
                             data-bs-target="#homePreviewImageModal"
                             aria-label="{% trans '소비시간의 분류 이미지 크게 보기' %}"
                         >
-                            <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-preview-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시' %}">
+                            <img src="{{ tag_usage_guide_src }}" class="home-preview-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시' %}">
                         </button>
                         <p class="home-preview-caption small mt-2 mb-0">{% trans "클릭해서 크게 볼 수 있습니다." %}</p>
                     </div>
@@ -336,7 +342,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans '닫기' %}"></button>
             </div>
             <div class="modal-body">
-                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="home-modal-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시' %}">
+                <img src="{{ tag_usage_guide_src }}" class="home-modal-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시' %}">
             </div>
         </div>
     </div>
