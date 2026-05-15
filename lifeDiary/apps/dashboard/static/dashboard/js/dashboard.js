@@ -25,11 +25,16 @@ let startSlot = null;
 let isAdditiveDrag = false;
 let dragBaseSelection = new Set();
 let touchStartX = 0, touchStartY = 0, touchDecided = false;
+let lastSelectedSlotElement = null;
 
 // ── 그리드 칼럼 수 (반응형) ──
 
 function getGridColumns() {
     return window.innerWidth <= 768 ? 6 : 12;
+}
+
+function isMobileDashboardLayout() {
+    return window.matchMedia('(max-width: 767.98px)').matches;
 }
 
 function slotToRowCol(slotIndex) {
@@ -94,6 +99,85 @@ function initializeDashboard() {
             window.location.href = tagsUrl;
         });
     }
+
+    document.querySelectorAll('[data-dashboard-sheet-close]').forEach((el) => {
+        el.addEventListener('click', closeQuickInputSheet);
+    });
+
+    syncQuickInputSheetForLayout();
+    window.addEventListener('resize', syncQuickInputSheetForLayout);
+}
+
+function syncQuickInputSheetForLayout() {
+    const sheet = document.getElementById('quickInputSheet');
+    const backdrop = document.getElementById('quickInputSheetBackdrop');
+    if (!sheet || !backdrop) return;
+
+    if (isMobileDashboardLayout()) {
+        updateQuickInputSheetHeight();
+        if (!sheet.classList.contains('is-open')) {
+            sheet.setAttribute('role', 'dialog');
+            sheet.setAttribute('aria-modal', 'true');
+            sheet.setAttribute('aria-hidden', 'true');
+            backdrop.setAttribute('aria-hidden', 'true');
+        }
+        return;
+    }
+
+    sheet.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    sheet.removeAttribute('role');
+    sheet.removeAttribute('aria-modal');
+    sheet.setAttribute('aria-hidden', 'false');
+    sheet.style.removeProperty('--quick-input-sheet-max-height');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('dashboard-sheet-open');
+}
+
+function updateQuickInputSheetHeight() {
+    const sheet = document.getElementById('quickInputSheet');
+    const oneAmSlot = document.querySelector('[data-slot-index="6"]');
+    if (!sheet || !oneAmSlot) return;
+
+    const top = oneAmSlot.getBoundingClientRect().top;
+    const maxHeight = Math.max(280, window.innerHeight - top);
+    sheet.style.setProperty('--quick-input-sheet-max-height', `${Math.round(maxHeight)}px`);
+}
+
+function openQuickInputSheet() {
+    if (!isMobileDashboardLayout() || selectedSlots.size === 0) return;
+    const sheet = document.getElementById('quickInputSheet');
+    const backdrop = document.getElementById('quickInputSheetBackdrop');
+    if (!sheet || !backdrop) return;
+
+    updateQuickInputSheetHeight();
+    sheet.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-modal', 'true');
+    sheet.setAttribute('aria-hidden', 'false');
+    backdrop.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('dashboard-sheet-open');
+
+    const firstTag = sheet.querySelector('.tag-btn');
+    const closeBtn = sheet.querySelector('[data-dashboard-sheet-close]');
+    (firstTag || closeBtn || sheet).focus({ preventScroll: true });
+}
+
+function closeQuickInputSheet() {
+    const sheet = document.getElementById('quickInputSheet');
+    const backdrop = document.getElementById('quickInputSheetBackdrop');
+    if (!sheet || !backdrop) return;
+
+    sheet.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    sheet.setAttribute('aria-hidden', 'true');
+    backdrop.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('dashboard-sheet-open');
+
+    if (lastSelectedSlotElement) {
+        lastSelectedSlotElement.focus({ preventScroll: true });
+    }
 }
 
 // ── 슬롯 선택 ──
@@ -120,8 +204,10 @@ const selectSlot = (slotIndex) => {
         }
     }
 
+    lastSelectedSlotElement = slotElement;
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
+    openQuickInputSheet();
 };
 
 const clearSelection = () => {
@@ -146,7 +232,10 @@ const startDrag = (slotIndex, event) => {
         clearSelection();
         selectedSlots.add(slotIndex);
         const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
-        if (slotElement) slotElement.classList.add('selected');
+        if (slotElement) {
+            slotElement.classList.add('selected');
+            lastSelectedSlotElement = slotElement;
+        }
     }
 };
 
@@ -207,6 +296,7 @@ const endDrag = () => {
         dragBaseSelection = new Set();
         showSlotInfo(Array.from(selectedSlots));
         updateButtons();
+        openQuickInputSheet();
     }
 };
 
@@ -218,10 +308,23 @@ const handleTouchMove = (event) => {
         const dx = Math.abs(touch.clientX - touchStartX);
         const dy = Math.abs(touch.clientY - touchStartY);
         if (dx < 5 && dy < 5) return;
+        if (dy > dx) {
+            clearSelection();
+            if (isAdditiveDrag) restoreBaseSelection();
+            isDragging = false;
+            startSlot = null;
+            isAdditiveDrag = false;
+            dragBaseSelection = new Set();
+            showSlotInfo(Array.from(selectedSlots));
+            updateButtons();
+            return;
+        }
         touchDecided = true;
     }
 
-    event.preventDefault();
+    if (event.cancelable) {
+        event.preventDefault();
+    }
     const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
     if (elementBelow && elementBelow.classList.contains('time-slot')) {
         const slotIndex = parseInt(elementBelow.dataset.slotIndex, 10);
@@ -516,4 +619,3 @@ function showTagError(message) {
     const tagContainer = document.getElementById('tagContainer');
     tagContainer.innerHTML = `<div class="alert alert-danger p-2 small">${message}</div>`;
 }
-
