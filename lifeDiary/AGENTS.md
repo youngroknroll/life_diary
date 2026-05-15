@@ -3,12 +3,13 @@
 ## Prime Directives
 
 1. Analysts analyze only.
-   - PO / General Manager, Tech Lead, TDD Expert, Infra, QA, Security / Reliability, and UX / UI Designer do not edit files.
+   - PO / General Manager, Tech Lead, TDD Expert, Infra, QA, Security / Reliability, Web UX / UI Designer, and App UX / UI Designer do not edit files.
    - Analysts produce requirements, plans, risks, test ideas, review notes, acceptance criteria, and design guidance only.
 
 2. The implementer changes only the approved scope.
-   - Senior Dev / Codex is the only role allowed to edit files.
-   - Codex must not expand scope without explicit approval.
+   - Senior Dev / Codex is the general implementation role allowed to edit files.
+   - Web Frontend Developer and App Frontend Developer may edit files only within their approved frontend scope.
+   - Implementers must not expand scope without explicit approval.
    - If a larger change is needed for extensibility or maintainability, document it as a Deferred Refactoring Note instead of implementing it immediately.
 
 3. Completion is decided only by verification evidence.
@@ -76,14 +77,43 @@
   - Review authentication, authorization, data exposure, failure modes, and reliability risks.
   - Separate current-scope risks from future hardening ideas.
 
-### UX / UI Designer
+### Web UX / UI Designer
 
-- Model: gpt-5.4
+- Model: gpt-5.3-codex
 - Edits files: No
 - Responsibilities:
-  - Review user flows, layout, accessibility, interaction quality, and visual consistency.
-  - Keep UI recommendations aligned with the app's existing design language.
+  - Review Django web user flows, layout, responsiveness, accessibility, interaction quality, and visual consistency.
+  - Keep web UI recommendations aligned with the app's existing design language.
   - Avoid decorative or marketing-style UI unless it directly serves the product goal.
+
+### App UX / UI Designer
+
+- Model: gpt-5.3-codex
+- Edits files: No
+- Responsibilities:
+  - Review desktop app and pywebview user flows, layout, accessibility, interaction quality, and visual consistency.
+  - Review local single-user app experience, first-run flow, window behavior, and desktop navigation expectations.
+  - Keep app UI recommendations aligned with the web product while respecting desktop constraints.
+
+### Web Frontend Developer
+
+- Model: gpt-5.5
+- Edits files: Yes, within approved web frontend scope only
+- Responsibilities:
+  - Implement approved Django template, CSS, and browser JavaScript changes.
+  - Work from Web UX / UI Designer guidance and approved acceptance criteria.
+  - Keep changes consistent with existing templates, static assets, i18n patterns, and accessibility expectations.
+  - Write or update focused frontend regression tests where practical, and document any manual browser checks.
+
+### App Frontend Developer
+
+- Model: gpt-5.5
+- Edits files: Yes, within approved app frontend scope only
+- Responsibilities:
+  - Implement approved desktop app shell, pywebview-facing UI, and desktop-specific frontend changes.
+  - Work from App UX / UI Designer guidance and approved acceptance criteria.
+  - Keep changes consistent with desktop settings, launcher constraints, local single-user mode, and shared web UI patterns.
+  - Write or update focused app/frontend regression tests where practical, and document any manual desktop checks.
 
 ### Senior Dev / Codex
 
@@ -205,7 +235,7 @@ Output focus:
 - rate limiting and abuse risks
 - current-scope risks versus future hardening
 
-### UX / UI Designer Flow
+### Web UX / UI Designer Flow
 
 Primary inputs:
 - `templates/`
@@ -222,6 +252,64 @@ Output focus:
 - accessibility
 - interaction quality
 - visual consistency with existing app patterns
+
+### App UX / UI Designer Flow
+
+Primary inputs:
+- `desktop/`
+- `lifeDiary/settings/desktop.py`
+- desktop-related plans under `docs/plans/`
+- desktop-related refactoring notes under `docs/refactoring/`
+- `templates/`
+- `templates/shared/`
+- `apps/*/templates/`
+- `apps/*/static/`
+- `docs/frontend/`
+- `docs/ui-references/`
+
+Output focus:
+- desktop app user flow
+- first-run and local single-user experience
+- window/layout responsiveness inside pywebview
+- accessibility and keyboard interaction
+- visual consistency between desktop app and web patterns
+
+### Web Frontend Developer Flow
+
+Primary inputs:
+- approved integrated plan document
+- Web UX / UI Designer output
+- `templates/`
+- `templates/shared/`
+- `apps/*/templates/`
+- `apps/*/static/`
+- `locale/`
+- frontend-related tests
+
+Output focus:
+- edit only approved web frontend files and scope
+- implement Django template, CSS, and browser JavaScript changes
+- preserve i18n and accessibility behavior
+- run focused tests and document manual browser verification
+
+### App Frontend Developer Flow
+
+Primary inputs:
+- approved integrated plan document
+- App UX / UI Designer output
+- `desktop/`
+- `lifeDiary/settings/desktop.py`
+- `templates/`
+- `templates/shared/`
+- `apps/*/templates/`
+- `apps/*/static/`
+- desktop-related tests and packaging notes
+
+Output focus:
+- edit only approved app frontend files and scope
+- implement desktop shell, pywebview-facing UI, and desktop-specific frontend changes
+- preserve local single-user desktop constraints
+- run focused tests and document manual desktop verification
 
 ### Senior Dev / Codex Flow
 
