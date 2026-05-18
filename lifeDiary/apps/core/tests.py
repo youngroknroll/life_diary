@@ -31,6 +31,23 @@ class TestHomePage:
         assert f"라이프 다이어리 &copy; {years} LogBetter. All rights reserved." in body
         assert "songyeongrok" not in body
 
+    def test_home_page_renders_header_utility_controls(self, ko_client):
+        response = ko_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert 'class="navbar-utility-controls"' in body
+        utility_start = body.index('class="navbar-utility-controls"')
+        utility_end = body.index('<button class="navbar-toggler"', utility_start)
+        utility_section = body[utility_start:utility_end]
+
+        assert 'class="navbar-language-form"' in utility_section
+        assert "navbar-language-select" in utility_section
+        assert 'id="themeToggle"' in utility_section
+        assert 'class="theme-toggle__label"' in utility_section
+        assert "다크" in utility_section
+        assert "fas fa-moon" not in utility_section
+        assert "fas fa-sun" not in utility_section
+
     def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
         ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
         response = ko_client.get(reverse("home"))
