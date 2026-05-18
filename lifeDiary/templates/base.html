@@ -69,24 +69,36 @@
                 <i class="fas fa-clock me-2"></i>
                 {% trans "라이프 다이어리" %}
             </a>
-            
-            <form action="{% url 'set_language' %}" method="post" class="d-inline me-2">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.path }}">
-                {% get_current_language as LANGUAGE_CODE %}
-                <select name="language" onchange="this.form.submit()" class="form-select form-select-sm d-inline-block" style="width: auto; font-size: 0.8rem;">
-                    {% get_available_languages as LANGUAGES %}
-                    {% for lang_code, lang_name in LANGUAGES %}
-                        <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
-                            {{ lang_name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </form>
 
-            <button class="theme-toggle me-2" id="themeToggle" type="button" aria-label="{% trans '테마 전환' %}">
-                <i class="fas fa-moon"></i>
-            </button>
+            <div class="navbar-utility-controls">
+                <form action="{% url 'set_language' %}" method="post" class="navbar-language-form">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.path }}">
+                    {% get_current_language as LANGUAGE_CODE %}
+                    <select name="language" onchange="this.form.submit()" class="form-select form-select-sm navbar-language-select">
+                        {% get_available_languages as LANGUAGES %}
+                        {% for lang_code, lang_name in LANGUAGES %}
+                            <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                                {{ lang_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </form>
+
+                <button
+                    class="theme-toggle"
+                    id="themeToggle"
+                    type="button"
+                    aria-label="{% trans '다크 모드로 전환' %}"
+                    aria-pressed="false"
+                    data-label-dark="{% trans '다크' %}"
+                    data-label-light="{% trans '라이트' %}"
+                    data-aria-dark="{% trans '다크 모드로 전환' %}"
+                    data-aria-light="{% trans '라이트 모드로 전환' %}"
+                >
+                    <span class="theme-toggle__label">{% trans "다크" %}</span>
+                </button>
+            </div>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -264,12 +276,20 @@
         // 다크모드 토글
         (function() {
             const toggle = document.getElementById('themeToggle');
-            const icon = toggle.querySelector('i');
+            if (!toggle) return;
+            const label = toggle.querySelector('.theme-toggle__label');
 
             function applyTheme(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.setAttribute('data-bs-theme', theme);
-                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
+                const isDark = theme === 'dark';
+                const nextLabel = isDark ? toggle.dataset.labelLight : toggle.dataset.labelDark;
+                const nextAria = isDark ? toggle.dataset.ariaLight : toggle.dataset.ariaDark;
+                if (label) {
+                    label.textContent = nextLabel;
+                }
+                toggle.setAttribute('aria-label', nextAria);
+                toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             }
 
             // 초기 아이콘 동기화

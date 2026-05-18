@@ -198,3 +198,11 @@ class TestDashboardJavaScriptAssets:
         source = css_path.read_text()
 
         assert "var(--quick-input-sheet-max-height, min(82vh, 680px))" in source
+
+    def test_time_grid_prevents_text_selection(self):
+        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
+        source = css_path.read_text()
+
+        assert ".navbar-utility-controls" in source
+        assert "user-select: none;" in source
+        assert "-webkit-user-select: none;" in source

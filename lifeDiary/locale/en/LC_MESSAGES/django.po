@@ -1025,6 +1025,18 @@ msgstr "Loading the page..."
 msgid "테마 전환"
 msgstr "Toggle theme"
 
+msgid "다크 모드로 전환"
+msgstr "Switch to dark mode"
+
+msgid "라이트 모드로 전환"
+msgstr "Switch to light mode"
+
+msgid "다크"
+msgstr "Dark"
+
+msgid "라이트"
+msgstr "Light"
+
 msgid "홈"
 msgstr "Home"
 

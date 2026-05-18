@@ -45,6 +45,22 @@ class TestHomePageEnglish:
         assert f"Life Diary &copy; {years} LogBetter. All rights reserved." in body
         assert "songyeongrok" not in body
 
+    def test_home_page_renders_english_header_theme_text(self, en_client):
+        response = en_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert 'class="navbar-utility-controls"' in body
+        utility_start = body.index('class="navbar-utility-controls"')
+        utility_end = body.index('<button class="navbar-toggler"', utility_start)
+        utility_section = body[utility_start:utility_end]
+
+        assert 'id="themeToggle"' in utility_section
+        assert 'class="theme-toggle__label"' in utility_section
+        assert "Dark" in utility_section
+        assert "Switch to dark mode" in utility_section
+        assert "fas fa-moon" not in utility_section
+        assert "fas fa-sun" not in utility_section
+
     def test_javascript_catalog_endpoint_returns_translations(self, en_client):
         response = en_client.get(reverse("javascript-catalog"))
         assert response.status_code == 200

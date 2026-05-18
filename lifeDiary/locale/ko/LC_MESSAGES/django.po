@@ -998,6 +998,18 @@ msgstr ""
 msgid "테마 전환"
 msgstr ""
 
+msgid "다크 모드로 전환"
+msgstr ""
+
+msgid "라이트 모드로 전환"
+msgstr ""
+
+msgid "다크"
+msgstr ""
+
+msgid "라이트"
+msgstr ""
+
 msgid "홈"
 msgstr ""
 
