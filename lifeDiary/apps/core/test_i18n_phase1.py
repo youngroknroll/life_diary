@@ -2,9 +2,17 @@
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import activate, deactivate
 
 from apps.core.utils import format_time_display
+
+
+def _copyright_year_range():
+    current_year = timezone.localtime(timezone.now()).year
+    if current_year == 2025:
+        return "2025"
+    return f"2025-{current_year}"
 
 
 @pytest.mark.django_db
@@ -29,6 +37,13 @@ class TestHomePageEnglish:
     def test_javascript_catalog_url_is_loaded(self, en_client):
         response = en_client.get(reverse("home"))
         assert reverse("javascript-catalog") in response.content.decode()
+
+    def test_home_page_renders_english_footer_copyright(self, en_client):
+        response = en_client.get(reverse("home"))
+        body = response.content.decode()
+        years = _copyright_year_range()
+        assert f"Life Diary &copy; {years} LogBetter. All rights reserved." in body
+        assert "songyeongrok" not in body
 
     def test_javascript_catalog_endpoint_returns_translations(self, en_client):
         response = en_client.get(reverse("javascript-catalog"))

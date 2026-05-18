@@ -1,5 +1,14 @@
 import pytest
+from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
+
+
+def _copyright_year_range():
+    current_year = timezone.localtime(timezone.now()).year
+    if current_year == 2025:
+        return "2025"
+    return f"2025-{current_year}"
 
 
 @pytest.mark.django_db
@@ -14,6 +23,29 @@ class TestHomePage:
         assert 'data-bs-target="#homePreviewImageModal"' in body
         assert 'id="homePreviewImageModal"' in body
         assert "10분 단위" not in body
+
+    def test_home_page_renders_korean_footer_copyright(self, ko_client):
+        response = ko_client.get(reverse("home"))
+        body = response.content.decode()
+        years = _copyright_year_range()
+        assert f"라이프 다이어리 &copy; {years} LogBetter. All rights reserved." in body
+        assert "songyeongrok" not in body
+
+    def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
+        ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
+        response = ko_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert "/static/core/img/tag_usage_guide.png" in body
+        assert "/static/core/img/tag_usage_guide_en.png" not in body
+
+    def test_home_page_uses_english_tag_usage_guide_for_english_language(self, en_client):
+        en_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        response = en_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert "/static/core/img/tag_usage_guide_en.png" in body
+        assert "/static/core/img/tag_usage_guide.png" not in body
 
     def test_home_page_invites_authenticated_user_to_record_today(self, ko_client, make_user):
         user = make_user(username="daily-user")

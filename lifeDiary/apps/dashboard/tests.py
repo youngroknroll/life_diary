@@ -1,6 +1,8 @@
 from html.parser import HTMLParser
+import re
 
 import pytest
+from django.conf import settings
 
 from apps.dashboard.services import build_time_headers, validate_slot_indexes
 from apps.tags.models import Category, Tag
@@ -102,6 +104,36 @@ class TestDashboardIndexRendering:
         assert idx_passive_tag < idx_invest_header
         assert idx_invest_header < idx_invest_tag
 
+    def test_sidebar_category_headers_use_separator_not_color_dot(self, dash_user_with_tags):
+        client, _ = dash_user_with_tags
+        resp = client.get("/dashboard/")
+        section = _extract_element(resp.content.decode(), "tagContainer")
+        passive_header_start = section.index("tag-category-header")
+        passive_tag_start = section.index("수동태그")
+        passive_header = section[passive_header_start:passive_tag_start]
+        normalized_header = re.sub(r"\s+", " ", passive_header)
+
+        assert "- 수동적 소비시간" in normalized_header
+        assert "background-color: #222222" not in passive_header
+        assert "background-color: #222222" in section[passive_tag_start:]
+
+    def test_sidebar_tag_list_uses_compact_wrapping_row_layout(self, dash_user_with_tags):
+        client, _ = dash_user_with_tags
+        resp = client.get("/dashboard/")
+        section = _extract_element(resp.content.decode(), "tagContainer")
+        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
+        css_source = css_path.read_text()
+        css_block = re.search(
+            r"\.quick-input-tag-list \{(?P<body>.*?)\}",
+            css_source,
+            re.DOTALL,
+        ).group("body")
+
+        assert "quick-input-tag-list" in section
+        assert '<div class="d-grid gap-1">' not in section
+        assert "flex-wrap: wrap;" in css_block
+        assert "flex-direction: column;" not in css_block
+
     def test_dashboard_legend_badges_are_clickable(self, dash_user_with_tags):
         client, _ = dash_user_with_tags
         resp = client.get("/dashboard/")
@@ -133,3 +165,36 @@ class TestDashboardIndexRendering:
         section = _extract_element(resp.content.decode(), "tagContainer")
         assert "onclick" not in section
         assert "<script" not in section
+
+    def test_dashboard_renders_mobile_bottom_sheet_structure(self, dash_user_with_tags):
+        client, _ = dash_user_with_tags
+        resp = client.get("/dashboard/")
+        content = resp.content.decode()
+
+        assert 'id="quickInputSheetBackdrop"' in content
+        assert 'id="quickInputSheet"' in content
+        assert 'aria-labelledby="quickInputSheetTitle"' in content
+        assert 'id="quickInputSheetTitle"' in content
+        assert "data-dashboard-sheet-close" in content
+
+
+class TestDashboardJavaScriptAssets:
+    def test_touchmove_prevent_default_is_guarded_by_cancelable(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert "if (event.cancelable) {" in source
+        assert "event.preventDefault();" in source
+
+    def test_mobile_sheet_height_is_anchored_to_one_am_slot(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert '[data-slot-index="6"]' in source
+        assert "--quick-input-sheet-max-height" in source
+
+    def test_mobile_sheet_css_uses_dynamic_height_cap(self):
+        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
+        source = css_path.read_text()
+
+        assert "var(--quick-input-sheet-max-height, min(82vh, 680px))" in source

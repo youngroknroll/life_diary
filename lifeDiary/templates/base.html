@@ -175,7 +175,12 @@
         <div class="container text-center">
             <p class="mb-0 text-muted" style="font-size: clamp(0.55rem, 2vw, 0.875rem); white-space: nowrap;">
                 <i class="fas fa-clock me-1"></i>
-                {% blocktrans %}라이프 다이어리 &copy; 2025 songyeongrok all rights reserved.{% endblocktrans %}
+                {% now "Y" as current_year %}
+                {% if current_year == "2025" %}
+                    {% blocktrans %}라이프 다이어리 &copy; 2025 LogBetter. All rights reserved.{% endblocktrans %}
+                {% else %}
+                    {% blocktrans %}라이프 다이어리 &copy; 2025-{{ current_year }} LogBetter. All rights reserved.{% endblocktrans %}
+                {% endif %}
             </p>
         </div>
     </footer>
@@ -304,4 +309,4 @@
     
     {% block extra_js %}{% endblock %}
 </body>
-</html> 
+</html>

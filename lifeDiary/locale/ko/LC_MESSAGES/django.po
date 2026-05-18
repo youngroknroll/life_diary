@@ -1004,7 +1004,10 @@ msgstr ""
 msgid "로그아웃"
 msgstr ""
 
-msgid "라이프 다이어리 &copy; 2025 songyeongrok all rights reserved."
+msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
+msgstr ""
+
+msgid "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
 msgstr ""
 
 msgid "하루를 단순하게 기록하세요"

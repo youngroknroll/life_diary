@@ -16,6 +16,30 @@ jobs:
         with:
           fetch-depth: 0
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install LifeDiary dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r lifeDiary/requirements.txt
+
+      - name: Verify LifeDiary deploy readiness
+        working-directory: lifeDiary
+        env:
+          DJANGO_SECRET_KEY: test-ci-secret-value-for-deploy-readiness-checks-only-1234567890
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_HOST: localhost
+          DB_PORT: '6543'
+          RESEND_API_KEY: re_test_dummy
+          DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
+        run: |
+          python -m pytest lifeDiary/test_prod_settings.py apps/core/test_email_backends.py --tb=short
+          python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR
+
       - name: Create or update deploy PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

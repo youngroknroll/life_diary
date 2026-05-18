@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from django.conf import settings
 from django.db.models import ProtectedError
 from django.template import Context, Template
 
@@ -205,6 +206,21 @@ class TestTagBadgeTemplateTag:
         )
         assert "<script>alert(1)</script>" not in html
         assert "&lt;script&gt;" in html
+
+
+class TestTagModalTemplate:
+    def test_category_select_has_readable_font_size_class(self):
+        template_path = settings.BASE_DIR / "apps/tags/templates/tags/_tag_modal.html"
+        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
+
+        template_source = template_path.read_text()
+        css_source = css_path.read_text()
+
+        assert 'id="tagFormCategory"' in template_source
+        assert "tag-category-select" in template_source
+        assert ".tag-category-select" in css_source
+        assert "font-size: 1rem;" in css_source
+        assert ".tag-category-select option" in css_source
 
 
 # === Seed Data Migration Tests ===

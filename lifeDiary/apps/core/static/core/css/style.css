@@ -217,6 +217,101 @@ footer {
     }
 }
 
+.quick-input-sheet-backdrop {
+    display: none;
+}
+
+.quick-input-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.25rem 0.375rem;
+}
+
+.quick-input-tag-list .tag-btn {
+    width: fit-content;
+    max-width: 100%;
+    white-space: normal;
+}
+
+.tag-category-select,
+.tag-category-select option {
+    font-size: 1rem;
+}
+
+@media (max-width: 767.98px) {
+    body.dashboard-sheet-open {
+        overflow: hidden;
+    }
+
+    .quick-input-sheet-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1030;
+        background: rgba(15, 23, 42, 0.45);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .quick-input-sheet-backdrop.is-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .quick-input-sheet {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1040;
+        max-height: var(--quick-input-sheet-max-height, min(82vh, 680px));
+        overflow-y: auto;
+        transform: translateY(100%);
+        transition: transform 0.24s ease;
+        padding: 0 0.75rem 0.75rem;
+        will-change: transform;
+    }
+
+    .quick-input-sheet.is-open {
+        transform: translateY(0);
+    }
+
+    .quick-input-sheet .card {
+        border-radius: 12px 12px 8px 8px !important;
+        box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.24);
+    }
+
+    .quick-input-sheet .card-header {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+    }
+
+    .quick-input-sheet .btn,
+    .quick-input-sheet .tag-btn,
+    .quick-input-sheet #saveBtn {
+        min-height: 44px;
+    }
+
+    .quick-input-toolbar {
+        align-items: flex-start !important;
+        gap: 0.5rem;
+    }
+
+    .quick-input-actions {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.35rem;
+    }
+
+    .quick-input-actions .btn {
+        margin-right: 0 !important;
+    }
+}
+
 /* =========================================================
    Card & Button (전역 공통)
    ========================================================= */
@@ -1015,11 +1110,75 @@ footer {
     border-bottom: 2px solid var(--color-border);
 }
 
-/* Life Feedback 카드 — 좁은 화면에서 overflow 방지 */
+/* Life Feedback 토글 목록 */
+.life-feedback-panel {
+    border-top: 1px solid var(--color-border-soft);
+}
+
+.life-feedback-toggle {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 44px;
+    padding: 0.65rem 0.85rem;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.life-feedback-toggle:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+.life-feedback-toggle__title {
+    min-width: 0;
+    font-weight: 700;
+}
+
+.life-feedback-toggle__chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.8rem;
+    color: var(--color-text-muted);
+}
+
+.life-feedback-toggle.collapsed .life-feedback-toggle__chevron {
+    transform: rotate(-90deg);
+}
+
+.life-feedback-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0 0.85rem 0.85rem;
+}
+
 .life-feedback-card {
+    flex: 1 1 min(320px, 100%);
     min-width: 0;
     width: 100%;
     max-width: min(400px, 100%);
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--radius-sm);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.life-feedback-card--positive {
+    background: var(--bs-primary-bg-subtle);
+    color: var(--bs-primary-text-emphasis);
+}
+
+.life-feedback-card--warning {
+    background: var(--bs-warning-bg-subtle);
+    color: var(--bs-warning-text-emphasis);
+}
+
+.life-feedback-card--info {
+    background: var(--bs-info-bg-subtle);
+    color: var(--bs-info-text-emphasis);
 }
 
 /* 목표 안내 패널 (mypage) */
