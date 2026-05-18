@@ -1,6 +1,14 @@
 import pytest
 from django.conf import settings
 from django.urls import reverse
+from django.utils import timezone
+
+
+def _copyright_year_range():
+    current_year = timezone.localtime(timezone.now()).year
+    if current_year == 2025:
+        return "2025"
+    return f"2025-{current_year}"
 
 
 @pytest.mark.django_db
@@ -15,6 +23,13 @@ class TestHomePage:
         assert 'data-bs-target="#homePreviewImageModal"' in body
         assert 'id="homePreviewImageModal"' in body
         assert "10분 단위" not in body
+
+    def test_home_page_renders_korean_footer_copyright(self, ko_client):
+        response = ko_client.get(reverse("home"))
+        body = response.content.decode()
+        years = _copyright_year_range()
+        assert f"라이프 다이어리 &copy; {years} LogBetter. All rights reserved." in body
+        assert "songyeongrok" not in body
 
     def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
         ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"

@@ -17,6 +17,12 @@
    - Completion requires fresh verification output: tests, build, lint, manual checklist, or other agreed evidence.
    - Any unverified item must be reported as unverified, not complete.
 
+4. The user owns scope and process judgment.
+   - Agents must not independently decide that a task is too small, obvious, low-risk, or urgent to follow this operating guide.
+   - Agents must not skip, compress, or replace required workflow steps unless the user explicitly approves that exception.
+   - If a required step seems unnecessary, excessive, or unclear for the current task, the agent must ask the user before omitting or changing it.
+   - Chat-based agreement does not replace a required project document unless the user explicitly says that it does.
+
 ## Default Agent Roles
 
 ### PO / General Manager
@@ -341,6 +347,8 @@ Output focus:
    - Before code work starts, consolidate analyst requirements, designs, risks, and test guidance into a plan document.
    - The plan document must identify the approved scope, acceptance criteria, implementation steps, TDD checkpoints, verification commands, and deferred work.
    - Codex must use the plan document as the implementation boundary.
+   - Codex must not treat a small or simple change as an implicit waiver of this plan document requirement.
+   - If Codex believes a plan document should be skipped, Codex must ask for and receive explicit user approval before editing files.
 
 4. TDD implementation
    - TDD Expert proposes the next smallest failing behavior test.
