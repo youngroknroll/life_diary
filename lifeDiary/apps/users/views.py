@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
+from django.contrib.auth.views import PasswordResetView
+from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.translation import gettext
@@ -42,9 +44,33 @@ _save_note = SaveNoteUseCase()
 _delete_note = DeleteNoteUseCase()
 
 
+RECOVERY_RATE_LIMIT_MAX_ATTEMPTS = 5
+RECOVERY_RATE_LIMIT_WINDOW_SECONDS = 60 * 10
+VALIDATION_RATE_LIMIT_MAX_ATTEMPTS = 10
+VALIDATION_RATE_LIMIT_WINDOW_SECONDS = 60
+
+
 def _get_user_tag_queryset(user):
     """사용자 태그 + 기본 태그 쿼리셋"""
     return _tag_repo.find_accessible(user)
+
+
+def _get_client_identifier(request):
+    return request.META.get("REMOTE_ADDR", "unknown")
+
+
+def _get_rate_limit_retry_message():
+    return gettext("잠시 후 다시 시도해주세요.")
+
+
+def _is_rate_limited(request, scope, max_attempts_setting, window_setting):
+    max_attempts = getattr(settings, max_attempts_setting, globals()[max_attempts_setting])
+    window_seconds = getattr(settings, window_setting, globals()[window_setting])
+    key = f"rate-limit:{scope}:{_get_client_identifier(request)}"
+    if cache.add(key, 1, timeout=window_seconds):
+        return False
+    attempts = cache.incr(key)
+    return attempts > max_attempts
 
 
 def _goal_data_from_form(form: UserGoalForm) -> GoalData:
@@ -92,7 +118,7 @@ def signup_view(request):
     )
 
 
-REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 30  # 30 days
+REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 14  # 14 days
 
 
 def login_view(request):
@@ -104,7 +130,7 @@ def login_view(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            # Remember me: 체크 시 30일 유지, 미체크 시 브라우저 종료 시 만료
+            # Remember me: 체크 시 14일 유지, 미체크 시 브라우저 종료 시 만료
             if request.POST.get("remember_me"):
                 request.session.set_expiry(REMEMBER_ME_DURATION_SECONDS)
             else:
@@ -160,6 +186,13 @@ def username_recovery_view(request):
     if request.method == "POST":
         form = UsernameRecoveryForm(request.POST)
         if form.is_valid():
+            if _is_rate_limited(
+                request,
+                "username-recovery",
+                "RECOVERY_RATE_LIMIT_MAX_ATTEMPTS",
+                "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
+            ):
+                return redirect("users:username_recovery_done")
             _send_username_recovery_email(request, form.cleaned_data["email"])
             return redirect("users:username_recovery_done")
     else:
@@ -186,6 +219,13 @@ _USERNAME_MAX_LENGTH = 30
 @require_GET
 def check_username_view(request):
     """signup blur 시 username 중복/형식 비동기 검증."""
+    if _is_rate_limited(
+        request,
+        "check-username",
+        "VALIDATION_RATE_LIMIT_MAX_ATTEMPTS",
+        "VALIDATION_RATE_LIMIT_WINDOW_SECONDS",
+    ):
+        return JsonResponse({"available": False, "message": _get_rate_limit_retry_message()})
     username = (request.GET.get("username") or "").strip()
     if not username:
         return JsonResponse({"available": False, "message": gettext("사용자명을 입력해주세요.")})
@@ -208,6 +248,13 @@ def check_username_view(request):
 @require_GET
 def check_email_view(request):
     """signup blur 시 email 형식/중복 비동기 검증."""
+    if _is_rate_limited(
+        request,
+        "check-email",
+        "VALIDATION_RATE_LIMIT_MAX_ATTEMPTS",
+        "VALIDATION_RATE_LIMIT_WINDOW_SECONDS",
+    ):
+        return JsonResponse({"available": False, "message": _get_rate_limit_retry_message()})
     email = (request.GET.get("email") or "").strip()
     if not email:
         return JsonResponse({"available": False, "message": gettext("이메일을 입력해주세요.")})
@@ -223,6 +270,18 @@ def check_email_view(request):
             {"available": False, "message": gettext("이미 사용 중인 이메일입니다.")}
         )
     return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
+
+
+class RateLimitedPasswordResetView(PasswordResetView):
+    def form_valid(self, form):
+        if _is_rate_limited(
+            self.request,
+            "password-reset",
+            "RECOVERY_RATE_LIMIT_MAX_ATTEMPTS",
+            "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
+        ):
+            return redirect(self.get_success_url())
+        return super().form_valid(form)
 
 
 @login_required

@@ -1013,6 +1013,9 @@ msgstr "This username is already taken."
 msgid "사용 가능합니다."
 msgstr "Available."
 
+msgid "잠시 후 다시 시도해주세요."
+msgstr "Please try again later."
+
 msgid "이메일을 입력해주세요."
 msgstr "Please enter an email."
 
