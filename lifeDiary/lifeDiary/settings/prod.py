@@ -36,11 +36,15 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
 
 # 프로덕션 전용 세션 보안 설정
 SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 종료 시 세션 만료
 SESSION_SAVE_EVERY_REQUEST = False  # DB session write 최소화 (Django 기본값)
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 3  # 3시간
 
 CACHES = {
     "default": {
@@ -50,7 +54,12 @@ CACHES = {
     }
 }
 
-# Email (production: Resend HTTPS API)
-EMAIL_BACKEND = "apps.core.email_backends.ResendEmailBackend"
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@lifediary.local")
+# Email (production: Gmail SMTP)
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
+SERVER_EMAIL = DEFAULT_FROM_EMAIL

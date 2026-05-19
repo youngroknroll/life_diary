@@ -7,6 +7,7 @@
 import json
 import secrets
 import pytest
+from django.test import override_settings
 from django.urls import reverse
 
 # Test-only password generated per run (no real credential).
@@ -49,6 +50,70 @@ class TestCheckUsername:
         _, data = _get_json(client, reverse("users:check_username"), username="brand_new_42")
         assert data["available"] is True
 
+    @override_settings(
+        VALIDATION_RATE_LIMIT_MAX_ATTEMPTS=2,
+        VALIDATION_RATE_LIMIT_WINDOW_SECONDS=60,
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-username-rate-limit",
+            }
+        },
+    )
+    def test_rate_limited_returns_generic_unavailable_response(self, client):
+        url = reverse("users:check_username")
+
+        _, first = _get_json(client, url, username="brand_new_42")
+        _, second = _get_json(client, url, username="brand_new_42")
+        status, third = _get_json(client, url, username="brand_new_42")
+
+        assert status == 200
+        assert first["available"] is True
+        assert second["available"] is True
+        assert third["available"] is False
+        assert third["message"]
+
+    @override_settings(
+        VALIDATION_RATE_LIMIT_MAX_ATTEMPTS=2,
+        VALIDATION_RATE_LIMIT_WINDOW_SECONDS=60,
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-username-xff-bypass",
+            }
+        },
+    )
+    def test_rate_limit_ignores_spoofed_forwarded_for_header(self, client):
+        url = reverse("users:check_username")
+        environ = {"REMOTE_ADDR": "10.0.0.1"}
+
+        _, first = _get_json(
+            client,
+            url,
+            username="brand_new_42",
+            **environ,
+            HTTP_X_FORWARDED_FOR="1.1.1.1",
+        )
+        _, second = _get_json(
+            client,
+            url,
+            username="brand_new_42",
+            **environ,
+            HTTP_X_FORWARDED_FOR="2.2.2.2",
+        )
+        status, third = _get_json(
+            client,
+            url,
+            username="brand_new_42",
+            **environ,
+            HTTP_X_FORWARDED_FOR="3.3.3.3",
+        )
+
+        assert status == 200
+        assert first["available"] is True
+        assert second["available"] is True
+        assert third["available"] is False
+
 
 @pytest.mark.django_db
 class TestCheckEmail:
@@ -81,6 +146,49 @@ class TestCheckEmail:
     def test_available(self, client):
         _, data = _get_json(client, reverse("users:check_email"), email="fresh@example.com")
         assert data["available"] is True
+
+    @override_settings(
+        VALIDATION_RATE_LIMIT_MAX_ATTEMPTS=2,
+        VALIDATION_RATE_LIMIT_WINDOW_SECONDS=60,
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-email-rate-limit",
+            }
+        },
+    )
+    def test_rate_limited_returns_generic_unavailable_response(self, client):
+        url = reverse("users:check_email")
+
+        _, first = _get_json(client, url, email="fresh@example.com")
+        _, second = _get_json(client, url, email="fresh@example.com")
+        status, third = _get_json(client, url, email="fresh@example.com")
+
+        assert status == 200
+        assert first["available"] is True
+        assert second["available"] is True
+        assert third["available"] is False
+        assert third["message"]
+
+    @override_settings(
+        VALIDATION_RATE_LIMIT_MAX_ATTEMPTS=2,
+        VALIDATION_RATE_LIMIT_WINDOW_SECONDS=60,
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-email-en-rate-limit",
+            }
+        },
+    )
+    def test_rate_limited_message_respects_english_locale(self, en_client):
+        url = reverse("users:check_email")
+
+        _get_json(en_client, url, email="fresh@example.com")
+        _get_json(en_client, url, email="fresh@example.com")
+        _, third = _get_json(en_client, url, email="fresh@example.com")
+
+        assert third["available"] is False
+        assert third["message"] == "Please try again later."
 
 
 @pytest.mark.django_db

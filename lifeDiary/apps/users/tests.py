@@ -1,6 +1,9 @@
+import time
+from datetime import timedelta
 from types import SimpleNamespace
 
 import pytest
+from django.core.management import call_command
 from django.test import override_settings
 from django.urls import reverse
 
@@ -92,3 +95,60 @@ class TestLoginView:
             )
         assert response.status_code == 302
         assert response.url == reverse("home")
+
+
+@pytest.mark.django_db
+class TestLoginAxesBehavior:
+    @pytest.fixture(autouse=True)
+    def _axes_settings(self, settings):
+        settings.AXES_ENABLED = True
+        settings.AXES_FAILURE_LIMIT = 2
+        settings.AXES_COOLOFF_TIME = timedelta(seconds=1)
+        settings.AXES_RESET_ON_SUCCESS = True
+        settings.AUTHENTICATION_BACKENDS = [
+            "axes.backends.AxesStandaloneBackend",
+            "django.contrib.auth.backends.ModelBackend",
+        ]
+        call_command("axes_reset")
+
+    def _login(self, client, password):
+        return client.post(
+            reverse("users:login"),
+            data={"username": "login-user", "password": password},
+        )
+
+    def test_lockout_after_failure_limit(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
+
+        first = self._login(client, "wrong-password")
+        lockout_trigger = self._login(client, "wrong-password")
+        locked = self._login(client, "wrong-password")
+
+        assert first.status_code == 200
+        assert lockout_trigger.status_code == 429
+        assert locked.status_code == 429
+
+    def test_cooloff_allows_login_again(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
+
+        self._login(client, "wrong-password")
+        self._login(client, "wrong-password")
+        locked = self._login(client, "wrong-password")
+        assert locked.status_code == 429
+
+        time.sleep(1.1)
+
+        recovered = self._login(client, "pw123456!!")
+        assert recovered.status_code == 302
+        assert recovered.url == reverse("home")
+
+    def test_successful_login_resets_failure_count(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
+
+        first_failure = self._login(client, "wrong-password")
+        success = self._login(client, "pw123456!!")
+        second_failure_after_success = self._login(client, "wrong-password")
+
+        assert first_failure.status_code == 200
+        assert success.status_code == 302
+        assert second_failure_after_success.status_code == 200
