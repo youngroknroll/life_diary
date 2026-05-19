@@ -72,3 +72,10 @@ class TestHomePage:
         assert "daily-user님" in body
         assert "오늘 기록하기" in body
         assert "로그인하고 기록 시작" not in body
+
+    def test_robots_txt_disallows_all_crawlers(self, ko_client):
+        response = ko_client.get("/robots.txt")
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "text/plain"
+        assert response.content.decode() == "User-agent: *\nDisallow: /\n"

@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponse
 from django.views.i18n import JavaScriptCatalog
 from . import views
 
@@ -28,6 +29,14 @@ admin.site.login = user_passes_test(lambda u: u.is_superuser, login_url="/")(
 
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
+    path(
+        "robots.txt",
+        lambda request: HttpResponse(
+            "User-agent: *\nDisallow: /\n",
+            content_type="text/plain",
+        ),
+        name="robots-txt",
+    ),
     path(
         "jsi18n/",
         JavaScriptCatalog.as_view(
