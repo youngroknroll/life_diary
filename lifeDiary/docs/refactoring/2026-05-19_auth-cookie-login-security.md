@@ -42,6 +42,7 @@ Implemented the approved web-only auth hardening from:
   - realtime validation endpoints still return `200` JSON and switch to a generic unavailable response when throttled
 - Added password reset UX tests for invalid, expired, and reused tokens.
 - Added `django-axes` behavior tests for lockout, cooloff recovery, and reset-on-success.
+- Followed up review fixes by removing trust in client-supplied `X-Forwarded-For` for throttling and translating retry messages at request time.
 
 ## Verification
 
@@ -75,7 +76,13 @@ Implemented the approved web-only auth hardening from:
   - same targeted command passed with `8 passed in 15.92s`
 - Final focused regression:
   - `conda run -n knou-life-diary pytest apps/users/test_remember_me.py apps/users/test_prod_settings.py apps/users/test_password_reset.py apps/users/test_username_recovery.py apps/users/test_realtime_validation.py apps/users/tests.py --tb=short`
-  - `40 passed in 35.83s`
+  - `42 passed in 34.03s`
+- Review follow-up regression:
+  - `conda run -n knou-life-diary pytest apps/users/test_realtime_validation.py --tb=short`
+  - `16 passed in 4.49s`
+- Translation compile:
+  - `conda run -n knou-life-diary python manage.py compilemessages`
+  - completed successfully
 - Deploy-oriented settings check:
   - `DJANGO_SECRET_KEY=test-ci-secret-value-for-deploy-readiness-checks-only-1234567890 DB_NAME=test_db DB_USER=test_user DB_PASSWORD=test_password DB_HOST=localhost DB_PORT=6543 RESEND_API_KEY=re_test_dummy DEFAULT_FROM_EMAIL='LifeDiary <noreply@example.com>' conda run -n knou-life-diary python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR`
   - `System check identified no issues (0 silenced).`
