@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-18
+Last updated: 2026-05-19
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -54,6 +54,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Korean-English i18n | `docs/refactoring/2026-04-28_i18n-phase1-5-execution-log.md` | Completed i18n phases for base/core, dashboard, tags, users, and stats using `LocalizableMessage` and JS catalog. | Document includes verification section and phase commits. |
 | pytest migration | `docs/refactoring/2026-04-28_pytest-migration.md` | Converted unittest-style tests to pytest-native style and expanded fixtures. | Document reports `111 passed in 45.02s`. |
 | Account recovery and email infrastructure | Code analysis: `apps/users/urls.py`, `apps/users/forms.py`, `apps/users/views.py`, `apps/core/email_backends.py`, `apps/users/templates/users/password/`, `apps/users/templates/users/recovery/` | Implemented password reset, username recovery, signup email capture/validation, and Resend HTTPS email backend. | Fresh verification: `conda run -n knou-life-diary pytest apps/users/test_password_reset.py apps/users/test_username_recovery.py apps/users/test_signup_email.py apps/core/test_email_backends.py ... --tb=short` included in a 50-test run, `50 passed in 29.65s`. |
+| Auth cookie and login security phase 1 | `docs/plans/2026-05-19_auth-cookie-login-security-plan.md`, `docs/plans/2026-05-19_auth-cookie-login-security-implementation-plan.md`, `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | Hardened web auth without changing the overall auth architecture: reduced remember-me to 14 days, made key production cookie settings explicit, added production password reset timeout, added cache-based throttling for password reset / username recovery / signup validation endpoints, and added behavior tests for reset-token failure states and `django-axes` lockout/cooloff/reset behavior. | Fresh verification: focused auth regression `40 passed in 35.83s`; prod deploy check reported `System check identified no issues (0 silenced)`; `git diff --check` exit 0. |
 | Production deploy email readiness | `docs/plans/2026-05-15_production-deploy-email-readiness.md`, `docs/refactoring/2026-05-15_production-deploy-email-readiness.md`, `.github/workflows/deploy-pr.yml`, `lifeDiary/settings/prod.py`, `lifeDiary/test_prod_settings.py` | Added a production settings regression test, set production `DEBUG=False`, added deploy PR verification before PR creation/update, and documented that live recovery email delivery is deferred until a sender domain is purchased/configured and verified in Resend. | Fresh verification: `conda run -n knou-life-diary pytest lifeDiary/test_prod_settings.py apps/core/test_email_backends.py --tb=short` -> `3 passed`; prod deploy check -> `System check identified no issues`; `ruby ... YAML.load_file(...)` -> `yaml ok`; full suite -> `167 passed in 73.18s`. |
 | Footer copyright LogBetter display | `docs/refactoring/2026-05-18_footer-copyright-logbetter.md` | Updated the shared footer copyright notice to use `LogBetter`, with a 2025 service-start year range and localized app names: Korean screens show `라이프 다이어리 © 2025-2026 LogBetter. All rights reserved.`, and English screens show `Life Diary © 2025-2026 LogBetter. All rights reserved.` for the current year. | Fresh verification: targeted RED failed before implementation for the missing footer strings; after implementation `conda run -n knou-life-diary pytest apps/core/tests.py::TestHomePage::test_home_page_renders_korean_footer_copyright apps/core/test_i18n_phase1.py::TestHomePageEnglish::test_home_page_renders_english_footer_copyright --tb=short` -> `2 passed in 0.64s`; focused core/i18n regression `conda run -n knou-life-diary pytest apps/core/tests.py apps/core/test_i18n_phase1.py --tb=short` -> `12 passed in 1.92s`. |
 | Header utility controls and dashboard drag polish | `docs/plans/2026-05-19-header-utility-controls-design.md`, `docs/plans/2026-05-19-header-utility-controls.md`, `docs/refactoring/2026-05-19_header-utility-controls.md` | Added a stable header utility row beside the Life Diary brand for the language selector and text-based dark/light toggle, updated theme toggle accessibility attributes, and prevented dashboard time-slot text selection during drag. | Fresh verification: targeted RED failed before implementation with `3 failed`; after implementation the same targeted command passed with `3 passed in 0.75s`; focused regression `conda run -n knou-life-diary pytest apps/core/tests.py apps/core/test_i18n_phase1.py apps/dashboard/tests.py --tb=short` -> `29 passed in 8.74s`. Manual browser viewport and pointer-drag checks remain unverified. |
@@ -114,7 +115,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Security | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | CSP, stronger cookie/security flags, production debug review, and login failure notifications. |
 | pytest | `docs/refactoring/2026-04-28_pytest-migration.md` | More locale parametrization, possible `factory_boy`, and optional locale leak guard fixture. |
 | Desktop distribution | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | Code signing, notarization, auto-update, operational metrics, and monetization phases. |
-| Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, recovery endpoint rate limiting, email verification, and email backfill policy. |
+| Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, email verification, and email backfill policy. |
+| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`, `ALLOWED_HOSTS` refinement, deployed `Set-Cookie` header inspection, and live Resend sender-domain verification remain deferred. |
 | Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
 
 ## Next Recommended Work
@@ -152,6 +154,19 @@ ruby -e "require 'yaml'; YAML.load_file('/Users/yeongroksong/Desktop/study/proje
 
 conda run -n knou-life-diary pytest --tb=short
 # 167 passed in 73.18s
+```
+
+Commands run on 2026-05-19:
+
+```bash
+conda run -n knou-life-diary pytest apps/users/test_remember_me.py apps/users/test_prod_settings.py apps/users/test_password_reset.py apps/users/test_username_recovery.py apps/users/test_realtime_validation.py apps/users/tests.py --tb=short
+# 40 passed in 35.83s
+
+DJANGO_SECRET_KEY=test-ci-secret-value-for-deploy-readiness-checks-only-1234567890 DB_NAME=test_db DB_USER=test_user DB_PASSWORD=test_password DB_HOST=localhost DB_PORT=6543 RESEND_API_KEY=re_test_dummy DEFAULT_FROM_EMAIL='LifeDiary <noreply@example.com>' conda run -n knou-life-diary python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR
+# System check identified no issues (0 silenced).
+
+git diff --check
+# exit 0
 ```
 
 The default local `python -m pytest ...` command failed before test collection because the default Python environment did not initialize Django settings/apps correctly. The conda environment used by project documents, `knou-life-diary`, was used for the successful verification runs.

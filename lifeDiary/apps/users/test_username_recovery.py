@@ -1,5 +1,6 @@
 import pytest
 from django.core import mail
+from django.test import override_settings
 from django.urls import reverse
 from smtplib import SMTPServerDisconnected
 
@@ -61,3 +62,30 @@ class TestUsernameRecovery:
 
         assert response.status_code == 302
         assert response.url == reverse("users:username_recovery_done")
+
+    @override_settings(
+        RECOVERY_RATE_LIMIT_MAX_ATTEMPTS=2,
+        RECOVERY_RATE_LIMIT_WINDOW_SECONDS=60,
+        CACHES={
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-username-recovery-rate-limit",
+            }
+        },
+    )
+    def test_recovery_is_rate_limited_without_changing_redirect_contract(
+        self, client, make_user
+    ):
+        make_user(username="alice", email="alice@example.com")
+
+        first = client.post(reverse("users:username_recovery"), {"email": "alice@example.com"})
+        second = client.post(reverse("users:username_recovery"), {"email": "alice@example.com"})
+        third = client.post(reverse("users:username_recovery"), {"email": "alice@example.com"})
+
+        assert first.status_code == 302
+        assert second.status_code == 302
+        assert third.status_code == 302
+        assert first.url == reverse("users:username_recovery_done")
+        assert second.url == reverse("users:username_recovery_done")
+        assert third.url == reverse("users:username_recovery_done")
+        assert len(mail.outbox) == 2
