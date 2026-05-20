@@ -169,15 +169,15 @@ function closeQuickInputSheet() {
     const backdrop = document.getElementById('quickInputSheetBackdrop');
     if (!sheet || !backdrop) return;
 
+    if (lastSelectedSlotElement) {
+        lastSelectedSlotElement.focus({ preventScroll: true });
+    }
+
     sheet.classList.remove('is-open');
     backdrop.classList.remove('is-open');
     sheet.setAttribute('aria-hidden', 'true');
     backdrop.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('dashboard-sheet-open');
-
-    if (lastSelectedSlotElement) {
-        lastSelectedSlotElement.focus({ preventScroll: true });
-    }
 }
 
 // ── 슬롯 선택 ──
@@ -308,17 +308,6 @@ const handleTouchMove = (event) => {
         const dx = Math.abs(touch.clientX - touchStartX);
         const dy = Math.abs(touch.clientY - touchStartY);
         if (dx < 5 && dy < 5) return;
-        if (dy > dx) {
-            clearSelection();
-            if (isAdditiveDrag) restoreBaseSelection();
-            isDragging = false;
-            startSlot = null;
-            isAdditiveDrag = false;
-            dragBaseSelection = new Set();
-            showSlotInfo(Array.from(selectedSlots));
-            updateButtons();
-            return;
-        }
         touchDecided = true;
     }
 

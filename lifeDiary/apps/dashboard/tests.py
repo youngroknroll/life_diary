@@ -186,6 +186,25 @@ class TestDashboardJavaScriptAssets:
         assert "if (event.cancelable) {" in source
         assert "event.preventDefault();" in source
 
+    def test_mobile_touch_drag_does_not_cancel_vertical_time_slot_gesture(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert "dy > dx" not in source
+        assert source.index("event.preventDefault();") < source.index("document.elementFromPoint")
+
+    def test_mobile_sheet_close_moves_focus_before_hiding_dialog(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+        close_body = source[
+            source.index("function closeQuickInputSheet()"):
+            source.index("// ── 슬롯 선택 ──")
+        ]
+
+        assert close_body.index("focus({ preventScroll: true })") < close_body.index(
+            "sheet.setAttribute('aria-hidden', 'true')"
+        )
+
     def test_mobile_sheet_height_is_anchored_to_one_am_slot(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
         source = js_path.read_text()
