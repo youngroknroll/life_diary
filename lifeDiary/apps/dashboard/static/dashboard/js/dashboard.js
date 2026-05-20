@@ -342,6 +342,7 @@ const showSlotInfo = (slotIndexes) => {
         document.querySelector(`[data-slot-index="${idx}"]`)?.classList.contains('filled')
     );
 
+    const nextActionPrompt = gettext('시간을 선택했어요. 원하는 태그를 선택하세요.');
     let infoHTML = '';
     if (slotIndexes.length === 1) {
         const slotIndex = slotIndexes[0];
@@ -376,6 +377,7 @@ const showSlotInfo = (slotIndexes) => {
                 <div class="text-muted"><strong>${labelTime}</strong> ${timeRange}</div>
                 <div class="text-muted"><strong>${labelStatus}</strong> ${tagName}</div>
                 ${memo ? `<div class="text-muted small">${memo}</div>` : ''}
+                <div class="text-primary small mt-1"><i class="fas fa-tags me-1"></i>${nextActionPrompt}</div>
             </div>
             ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
         </div>`;
@@ -399,6 +401,7 @@ const showSlotInfo = (slotIndexes) => {
             <div>
                 <div class="text-muted"><strong>${slotsLabel}</strong> ${startTime} - ${endTime}</div>
                 <div class="text-muted small">${durationLabel}</div>
+                <div class="text-primary small mt-1"><i class="fas fa-tags me-1"></i>${nextActionPrompt}</div>
             </div>
             ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
         </div>`;

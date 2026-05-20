@@ -264,6 +264,13 @@ footer {
     white-space: normal;
 }
 
+#saveBtn:disabled {
+    background-color: var(--color-text-muted);
+    border-color: var(--color-text-muted);
+    color: white;
+    opacity: 1;
+}
+
 .tag-category-select,
 .tag-category-select option {
     font-size: 1rem;

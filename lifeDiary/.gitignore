@@ -1,0 +1,49 @@
+.venv/
+.claude
+__pycache__/
+*.pyc
+.pytest_cache/
+.cache/
+/staticfiles/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 로그
+*.log
+logs/
+
+# 환경/시크릿
+.env
+.env.local
+.env.*.local
+secret_key
+secrets/
+
+# 인증서/키
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# 백업/임시
+*.bak
+*.swp
+*.tmp
+*~
+
+# 미디어 업로드 (있다면)
+/media/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# lazyweb MCP plugin cache
+.lazyweb/
+
+# local git worktrees
+.worktrees/
