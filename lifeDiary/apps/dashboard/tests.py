@@ -177,6 +177,21 @@ class TestDashboardIndexRendering:
         assert 'id="quickInputSheetTitle"' in content
         assert "data-dashboard-sheet-close" in content
 
+    def test_memo_optional_text_is_placeholder_only(self, dash_user_with_tags):
+        client, _ = dash_user_with_tags
+        resp = client.get("/dashboard/")
+        section = _extract_element(resp.content.decode(), "quickInputSheet")
+
+        assert 'placeholder="메모 (선택사항)"' in section
+        assert '<label for="memoInput"' not in section
+
+    def test_disabled_save_button_has_gray_state_css(self):
+        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
+        source = css_path.read_text()
+
+        assert "#saveBtn:disabled" in source
+        assert "background-color: var(--color-text-muted);" in source
+
 
 class TestDashboardJavaScriptAssets:
     def test_touchmove_prevent_default_is_guarded_by_cancelable(self):
@@ -217,6 +232,15 @@ class TestDashboardJavaScriptAssets:
         source = css_path.read_text()
 
         assert "var(--quick-input-sheet-max-height, min(82vh, 680px))" in source
+
+    def test_selected_slot_info_prompts_tag_selection(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert "시간을 선택했어요. 원하는 태그를 선택하세요." in source
+        assert source.index("시간을 선택했어요. 원하는 태그를 선택하세요.") < source.index(
+            "inlineEl.innerHTML = infoHTML;"
+        )
 
     def test_time_grid_prevents_text_selection(self):
         css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
