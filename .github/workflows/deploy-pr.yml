@@ -73,7 +73,7 @@ jobs:
 
           EXISTING=$(retry gh pr list --base production --head main --state open --json number --jq '.[0].number // empty')
 
-          COMMITS=$(git log origin/production..origin/main --pretty=format:'- %s (%h)' | head -50)
+          COMMITS=$(git log -50 origin/production..origin/main --pretty=format:'- %s (%h)')
 
           BODY=$(cat <<EOF
           ## Deploy candidate
