@@ -29,3 +29,13 @@ def test_login_page_does_not_load_strength_meter(client):
     r = client.get('/accounts/login/')
     assert r.status_code == 200
     assert 'password-strength.js' not in r.content.decode()
+
+
+@pytest.mark.django_db
+def test_login_page_has_google_continue_link(client):
+    r = client.get("/accounts/login/")
+
+    assert r.status_code == 200
+    h = r.content.decode()
+    assert "Google로 계속하기" in h
+    assert "/accounts/google/login/" in h
