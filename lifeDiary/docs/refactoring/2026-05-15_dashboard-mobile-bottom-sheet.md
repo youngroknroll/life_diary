@@ -7,7 +7,7 @@
 - Added mobile open/close behavior, backdrop handling, ARIA state updates, and focus return after closing.
 - Preserved vertical touch movement as page scroll instead of forcing slot selection.
 - Guarded `touchmove` cancellation with `event.cancelable` to avoid browser intervention warnings after scrolling starts.
-- Changed the mobile sheet from a grid 01:00-line dynamic cap to a fixed `80vh` viewport height anchored to the bottom of the screen.
+- Changed the mobile sheet from a grid 01:00-line dynamic cap to a fixed `80dvh` viewport height with border-box sizing, anchored to the bottom of the visible screen.
 - Replaced quick input category header color dots with a plain `-` separator while preserving individual tag color markers.
 - Changed quick input tag lists to a compact wrapping row layout where buttons size to their contents.
 - Added a scoped readable font-size rule for the shared tag modal category select.
@@ -40,7 +40,7 @@ Fresh verification for the 2026-05-23 80vh sheet height adjustment:
 
 ```bash
 conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
-# 20 passed in 7.92s
+# 20 passed in 8.05s
 
 node --check apps/dashboard/static/dashboard/js/dashboard.js
 # exit 0

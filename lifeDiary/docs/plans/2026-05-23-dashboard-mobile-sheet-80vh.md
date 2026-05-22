@@ -18,7 +18,7 @@ Change the dashboard mobile "입력정보" bottom sheet so it uses a fixed mobil
 ## Implementation Notes
 
 - Replaced the previous dynamic 01:00 grid-line height cap with CSS-only mobile sizing.
-- Mobile `.quick-input-sheet` now uses `height: 80vh`, `max-height: 80vh`, `bottom: 0`, and `overflow-y: auto`.
+- Mobile `.quick-input-sheet` now uses `height: 80dvh`, `max-height: calc(100dvh - env(safe-area-inset-bottom, 0px))`, `box-sizing: border-box`, `bottom: 0`, and `overflow-y: auto`.
 - Removed JavaScript measurement of `[data-slot-index="6"]` and the `--quick-input-sheet-max-height` CSS custom property.
 - Kept the existing open/close, backdrop, ARIA, and focus behavior.
 
@@ -35,7 +35,7 @@ git diff --check
 # exit 0
 
 conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
-# 20 passed in 7.92s
+# 20 passed in 8.05s
 ```
 
 ## Manual Checks Still Needed

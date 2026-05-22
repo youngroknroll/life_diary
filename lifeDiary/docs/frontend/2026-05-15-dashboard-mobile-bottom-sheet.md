@@ -10,7 +10,7 @@ Changed behavior:
 - Desktop keeps the existing right-side quick input card.
 - The sheet includes selected-slot info, tag selection, memo, save action, and a close button.
 - Vertical touch movement is treated as page scroll rather than forced slot selection.
-- The mobile sheet now uses a fixed `80vh` height and remains anchored to the viewport bottom so the sheet bottom does not extend past the screen.
+- The mobile sheet now uses a fixed `80dvh` height with border-box sizing and remains anchored to the viewport bottom so the sheet bottom does not extend past the visible screen.
 - Tag category headers in the quick input area use a plain `-` separator instead of a color dot; individual tag buttons keep their color markers.
 - Tag buttons in each quick input category flow in a compact wrapping row and size to their color marker plus label instead of filling the full row.
 - The shared tag modal category select uses a scoped readable font-size rule for the select and option text.
@@ -44,7 +44,7 @@ Fresh verification for the 2026-05-23 80vh sheet height adjustment:
 
 ```bash
 conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
-# 20 passed in 7.92s
+# 20 passed in 8.05s
 
 node --check apps/dashboard/static/dashboard/js/dashboard.js
 # exit 0

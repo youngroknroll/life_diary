@@ -231,8 +231,9 @@ class TestDashboardJavaScriptAssets:
         css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
         source = css_path.read_text()
 
-        assert "height: 80vh;" in source
-        assert "max-height: 80vh;" in source
+        assert "height: 80dvh;" in source
+        assert "max-height: calc(100dvh - env(safe-area-inset-bottom, 0px));" in source
+        assert "box-sizing: border-box;" in source
         assert "bottom: 0;" in source
         assert "overflow-y: auto;" in source
 
