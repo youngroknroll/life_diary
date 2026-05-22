@@ -14,6 +14,7 @@ Changed behavior:
 - Tag category headers in the quick input area use a plain `-` separator instead of a color dot; individual tag buttons keep their color markers.
 - Tag buttons in each quick input category flow in a compact wrapping row and size to their color marker plus label instead of filling the full row.
 - The shared tag modal category select uses a scoped readable font-size rule for the select and option text.
+- The tag category explanation image modal now uses the English guide image on English screens and the Korean guide image otherwise.
 
 ## Changed Files
 
@@ -48,6 +49,16 @@ conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
 
 node --check apps/dashboard/static/dashboard/js/dashboard.js
 # exit 0
+
+git diff --check
+# exit 0
+```
+
+Fresh verification for the 2026-05-23 language-specific category explanation image adjustment:
+
+```bash
+conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
+# 22 passed in 9.50s
 
 git diff --check
 # exit 0

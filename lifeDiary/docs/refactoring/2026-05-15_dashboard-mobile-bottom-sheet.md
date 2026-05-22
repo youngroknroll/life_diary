@@ -11,12 +11,14 @@
 - Replaced quick input category header color dots with a plain `-` separator while preserving individual tag color markers.
 - Changed quick input tag lists to a compact wrapping row layout where buttons size to their contents.
 - Added a scoped readable font-size rule for the shared tag modal category select.
+- Updated the tag category explanation image modal to use the English guide image on English screens and the Korean guide image otherwise.
 - Added a dashboard rendering test for the bottom sheet structure.
 - Added a dashboard JavaScript asset regression test for guarded touch cancellation.
 - Updated regression checks to ensure the mobile sheet no longer depends on the 01:00 grid anchor and instead uses fixed `80vh` viewport sizing.
 - Added a rendering regression check for category header separators.
 - Added a rendering regression check for the compact tag list layout.
 - Added a tag modal regression check for the category select font-size class and CSS rule.
+- Added dashboard rendering regression checks for the language-specific category explanation image.
 
 ## Verification
 
@@ -44,6 +46,16 @@ conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
 
 node --check apps/dashboard/static/dashboard/js/dashboard.js
 # exit 0
+
+git diff --check
+# exit 0
+```
+
+Fresh verification for the 2026-05-23 language-specific category explanation image adjustment:
+
+```bash
+conda run -n knou-life-diary pytest apps/dashboard/tests.py --tb=short
+# 22 passed in 9.50s
 
 git diff --check
 # exit 0
