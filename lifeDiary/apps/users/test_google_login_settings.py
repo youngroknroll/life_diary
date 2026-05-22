@@ -29,6 +29,10 @@ def test_google_provider_uses_settings_based_environment_config():
     assert google_app["client_id"] == settings.GOOGLE_OAUTH_CLIENT_ID
     assert google_app["secret"] == settings.GOOGLE_OAUTH_CLIENT_SECRET
     assert google["SCOPE"] == ["profile", "email"]
+    assert google["AUTH_PARAMS"] == {
+        "access_type": "online",
+        "prompt": "select_account",
+    }
 
 
 def test_google_login_url_is_registered():
