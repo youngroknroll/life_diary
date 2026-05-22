@@ -114,7 +114,6 @@ function syncQuickInputSheetForLayout() {
     if (!sheet || !backdrop) return;
 
     if (isMobileDashboardLayout()) {
-        updateQuickInputSheetHeight();
         if (!sheet.classList.contains('is-open')) {
             sheet.setAttribute('role', 'dialog');
             sheet.setAttribute('aria-modal', 'true');
@@ -129,19 +128,8 @@ function syncQuickInputSheetForLayout() {
     sheet.removeAttribute('role');
     sheet.removeAttribute('aria-modal');
     sheet.setAttribute('aria-hidden', 'false');
-    sheet.style.removeProperty('--quick-input-sheet-max-height');
     backdrop.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('dashboard-sheet-open');
-}
-
-function updateQuickInputSheetHeight() {
-    const sheet = document.getElementById('quickInputSheet');
-    const oneAmSlot = document.querySelector('[data-slot-index="6"]');
-    if (!sheet || !oneAmSlot) return;
-
-    const top = oneAmSlot.getBoundingClientRect().top;
-    const maxHeight = Math.max(280, window.innerHeight - top);
-    sheet.style.setProperty('--quick-input-sheet-max-height', `${Math.round(maxHeight)}px`);
 }
 
 function openQuickInputSheet() {
@@ -150,7 +138,6 @@ function openQuickInputSheet() {
     const backdrop = document.getElementById('quickInputSheetBackdrop');
     if (!sheet || !backdrop) return;
 
-    updateQuickInputSheetHeight();
     sheet.classList.add('is-open');
     backdrop.classList.add('is-open');
     sheet.setAttribute('role', 'dialog');

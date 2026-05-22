@@ -57,6 +57,7 @@ urlpatterns = [
     path("stats/", include("apps.stats.urls")),
     path("tags/", include("apps.tags.urls")),
     path("accounts/", include("apps.users.urls")),
+    path("accounts/", include("allauth.urls")),
     # API URLs
     path("api/", include("apps.dashboard.api_urls")),
     path("api/", include("apps.tags.api_urls")),

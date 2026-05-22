@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load socialaccount %}
 
 {% block title %}{% trans "로그인" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
@@ -61,6 +62,12 @@
                             <i class="fas fa-sign-in-alt me-1"></i>
                             {% trans "로그인" %}
                         </button>
+                    </div>
+                    <div class="d-grid gap-2 mt-2">
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline-secondary auth-google-login">
+                            <i class="fab fa-google me-1" aria-hidden="true"></i>
+                            {% trans "Google로 계속하기" %}
+                        </a>
                     </div>
                 </form>
 

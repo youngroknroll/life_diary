@@ -78,6 +78,13 @@ def dash_user_with_tags(ko_client, make_user):
     return ko_client, user
 
 
+@pytest.fixture
+def dash_en_user_with_tags(en_client, make_user):
+    user = make_user(username="dash-en-user")
+    en_client.force_login(user)
+    return en_client, user
+
+
 @pytest.mark.django_db
 class TestDashboardIndexRendering:
     def test_dashboard_renders_category_headers(self, dash_user_with_tags):
@@ -177,6 +184,28 @@ class TestDashboardIndexRendering:
         assert 'id="quickInputSheetTitle"' in content
         assert "data-dashboard-sheet-close" in content
 
+    def test_dashboard_uses_korean_tag_usage_guide_for_non_english_language(
+        self, dash_user_with_tags
+    ):
+        client, _ = dash_user_with_tags
+        client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
+        resp = client.get("/dashboard/")
+        body = resp.content.decode()
+
+        assert "/static/core/img/tag_usage_guide.png" in body
+        assert "/static/core/img/tag_usage_guide_en.png" not in body
+
+    def test_dashboard_uses_english_tag_usage_guide_for_english_language(
+        self, dash_en_user_with_tags
+    ):
+        client, _ = dash_en_user_with_tags
+        client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
+        resp = client.get("/dashboard/")
+        body = resp.content.decode()
+
+        assert "/static/core/img/tag_usage_guide_en.png" in body
+        assert "/static/core/img/tag_usage_guide.png" not in body
+
     def test_memo_optional_text_is_placeholder_only(self, dash_user_with_tags):
         client, _ = dash_user_with_tags
         resp = client.get("/dashboard/")
@@ -220,18 +249,31 @@ class TestDashboardJavaScriptAssets:
             "sheet.setAttribute('aria-hidden', 'true')"
         )
 
-    def test_mobile_sheet_height_is_anchored_to_one_am_slot(self):
+    def test_mobile_sheet_no_longer_uses_grid_anchor_for_height(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
         source = js_path.read_text()
 
-        assert '[data-slot-index="6"]' in source
-        assert "--quick-input-sheet-max-height" in source
+        assert '[data-slot-index="6"]' not in source
+        assert "--quick-input-sheet-max-height" not in source
 
-    def test_mobile_sheet_css_uses_dynamic_height_cap(self):
+    def test_mobile_sheet_css_uses_fixed_viewport_height_cap(self):
         css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
         source = css_path.read_text()
 
-        assert "var(--quick-input-sheet-max-height, min(82vh, 680px))" in source
+        assert "height: 80dvh;" in source
+        assert "max-height: calc(100dvh - env(safe-area-inset-bottom, 0px));" in source
+        assert "box-sizing: border-box;" in source
+        assert "bottom: 0;" in source
+        assert "overflow-y: auto;" in source
+
+    def test_selected_slot_info_prompts_tag_selection(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert "시간을 선택했어요. 원하는 태그를 선택하세요." in source
+        assert source.index("시간을 선택했어요. 원하는 태그를 선택하세요.") < source.index(
+            "inlineEl.innerHTML = infoHTML;"
+        )
 
     def test_selected_slot_info_prompts_tag_selection(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"

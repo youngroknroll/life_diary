@@ -1,5 +1,11 @@
 {% load static %}
 {% load i18n %}
+{% get_current_language as LANGUAGE_CODE %}
+{% if LANGUAGE_CODE == "en" %}
+    {% static 'core/img/tag_usage_guide_en.png' as tag_usage_guide_src %}
+{% else %}
+    {% static 'core/img/tag_usage_guide.png' as tag_usage_guide_src %}
+{% endif %}
 <!-- 태그 설명 이미지 모달 -->
 <div class="modal fade" id="tagImageModal" tabindex="-1" aria-labelledby="tagImageModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -12,7 +18,7 @@
             </div>
             <div class="modal-body text-center">
 
-                <img src="{% static 'core/img/tag_usage_guide.png' %}" class="img-fluid" alt="{% trans '태그 사용법' %}">
+                <img src="{{ tag_usage_guide_src }}" class="img-fluid" alt="{% trans '태그 사용법' %}">
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "닫기" %}</button>
