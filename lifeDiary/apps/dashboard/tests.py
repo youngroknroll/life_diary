@@ -220,18 +220,21 @@ class TestDashboardJavaScriptAssets:
             "sheet.setAttribute('aria-hidden', 'true')"
         )
 
-    def test_mobile_sheet_height_is_anchored_to_one_am_slot(self):
+    def test_mobile_sheet_no_longer_uses_grid_anchor_for_height(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
         source = js_path.read_text()
 
-        assert '[data-slot-index="6"]' in source
-        assert "--quick-input-sheet-max-height" in source
+        assert '[data-slot-index="6"]' not in source
+        assert "--quick-input-sheet-max-height" not in source
 
-    def test_mobile_sheet_css_uses_dynamic_height_cap(self):
+    def test_mobile_sheet_css_uses_fixed_viewport_height_cap(self):
         css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
         source = css_path.read_text()
 
-        assert "var(--quick-input-sheet-max-height, min(82vh, 680px))" in source
+        assert "height: 80vh;" in source
+        assert "max-height: 80vh;" in source
+        assert "bottom: 0;" in source
+        assert "overflow-y: auto;" in source
 
     def test_selected_slot_info_prompts_tag_selection(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
