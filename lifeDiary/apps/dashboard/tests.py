@@ -275,6 +275,15 @@ class TestDashboardJavaScriptAssets:
             "inlineEl.innerHTML = infoHTML;"
         )
 
+    def test_selected_slot_info_prompts_tag_selection(self):
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        source = js_path.read_text()
+
+        assert "시간을 선택했어요. 원하는 태그를 선택하세요." in source
+        assert source.index("시간을 선택했어요. 원하는 태그를 선택하세요.") < source.index(
+            "inlineEl.innerHTML = infoHTML;"
+        )
+
     def test_time_grid_prevents_text_selection(self):
         css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
         source = css_path.read_text()
