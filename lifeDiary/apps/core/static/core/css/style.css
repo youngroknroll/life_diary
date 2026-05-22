@@ -637,6 +637,13 @@ footer {
     font-weight: bold;
 }
 
+.auth-card .auth-google-login:hover,
+.auth-card .auth-google-login:focus {
+    color: #ffffff;
+    background-color: #2563eb;
+    border-color: #2563eb;
+}
+
 .auth-card .form-text {
     font-size: 0.875rem;
     color: var(--color-text-muted);
