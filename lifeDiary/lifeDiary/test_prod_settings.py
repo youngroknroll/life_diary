@@ -24,3 +24,29 @@ def test_prod_settings_disable_debug_and_use_gmail_smtp(monkeypatch):
     assert prod_settings.EMAIL_USE_TLS is True
     assert prod_settings.DEFAULT_FROM_EMAIL == "logbetter.info@gmail.com"
     assert prod_settings.SERVER_EMAIL == "logbetter.info@gmail.com"
+
+
+def test_prod_settings_send_error_logs_to_console(monkeypatch):
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    assert prod_settings.LOGGING["disable_existing_loggers"] is False
+    assert prod_settings.LOGGING["handlers"]["console"] == {
+        "class": "logging.StreamHandler",
+    }
+    assert prod_settings.LOGGING["root"] == {
+        "handlers": ["console"],
+        "level": "WARNING",
+    }
+    assert prod_settings.LOGGING["loggers"]["django.request"] == {
+        "handlers": ["console"],
+        "level": "ERROR",
+        "propagate": False,
+    }
