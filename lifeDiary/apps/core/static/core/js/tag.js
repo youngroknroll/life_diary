@@ -19,6 +19,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const colorPicker = document.getElementById('tagFormColor');
     const colorText = document.getElementById('tagFormColorText');
 
+    function syncTagColorInputs(color) {
+        if (!/^#[0-9a-fA-F]{6}$/.test(color)) return;
+        if (colorPicker) colorPicker.value = color;
+        if (colorText) colorText.value = color;
+    }
+
     if(colorPicker && colorText) {
         colorPicker.addEventListener('input', () => colorText.value = colorPicker.value);
         colorText.addEventListener('input', () => {
@@ -27,6 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    tagFormModalEl.addEventListener('click', function(event) {
+        const swatch = event.target.closest('[data-tag-color-swatch]');
+        if (!swatch || !tagFormModalEl.contains(swatch)) return;
+        const color = swatch.dataset.color;
+        syncTagColorInputs(color);
+    });
 
     // 카테고리 드롭다운 초기화
     function populateCategorySelect(selectedCategoryId) {
@@ -145,4 +158,4 @@ document.addEventListener('DOMContentLoaded', function() {
             showNotification(interpolate(gettext('태그 삭제 실패: %s'), [error.message]), 'error');
         }
     };
-}); 
+});

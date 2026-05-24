@@ -41,6 +41,9 @@
 </div>
 
 {% include 'tags/_tag_modal.html' %}
+<template id="tagCategoryHeaderTemplate">
+    {% include 'shared/_tag_category_header.html' with category_name='' category_count='' category_header_class='mb-3 fw-bold' %}
+</template>
 {% endblock %}
 
 {% block extra_js %}
@@ -90,6 +93,31 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>`;
     }
 
+    function renderCategoryHeader(categoryName, categoryCount = null) {
+        const template = document.getElementById('tagCategoryHeaderTemplate');
+        const safeName = escapeHTML(categoryName);
+        if (!template || !template.content || !template.content.firstElementChild) {
+            const countHtml = categoryCount === null ? '' :
+                `<small class="text-muted ms-1">(${categoryCount})</small>`;
+            return `<div class="mb-3 fw-bold">- ${safeName}${countHtml}</div>`;
+        }
+
+        const header = template.content.firstElementChild.cloneNode(true);
+        const nameEl = header.querySelector('[data-tag-category-name]');
+        const countEl = header.querySelector('[data-tag-category-count]');
+        if (nameEl) nameEl.textContent = `- ${categoryName}`;
+        if (countEl) {
+            if (categoryCount === null) {
+                countEl.remove();
+            } else {
+                countEl.classList.remove('d-none');
+                countEl.textContent = `(${categoryCount})`;
+            }
+        }
+
+        return header.outerHTML;
+    }
+
     function renderTags(tags) {
         const container = document.getElementById('tagListContainer');
         const emptyState = document.getElementById('tagEmptyState');
@@ -107,11 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             let html = `
                 <div class="mb-4">
-                    <h6 class="mb-3">
-                        <span class="badge me-2" style="background-color: ${cat.color};">&nbsp;</span>
-                        ${escapeHTML(cat.name)}
-                        <small class="text-muted ms-1">(${catTags.length})</small>
-                    </h6>
+                    ${renderCategoryHeader(cat.name, catTags.length)}
                     <div class="row">`;
             catTags.forEach(tag => {
                 html += createTagCardHtml(tag);

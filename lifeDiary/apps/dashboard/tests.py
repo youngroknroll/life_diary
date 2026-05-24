@@ -223,6 +223,17 @@ class TestDashboardIndexRendering:
 
 
 class TestDashboardJavaScriptAssets:
+    def test_dashboard_dynamic_category_header_uses_shared_template(self):
+        template_path = settings.BASE_DIR / "apps/dashboard/templates/dashboard/index.html"
+        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
+        template_source = template_path.read_text()
+        js_source = js_path.read_text()
+
+        assert "{% include 'shared/_tag_category_header.html'" in template_source
+        assert 'id="tagCategoryHeaderTemplate"' in template_source
+        assert "renderCategoryHeader(" in js_source
+        assert 'background-color: ${escapeHtml(cat.color)}' not in js_source
+
     def test_touchmove_prevent_default_is_guarded_by_cancelable(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
         source = js_path.read_text()

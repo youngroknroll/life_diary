@@ -1,0 +1,4 @@
+<div class="{{ category_header_class|default:'tag-category-header small text-muted fw-bold mt-2 mb-1' }}" data-tag-category-header>
+    <span data-tag-category-name>- {{ category_name }}</span>
+    <small class="text-muted ms-1{% if not category_count %} d-none{% endif %}" data-tag-category-count>{% if category_count %}({{ category_count }}){% endif %}</small>
+</div>

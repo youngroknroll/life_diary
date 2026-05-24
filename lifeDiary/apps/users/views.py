@@ -281,7 +281,19 @@ class RateLimitedPasswordResetView(PasswordResetView):
             "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
         ):
             return redirect(self.get_success_url())
-        return super().form_valid(form)
+        opts = {
+            "use_https": self.request.is_secure(),
+            "token_generator": self.token_generator,
+            "from_email": self.from_email,
+            "email_template_name": self.email_template_name,
+            "subject_template_name": self.subject_template_name,
+            "request": self.request,
+            "domain_override": self.request.get_host(),
+            "html_email_template_name": self.html_email_template_name,
+            "extra_email_context": self.extra_email_context,
+        }
+        form.save(**opts)
+        return super(PasswordResetView, self).form_valid(form)
 
 
 @login_required
