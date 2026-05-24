@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-23
+Last updated: 2026-05-24
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -63,6 +63,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Auth onboarding and signup UX | Code analysis: `apps/users/views.py`, `apps/users/urls.py`, `apps/users/templates/users/login.html`, `apps/users/templates/users/signup.html`, `apps/users/templates/users/welcome.html`, `apps/users/static/users/js/` | Implemented remember-me session behavior, signup-to-welcome flow, realtime username/email checks, password visibility/strength enhancements, and auth JS i18n catalog wiring. | Fresh verification: auth-related tests included in the same 50-test run, `50 passed in 29.65s`. |
 | Stats goal cards and mobile tab structure tests | Code analysis: `apps/stats/templates/stats/life_feedback.html`, `apps/stats/templates/stats/_goal_accordion_item.html`, `apps/stats/test_goal_accordion.py`, `apps/stats/test_mobile_layout.py` | Implemented daily/weekly/monthly goal cards with per-card collapse behavior, weekly default expansion, count badges, and empty-state add links. Stats tab structure regression tests exist. | Fresh verification: stats goal/mobile tests included in the same 50-test run, `50 passed in 29.65s`. |
 | Stats UserGoal query consolidation and performance guard | Code analysis: `apps/users/repositories.py`, `apps/stats/logic.py`, `apps/users/test_goal_repository.py`, `apps/stats/test_stats_perf.py` | Implemented `GoalRepository.find_grouped_by_period()` and stats context usage to fetch goals once and split by period; query target is guarded by performance tests. | Fresh verification: `conda run -n knou-life-diary pytest apps/users/test_goal_repository.py apps/stats/test_stats_perf.py --tb=short` -> `7 passed in 8.12s`. |
+| Production console logging | `docs/refactoring/2026-05-24_production-console-logging.md` | Added production `LOGGING` so `DEBUG=False` deployments send framework warnings and request errors to the server console/deployment logs. | Fresh verification: RED `pytest lifeDiary/test_prod_settings.py::test_prod_settings_send_error_logs_to_console` -> missing `LOGGING`; GREEN same command -> `1 passed in 0.03s`; regression `pytest lifeDiary/test_prod_settings.py apps/users/test_prod_settings.py` -> `4 passed in 0.06s`; production check `python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR` -> `System check identified no issues (0 silenced).`; `git diff --check` -> exit 0. Live deployment logs were not verified. |
 
 ## Active Plans
 
