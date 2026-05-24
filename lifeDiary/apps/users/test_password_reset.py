@@ -23,6 +23,20 @@ class TestPasswordReset:
         assert len(mail.outbox) == 1
         assert "alice@example.com" in mail.outbox[0].to
 
+    def test_reset_email_uses_request_host_not_default_site_domain(self, client, make_user):
+        make_user(username="hosted", email="hosted@example.com")
+
+        response = client.post(
+            reverse("users:password_reset"),
+            {"email": "hosted@example.com"},
+            HTTP_HOST="127.0.0.1:8000",
+        )
+
+        assert response.status_code == 302
+        assert len(mail.outbox) == 1
+        assert "http://127.0.0.1:8000" in mail.outbox[0].body
+        assert "example.com" not in mail.outbox[0].body
+
     def test_unknown_email_no_mail_same_response(self, client):
         response = client.post(
             reverse("users:password_reset"), {"email": "ghost@example.com"}

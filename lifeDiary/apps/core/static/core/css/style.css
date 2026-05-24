@@ -1257,6 +1257,36 @@ footer {
     color: var(--bs-info-text-emphasis);
 }
 
+.tag-color-recommendations {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+}
+
+.tag-color-recommendations__label {
+    color: var(--color-text-muted);
+    font-size: 0.875rem;
+    font-weight: 600;
+    margin-right: 0.15rem;
+}
+
+.tag-color-swatch {
+    width: 1.35rem;
+    height: 1.35rem;
+    flex: 0 0 1.35rem;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0;
+}
+
+.tag-color-swatch:hover,
+.tag-color-swatch:focus {
+    border-color: var(--color-text);
+    outline: 2px solid var(--color-primary-border);
+    outline-offset: 2px;
+}
+
 /* 목표 안내 패널 (mypage) */
 .goal-guide-panel {
     background-color: var(--color-primary-soft);

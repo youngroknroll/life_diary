@@ -1,6 +1,7 @@
 import time
 from datetime import timedelta
 from types import SimpleNamespace
+from unittest.mock import patch
 
 import pytest
 from django.core.management import call_command
@@ -93,6 +94,76 @@ class TestLoginView:
                 reverse("users:login"),
                 data={"username": "login-user", "password": "pw123456!!"},
             )
+        assert response.status_code == 302
+        assert response.url == reverse("home")
+
+    def test_local_development_disables_axes(self):
+        from lifeDiary.settings import dev
+
+        assert dev.AXES_ENABLED is False
+
+
+@pytest.mark.django_db
+class TestLoginRecaptchaChallenge:
+    @pytest.fixture(autouse=True)
+    def _settings(self, settings):
+        settings.LOGIN_RECAPTCHA_ENABLED = True
+        settings.LOGIN_RECAPTCHA_FAILURE_LIMIT = 5
+        settings.LOGIN_RECAPTCHA_CACHE_TIMEOUT = 60 * 60
+        settings.RECAPTCHA_SITE_KEY = "site-key"
+        settings.RECAPTCHA_SECRET_KEY = "secret-key"
+        settings.CACHES = {
+            "default": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-login-recaptcha-tests",
+            }
+        }
+        settings.AXES_ENABLED = False
+        call_command("axes_reset")
+
+    def _login(self, client, password, token=None):
+        data = {"username": "login-user", "password": password}
+        if token is not None:
+            data["g-recaptcha-response"] = token
+        return client.post(reverse("users:login"), data=data)
+
+    def test_fifth_failed_login_shows_recaptcha(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
+
+        for _ in range(4):
+            response = self._login(client, "wrong-password")
+            assert response.status_code == 200
+            assert "g-recaptcha" not in response.content.decode()
+
+        response = self._login(client, "wrong-password")
+        content = response.content.decode()
+
+        assert response.status_code == 200
+        assert "g-recaptcha" in content
+        assert "site-key" in content
+
+    def test_challenged_login_requires_recaptcha_even_with_correct_password(
+        self, client, make_user
+    ):
+        make_user(username="login-user", password="pw123456!!")
+
+        for _ in range(5):
+            self._login(client, "wrong-password")
+
+        response = self._login(client, "pw123456!!")
+
+        assert response.status_code == 200
+        assert "g-recaptcha" in response.content.decode()
+
+    def test_valid_recaptcha_allows_challenged_login(self, client, make_user):
+        make_user(username="login-user", password="pw123456!!")
+
+        for _ in range(5):
+            self._login(client, "wrong-password")
+
+        with patch("apps.users.views._verify_recaptcha", return_value=True):
+            response = self._login(client, "pw123456!!", token="valid-token")
+
         assert response.status_code == 302
         assert response.url == reverse("home")
 

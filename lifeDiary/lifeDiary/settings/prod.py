@@ -45,6 +45,15 @@ SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True  # 브라우저 종료 시 세션 만료
 SESSION_SAVE_EVERY_REQUEST = False  # DB session write 최소화 (Django 기본값)
 PASSWORD_RESET_TIMEOUT = 60 * 60 * 3  # 3시간
+AXES_ENABLED = True
+# reCAPTCHA is the user-facing challenge after repeated failures; keep axes from
+# returning an account-locked response before that challenge can be completed.
+AXES_FAILURE_LIMIT = int(os.getenv("AXES_FAILURE_LIMIT", "1000"))
+LOGIN_RECAPTCHA_ENABLED = True
+LOGIN_RECAPTCHA_FAILURE_LIMIT = 5
+LOGIN_RECAPTCHA_CACHE_TIMEOUT = 60 * 60
+RECAPTCHA_SITE_KEY = os.getenv("RECAPTCHA_SITE_KEY", "")
+RECAPTCHA_SECRET_KEY = os.getenv("RECAPTCHA_SECRET_KEY", "")
 
 CACHES = {
     "default": {

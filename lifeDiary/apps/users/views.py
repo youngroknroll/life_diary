@@ -1,6 +1,9 @@
 import logging
 import re
+import json
 from smtplib import SMTPException
+from urllib import parse, request as urlrequest
+from urllib.error import URLError
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
@@ -48,6 +51,7 @@ RECOVERY_RATE_LIMIT_MAX_ATTEMPTS = 5
 RECOVERY_RATE_LIMIT_WINDOW_SECONDS = 60 * 10
 VALIDATION_RATE_LIMIT_MAX_ATTEMPTS = 10
 VALIDATION_RATE_LIMIT_WINDOW_SECONDS = 60
+LOGIN_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
 
 
 def _get_user_tag_queryset(user):
@@ -71,6 +75,72 @@ def _is_rate_limited(request, scope, max_attempts_setting, window_setting):
         return False
     attempts = cache.incr(key)
     return attempts > max_attempts
+
+
+def _login_recaptcha_enabled():
+    return bool(getattr(settings, "LOGIN_RECAPTCHA_ENABLED", False))
+
+
+def _login_failure_limit():
+    return getattr(settings, "LOGIN_RECAPTCHA_FAILURE_LIMIT", 5)
+
+
+def _login_failure_cache_timeout():
+    return getattr(settings, "LOGIN_RECAPTCHA_CACHE_TIMEOUT", 60 * 60)
+
+
+def _login_failure_key(request, username):
+    normalized_username = (username or "").strip().lower() or "anonymous"
+    return f"login-failure:{_get_client_identifier(request)}:{normalized_username}"
+
+
+def _get_login_failure_count(request, username):
+    return int(cache.get(_login_failure_key(request, username), 0) or 0)
+
+
+def _record_login_failure(request, username):
+    key = _login_failure_key(request, username)
+    if cache.add(key, 1, timeout=_login_failure_cache_timeout()):
+        return 1
+    try:
+        return cache.incr(key)
+    except ValueError:
+        cache.set(key, 1, timeout=_login_failure_cache_timeout())
+        return 1
+
+
+def _reset_login_failures(request, username):
+    cache.delete(_login_failure_key(request, username))
+
+
+def _login_requires_recaptcha(request, username):
+    return (
+        _login_recaptcha_enabled()
+        and _get_login_failure_count(request, username) >= _login_failure_limit()
+    )
+
+
+def _verify_recaptcha(token, remote_ip=None):
+    if not token:
+        return False
+    secret = getattr(settings, "RECAPTCHA_SECRET_KEY", "")
+    if not secret:
+        return False
+    data = {
+        "secret": secret,
+        "response": token,
+    }
+    if remote_ip:
+        data["remoteip"] = remote_ip
+    encoded_data = parse.urlencode(data).encode()
+    req = urlrequest.Request(LOGIN_RECAPTCHA_VERIFY_URL, data=encoded_data, method="POST")
+    try:
+        with urlrequest.urlopen(req, timeout=5) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except (OSError, URLError, json.JSONDecodeError):
+        logger.exception("Failed to verify login reCAPTCHA")
+        return False
+    return payload.get("success") is True
 
 
 def _goal_data_from_form(form: UserGoalForm) -> GoalData:
@@ -125,11 +195,32 @@ def login_view(request):
     """
     사용자 로그인
     """
+    recaptcha_required = False
     if request.method == "POST":
+        username = (request.POST.get("username") or "").strip()
+        recaptcha_required = _login_requires_recaptcha(request, username)
+        if recaptcha_required:
+            token = request.POST.get("g-recaptcha-response", "")
+            if not _verify_recaptcha(token, _get_client_identifier(request)):
+                form = AuthenticationForm(request, data=request.POST)
+                messages.error(request, gettext("reCAPTCHA 확인 후 다시 로그인해주세요."))
+                for field in form.fields.values():
+                    field.widget.attrs.update({"class": "form-control"})
+                return render(
+                    request,
+                    "users/login.html",
+                    {
+                        "form": form,
+                        "page_title": gettext("로그인"),
+                        "show_recaptcha": True,
+                        "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+                    },
+                )
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            _reset_login_failures(request, username)
             # Remember me: 체크 시 14일 유지, 미체크 시 브라우저 종료 시 만료
             if request.POST.get("remember_me"):
                 request.session.set_expiry(REMEMBER_ME_DURATION_SECONDS)
@@ -140,6 +231,10 @@ def login_view(request):
                 gettext("%(username)s님, 환영합니다!") % {"username": user.username},
             )
             return redirect("home")
+        failure_count = _record_login_failure(request, username)
+        recaptcha_required = (
+            _login_recaptcha_enabled() and failure_count >= _login_failure_limit()
+        )
     else:
         form = AuthenticationForm()
 
@@ -147,7 +242,16 @@ def login_view(request):
     for field in form.fields.values():
         field.widget.attrs.update({"class": "form-control"})
 
-    return render(request, "users/login.html", {"form": form, "page_title": gettext("로그인")})
+    return render(
+        request,
+        "users/login.html",
+        {
+            "form": form,
+            "page_title": gettext("로그인"),
+            "show_recaptcha": recaptcha_required,
+            "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+        },
+    )
 
 
 def _send_username_recovery_email(request, email):
@@ -281,7 +385,19 @@ class RateLimitedPasswordResetView(PasswordResetView):
             "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
         ):
             return redirect(self.get_success_url())
-        return super().form_valid(form)
+        opts = {
+            "use_https": self.request.is_secure(),
+            "token_generator": self.token_generator,
+            "from_email": self.from_email,
+            "email_template_name": self.email_template_name,
+            "subject_template_name": self.subject_template_name,
+            "request": self.request,
+            "domain_override": self.request.get_host(),
+            "html_email_template_name": self.html_email_template_name,
+            "extra_email_context": self.extra_email_context,
+        }
+        form.save(**opts)
+        return super(PasswordResetView, self).form_valid(form)
 
 
 @login_required

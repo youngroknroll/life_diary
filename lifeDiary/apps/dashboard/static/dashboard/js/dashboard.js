@@ -534,6 +534,31 @@ function renderTagButton(tag) {
         </button>`;
 }
 
+function renderCategoryHeader(categoryName, categoryCount = null) {
+    const template = document.getElementById('tagCategoryHeaderTemplate');
+    const safeName = escapeHtml(categoryName);
+    if (!template || !template.content || !template.content.firstElementChild) {
+        const countHtml = categoryCount === null ? '' :
+            `<small class="text-muted ms-1">(${categoryCount})</small>`;
+        return `<div class="tag-category-header small text-muted fw-bold mt-2 mb-1">- ${safeName}${countHtml}</div>`;
+    }
+
+    const header = template.content.firstElementChild.cloneNode(true);
+    const nameEl = header.querySelector('[data-tag-category-name]');
+    const countEl = header.querySelector('[data-tag-category-count]');
+    if (nameEl) nameEl.textContent = `- ${categoryName}`;
+    if (countEl) {
+        if (categoryCount === null) {
+            countEl.remove();
+        } else {
+            countEl.classList.remove('d-none');
+            countEl.textContent = `(${categoryCount})`;
+        }
+    }
+
+    return header.outerHTML;
+}
+
 function renderTagContainer(tags) {
     const tagContainer = document.getElementById('tagContainer');
     if (tags.length === 0) {
@@ -566,10 +591,7 @@ function renderTagContainer(tags) {
         .filter(cat => byCategory.has(cat.id))
         .map(cat => `
             <div class="tag-category-group">
-                <div class="tag-category-header small text-muted fw-bold mt-2 mb-1">
-                    <span class="badge me-2" style="background-color: ${escapeHtml(cat.color)};">&nbsp;</span>
-                    ${escapeHtml(cat.name)}
-                </div>
+                ${renderCategoryHeader(cat.name)}
                 <div class="d-grid gap-1">
                     ${byCategory.get(cat.id).map(renderTagButton).join('')}
                 </div>

@@ -50,3 +50,24 @@ def test_prod_settings_send_error_logs_to_console(monkeypatch):
         "level": "ERROR",
         "propagate": False,
     }
+
+
+def test_prod_settings_enable_login_recaptcha_after_failures(monkeypatch):
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+    monkeypatch.setenv("RECAPTCHA_SITE_KEY", "site-key")
+    monkeypatch.setenv("RECAPTCHA_SECRET_KEY", "secret-key")
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    assert prod_settings.AXES_ENABLED is True
+    assert prod_settings.AXES_FAILURE_LIMIT > prod_settings.LOGIN_RECAPTCHA_FAILURE_LIMIT
+    assert prod_settings.LOGIN_RECAPTCHA_ENABLED is True
+    assert prod_settings.LOGIN_RECAPTCHA_FAILURE_LIMIT == 5
+    assert prod_settings.RECAPTCHA_SITE_KEY == "site-key"
+    assert prod_settings.RECAPTCHA_SECRET_KEY == "secret-key"

@@ -208,10 +208,7 @@
                                 {% regroup user_tags by category as tags_by_category %}
                                 {% for cat_group in tags_by_category %}
                                     <div class="tag-category-group">
-                                        <div class="tag-category-header small text-muted fw-bold mt-2 mb-1">
-                                            -
-                                            {{ cat_group.grouper.display_name }}
-                                        </div>
+                                        {% include 'shared/_tag_category_header.html' with category_name=cat_group.grouper.display_name %}
                                         <div class="quick-input-tag-list">
                                             {% for tag in cat_group.list %}
                                                 <button type="button" class="btn btn-outline-secondary btn-sm tag-btn text-start"
@@ -251,6 +248,10 @@
         </div>
     </div>
 </div>
+
+<template id="tagCategoryHeaderTemplate">
+    {% include 'shared/_tag_category_header.html' with category_name='' %}
+</template>
 
 <!-- 태그 관리 모달, 편집 모달, 생성 모달 등은 이제 공통 템플릿으로 -->
 {% include 'tags/_tag_modal.html' %}

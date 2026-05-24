@@ -50,6 +50,12 @@
                         </div>
                     {% endif %}
 
+                    {% if show_recaptcha %}
+                        <div class="mb-3">
+                            <div class="g-recaptcha" data-sitekey="{{ recaptcha_site_key }}"></div>
+                        </div>
+                    {% endif %}
+
                     <div class="form-check mb-3">
                         <input type="checkbox" class="form-check-input" id="remember_me" name="remember_me" value="1">
                         <label class="form-check-label" for="remember_me">
@@ -97,6 +103,9 @@
 {% block extra_js %}
 {% load static %}
 <script src="{% static 'users/js/auth-enhance.js' %}" defer></script>
+{% if show_recaptcha %}
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+{% endif %}
 <script>
 document.querySelector('.auth-card form').addEventListener('submit', function () {
     showOverlay(gettext('로그인 중입니다...'), 'fa-sign-in-alt');
