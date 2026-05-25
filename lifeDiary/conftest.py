@@ -1,4 +1,18 @@
 import pytest
+from django.core import management
+
+
+def _compile_test_messages():
+    management.call_command(
+        "compilemessages",
+        ignore=[".venv/*", ".worktrees/*", "staticfiles/*"],
+        locale=["en", "ko"],
+        verbosity=0,
+    )
+
+
+def pytest_sessionstart(session):
+    _compile_test_messages()
 
 
 @pytest.fixture(autouse=True)
