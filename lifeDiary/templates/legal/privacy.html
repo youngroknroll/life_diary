@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "개인정보처리방침" %} - {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<section class="policy-page mx-auto" style="max-width: 860px;">
+    <div class="mb-4">
+        <p class="text-muted mb-2">{% trans "최종 업데이트: 2026년 5월 25일" %}</p>
+        <h1 class="h2 mb-3">{% trans "개인정보처리방침" %}</h1>
+        <p class="lead">
+            {% trans "라이프 다이어리는 사용자가 하루 기록과 생활 패턴을 관리할 수 있도록 필요한 최소한의 개인정보를 처리합니다." %}
+        </p>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "1. 처리하는 개인정보" %}</h2>
+            <p>{% trans "서비스 이용 과정에서 다음 정보가 처리될 수 있습니다." %}</p>
+            <ul>
+                <li>{% trans "계정 정보: 사용자명, 이메일 주소, 비밀번호 해시" %}</li>
+                <li>{% trans "복구 정보: 아이디 찾기와 비밀번호 재설정 이메일 발송 기록" %}</li>
+                <li>{% trans "사용자 입력 정보: 시간 블록, 일기/메모, 태그, 목표, 통계 산출에 필요한 기록" %}</li>
+                <li>{% trans "보안 및 운영 정보: 접속 IP, 요청 시간, 로그인 실패 횟수, 세션 식별자" %}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "2. 이용 목적" %}</h2>
+            <ul>
+                <li>{% trans "회원가입, 로그인, 로그아웃, 계정 복구 기능 제공" %}</li>
+                <li>{% trans "하루 기록, 태그 관리, 목표 관리, 통계 화면 제공" %}</li>
+                <li>{% trans "부정 로그인 시도 완화, reCAPTCHA 확인, 세션 보호 등 보안 조치" %}</li>
+                <li>{% trans "오류 확인, 서비스 안정성 개선, 문의 대응" %}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "3. 쿠키 사용" %}</h2>
+            <p>
+                {% trans "서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키를 사용합니다. 현재 별도의 광고 추적 쿠키나 행동 기반 광고 목적의 쿠키는 사용하지 않습니다." %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "4. 보관 및 삭제" %}</h2>
+            <p>
+                {% trans "계정과 사용자가 작성한 기록은 서비스 제공에 필요한 기간 동안 보관됩니다. 사용자가 삭제를 요청하거나 계정 처리가 종료되면 관련 법령상 보관이 필요한 경우를 제외하고 합리적인 기간 내 삭제합니다." %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "5. 제3자 제공 및 처리 위탁" %}</h2>
+            <p>
+                {% trans "라이프 다이어리는 법령상 요구되는 경우를 제외하고 사용자의 개인정보를 임의로 판매하거나 공개하지 않습니다. 이메일 발송, 호스팅, 보안 확인 등 서비스 운영에 필요한 외부 제공자가 사용될 수 있으며, 이 경우 필요한 범위로 제한합니다." %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "6. 이용자의 권리" %}</h2>
+            <p>
+                {% trans "사용자는 본인의 개인정보 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다. 계정 또는 기록 삭제가 필요한 경우 아래 연락처로 문의해 주세요." %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="h5">{% trans "7. 문의" %}</h2>
+            <p class="mb-0">
+                {% trans "개인정보, 계정, 보안 관련 문의:" %}
+                <a href="mailto:logbetter.info@gmail.com">logbetter.info@gmail.com</a>
+            </p>
+        </div>
+    </div>
+</section>
+{% endblock %}

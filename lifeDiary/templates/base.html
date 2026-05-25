@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 {% load i18n %}
-<html lang="ko">
+{% get_current_language as LANGUAGE_CODE %}
+<html lang="{{ LANGUAGE_CODE }}">
 <script>
     // FOUC 방지: head 파싱 전 테마 적용
     (function() {
@@ -185,6 +186,11 @@
     <!-- Footer -->
     <footer class="mt-5 py-4 border-top">
         <div class="container text-center">
+            <p class="mb-2 legal-footer-links">
+                <a href="{% url 'privacy' %}" class="text-muted text-decoration-none">{% trans "개인정보처리방침" %}</a>
+                <span class="text-muted mx-2" aria-hidden="true">|</span>
+                <a href="{% url 'terms' %}" class="text-muted text-decoration-none">{% trans "이용약관" %}</a>
+            </p>
             <p class="mb-0 text-muted" style="font-size: clamp(0.55rem, 2vw, 0.875rem); white-space: nowrap;">
                 <i class="fas fa-clock me-1"></i>
                 {% now "Y" as current_year %}

@@ -28,3 +28,13 @@ def index(request: HttpRequest):
         ],
     }
     return render(request, "index.html", context)
+
+
+def privacy_policy(request: HttpRequest):
+    """Public privacy policy page."""
+    return render(request, "legal/privacy.html")
+
+
+def terms_of_service(request: HttpRequest):
+    """Public terms of service page."""
+    return render(request, "legal/terms.html")
