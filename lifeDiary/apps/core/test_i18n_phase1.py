@@ -72,6 +72,9 @@ class TestHomePageEnglish:
         assert "Terms of Service" in body
         assert "Account Responsibility" in body
         assert "Prohibited Conduct" in body
+        assert "Intellectual Property" in body
+        assert "screens, logos, UI, code, text, design, and service structure" in body
+        assert "user-entered data" in body
         assert "이용약관" not in body
 
     def test_home_page_renders_english_header_theme_text(self, en_client):

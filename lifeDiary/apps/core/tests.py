@@ -109,5 +109,8 @@ class TestHomePage:
         assert "이용약관" in body
         assert "계정 책임" in body
         assert "사용자 기록과 콘텐츠" in body
+        assert "지식재산권" in body
+        assert "화면, 로고, UI, 코드, 문구, 디자인, 서비스 구조" in body
+        assert "사용자 입력 데이터의 권리는 사용자에게" in body
         assert "서비스 보안, 인증, rate limit, reCAPTCHA 확인" in body
         assert "logbetter.info@gmail.com" in body

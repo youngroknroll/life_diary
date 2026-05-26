@@ -1242,17 +1242,35 @@ msgstr "Storing illegal content or content that infringes others' rights"
 msgid "5. 서비스 변경과 중단"
 msgstr "5. Service Changes and Interruptions"
 
+msgid "5. 지식재산권"
+msgstr "5. Intellectual Property"
+
+msgid "라이프 다이어리와 LogBetter의 화면, 로고, UI, 코드, 문구, 디자인, 서비스 구조에 대한 권리는 운영자에게 있습니다. 사용자는 서비스를 이용할 수 있는 권한만 부여받으며, 허가 없이 서비스 구성요소를 복제, 배포, 상업적으로 이용하거나 역설계해서는 안 됩니다."
+msgstr "The rights to Life Diary and LogBetter screens, logos, UI, code, text, design, and service structure belong to the operator. Users are granted only permission to use the service and must not copy, distribute, commercially use, or reverse engineer service components without permission."
+
+msgid "사용자가 작성한 일기, 메모, 태그명, 목표 등 사용자 입력 데이터의 권리는 사용자에게 있으며, 서비스는 기능 제공, 백업, 보안, 통계 화면 제공 등 필요한 범위에서만 이를 처리합니다."
+msgstr "Rights to user-entered data such as diary entries, notes, tag names, and goals remain with the user, and the service processes that data only as needed to provide features, backups, security, and statistics screens."
+
+msgid "6. 서비스 변경과 중단"
+msgstr "6. Service Changes and Interruptions"
+
 msgid "서비스 기능은 개선, 보안 조치, 운영 사정에 따라 변경되거나 일시 중단될 수 있습니다. 중요한 변경이 있는 경우 가능한 범위에서 사이트 내 공지 또는 적절한 방법으로 안내합니다."
 msgstr "Service features may change or be temporarily interrupted due to improvements, security measures, or operational needs. Important changes will be announced on the site or through an appropriate method where practical."
 
 msgid "6. 책임 제한"
 msgstr "6. Limitation of Liability"
 
+msgid "7. 책임 제한"
+msgstr "7. Limitation of Liability"
+
 msgid "라이프 다이어리는 안정적인 서비스 제공을 위해 노력하지만, 사용자의 입력 내용, 네트워크 상태, 외부 서비스 장애, 불가항력으로 인한 손해에 대해 법령상 허용되는 범위 내에서 책임이 제한될 수 있습니다."
 msgstr "Life Diary works to provide a stable service, but liability for user-entered content, network conditions, external service failures, or force majeure may be limited to the extent permitted by law."
 
 msgid "서비스 이용, 계정, 약관 관련 문의:"
 msgstr "Service, account, and terms inquiries:"
+
+msgid "8. 문의"
+msgstr "8. Contact"
 
 msgid "계정 탈퇴"
 msgstr "Account deletion"
