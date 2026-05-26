@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordResetView
@@ -23,6 +24,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
+from .account_deletion import cancel_account_deletion, request_account_deletion
 from .repositories import GoalRepository, NoteRepository
 from apps.tags.repositories import TagRepository
 from .use_cases import (
@@ -231,6 +233,15 @@ def login_view(request):
                 gettext("%(username)s님, 환영합니다!") % {"username": user.username},
             )
             return redirect("home")
+        pending_user = _get_pending_deletion_user_for_login(username, request.POST.get("password"))
+        if pending_user and cancel_account_deletion(pending_user):
+            login(request, pending_user, backend="django.contrib.auth.backends.ModelBackend")
+            _reset_login_failures(request, username)
+            messages.success(
+                request,
+                gettext("계정 탈퇴 요청이 취소되었습니다. 다시 로그인되었습니다."),
+            )
+            return redirect("home")
         failure_count = _record_login_failure(request, username)
         recaptcha_required = (
             _login_recaptcha_enabled() and failure_count >= _login_failure_limit()
@@ -252,6 +263,25 @@ def login_view(request):
             "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
         },
     )
+
+
+def _get_pending_deletion_user_for_login(username, password):
+    if not username or not password:
+        return None
+    User = get_user_model()
+    user = (
+        User.objects.filter(
+            username__iexact=username,
+            is_active=False,
+            deletion_request__cancelled_at__isnull=True,
+            deletion_request__purged_at__isnull=True,
+        )
+        .select_related("deletion_request")
+        .first()
+    )
+    if user and check_password(password, user.password):
+        return user
+    return None
 
 
 def _send_username_recovery_email(request, email):
@@ -518,3 +548,21 @@ def mypage(request):
 def mypage_goals_partial(request):
     data = _mypage_use_case.execute(request.user)
     return render(request, "users/usergoal_list.html", {"goals": data["goals"]})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account_delete(request):
+    if request.method == "POST":
+        request_account_deletion(request.user)
+        logout(request)
+        messages.warning(
+            request,
+            gettext("계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."),
+        )
+        return redirect("home")
+    return render(
+        request,
+        "users/account_delete_confirm.html",
+        {"page_title": gettext("계정 탈퇴")},
+    )

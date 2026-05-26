@@ -1254,6 +1254,36 @@ msgstr "Life Diary works to provide a stable service, but liability for user-ent
 msgid "서비스 이용, 계정, 약관 관련 문의:"
 msgstr "Service, account, and terms inquiries:"
 
+msgid "계정 탈퇴"
+msgstr "Account deletion"
+
+msgid "탈퇴 요청 즉시 계정은 비활성화되고 로그아웃됩니다."
+msgstr "Your account will be deactivated and you will be logged out as soon as you request deletion."
+
+msgid "15일 안에 같은 아이디와 비밀번호로 다시 로그인하면 탈퇴 요청이 취소됩니다."
+msgstr "If you log in again with the same username and password within 15 days, the deletion request will be cancelled."
+
+msgid "15일이 지나면 계정, 시간 기록, 태그, 목표, 메모가 완전히 삭제됩니다."
+msgstr "After 15 days, your account, time records, tags, goals, and notes will be permanently deleted."
+
+msgid "완전 삭제 후에는 계정 ID, 사용자명, 마스킹된 이메일, 가입일, 탈퇴 요청일, 삭제일만 감사 기록으로 남습니다."
+msgstr "After permanent deletion, only the account ID, username, masked email, signup date, deletion request date, and deletion date remain as an audit record."
+
+msgid "탈퇴 요청"
+msgstr "Request deletion"
+
+msgid "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정과 개인 기록이 완전히 삭제됩니다."
+msgstr "If you log in again within 15 days after requesting deletion, the request will be cancelled. After 15 days, your account and personal records will be permanently deleted."
+
+msgid "계정 탈퇴 진행"
+msgstr "Delete account"
+
+msgid "계정 탈퇴 요청이 취소되었습니다. 다시 로그인되었습니다."
+msgstr "Your account deletion request has been cancelled. You have been logged in again."
+
+msgid "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."
+msgstr "Your account deletion request has been received. Log in again within 15 days to cancel it."
+
 #, python-format
 #~ msgid "%(username)s님, 환영합니다! 회원가입이 완료되었습니다."
 #~ msgstr "Welcome, %(username)s! Your account has been created."

@@ -52,3 +52,43 @@ class UserNote(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.created_at.strftime('%Y-%m-%d')}"
+
+
+class AccountDeletionRequest(models.Model):
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="deletion_request",
+    )
+    requested_at = models.DateTimeField()
+    scheduled_delete_at = models.DateTimeField()
+    cancelled_at = models.DateTimeField(null=True, blank=True)
+    purged_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["scheduled_delete_at"], name="acct_del_scheduled_idx"),
+            models.Index(fields=["cancelled_at"], name="acct_del_cancelled_idx"),
+            models.Index(fields=["purged_at"], name="acct_del_purged_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} deletion requested at {self.requested_at}"
+
+
+class DeletedAccountRecord(models.Model):
+    original_user_id = models.PositiveIntegerField()
+    username = models.CharField(max_length=150)
+    masked_email = models.CharField(max_length=254, blank=True)
+    date_joined = models.DateTimeField()
+    deletion_requested_at = models.DateTimeField()
+    purged_at = models.DateTimeField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["original_user_id"], name="deleted_acct_user_idx"),
+            models.Index(fields=["purged_at"], name="deleted_acct_purged_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.username} purged at {self.purged_at}"

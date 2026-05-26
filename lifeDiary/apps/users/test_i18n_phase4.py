@@ -40,8 +40,11 @@ class TestMypageEnglish:
         assert "Tag" in body
         assert "Period" in body
         assert "Target hours" in body
+        assert "Delete account" in body
+        assert "Account deletion" in body
         assert "마이페이지" not in body
         assert "목표 추가" not in body
+        assert "계정 탈퇴" not in body
 
     def test_mypage_period_choices_english(self, auth_en_client):
         response = auth_en_client.get(reverse("users:mypage"))
@@ -84,3 +87,25 @@ class TestLogoutMessageEnglish:
     def test_logout_success_message_english(self, auth_en_client):
         response = auth_en_client.post(reverse("users:logout"), follow=True)
         assert "Successfully logged out." in response.content.decode()
+
+
+@pytest.mark.django_db
+class TestAccountDeletionEnglish:
+    def test_account_delete_confirmation_renders_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:account_delete"))
+        body = response.content.decode()
+
+        assert response.status_code == 200
+        assert "Account deletion" in body
+        assert "Request deletion" in body
+        assert "within 15 days" in body
+        assert "masked email" in body
+        assert "계정 탈퇴" not in body
+        assert "탈퇴 요청" not in body
+
+    def test_account_delete_request_message_renders_english(self, auth_en_client):
+        response = auth_en_client.post(reverse("users:account_delete"), follow=True)
+        body = response.content.decode()
+
+        assert "Your account deletion request has been received." in body
+        assert "계정 탈퇴 요청이 접수되었습니다." not in body
