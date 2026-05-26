@@ -85,6 +85,24 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-12">
+        <div class="card border-danger">
+            <div class="card-header bg-transparent">
+                <h6 class="mb-0 text-danger"><i class="fas fa-user-slash me-1"></i>{% trans "계정 탈퇴" %}</h6>
+            </div>
+            <div class="card-body">
+                <p class="text-muted mb-3">
+                    {% trans "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정과 개인 기록이 완전히 삭제됩니다." %}
+                </p>
+                <a href="{% url 'users:account_delete' %}" class="btn btn-outline-danger">
+                    {% trans "계정 탈퇴 진행" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% load static %}
 <script src="{% static 'users/js/goals.js' %}" defer></script>
 {% endblock %}

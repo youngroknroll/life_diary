@@ -20,6 +20,7 @@ class TestHomePageEnglish:
     def test_home_page_renders_english_hero(self, en_client):
         response = en_client.get(reverse("home"))
         body = response.content.decode()
+        assert '<html lang="en">' in body
         assert "Capture your day, simply." in body
         assert "Pick activities, log the flow of your day, then look back." in body
         assert "하루를 단순하게 기록하세요" not in body
@@ -44,6 +45,37 @@ class TestHomePageEnglish:
         years = _copyright_year_range()
         assert f"Life Diary &copy; {years} LogBetter. All rights reserved." in body
         assert "songyeongrok" not in body
+
+    def test_home_page_renders_english_legal_footer_links(self, en_client):
+        response = en_client.get(reverse("home"))
+        body = response.content.decode()
+
+        assert "Privacy Policy" in body
+        assert "Terms of Service" in body
+        assert "개인정보처리방침" not in body
+
+    def test_privacy_policy_page_renders_english_copy(self, en_client):
+        response = en_client.get(reverse("privacy"))
+        body = response.content.decode()
+
+        assert response.status_code == 200
+        assert "Privacy Policy" in body
+        assert "Personal Information We Process" in body
+        assert "login sessions, CSRF protection, language preferences" in body
+        assert "개인정보처리방침" not in body
+
+    def test_terms_page_renders_english_copy(self, en_client):
+        response = en_client.get(reverse("terms"))
+        body = response.content.decode()
+
+        assert response.status_code == 200
+        assert "Terms of Service" in body
+        assert "Account Responsibility" in body
+        assert "Prohibited Conduct" in body
+        assert "Intellectual Property" in body
+        assert "screens, logos, UI, code, text, design, and service structure" in body
+        assert "user-entered data" in body
+        assert "이용약관" not in body
 
     def test_home_page_renders_english_header_theme_text(self, en_client):
         response = en_client.get(reverse("home"))

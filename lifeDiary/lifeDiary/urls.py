@@ -52,6 +52,8 @@ urlpatterns = [
     ),
     path("admin/", admin.site.urls),
     path("", views.index, name="home"),
+    path("privacy/", views.privacy_policy, name="privacy"),
+    path("terms/", views.terms_of_service, name="terms"),
     # Page URLs
     path("dashboard/", include("apps.dashboard.urls")),
     path("stats/", include("apps.stats.urls")),
