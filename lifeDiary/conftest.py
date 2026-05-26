@@ -1,14 +1,19 @@
 import pytest
 from django.core import management
+from django.core.management.base import CommandError
 
 
 def _compile_test_messages():
-    management.call_command(
-        "compilemessages",
-        ignore=[".venv/*", ".worktrees/*", "staticfiles/*"],
-        locale=["en", "ko"],
-        verbosity=0,
-    )
+    try:
+        management.call_command(
+            "compilemessages",
+            ignore=[".venv/*", ".worktrees/*", "staticfiles/*"],
+            locale=["en", "ko"],
+            verbosity=0,
+        )
+    except CommandError as exc:
+        if "Can't find msgfmt" not in str(exc):
+            raise
 
 
 def pytest_sessionstart(session):
