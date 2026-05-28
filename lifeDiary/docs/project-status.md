@@ -82,6 +82,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Medium | `docs/plans/2026-05-07_stats-dashboard-mobile-ui-plan.md` | Improve mobile stats/dashboard UX: stacked stats sections, goal accordion, feedback reveal, mobile tag bottom sheet. | Goal cards, dashboard mobile bottom sheet, and default-closed stats feedback reveal are implemented and covered by focused tests. Re-check item #1 expectations before marking complete because current tests preserve tab structure rather than requiring all mobile panes to be stacked. |
 | Medium | `docs/plans/2026-04-26_stats-tab-performance-plan.md` | Measure and optimize stats tab backend queries and chart rendering. | Backend query consolidation and query-count guards are implemented and verified. Frontend chart lazy render was not confirmed in this pass. |
 | Strategic | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | Public distribution, operational infrastructure, monetization experiment, portfolio metrics. | Treat as roadmap; each phase requires explicit approval. |
+| Strategic | `docs/plans/2026-05-28-ad-revenue-marketing-strategy.md` | Advertising-only marketing and revenue strategy for covering roughly KRW 30,000/month in server operating costs through public content pages, conservative ad placement, and weekly revenue/traffic measurement. | Treat as planning scope. Before implementing ad code, approve the content/policy/ad-slot phase and keep ads off private dashboard, stats, auth, and account workflows. |
 
 ## Code Found But Not Fully Completed
 
