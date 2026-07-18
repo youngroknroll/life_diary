@@ -19,111 +19,111 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "카테고리를 선택하세요"
-msgstr ""
+msgstr "카테고리를 선택하세요"
 
 msgid "태그 수정"
-msgstr ""
+msgstr "태그 수정"
 
 msgid "새 태그 생성"
-msgstr ""
+msgstr "새 태그 생성"
 
 msgid "태그명을 입력해주세요."
-msgstr ""
+msgstr "태그명을 입력해주세요."
 
 msgid "카테고리를 선택해주세요."
-msgstr ""
+msgstr "카테고리를 선택해주세요."
 
 #, javascript-format
 msgid "태그 저장 실패: %s"
-msgstr ""
+msgstr "태그 저장 실패: %s"
 
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
-msgstr ""
+msgstr "'%s' 태그를 정말 삭제하시겠습니까?"
 
 #, javascript-format
 msgid "태그 삭제 실패: %s"
-msgstr ""
+msgstr "태그 삭제 실패: %s"
 
 msgid "정말 삭제하시겠습니까?"
-msgstr ""
+msgstr "정말 삭제하시겠습니까?"
 
 msgid "처리 중..."
-msgstr ""
+msgstr "처리 중..."
 
 msgid "그리드에서 시간을 선택하세요"
-msgstr ""
+msgstr "그리드에서 시간을 선택하세요"
 
 msgid "빈 슬롯"
-msgstr ""
+msgstr "빈 슬롯"
 
 msgid "알 수 없음"
-msgstr ""
+msgstr "알 수 없음"
 
 msgid "시간:"
-msgstr ""
+msgstr "시간:"
 
 msgid "상태:"
-msgstr ""
+msgstr "상태:"
 
 msgid "삭제"
-msgstr ""
+msgstr "삭제"
 
 #, javascript-format
 msgid "%s개 슬롯"
 msgid_plural "%s개 슬롯"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s개 슬롯"
+msgstr[1] "%s개 슬롯"
 
 msgid "%(h)s시간 %(m)s분"
-msgstr ""
+msgstr "%(h)s시간 %(m)s분"
 
 msgid "슬롯을 선택해주세요."
-msgstr ""
+msgstr "슬롯을 선택해주세요."
 
 msgid "태그를 선택해주세요."
-msgstr ""
+msgstr "태그를 선택해주세요."
 
 msgid "저장 중입니다..."
-msgstr ""
+msgstr "저장 중입니다..."
 
 #, javascript-format
 msgid "저장 실패: %s"
-msgstr ""
+msgstr "저장 실패: %s"
 
 msgid "삭제할 슬롯을 선택해주세요."
-msgstr ""
+msgstr "삭제할 슬롯을 선택해주세요."
 
 msgid "삭제할 기록이 없습니다."
-msgstr ""
+msgstr "삭제할 기록이 없습니다."
 
 #, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
+msgstr[1] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 
 msgid "삭제 중입니다..."
-msgstr ""
+msgstr "삭제 중입니다..."
 
 #, javascript-format
 msgid "삭제 실패: %s"
-msgstr ""
+msgstr "삭제 실패: %s"
 
 msgid "태그 로드 중 오류가 발생했습니다."
-msgstr ""
+msgstr "태그 로드 중 오류가 발생했습니다."
 
 msgid "기본 태그"
-msgstr ""
+msgstr "기본 태그"
 
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
-msgstr ""
+msgstr "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 
 msgid "생성된 태그가 없습니다."
-msgstr ""
+msgstr "생성된 태그가 없습니다."
 
 msgid "데이터가 없습니다"
-msgstr ""
+msgstr "데이터가 없습니다"
 
 msgid "%(label)s: %(h)sh (%(p)s%%)"
 msgstr "%(label)s: %(h)s시간 (%(p)s%%)"
@@ -159,98 +159,100 @@ msgid "Total hours"
 msgstr "총 시간"
 
 msgid "비밀번호 표시"
-msgstr ""
+msgstr "비밀번호 표시"
 
 msgid "비밀번호 숨기기"
-msgstr ""
+msgstr "비밀번호 숨기기"
 
 msgid "Caps Lock이 켜져 있습니다"
-msgstr ""
+msgstr "Caps Lock이 켜져 있습니다"
 
 #, javascript-format
 msgid "최대 %s시간까지 입력 가능"
-msgstr ""
+msgstr "최대 %s시간까지 입력 가능"
 
 msgid "저장중..."
-msgstr ""
+msgstr "저장중..."
 
 msgid "저장완료!"
-msgstr ""
+msgstr "저장완료!"
 
 msgid "저장 실패"
-msgstr ""
+msgstr "저장 실패"
 
 msgid "저장 실패 - 네트워크 오류"
-msgstr ""
+msgstr "저장 실패 - 네트워크 오류"
 
 msgid "너무 짧음"
-msgstr ""
+msgstr "너무 짧음"
 
 msgid "약함"
-msgstr ""
+msgstr "약함"
 
 msgid "보통"
-msgstr ""
+msgstr "보통"
 
 msgid "좋음"
-msgstr ""
+msgstr "좋음"
 
 msgid "강함"
-msgstr ""
+msgstr "강함"
 
 msgid "비밀번호가 일치합니다."
-msgstr ""
+msgstr "비밀번호가 일치합니다."
 
 msgid "비밀번호가 일치하지 않습니다."
-msgstr ""
+msgstr "비밀번호가 일치하지 않습니다."
 
 #, javascript-format
 msgid "Available %s"
-msgstr ""
+msgstr "Available %s"
 
 #, javascript-format
 msgid ""
 "Choose %s by selecting them and then select the \"Choose\" arrow button."
 msgstr ""
+"Choose %s by selecting them and then select the \"Choose\" arrow button."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of available %s."
-msgstr ""
+msgstr "Type into this box to filter down the list of available %s."
 
 msgid "Filter"
-msgstr ""
+msgstr "Filter"
 
 #, javascript-format
 msgid "Choose all %s"
-msgstr ""
+msgstr "Choose all %s"
 
 #, javascript-format
 msgid "Choose selected %s"
-msgstr ""
+msgstr "Choose selected %s"
 
 #, javascript-format
 msgid "Remove selected %s"
-msgstr ""
+msgstr "Remove selected %s"
 
 #, javascript-format
 msgid "Chosen %s"
-msgstr ""
+msgstr "Chosen %s"
 
 #, javascript-format
 msgid ""
 "Remove %s by selecting them and then select the \"Remove\" arrow button."
 msgstr ""
+"Remove %s by selecting them and then select the \"Remove\" arrow button."
 
 #, javascript-format
 msgid "Type into this box to filter down the list of selected %s."
-msgstr ""
+msgstr "Type into this box to filter down the list of selected %s."
 
 msgid "(click to clear)"
-msgstr ""
+msgstr "(click to clear)"
 
 #, javascript-format
 msgid "Remove all %s"
-msgstr ""
+msgstr "Remove all %s"
 
 #, javascript-format
 msgid "%s selected option not visible"
@@ -265,33 +267,41 @@ msgid ""
 "You have unsaved changes on individual editable fields. If you run an "
 "action, your unsaved changes will be lost."
 msgstr ""
+"You have unsaved changes on individual editable fields. If you run an "
+"action, your unsaved changes will be lost."
 
 msgid ""
 "You have selected an action, but you haven’t saved your changes to "
 "individual fields yet. Please click OK to save. You’ll need to re-run the "
 "action."
 msgstr ""
+"You have selected an action, but you haven’t saved your changes to "
+"individual fields yet. Please click OK to save. You’ll need to re-run the "
+"action."
 
 msgid ""
 "You have selected an action, and you haven’t made any changes on individual "
 "fields. You’re probably looking for the Go button rather than the Save "
 "button."
 msgstr ""
+"You have selected an action, and you haven’t made any changes on individual "
+"fields. You’re probably looking for the Go button rather than the Save "
+"button."
 
 msgid "Now"
-msgstr ""
+msgstr "Now"
 
 msgid "Midnight"
-msgstr ""
+msgstr "Midnight"
 
 msgid "6 a.m."
-msgstr ""
+msgstr "6 a.m."
 
 msgid "Noon"
-msgstr ""
+msgstr "Noon"
 
 msgid "6 p.m."
-msgstr ""
+msgstr "6 p.m."
 
 #, javascript-format
 msgid "Note: You are %s hour ahead of server time."
@@ -304,183 +314,183 @@ msgid_plural "Note: You are %s hours behind server time."
 msgstr[0] ""
 
 msgid "Choose a Time"
-msgstr ""
+msgstr "Choose a Time"
 
 msgid "Choose a time"
-msgstr ""
+msgstr "Choose a time"
 
 msgid "Cancel"
-msgstr ""
+msgstr "Cancel"
 
 msgid "Today"
-msgstr ""
+msgstr "Today"
 
 msgid "Choose a Date"
-msgstr ""
+msgstr "Choose a Date"
 
 msgid "Yesterday"
-msgstr ""
+msgstr "Yesterday"
 
 msgid "Tomorrow"
-msgstr ""
+msgstr "Tomorrow"
 
 msgid "January"
-msgstr ""
+msgstr "January"
 
 msgid "February"
-msgstr ""
+msgstr "February"
 
 msgid "March"
-msgstr ""
+msgstr "March"
 
 msgid "April"
-msgstr ""
+msgstr "April"
 
 msgid "May"
-msgstr ""
+msgstr "May"
 
 msgid "June"
-msgstr ""
+msgstr "June"
 
 msgid "July"
-msgstr ""
+msgstr "July"
 
 msgid "August"
-msgstr ""
+msgstr "August"
 
 msgid "September"
-msgstr ""
+msgstr "September"
 
 msgid "October"
-msgstr ""
+msgstr "October"
 
 msgid "November"
-msgstr ""
+msgstr "November"
 
 msgid "December"
-msgstr ""
+msgstr "December"
 
 msgctxt "abbrev. month January"
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 msgctxt "abbrev. month February"
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 msgctxt "abbrev. month March"
 msgid "Mar"
-msgstr ""
+msgstr "Mar"
 
 msgctxt "abbrev. month April"
 msgid "Apr"
-msgstr ""
+msgstr "Apr"
 
 msgctxt "abbrev. month May"
 msgid "May"
-msgstr ""
+msgstr "May"
 
 msgctxt "abbrev. month June"
 msgid "Jun"
-msgstr ""
+msgstr "Jun"
 
 msgctxt "abbrev. month July"
 msgid "Jul"
-msgstr ""
+msgstr "Jul"
 
 msgctxt "abbrev. month August"
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 msgctxt "abbrev. month September"
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 msgctxt "abbrev. month October"
 msgid "Oct"
-msgstr ""
+msgstr "Oct"
 
 msgctxt "abbrev. month November"
 msgid "Nov"
-msgstr ""
+msgstr "Nov"
 
 msgctxt "abbrev. month December"
 msgid "Dec"
-msgstr ""
+msgstr "Dec"
 
 msgid "Sunday"
-msgstr ""
+msgstr "Sunday"
 
 msgid "Monday"
-msgstr ""
+msgstr "Monday"
 
 msgid "Tuesday"
-msgstr ""
+msgstr "Tuesday"
 
 msgid "Wednesday"
-msgstr ""
+msgstr "Wednesday"
 
 msgid "Thursday"
-msgstr ""
+msgstr "Thursday"
 
 msgid "Friday"
-msgstr ""
+msgstr "Friday"
 
 msgid "Saturday"
-msgstr ""
+msgstr "Saturday"
 
 msgctxt "abbrev. day Sunday"
 msgid "Sun"
-msgstr ""
+msgstr "Sun"
 
 msgctxt "abbrev. day Monday"
 msgid "Mon"
-msgstr ""
+msgstr "Mon"
 
 msgctxt "abbrev. day Tuesday"
 msgid "Tue"
-msgstr ""
+msgstr "Tue"
 
 msgctxt "abbrev. day Wednesday"
 msgid "Wed"
-msgstr ""
+msgstr "Wed"
 
 msgctxt "abbrev. day Thursday"
 msgid "Thur"
-msgstr ""
+msgstr "Thur"
 
 msgctxt "abbrev. day Friday"
 msgid "Fri"
-msgstr ""
+msgstr "Fri"
 
 msgctxt "abbrev. day Saturday"
 msgid "Sat"
-msgstr ""
+msgstr "Sat"
 
 msgctxt "one letter Sunday"
 msgid "S"
-msgstr ""
+msgstr "S"
 
 msgctxt "one letter Monday"
 msgid "M"
-msgstr ""
+msgstr "M"
 
 msgctxt "one letter Tuesday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Wednesday"
 msgid "W"
-msgstr ""
+msgstr "W"
 
 msgctxt "one letter Thursday"
 msgid "T"
-msgstr ""
+msgstr "T"
 
 msgctxt "one letter Friday"
 msgid "F"
-msgstr ""
+msgstr "F"
 
 msgctxt "one letter Saturday"
 msgid "S"
-msgstr ""
+msgstr "S"

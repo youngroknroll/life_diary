@@ -20,271 +20,279 @@ msgstr ""
 
 #, python-format
 msgid "[missing message: %(code)s]"
-msgstr ""
+msgstr "[missing message: %(code)s]"
 
 #, python-format
 msgid "안녕 %(name)s"
-msgstr ""
+msgstr "안녕 %(name)s"
 
 #, python-format
 msgid "%(period)s 요약입니다"
-msgstr ""
+msgstr "%(period)s 요약입니다"
 
 msgid "오늘"
-msgstr ""
+msgstr "오늘"
 
 msgid "이번주"
-msgstr ""
+msgstr "이번주"
 
 #, python-format
 msgid "Hi %(name)s"
-msgstr ""
+msgstr "Hi %(name)s"
 
 #, python-format
 msgid "%(hours)s시간 %(minutes)s분"
-msgstr ""
+msgstr "%(hours)s시간 %(minutes)s분"
 
 #, python-format
 msgid "%(hours)s시간"
-msgstr ""
+msgstr "%(hours)s시간"
 
 #, python-format
 msgid "%(minutes)s분"
-msgstr ""
+msgstr "%(minutes)s분"
 
 msgid "0분"
-msgstr ""
+msgstr "0분"
 
 msgid "사용자"
-msgstr ""
+msgstr "사용자"
 
 msgid "날짜"
-msgstr ""
+msgstr "날짜"
 
 msgid "슬롯 인덱스"
-msgstr ""
+msgstr "슬롯 인덱스"
 
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
-msgstr ""
+msgstr "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 
 msgid "태그"
-msgstr ""
+msgstr "태그"
 
 msgid "메모"
-msgstr ""
+msgstr "메모"
 
 msgid "최대 500자까지 입력 가능"
-msgstr ""
+msgstr "최대 500자까지 입력 가능"
 
 msgid "생성일"
-msgstr ""
+msgstr "생성일"
 
 msgid "수정일"
-msgstr ""
+msgstr "수정일"
 
 msgid "시간 블록"
-msgstr ""
+msgstr "시간 블록"
 
 msgid "시간 블록들"
-msgstr ""
+msgstr "시간 블록들"
 
 msgid "해당 시간대에 이미 기록이 존재합니다."
-msgstr ""
+msgstr "해당 시간대에 이미 기록이 존재합니다."
 
 msgid "다른 사용자의 태그는 사용할 수 없습니다."
-msgstr ""
+msgstr "다른 사용자의 태그는 사용할 수 없습니다."
 
 #, python-format
 msgid "%(minute)s분"
-msgstr ""
+msgstr "%(minute)s분"
 
 msgid "태그 사용법 이미지"
-msgstr ""
+msgstr "태그 사용법 이미지"
 
 msgid "Close"
 msgstr "닫기"
 
 msgid "태그 사용법"
-msgstr ""
+msgstr "태그 사용법"
 
 msgid "닫기"
-msgstr ""
+msgstr "닫기"
 
 #, python-format
 msgid "대시보드 - %(d)s | 라이프 다이어리"
-msgstr ""
+msgstr "대시보드 - %(d)s | 라이프 다이어리"
 
 msgid "목표 추가"
-msgstr ""
+msgstr "목표 추가"
 
 msgid "총 슬롯"
-msgstr ""
+msgstr "총 슬롯"
 
 msgid "기록된 슬롯"
-msgstr ""
+msgstr "기록된 슬롯"
 
 msgid "기록률"
-msgstr ""
+msgstr "기록률"
 
 #, python-format
 msgid "%(h)s시간 %(m)s분"
-msgstr ""
+msgstr "%(h)s시간 %(m)s분"
 
 msgid "총 기록 시간"
-msgstr ""
+msgstr "총 기록 시간"
 
 msgid "시간 그리드 (10분 단위)"
-msgstr ""
+msgstr "시간 그리드 (10분 단위)"
 
 #, python-format
 msgid "%(t)s - 빈 슬롯"
-msgstr ""
+msgstr "%(t)s - 빈 슬롯"
 
 msgid "생성된 태그가 없습니다."
-msgstr ""
+msgstr "생성된 태그가 없습니다."
 
 msgid "입력정보"
-msgstr ""
+msgstr "입력정보"
 
 msgid "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!"
-msgstr ""
+msgstr "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!"
 
 msgid "태그 선택"
-msgstr ""
+msgstr "태그 선택"
 
 msgid "새 태그"
-msgstr ""
+msgstr "새 태그"
 
 msgid "사용법:"
-msgstr ""
+msgstr "사용법:"
 
 msgid "단일 선택:"
-msgstr ""
+msgstr "단일 선택:"
 
 msgid "슬롯 클릭"
-msgstr ""
+msgstr "슬롯 클릭"
 
 msgid "드래그 선택:"
-msgstr ""
+msgstr "드래그 선택:"
 
 msgid "마우스로 드래그"
-msgstr ""
+msgstr "마우스로 드래그"
 
 msgid "다중 선택:"
-msgstr ""
+msgstr "다중 선택:"
 
 msgid "Ctrl/Cmd + 클릭"
-msgstr ""
+msgstr "Ctrl/Cmd + 클릭"
 
 msgid "터치:"
-msgstr ""
+msgstr "터치:"
 
 msgid "터치 후 드래그"
-msgstr ""
+msgstr "터치 후 드래그"
 
 msgid "슬롯을 선택했다면?!"
-msgstr ""
+msgstr "슬롯을 선택했다면?!"
 
 msgid "해당하는 태그 선택 후 저장 버튼 클릭!"
-msgstr ""
+msgstr "해당하는 태그 선택 후 저장 버튼 클릭!"
 
 msgid "💡 이 도움말은 ? 버튼을 다시 클릭하면 닫힙니다."
-msgstr ""
+msgstr "💡 이 도움말은 ? 버튼을 다시 클릭하면 닫힙니다."
 
 msgid "태그 카테고리 설명"
-msgstr ""
+msgstr "태그 카테고리 설명"
 
 msgid "기본 태그"
-msgstr ""
+msgstr "기본 태그"
 
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
-msgstr ""
+msgstr "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 
 msgid "메모 (선택사항)"
-msgstr ""
+msgstr "메모 (선택사항)"
 
 msgid "메모를 입력하세요..."
-msgstr ""
+msgstr "메모를 입력하세요..."
 
 msgid "저장"
-msgstr ""
+msgstr "저장"
 
 msgid "대시보드"
-msgstr ""
+msgstr "대시보드"
 
 msgid "올바른 JSON 형식이 아닙니다."
-msgstr ""
+msgstr "올바른 JSON 형식이 아닙니다."
 
 msgid "저장 중 오류가 발생했습니다."
-msgstr ""
+msgstr "저장 중 오류가 발생했습니다."
 
 #, python-format
 msgid "%(count)d개의 슬롯이 저장되었습니다."
 msgid_plural "%(count)d개의 슬롯이 저장되었습니다."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)d개의 슬롯이 저장되었습니다."
+msgstr[1] "%(count)d개의 슬롯이 저장되었습니다."
 
 msgid "삭제 중 오류가 발생했습니다."
-msgstr ""
+msgstr "삭제 중 오류가 발생했습니다."
 
 msgid "삭제할 기록이 없습니다."
-msgstr ""
+msgstr "삭제할 기록이 없습니다."
 
 #, python-format
 msgid "%(count)d개의 슬롯이 삭제되었습니다."
 msgid_plural "%(count)d개의 슬롯이 삭제되었습니다."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)d개의 슬롯이 삭제되었습니다."
+msgstr[1] "%(count)d개의 슬롯이 삭제되었습니다."
 
 #, python-format
 msgid "%(period)s '%(name)s' 목표(%(hours)s시간)를 이미 달성했습니다!"
-msgstr ""
+msgstr "%(period)s '%(name)s' 목표(%(hours)s시간)를 이미 달성했습니다!"
 
 #, python-format
 msgid ""
 "%(period)s '%(name)s' 목표(%(hours)s시간) 중 %(actual).1f시간을 달성했습니"
 "다. %(remain).1f시간만 더 해보세요!"
 msgstr ""
+"%(period)s '%(name)s' 목표(%(hours)s시간) 중 %(actual).1f시간을 달성했습니"
+"다. %(remain).1f시간만 더 해보세요!"
 
 #, python-format
 msgid ""
 "'%(name)s' 시간이 전체의 %(percent)d%%를 차지합니다. 활동의 균형을 점검해보세"
 "요."
 msgstr ""
+"'%(name)s' 시간이 전체의 %(percent)d%%를 차지합니다. 활동의 균형을 점검해보세"
+"요."
 
 #, python-format
 msgid "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 msgstr ""
+"최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #, python-format
 msgid ""
 "휴식 시간이 전체의 %(percent)d%%를 차지합니다. 활동적인 시간을 늘려보세요."
 msgstr ""
+"휴식 시간이 전체의 %(percent)d%%를 차지합니다. 활동적인 시간을 늘려보세요."
 
 #, python-format
 msgid ""
 "기록되지 않은 시간이 전체의 %(percent)d%%입니다. 하루를 더 꼼꼼히 기록해보세"
 "요."
 msgstr ""
+"기록되지 않은 시간이 전체의 %(percent)d%%입니다. 하루를 더 꼼꼼히 기록해보세"
+"요."
 
 msgid "이번 달"
-msgstr ""
+msgstr "이번 달"
 
 msgid "미분류"
-msgstr ""
+msgstr "미분류"
 
 msgid "통계"
-msgstr ""
+msgstr "통계"
 
 msgid "라이프 다이어리"
-msgstr ""
+msgstr "라이프 다이어리"
 
 #, python-format
 msgid "%(d)s (%(wd)s) stats analysis"
 msgstr "%(d)s (%(wd)s) 통계 분석"
 
 msgid "목표 확인"
-msgstr ""
+msgstr "목표 확인"
 
 #, python-format
 msgid "%(h)sh"
@@ -445,7 +453,7 @@ msgstr "총 블록 수"
 
 #, python-format
 msgid "%(c)s blocks"
-msgstr ""
+msgstr "%(c)s blocks"
 
 msgid "Goal progress"
 msgstr "목표 진행"
@@ -454,404 +462,418 @@ msgid "Daily goals"
 msgstr "일간 목표"
 
 msgid "목표:"
-msgstr ""
+msgstr "목표:"
 
 msgid "실제:"
-msgstr ""
+msgstr "실제:"
 
 msgid "달성률:"
-msgstr ""
+msgstr "달성률:"
 
 msgid "등록된 일간 목표가 없거나 기록이 없습니다."
-msgstr ""
+msgstr "등록된 일간 목표가 없거나 기록이 없습니다."
 
 msgid "Weekly goals"
 msgstr "주간 목표"
 
 msgid "등록된 주간 목표가 없거나 기록이 없습니다."
-msgstr ""
+msgstr "등록된 주간 목표가 없거나 기록이 없습니다."
 
 msgid "Monthly goals"
 msgstr "월간 목표"
 
 msgid "등록된 월간 목표가 없거나 기록이 없습니다."
-msgstr ""
+msgstr "등록된 월간 목표가 없거나 기록이 없습니다."
 
 msgid "특이사항:"
-msgstr ""
+msgstr "특이사항:"
 
 msgid "라이프 피드백"
-msgstr ""
+msgstr "라이프 피드백"
 
 msgid "기본 태그 설정 변경은 관리자만 할 수 있습니다."
-msgstr ""
+msgstr "기본 태그 설정 변경은 관리자만 할 수 있습니다."
 
 msgid "기본 태그는 관리자만 생성할 수 있습니다."
-msgstr ""
+msgstr "기본 태그는 관리자만 생성할 수 있습니다."
 
 msgid "수동적 소비시간"
-msgstr ""
+msgstr "수동적 소비시간"
 
 msgid "주도적 사용시간"
-msgstr ""
+msgstr "주도적 사용시간"
 
 msgid "투자시간"
-msgstr ""
+msgstr "투자시간"
 
 msgid "기초 생활시간"
-msgstr ""
+msgstr "기초 생활시간"
 
 msgid "수면시간"
-msgstr ""
+msgstr "수면시간"
 
 msgid "비계획적이고 예정되지 않은 방식으로 소비되어버린 시간"
-msgstr ""
+msgstr "비계획적이고 예정되지 않은 방식으로 소비되어버린 시간"
 
 msgid "계획과 통제 안에서 내가 주도적으로 사용한 시간"
-msgstr ""
+msgstr "계획과 통제 안에서 내가 주도적으로 사용한 시간"
 
 msgid "성과를 얻길 바라는 목표 영역에 대한 투자시간"
-msgstr ""
+msgstr "성과를 얻길 바라는 목표 영역에 대한 투자시간"
 
 msgid "일정과 일정 사이의 기초적인 준비시간"
-msgstr ""
+msgstr "일정과 일정 사이의 기초적인 준비시간"
 
 msgid "잠, 낮잠"
-msgstr ""
+msgstr "잠, 낮잠"
 
 msgid "카테고리명"
-msgstr ""
+msgstr "카테고리명"
 
 msgid "슬러그"
-msgstr ""
+msgstr "슬러그"
 
 msgid "설명"
-msgstr ""
+msgstr "설명"
 
 msgid "올바른 HEX 색상 코드를 입력하세요 (예: #FF5733)"
-msgstr ""
+msgstr "올바른 HEX 색상 코드를 입력하세요 (예: #FF5733)"
 
 msgid "색상"
-msgstr ""
+msgstr "색상"
 
 msgid "표시 순서"
-msgstr ""
+msgstr "표시 순서"
 
 msgid "카테고리"
-msgstr ""
+msgstr "카테고리"
 
 msgid "카테고리들"
-msgstr ""
+msgstr "카테고리들"
 
 msgid "null이면 기본 태그 (모든 사용자 공용)"
-msgstr ""
+msgstr "null이면 기본 태그 (모든 사용자 공용)"
 
 msgid "태그명"
-msgstr ""
+msgstr "태그명"
 
 msgid "최대 50자까지 입력 가능"
-msgstr ""
+msgstr "최대 50자까지 입력 가능"
 
 msgid "HEX 색상 코드 (예: #FF5733)"
-msgstr ""
+msgstr "HEX 색상 코드 (예: #FF5733)"
 
 msgid "관리자가 등록한 모든 사용자 공용 태그"
-msgstr ""
+msgstr "관리자가 등록한 모든 사용자 공용 태그"
 
 msgid "태그들"
-msgstr ""
+msgstr "태그들"
 
 msgid "이미 같은 이름의 태그가 존재합니다."
-msgstr ""
+msgstr "이미 같은 이름의 태그가 존재합니다."
 
 msgid "이미 같은 이름의 기본 태그가 존재합니다."
-msgstr ""
+msgstr "이미 같은 이름의 기본 태그가 존재합니다."
 
 msgid "태그명은 공백일 수 없습니다."
-msgstr ""
+msgstr "태그명은 공백일 수 없습니다."
 
 msgid "새 태그 생성"
-msgstr ""
+msgstr "새 태그 생성"
 
 msgid "카테고리를 선택하세요"
-msgstr ""
+msgstr "카테고리를 선택하세요"
 
 msgid "기본 태그로 설정 (모든 사용자가 사용 가능)"
-msgstr ""
+msgstr "기본 태그로 설정 (모든 사용자가 사용 가능)"
 
 msgid "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
-msgstr ""
+msgstr "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
 
 msgid "취소"
-msgstr ""
+msgstr "취소"
 
 msgid "태그 관리"
-msgstr ""
+msgstr "태그 관리"
 
 msgid "관리자"
-msgstr ""
+msgstr "관리자"
 
 msgid "로딩 중"
-msgstr ""
+msgstr "로딩 중"
 
 msgid "태그 목록 불러오는 중..."
-msgstr ""
+msgstr "태그 목록 불러오는 중..."
 
 msgid "등록된 태그가 없습니다."
-msgstr ""
+msgstr "등록된 태그가 없습니다."
 
 msgid "새 태그를 생성하여 시간 기록을 시작해보세요."
-msgstr ""
+msgstr "새 태그를 생성하여 시간 기록을 시작해보세요."
 
 msgid "태그명과 색상을 입력해주세요."
-msgstr ""
+msgstr "태그명과 색상을 입력해주세요."
 
 msgid "카테고리를 선택해주세요."
-msgstr ""
+msgstr "카테고리를 선택해주세요."
 
 msgid "존재하지 않는 카테고리입니다."
-msgstr ""
+msgstr "존재하지 않는 카테고리입니다."
 
 msgid "이 기본 태그는 사용 중이어서 삭제할 수 없습니다."
-msgstr ""
+msgstr "이 기본 태그는 사용 중이어서 삭제할 수 없습니다."
 
 msgid "카테고리 목록"
-msgstr ""
+msgstr "카테고리 목록"
 
 msgid "카테고리 조회 중 오류가 발생했습니다."
-msgstr ""
+msgstr "카테고리 조회 중 오류가 발생했습니다."
 
 msgid "태그 목록"
-msgstr ""
+msgstr "태그 목록"
 
 msgid "태그 조회 중 오류가 발생했습니다."
-msgstr ""
+msgstr "태그 조회 중 오류가 발생했습니다."
 
 msgid "잘못된 형식의 요청입니다."
-msgstr ""
+msgstr "잘못된 형식의 요청입니다."
 
 msgid "태그가 생성되었습니다."
-msgstr ""
+msgstr "태그가 생성되었습니다."
 
 msgid "태그 생성 중 오류가 발생했습니다."
-msgstr ""
+msgstr "태그 생성 중 오류가 발생했습니다."
 
 msgid "태그가 수정되었습니다."
-msgstr ""
+msgstr "태그가 수정되었습니다."
 
 msgid "태그 수정 중 오류가 발생했습니다."
-msgstr ""
+msgstr "태그 수정 중 오류가 발생했습니다."
 
 #, python-format
 msgid "\"%(name)s\" 태그가 삭제되었습니다."
-msgstr ""
+msgstr "\"%(name)s\" 태그가 삭제되었습니다."
 
 msgid "태그 삭제 중 오류가 발생했습니다."
-msgstr ""
+msgstr "태그 삭제 중 오류가 발생했습니다."
 
 msgid "이메일"
-msgstr ""
+msgstr "이메일"
 
 msgid "아이디/비밀번호 찾기에 사용됩니다."
-msgstr ""
+msgstr "아이디/비밀번호 찾기에 사용됩니다."
 
 msgid "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
-msgstr ""
+msgstr "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
 
 msgid "사용자명은 30자 이하여야 합니다."
-msgstr ""
+msgstr "사용자명은 30자 이하여야 합니다."
 
 msgid "이미 사용 중인 이메일입니다."
-msgstr ""
+msgstr "이미 사용 중인 이메일입니다."
 
 msgid "기간"
-msgstr ""
+msgstr "기간"
 
 msgid "목표 시간"
-msgstr ""
+msgstr "목표 시간"
 
 msgid "일간"
-msgstr ""
+msgstr "일간"
 
 msgid "주간"
-msgstr ""
+msgstr "주간"
 
 msgid "월간"
-msgstr ""
+msgstr "월간"
 
 msgid "주간/월간은 해당 기간의 총 목표 시간입니다."
-msgstr ""
+msgstr "주간/월간은 해당 기간의 총 목표 시간입니다."
 
 msgid "내용"
-msgstr ""
+msgstr "내용"
 
 msgid "특이사항을 입력하세요."
-msgstr ""
+msgstr "특이사항을 입력하세요."
 
 msgid "일간 목표는 24시간을 초과할 수 없습니다."
-msgstr ""
+msgstr "일간 목표는 24시간을 초과할 수 없습니다."
 
 msgid "주간 목표는 100시간을 초과할 수 없습니다."
-msgstr ""
+msgstr "주간 목표는 100시간을 초과할 수 없습니다."
 
 msgid "월간 목표는 300시간을 초과할 수 없습니다."
-msgstr ""
+msgstr "월간 목표는 300시간을 초과할 수 없습니다."
 
 msgid "달성률"
-msgstr ""
+msgstr "달성률"
 
 msgid "실제 기록"
-msgstr ""
+msgstr "실제 기록"
 
 msgid "수정"
-msgstr ""
+msgstr "수정"
 
 msgid "삭제"
-msgstr ""
+msgstr "삭제"
 
 #, python-format
 msgid "%(h)s시간"
-msgstr ""
+msgstr "%(h)s시간"
 
 msgid "로그인"
-msgstr ""
+msgstr "로그인"
 
 msgid "오늘의 하루를 기록하고, 내일의 나를 만들어가세요."
-msgstr ""
+msgstr "오늘의 하루를 기록하고, 내일의 나를 만들어가세요."
 
 msgid "사용자명"
-msgstr ""
+msgstr "사용자명"
 
 msgid "비밀번호"
-msgstr ""
+msgstr "비밀번호"
 
 msgid "로그인 상태 유지"
-msgstr ""
+msgstr "로그인 상태 유지"
 
 msgid "아이디 찾기"
-msgstr ""
+msgstr "아이디 찾기"
 
 msgid "비밀번호 찾기"
-msgstr ""
+msgstr "비밀번호 찾기"
 
 msgid "계정이 없으신가요?"
-msgstr ""
+msgstr "계정이 없으신가요?"
 
 msgid "회원가입"
-msgstr ""
+msgstr "회원가입"
 
 msgid "마이페이지"
-msgstr ""
+msgstr "마이페이지"
 
 msgid "목표 시간 입력 안내"
-msgstr ""
+msgstr "목표 시간 입력 안내"
 
 msgid ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
 "                        • 월간: 한 달 총 목표 시간 (최대 300시간)"
 msgstr ""
+"• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
+"                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
+"                        • 월간: 한 달 총 목표 시간 (최대 300시간)"
 
 msgid "시간"
-msgstr ""
+msgstr "시간"
 
 msgid "저장완료!"
-msgstr ""
+msgstr "저장완료!"
 
 msgid "나의 목표 목록"
-msgstr ""
+msgstr "나의 목표 목록"
 
 msgid "비밀번호 변경 완료"
-msgstr ""
+msgstr "비밀번호 변경 완료"
 
 msgid "비밀번호가 변경되었습니다"
-msgstr ""
+msgstr "비밀번호가 변경되었습니다"
 
 msgid "새 비밀번호로 로그인하실 수 있습니다."
-msgstr ""
+msgstr "새 비밀번호로 로그인하실 수 있습니다."
 
 msgid "새 비밀번호 설정"
-msgstr ""
+msgstr "새 비밀번호 설정"
 
 msgid "새 비밀번호"
-msgstr ""
+msgstr "새 비밀번호"
 
 msgid "새 비밀번호 확인"
-msgstr ""
+msgstr "새 비밀번호 확인"
 
 msgid "비밀번호 변경"
-msgstr ""
+msgstr "비밀번호 변경"
 
 msgid "재설정 링크가 유효하지 않거나 이미 사용되었습니다. 다시 요청해주세요."
-msgstr ""
+msgstr "재설정 링크가 유효하지 않거나 이미 사용되었습니다. 다시 요청해주세요."
 
 msgid "다시 요청하기"
-msgstr ""
+msgstr "다시 요청하기"
 
 msgid "비밀번호 재설정 메일 발송"
-msgstr ""
+msgstr "비밀번호 재설정 메일 발송"
 
 msgid "메일을 확인해주세요"
-msgstr ""
+msgstr "메일을 확인해주세요"
 
 msgid ""
 "입력하신 이메일이 등록되어 있다면, 비밀번호 재설정 링크가 발송되었습니다. 메"
 "일이 보이지 않으면 스팸함을 확인해주세요."
 msgstr ""
+"입력하신 이메일이 등록되어 있다면, 비밀번호 재설정 링크가 발송되었습니다. 메"
+"일이 보이지 않으면 스팸함을 확인해주세요."
 
 msgid "로그인으로 돌아가기"
-msgstr ""
+msgstr "로그인으로 돌아가기"
 
 msgid "안녕하세요,"
-msgstr ""
+msgstr "안녕하세요,"
 
 msgid ""
 "라이프 다이어리 계정의 비밀번호 재설정을 요청하셨습니다. 아래 링크를 눌러 새 "
 "비밀번호를 설정해주세요."
 msgstr ""
+"라이프 다이어리 계정의 비밀번호 재설정을 요청하셨습니다. 아래 링크를 눌러 새 "
+"비밀번호를 설정해주세요."
 
 msgid "계정 사용자명: "
-msgstr ""
+msgstr "계정 사용자명: "
 
 msgid "본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다."
-msgstr ""
+msgstr "본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩니다."
 
 msgid "— 라이프 다이어리"
-msgstr ""
+msgstr "— 라이프 다이어리"
 
 msgid ""
 "가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
 msgstr ""
+"가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
 
 msgid "재설정 링크 받기"
-msgstr ""
+msgstr "재설정 링크 받기"
 
 msgid "[라이프 다이어리] 비밀번호 재설정 안내"
-msgstr ""
+msgstr "[라이프 다이어리] 비밀번호 재설정 안내"
 
 msgid ""
 "입력하신 이메일이 등록되어 있다면, 해당 계정의 아이디가 발송되었습니다. 메일"
 "이 보이지 않으면 스팸함을 확인해주세요."
 msgstr ""
+"입력하신 이메일이 등록되어 있다면, 해당 계정의 아이디가 발송되었습니다. 메일"
+"이 보이지 않으면 스팸함을 확인해주세요."
 
 msgid ""
 "라이프 다이어리 계정 아이디 찾기를 요청하셨습니다. 이 이메일에 연결된 아이디"
 "는 다음과 같습니다."
 msgstr ""
+"라이프 다이어리 계정 아이디 찾기를 요청하셨습니다. 이 이메일에 연결된 아이디"
+"는 다음과 같습니다."
 
 msgid "로그인 페이지로 이동: "
-msgstr ""
+msgstr "로그인 페이지로 이동: "
 
 msgid ""
 "가입 시 등록한 이메일을 입력하세요. 해당 이메일로 아이디(사용자명)를 보내드립"
 "니다."
 msgstr ""
+"가입 시 등록한 이메일을 입력하세요. 해당 이메일로 아이디(사용자명)를 보내드립"
+"니다."
 
 msgid "아이디 받기"
-msgstr ""
+msgstr "아이디 받기"
 
 msgid "[라이프 다이어리] 아이디 찾기 안내"
-msgstr ""
+msgstr "[라이프 다이어리] 아이디 찾기 안내"
 
 msgid ""
 "• 8자 이상이어야 합니다<br>\n"
@@ -859,244 +881,257 @@ msgid ""
 "<br>\n"
 "                                • 숫자로만 구성될 수 없습니다"
 msgstr ""
+"• 8자 이상이어야 합니다<br>\n"
+"                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
+"<br>\n"
+"                                • 숫자로만 구성될 수 없습니다"
 
 msgid "비밀번호 확인"
-msgstr ""
+msgstr "비밀번호 확인"
 
 msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
-msgstr ""
+msgstr "확인을 위해 동일한 비밀번호를 입력해주세요."
 
 msgid "이미 계정이 있으신가요?"
-msgstr ""
+msgstr "이미 계정이 있으신가요?"
 
 msgid "목표 삭제"
-msgstr ""
+msgstr "목표 삭제"
 
 #, python-format
 msgid ""
 "정말로 <strong>%(name)s</strong> (%(period)s, %(hours)s시간) 목표를 삭제하시"
 "겠습니까?"
 msgstr ""
+"정말로 <strong>%(name)s</strong> (%(period)s, %(hours)s시간) 목표를 삭제하시"
+"겠습니까?"
 
 msgid "목표 수정"
-msgstr ""
+msgstr "목표 수정"
 
 msgid "목표 시간 입력 안내:"
-msgstr ""
+msgstr "목표 시간 입력 안내:"
 
 msgid ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
 "        • 월간: 한 달 총 목표 시간 (최대 300시간)"
 msgstr ""
+"• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
+"        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
+"        • 월간: 한 달 총 목표 시간 (최대 300시간)"
 
 msgid "목록으로"
-msgstr ""
+msgstr "목록으로"
 
 msgid "일간 목표"
-msgstr ""
+msgstr "일간 목표"
 
 msgid "주간 목표"
-msgstr ""
+msgstr "주간 목표"
 
 msgid "월간 목표"
-msgstr ""
+msgstr "월간 목표"
 
 msgid "하루 목표 시간"
-msgstr ""
+msgstr "하루 목표 시간"
 
 msgid "일주일 총 목표 시간"
-msgstr ""
+msgstr "일주일 총 목표 시간"
 
 msgid "한 달 총 목표 시간"
-msgstr ""
+msgstr "한 달 총 목표 시간"
 
 msgid "특이사항 삭제"
-msgstr ""
+msgstr "특이사항 삭제"
 
 msgid "정말로 아래 특이사항을 삭제하시겠습니까?"
-msgstr ""
+msgstr "정말로 아래 특이사항을 삭제하시겠습니까?"
 
 msgid "특이사항 추가"
-msgstr ""
+msgstr "특이사항 추가"
 
 msgid "특이사항 수정"
-msgstr ""
+msgstr "특이사항 수정"
 
 msgid "나의 특이사항 목록"
-msgstr ""
+msgstr "나의 특이사항 목록"
 
 msgid "작성일"
-msgstr ""
+msgstr "작성일"
 
 msgid "등록된 특이사항이 없습니다."
-msgstr ""
+msgstr "등록된 특이사항이 없습니다."
 
 msgid "환영합니다"
-msgstr ""
+msgstr "환영합니다"
 
 #, python-format
 msgid "%(username)s님, 환영합니다!"
-msgstr ""
+msgstr "%(username)s님, 환영합니다!"
 
 msgid ""
 "라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
 "도록 돕습니다."
 msgstr ""
+"라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
+"도록 돕습니다."
 
 msgid "시간 블록 기록"
-msgstr ""
+msgstr "시간 블록 기록"
 
 msgid "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
-msgstr ""
+msgstr "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
 
 msgid "태그로 분류"
-msgstr ""
+msgstr "태그로 분류"
 
 msgid "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
-msgstr ""
+msgstr "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
 
 msgid "통계와 목표"
-msgstr ""
+msgstr "통계와 목표"
 
 msgid "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
-msgstr ""
+msgstr "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
 
 msgid "오늘 첫 기록 시작하기"
-msgstr ""
+msgstr "오늘 첫 기록 시작하기"
 
 msgid "나중에 하기"
-msgstr ""
+msgstr "나중에 하기"
 
 msgid "접근할 수 없는 태그입니다."
-msgstr ""
+msgstr "접근할 수 없는 태그입니다."
 
 msgid "성공적으로 로그아웃되었습니다."
-msgstr ""
+msgstr "성공적으로 로그아웃되었습니다."
 
 msgid "사용자명을 입력해주세요."
-msgstr ""
+msgstr "사용자명을 입력해주세요."
 
 msgid "영문자, 숫자, @/./+/-/_ 만 가능합니다."
-msgstr ""
+msgstr "영문자, 숫자, @/./+/-/_ 만 가능합니다."
 
 msgid "이미 사용 중인 사용자명입니다."
-msgstr ""
+msgstr "이미 사용 중인 사용자명입니다."
 
 msgid "사용 가능합니다."
-msgstr ""
+msgstr "사용 가능합니다."
 
 msgid "잠시 후 다시 시도해주세요."
-msgstr ""
+msgstr "잠시 후 다시 시도해주세요."
 
 msgid "이메일을 입력해주세요."
-msgstr ""
+msgstr "이메일을 입력해주세요."
 
 msgid "올바른 이메일 형식이 아닙니다."
-msgstr ""
+msgstr "올바른 이메일 형식이 아닙니다."
 
 msgid "페이지를 불러오는 중입니다..."
-msgstr ""
+msgstr "페이지를 불러오는 중입니다..."
 
 msgid "테마 전환"
-msgstr ""
+msgstr "테마 전환"
 
 msgid "다크 모드로 전환"
-msgstr ""
+msgstr "다크 모드로 전환"
 
 msgid "라이트 모드로 전환"
-msgstr ""
+msgstr "라이트 모드로 전환"
 
 msgid "다크"
-msgstr ""
+msgstr "다크"
 
 msgid "라이트"
-msgstr ""
+msgstr "라이트"
 
 msgid "홈"
-msgstr ""
+msgstr "홈"
 
 msgid "로그아웃"
-msgstr ""
+msgstr "로그아웃"
 
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
-msgstr ""
+msgstr "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 
-msgid "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
+msgid ""
+"라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
 msgstr ""
+"라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
 
 msgid "하루를 단순하게 기록하세요"
-msgstr ""
+msgstr "하루를 단순하게 기록하세요"
 
 msgid "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다."
-msgstr ""
+msgstr "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다."
 
 msgid "오늘 기록하기"
-msgstr ""
+msgstr "오늘 기록하기"
 
 msgid "관리자 패널"
-msgstr ""
+msgstr "관리자 패널"
 
 msgid "로그인하고 기록 시작"
-msgstr ""
+msgstr "로그인하고 기록 시작"
 
 msgid "복잡한 정리 없이 이어지는 기록"
-msgstr ""
+msgstr "복잡한 정리 없이 이어지는 기록"
 
 msgid "기록하기"
-msgstr ""
+msgstr "기록하기"
 
 msgid "오늘 한 일을 가볍게 남깁니다."
-msgstr ""
+msgstr "오늘 한 일을 가볍게 남깁니다."
 
 msgid "정리하기"
-msgstr ""
+msgstr "정리하기"
 
 msgid "태그로 하루의 흐름을 구분합니다."
-msgstr ""
+msgstr "태그로 하루의 흐름을 구분합니다."
 
 msgid "돌아보기"
-msgstr ""
+msgstr "돌아보기"
 
 msgid "쌓인 기록에서 패턴을 확인합니다."
-msgstr ""
+msgstr "쌓인 기록에서 패턴을 확인합니다."
 
 msgid "오늘의 기록"
-msgstr ""
+msgstr "오늘의 기록"
 
 msgid "가볍게 남긴 하루"
-msgstr ""
+msgstr "가볍게 남긴 하루"
 
 msgid "소비시간의 분류"
-msgstr ""
+msgstr "소비시간의 분류"
 
 msgid "소비시간의 분류 이미지 크게 보기"
-msgstr ""
+msgstr "소비시간의 분류 이미지 크게 보기"
 
 msgid "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
-msgstr ""
+msgstr "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
 
 msgid "클릭해서 크게 볼 수 있습니다."
-msgstr ""
+msgstr "클릭해서 크게 볼 수 있습니다."
 
 msgid "하루 기록 예시"
-msgstr ""
+msgstr "하루 기록 예시"
 
 msgid "오늘의 한 줄"
-msgstr ""
+msgstr "오늘의 한 줄"
 
 msgid "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
-msgstr ""
+msgstr "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
 
 msgid "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
-msgstr ""
+msgstr "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
 
 #, python-format
 msgid "%(username)s님, 오늘 기록을 이어가세요"
-msgstr ""
+msgstr "%(username)s님, 오늘 기록을 이어가세요"
 
 msgid "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
-msgstr ""
+msgstr "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
 
 msgid "정말로 삭제하시겠습니까?"
-msgstr ""
+msgstr "정말로 삭제하시겠습니까?"
