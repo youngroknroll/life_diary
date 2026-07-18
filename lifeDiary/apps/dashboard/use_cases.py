@@ -6,8 +6,8 @@ from django.db import transaction
 
 from .commands import DeleteTimeBlocksCommand, UpsertTimeBlocksCommand
 from .ports import TimeBlockWriter
+from .signals import time_blocks_changed
 from apps.tags.ports import TagReader
-from apps.stats.use_cases import invalidate_stats_cache
 
 
 @dataclass(frozen=True)
@@ -64,7 +64,11 @@ class UpsertTimeBlocksUseCase:
         if to_update:
             self._writer.bulk_update(to_update, ["tag", "memo"])
 
-        invalidate_stats_cache(cmd.user_id, cmd.target_date)
+        time_blocks_changed.send(
+            sender=UpsertTimeBlocksUseCase,
+            user_id=cmd.user_id,
+            target_date=cmd.target_date,
+        )
 
         return UpsertResult(
             created=len(to_create),
@@ -82,5 +86,9 @@ class DeleteTimeBlocksUseCase:
     @transaction.atomic
     def execute(self, cmd: DeleteTimeBlocksCommand, user) -> DeleteResult:
         deleted = self._writer.delete_by_slots(user, cmd.target_date, cmd.slot_indexes)
-        invalidate_stats_cache(cmd.user_id, cmd.target_date)
+        time_blocks_changed.send(
+            sender=DeleteTimeBlocksUseCase,
+            user_id=cmd.user_id,
+            target_date=cmd.target_date,
+        )
         return DeleteResult(deleted=deleted, requested=len(cmd.slot_indexes))

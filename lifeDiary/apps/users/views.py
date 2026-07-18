@@ -11,7 +11,6 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordResetView
 from django.core.cache import cache
 from django.core.mail import send_mail
@@ -25,7 +24,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
 from .account_deletion import cancel_account_deletion, request_account_deletion
-from .repositories import GoalRepository, NoteRepository
+from .repositories import GoalRepository, NoteRepository, UserAccountRepository
 from apps.tags.repositories import TagRepository
 from .use_cases import (
     DeleteGoalUseCase,
@@ -42,6 +41,7 @@ logger = logging.getLogger(__name__)
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 _tag_repo = TagRepository()
+_user_repo = UserAccountRepository()
 _mypage_use_case = GetMyPageUseCase()
 _save_goal = SaveGoalUseCase(tags=_tag_repo)
 _delete_goal = DeleteGoalUseCase()
@@ -268,17 +268,7 @@ def login_view(request):
 def _get_pending_deletion_user_for_login(username, password):
     if not username or not password:
         return None
-    User = get_user_model()
-    user = (
-        User.objects.filter(
-            username__iexact=username,
-            is_active=False,
-            deletion_request__cancelled_at__isnull=True,
-            deletion_request__purged_at__isnull=True,
-        )
-        .select_related("deletion_request")
-        .first()
-    )
+    user = _user_repo.find_inactive_with_pending_deletion(username)
     if user and check_password(password, user.password):
         return user
     return None
@@ -289,8 +279,7 @@ def _send_username_recovery_email(request, email):
 
     Why: 한 이메일에 여러 계정이 있을 수 있으므로 모두 안내.
     """
-    User = get_user_model()
-    users = list(User.objects.filter(email__iexact=email, is_active=True))
+    users = _user_repo.find_active_by_email(email)
     if not users:
         return
     context = {
@@ -371,8 +360,7 @@ def check_username_view(request):
         return JsonResponse(
             {"available": False, "message": gettext("영문자, 숫자, @/./+/-/_ 만 가능합니다.")}
         )
-    User = get_user_model()
-    if User.objects.filter(username__iexact=username).exists():
+    if _user_repo.username_exists(username):
         return JsonResponse(
             {"available": False, "message": gettext("이미 사용 중인 사용자명입니다.")}
         )
@@ -398,8 +386,7 @@ def check_email_view(request):
         return JsonResponse(
             {"available": False, "message": gettext("올바른 이메일 형식이 아닙니다.")}
         )
-    User = get_user_model()
-    if User.objects.filter(email__iexact=email).exists():
+    if _user_repo.email_exists(email):
         return JsonResponse(
             {"available": False, "message": gettext("이미 사용 중인 이메일입니다.")}
         )
