@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-05-24
+Last updated: 2026-07-18
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,24 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## Known Current Regressions (Read Before Trusting "Passed" Evidence Below)
+
+Resolved 2026-07-18 (same day, later session): the 28-test failure caused by
+empty `msgstr` entries in the ko catalogs was fixed by filling identity
+translations with `msgen` (`django.po` 265, `djangojs.po` 112 entries), and
+the full suite is green again: 256 tests, exit 0. The 2
+`TestLoginAxesBehavior` failures reported by the morning review could not be
+reproduced (3 isolated runs + 3 full-suite runs all pass, no code change);
+treat them as environment/timing artifacts unless they reappear. Remediation
+plan, evidence, and remaining unverified items:
+`docs/plans/2026-07-18_comprehensive-review-remediation-plan.md`,
+`docs/refactoring/2026-07-18_comprehensive-review-remediation.md`. The other
+review findings (security settings, architecture, bottom-sheet interaction)
+were remediated in the same pass; excluded by user decision: timeslot-grid
+keyboard access and aria-live announcements. Still open from the review:
+desktop packaging absence (#11), priority drift (#12), ad-slot isolation
+(#13), and live-deployment verification questions.
 
 ## Current Product Direction
 
@@ -73,6 +91,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Legal policy pages | `docs/plans/2026-05-25-legal-policy-pages.md`, `docs/refactoring/2026-05-25_legal-policy-pages.md` | Added public `/privacy/` and `/terms/` pages plus footer links. The privacy page covers account/contact data, user-created diary/tag/goal/statistics data, recovery email flows, and functional/security/language cookies. The terms page covers account responsibility, acceptable use, user content responsibility, service changes, and contact path. English translations and i18n rendering tests were added for the new public copy, and the shared `<html lang>` now follows the active language. | Fresh verification: `pytest apps/core/tests.py apps/core/test_i18n_phase1.py --tb=short` -> `21 passed in 2.05s`; English-cookie render sample for `/`, `/privacy/`, and `/terms/` -> HTTP 200, `Content-Language: en`, `<html lang="en">`, English policy labels, no Korean policy labels; `git diff --check` -> exit 0. Legal review and manual browser inspection were not verified. |
 | Account deletion grace period | `docs/plans/2026-05-26-account-deletion-grace-period.md`, `docs/refactoring/2026-05-26_account-deletion-grace-period.md` | Added 15-day account deletion grace period. Deletion request disables the user, login within the deadline cancels the request, and `purge_deleted_accounts` permanently deletes due accounts while retaining minimal audit data with masked email and original `User.date_joined`. Korean and English UI/messages are covered. | Fresh verification: RED service test -> missing `apps.users.account_deletion`; RED English i18n -> `3 failed`; GREEN focused account deletion -> `14 passed in 12.59s`; deletion + users i18n -> `24 passed in 21.15s`; `pytest apps/users --tb=short` -> `101 passed in 81.95s`; `python manage.py makemigrations --check --dry-run` -> `No changes detected`; `git diff --check` -> exit 0. Production scheduler and manual browser inspection were not verified. |
 
+| Comprehensive review remediation | `docs/plans/2026-07-18_comprehensive-review-remediation-plan.md`, `docs/refactoring/2026-07-18_comprehensive-review-remediation.md` | Fixed ko catalog empty-msgstr regression (28 test failures), added `SECURE_PROXY_SSL_HEADER`/`CSRF_TRUSTED_ORIGINS`/CSP middleware to prod settings, inverted the dashboard->stats cache-invalidation dependency via a dashboard signal with a forbidden-import contract test, extracted `UserAccountRepository` for the direct-ORM auth spots in `apps/users/views.py`, and added Escape-close plus a dynamic focus trap to the mobile quick-input bottom sheet under the frontend dual-review gate. `TestLoginAxesBehavior` failures were not reproducible; no code change. | Fresh verification: full suite 256 tests exit 0; `manage.py check` no issues; prod deploy check `--fail-level ERROR` exit 0; `makemigrations --check` no changes; `node --check` exit 0. Unverified: real-device mobile browser Escape/Tab behavior (user risk acceptance pending), production `compilemessages` pipeline, live URL redirect check. |
+
 ## Active Plans
 
 | Priority | Document | Scope | Next decision or action |
@@ -118,6 +138,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | `docs/refactoring/2026-04-09_business-logic-analysis.md` | Early business logic analysis and service-layer refactoring direction. |
 | `docs/refactoring/2026-04-20_backend-flow-and-improvements.md` | Backend flow and improvement snapshot before later phase completion. |
 | `docs/refactoring/2026-04-21_backend-flow-and-improvements.md` | Updated backend flow and remaining improvement snapshot. |
+| `docs/2026-07-18_comprehensive-project-review.md` | Cross-cutting review (security, architecture, accessibility, desktop, product-direction drift) and the currently-failing test suite regression. Read this before trusting older "N passed" evidence in this file. |
 
 ## Deferred Or Later Work
 
