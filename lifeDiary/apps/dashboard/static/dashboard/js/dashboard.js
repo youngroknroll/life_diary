@@ -123,6 +123,8 @@ function syncQuickInputSheetForLayout() {
         return;
     }
 
+    // 데스크톱 전환 강제 닫힘 경로에서도 keydown 리스너를 반드시 해제한다.
+    document.removeEventListener('keydown', handleQuickInputSheetKeydown);
     sheet.classList.remove('is-open');
     backdrop.classList.remove('is-open');
     sheet.removeAttribute('role');
@@ -132,12 +134,59 @@ function syncQuickInputSheetForLayout() {
     document.body.classList.remove('dashboard-sheet-open');
 }
 
+function getQuickInputSheetFocusableElements(sheet) {
+    // 매 호출 시 재계산: saveBtn 활성/비활성, 도움말 collapse 펼침 등
+    // 열림 상태에서 변하는 요소를 즉시 반영해야 한다.
+    return Array.from(
+        sheet.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        )
+    ).filter((el) => !el.disabled && el.getClientRects().length > 0);
+}
+
+function handleQuickInputSheetKeydown(event) {
+    const sheet = document.getElementById('quickInputSheet');
+    if (!sheet || !sheet.classList.contains('is-open') || !isMobileDashboardLayout()) return;
+
+    if (event.key === 'Escape') {
+        // IME 조합 중 Escape는 후보창 닫기 용도이므로 시트를 닫지 않는다.
+        if (event.isComposing) return;
+        // 시트 위에 열린 Bootstrap 모달(새 태그, 카테고리 설명)은
+        // Bootstrap이 자체적으로 Escape를 처리하므로 시트는 유지한다.
+        if (document.querySelector('.modal.show')) return;
+        event.preventDefault();
+        closeQuickInputSheet();
+        return;
+    }
+
+    if (event.key !== 'Tab') return;
+    const focusable = getQuickInputSheetFocusableElements(sheet);
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = document.activeElement;
+
+    if (!sheet.contains(active)) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+        return;
+    }
+    if (event.shiftKey && active === first) {
+        event.preventDefault();
+        last.focus({ preventScroll: true });
+    } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus({ preventScroll: true });
+    }
+}
+
 function openQuickInputSheet() {
     if (!isMobileDashboardLayout() || selectedSlots.size === 0) return;
     const sheet = document.getElementById('quickInputSheet');
     const backdrop = document.getElementById('quickInputSheetBackdrop');
     if (!sheet || !backdrop) return;
 
+    const wasOpen = sheet.classList.contains('is-open');
     sheet.classList.add('is-open');
     backdrop.classList.add('is-open');
     sheet.setAttribute('role', 'dialog');
@@ -145,6 +194,11 @@ function openQuickInputSheet() {
     sheet.setAttribute('aria-hidden', 'false');
     backdrop.setAttribute('aria-hidden', 'false');
     document.body.classList.add('dashboard-sheet-open');
+
+    // 열림 전이당 1회만 등록: 시트가 열린 채 슬롯을 추가 선택해도 중복 등록 없음.
+    if (!wasOpen) {
+        document.addEventListener('keydown', handleQuickInputSheetKeydown);
+    }
 
     const firstTag = sheet.querySelector('.tag-btn');
     const closeBtn = sheet.querySelector('[data-dashboard-sheet-close]');
@@ -155,6 +209,8 @@ function closeQuickInputSheet() {
     const sheet = document.getElementById('quickInputSheet');
     const backdrop = document.getElementById('quickInputSheetBackdrop');
     if (!sheet || !backdrop) return;
+
+    document.removeEventListener('keydown', handleQuickInputSheetKeydown);
 
     if (lastSelectedSlotElement) {
         lastSelectedSlotElement.focus({ preventScroll: true });
