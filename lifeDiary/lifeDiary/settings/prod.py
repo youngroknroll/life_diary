@@ -30,6 +30,11 @@ DATABASES = {
 ALLOWED_HOSTS = ["lifediary.onrender.com"]
 
 # 프로덕션 보안 설정
+# Render는 TLS를 프록시에서 종료하고 X-Forwarded-Proto를 전달한다.
+# 이 헤더를 신뢰하지 않으면 request.is_secure()가 오판해
+# SECURE_SSL_REDIRECT와 결합 시 리다이렉트 루프가 발생할 수 있다.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = ["https://lifediary.onrender.com"]
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000  # 1년
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
@@ -39,6 +44,29 @@ CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+
+# CSP: 현재 템플릿이 실제로 사용하는 출처만 허용하는 심층방어 헤더.
+# 인라인 스크립트/핸들러와 Alpine.js가 남아 있어 'unsafe-inline'/'unsafe-eval'을
+# 허용한다. nonce 기반 엄격화는 인라인 제거 작업과 함께 별도 승인 대상.
+MIDDLEWARE = MIDDLEWARE + ["apps.core.middleware.ContentSecurityPolicyMiddleware"]
+CONTENT_SECURITY_POLICY = "; ".join(
+    [
+        "default-src 'self'",
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com"
+        " https://www.google.com https://www.gstatic.com",
+        "style-src 'self' 'unsafe-inline'"
+        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+        "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+        "img-src 'self' data:",
+        "connect-src 'self'",
+        "frame-src https://www.google.com",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "form-action 'self'",
+        "frame-ancestors 'none'",
+    ]
+)
 
 # 프로덕션 전용 세션 보안 설정
 SESSION_COOKIE_AGE = 3600  # 1시간 (초 단위)
