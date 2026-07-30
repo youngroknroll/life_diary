@@ -27,7 +27,7 @@ DATABASES = {
         "CONN_HEALTH_CHECKS": True,
     }
 }
-ALLOWED_HOSTS = ["lifediary.onrender.com"]
+ALLOWED_HOSTS = ["lifediary.onrender.com","lifediary.kr"]
 
 # 프로덕션 보안 설정
 SECURE_SSL_REDIRECT = True
