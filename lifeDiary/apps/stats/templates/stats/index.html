@@ -5,21 +5,14 @@
 {% block title %}{% trans "통계" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header dashboard-date-header">
-                <h5 class="mb-0 dashboard-date-title">
-                    <i class="fas fa-chart-bar me-2"></i>
-                    {% blocktrans with d=selected_date|date:"DATE_FORMAT" wd=selected_date|date:"l" %}{{ d }} ({{ wd }}) stats analysis{% endblocktrans %}
-                </h5>
-                {% trans "목표 확인" as view_goals_label %}
-                {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label=view_goals_label %}
-            </div>
-        </div>
+<div class="page-head mb-3">
+    <div>
+        <h1 class="page-title">{% trans "분석" %}</h1>
+        <p class="page-subtitle num">{% blocktrans with d=selected_date|date:"Y-m-d" wd=selected_date|date:"D" %}기준일 {{ d }} ({{ wd }}){% endblocktrans %}</p>
     </div>
+    {% trans "목표 확인" as view_goals_label %}
+    {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label=view_goals_label %}
 </div>
-
 
 <div class="row">
     <div class="col-12">
@@ -28,22 +21,22 @@
                 <ul class="nav nav-tabs card-header-tabs" id="statsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
-                            <i class="fas fa-list-ul me-1"></i>{% trans "요약" %}
+                            {% trans "요약" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
-                            <i class="fas fa-calendar-day me-1"></i>{% trans "Daily stats" %}
+                            {% trans "일" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
-                            <i class="fas fa-calendar-week me-1"></i>{% trans "Weekly stats" %}
+                            {% trans "주" %}
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
-                            <i class="fas fa-calendar-alt me-1"></i>{% trans "Monthly stats" %}
+                            {% trans "월" %}
                         </button>
                     </li>
                 </ul>
@@ -213,122 +206,105 @@
                     </div>
 
                     <div class="tab-pane fade" id="weekly" role="tabpanel">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <h6 class="mb-3">{% trans "Weekly tag trend" %}</h6>
-                                <div class="chart-container">
-                                    <canvas id="weeklyLineChart"></canvas>
-                                </div>
+                        <div class="inline-stats mb-4">
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ weekly_stats.week_total_hours }}<span class="inline-stat__unit">h</span></div>
+                                <div class="inline-stat__label">{% trans "주 합계" %}</div>
                             </div>
-                            <div class="col-lg-4">
-                                <h6 class="mb-3">{% trans "Activity by weekday" %}</h6>
-                                <div class="chart-container">
-                                    <canvas id="weeklyBarChart"></canvas>
-                                </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ weekly_stats.active_days }}<span class="inline-stat__unit">/7일</span></div>
+                                <div class="inline-stat__label">{% trans "기록한 날" %}</div>
                             </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <h6 class="mb-3">{% trans "Weekly summary" %}</h6>
-                                <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
-                                    {% with most_active_day=weekly_stats.most_active_day %}
-                                        <div class="row">
-                                            <div class="col-md-6">
-                                                <strong>{% trans "Weekly total:" %}</strong> {% blocktrans with h=weekly_stats.week_total_hours %}{{ h }}h{% endblocktrans %}<br>
-                                                <strong>{% trans "Daily average:" %}</strong> {% widthratio weekly_stats.week_total_hours 7 1 %}h<br>
-                                                <strong>{% trans "Active weekdays:" %}</strong> {{ weekly_stats.active_days }}/7
-                                            </div>
-                                            <div class="col-md-6">
-                                                <strong>{% trans "Most active day:" %}</strong> {{ most_active_day.day_korean }} ({% blocktrans with h=most_active_day.total_hours %}{{ h }}h{% endblocktrans %})<br>
-                                                <strong>{% trans "Week range:" %}</strong> {{ weekly_stats.start_date|date:"Y-m-d" }} ~ {{ weekly_stats.end_date|date:"Y-m-d" }}<br>
-                                                <strong>{% trans "Tag count:" %}</strong> {% blocktrans with c=weekly_stats.tag_weekly_stats|length %}{{ c }} tags{% endblocktrans %}
-                                            </div>
-                                        </div>
-                                        <hr class="my-3">
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <h6 class="mb-2">{% trans "Average hours per tag (by active weekdays)" %}</h6>
-                                                <div class="row">
-                                                    {% for tag in weekly_stats.tag_weekly_stats %}
-                                                    <div class="col-md-4 col-sm-6 mb-2">
-                                                        <div class="d-flex align-items-center">
-                                                            {% tag_dot tag.color %}
-                                                            <span class="small">{{ tag.name }}: <strong>{% blocktrans with h=tag.avg_hours %}{{ h }}h{% endblocktrans %}</strong></span>
-                                                        </div>
-                                                    </div>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endwith %}
-                                </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ weekly_stats.most_active_day.day_korean }}</div>
+                                <div class="inline-stat__label">{% trans "가장 많은 요일" %}</div>
+                            </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ weekly_stats.start_date|date:"n/j" }}–{{ weekly_stats.end_date|date:"n/j" }}</div>
+                                <div class="inline-stat__label">{% trans "기간" %}</div>
                             </div>
                         </div>
+
+                        <div class="section-title">{% trans "태그별 추세" %}<span class="section-title__note">{% trans "요일별 시간" %}</span></div>
+                        <div class="chart-panel chart-panel--tall mb-4">
+                            <canvas id="weeklyLineChart"></canvas>
+                        </div>
+
+                        <div class="section-title">{% trans "요일별 기록량" %}</div>
+                        <div class="chart-panel mb-4">
+                            <canvas id="weeklyBarChart"></canvas>
+                        </div>
+
+                        <div class="section-title">{% trans "태그 순위" %}<span class="section-title__note">{% trans "기록한 날 기준 하루 평균" %}</span></div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% trans "태그" %}</th>
+                                    <th scope="col" class="is-num">{% trans "하루 평균" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tag in weekly_stats.tag_weekly_stats %}
+                                    <tr{% if tag.is_unclassified %} class="is-rest"{% endif %}>
+                                        <td><span class="chip__swatch" style="background-color: {% if tag.is_unclassified %}var(--color-track){% else %}{{ tag.color }}{% endif %}"></span>{{ tag.name }}</td>
+                                        <td class="is-num num">{{ tag.avg_hours }}h</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
 
-                    
                     <div class="tab-pane fade" id="monthly" role="tabpanel">
-                        <div class="row">
-                            <div class="col-12">
-                                <h6 class="mb-3">{% trans "Monthly daily usage trend by tag" %}</h6>
-                                <div class="chart-container-lg">
-                                    <canvas id="monthlyLineChart"></canvas>
-                                </div>
+                        <div class="inline-stats mb-4">
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ monthly_stats.total_hours }}<span class="inline-stat__unit">h</span></div>
+                                <div class="inline-stat__label">{% trans "월 합계" %}</div>
+                            </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ monthly_stats.avg_daily_hours }}<span class="inline-stat__unit">h</span></div>
+                                <div class="inline-stat__label">{% trans "일 평균" %}</div>
+                            </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ monthly_stats.active_days }}<span class="inline-stat__unit">/{{ monthly_stats.total_days }}일</span></div>
+                                <div class="inline-stat__label">{% trans "기록한 날" %}</div>
+                            </div>
+                            <div class="inline-stat">
+                                {% if summary.month_delta.has_previous %}
+                                    <div class="inline-stat__value num{% if summary.month_delta.delta_minutes >= 0 %} is-up{% endif %}">{{ summary.month_delta.delta_hours }}</div>
+                                    <div class="inline-stat__label">{% trans "지난달 대비" %}</div>
+                                {% else %}
+                                    <div class="inline-stat__value num inline-stat__value--empty">—</div>
+                                    <div class="inline-stat__label">{% trans "지난 기간 없음" %}</div>
+                                {% endif %}
                             </div>
                         </div>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <h6 class="mb-3">{% trans "Monthly summary" %}</h6>
-                                <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <strong>{% trans "Monthly total:" %}</strong> {% blocktrans with h=monthly_stats.total_hours %}{{ h }}h{% endblocktrans %}<br>
-                                            <strong>{% trans "Active days:" %}</strong> {{ monthly_stats.active_days }}/{{ monthly_stats.total_days }} ({% widthratio monthly_stats.active_days monthly_stats.total_days 100 %}%)<br>
-                                            <strong>{% trans "Daily average:" %}</strong> {% blocktrans with h=monthly_stats.avg_daily_hours %}{{ h }}h{% endblocktrans %}
-                                        </div>
-                                        <div class="col-md-4">
-                                            <strong>{% trans "Tags used:" %}</strong> {% blocktrans with c=monthly_stats.tag_stats|length %}{{ c }} tags{% endblocktrans %}<br>
-                                            <strong>{% trans "Month range:" %}</strong> {{ monthly_stats.start_date|date:"Y-m-d" }} ~ {{ monthly_stats.end_date|date:"Y-m-d" }}<br>
-                                            <strong>{% trans "Most active tag:" %}</strong>
-                                            {% if monthly_stats.tag_stats %}
-                                                {{ monthly_stats.tag_stats.0.name }} ({% blocktrans with h=monthly_stats.tag_stats.0.total_hours %}{{ h }}h{% endblocktrans %})
-                                            {% else %}
-                                                {% trans "None" %}
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-4">
-                                            <strong>{% trans "Peak day:" %}</strong>
-                                            {% with max_hours=monthly_stats.daily_totals|first %}
-                                                {% for hours in monthly_stats.daily_totals %}
-                                                    {% if hours > max_hours %}{% with max_hours=hours %}{% endwith %}{% endif %}
-                                                {% endfor %}
-                                                {% blocktrans with h=max_hours %}{{ h }}h{% endblocktrans %}
-                                            {% endwith %}<br>
-                                            <strong>{% trans "Month:" %}</strong> {{ monthly_stats.month }}<br>
-                                            <strong>{% trans "Total days:" %}</strong> {% blocktrans with d=monthly_stats.total_days %}{{ d }} days{% endblocktrans %}
-                                        </div>
-                                    </div>
-                                    <hr class="my-3">
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <h6 class="mb-2">{% trans "Average hours per tag (by active days)" %}</h6>
-                                            <div class="row">
-                                                {% for tag in monthly_stats.tag_stats %}
-                                                {% if not tag.is_unclassified %}
-                                                <div class="col-md-3 col-sm-6 mb-2">
-                                                    <div class="d-flex align-items-center">
-                                                        {% tag_dot tag.color %}
-                                                        <span class="small">{{ tag.name }}: <strong>{% blocktrans with h=tag.avg_hours %}{{ h }}h{% endblocktrans %}</strong></span>
-                                                    </div>
-                                                </div>
-                                                {% endif %}
-                                                {% endfor %}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+
+                        <div class="section-title">{% trans "태그별 일별 추세" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n/j" }}–{{ monthly_stats.end_date|date:"n/j" }}</span></div>
+                        <div class="chart-panel chart-panel--tall mb-4">
+                            <canvas id="monthlyLineChart"></canvas>
                         </div>
+
+                        <div class="section-title">{% trans "태그 순위" %}<span class="section-title__note">{% trans "기록한 날 기준 하루 평균" %}</span></div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% trans "태그" %}</th>
+                                    <th scope="col" class="is-num">{% trans "합계" %}</th>
+                                    <th scope="col" class="is-num">{% trans "하루 평균" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tag in monthly_stats.tag_stats %}
+                                    {% if not tag.is_unclassified %}
+                                        <tr>
+                                            <td><span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}</td>
+                                            <td class="is-num num">{{ tag.total_hours }}h</td>
+                                            <td class="is-num num">{{ tag.avg_hours }}h</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
 
                     

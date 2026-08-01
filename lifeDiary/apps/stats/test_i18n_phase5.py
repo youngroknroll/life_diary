@@ -70,12 +70,10 @@ class TestStatsTemplatesEnglish:
     def test_stats_index_renders_english(self, auth_en_client):
         response = auth_en_client.get(reverse("stats:index"))
         body = response.content.decode()
-        assert "stats analysis" in body
-        assert "Daily stats" in body
-        assert "Weekly stats" in body
-        assert "Monthly stats" in body
-        assert "일별 통계" not in body
-        assert "주간 통계" not in body
+        assert "Analysis" in body
+        assert "Summary" in body
+        assert "Logged by hour" in body
+        assert "시간대별 기록" not in body
 
     def test_life_feedback_section_english(self, auth_en_client):
         response = auth_en_client.get(reverse("stats:index"))
