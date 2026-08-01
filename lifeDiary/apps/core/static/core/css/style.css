@@ -286,6 +286,73 @@ footer {
     }
 }
 
+/* =========================================================
+   Undo Snackbar — 저장·삭제 직후 되돌릴 기회를 준다
+   ========================================================= */
+.undo-snackbar {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translate(-50%, 12px);
+    z-index: 1080;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: calc(100vw - 32px);
+    padding: 12px 14px 12px 18px;
+    border-radius: var(--radius-md);
+    background: var(--color-text);
+    color: var(--color-surface);
+    font-size: 0.875rem;
+    box-shadow: 0 8px 24px rgba(20, 33, 26, 0.24);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+
+.undo-snackbar.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+}
+
+.undo-snackbar__action {
+    flex: none;
+    min-height: 44px;
+    padding: 0 12px;
+    border: none;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--color-accent-work);
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+}
+
+.undo-snackbar__action:hover,
+.undo-snackbar__action:focus-visible {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* 모바일은 하단 시트·탭바 위로 띄운다. */
+@media (max-width: 767.98px) {
+    .undo-snackbar {
+        left: 16px;
+        right: 16px;
+        bottom: 84px;
+        transform: translateY(12px);
+    }
+    .undo-snackbar.is-open {
+        transform: translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .undo-snackbar {
+        transition: opacity 0.18s ease, visibility 0.18s;
+    }
+}
+
 .quick-input-sheet-backdrop {
     display: none;
 }

@@ -53,6 +53,7 @@ def serialize_rows(rows, hours=None):
                     "start_index": run["start_index"],
                     "span": run["span"],
                     "tag_id": run["tag"].id if run["tag"] else None,
+                    "tag_name": run["tag"].name if run["tag"] else None,
                     "color": run["tag"].color if run["tag"] else None,
                     "label": run["label"],
                     "memo": run["memo"],

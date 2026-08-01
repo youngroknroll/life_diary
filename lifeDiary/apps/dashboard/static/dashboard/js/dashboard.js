@@ -537,6 +537,109 @@ const selectTag = (tagId, tagColor, tagName) => {
     updateButtons();
 };
 
+// ── 부분 갱신 ──
+// 저장 후 페이지를 다시 읽지 않는다. 서버가 돌려준 행만 다시 그린다.
+
+function renderRows(rows) {
+    (rows || []).forEach(row => {
+        const rowElement = document.querySelector(`.day-row[data-hour="${row.hour}"]`);
+        if (!rowElement) return;
+
+        const cells = rowElement.querySelector('.day-row__cells');
+        const selectionLayer = cells.querySelector('.day-row__selection');
+
+        cells.textContent = '';
+        row.runs.forEach(run => cells.appendChild(buildBlock(run)));
+        if (selectionLayer) cells.appendChild(selectionLayer);
+    });
+
+    renderSelection();
+}
+
+function buildBlock(run) {
+    const block = document.createElement('div');
+    block.className = run.tag_id ? 'slot-block' : 'slot-block is-empty';
+    block.style.gridColumn = `span ${run.span}`;
+    block.dataset.start = run.start_index;
+    block.dataset.span = run.span;
+
+    if (run.tag_id) {
+        block.style.backgroundColor = run.color;
+        block.dataset.tagId = run.tag_id;
+        block.title = run.memo ? `${run.tag_name} · ${run.memo}` : run.tag_name;
+    } else {
+        block.title = gettext('빈 구간');
+    }
+
+    if (run.label) {
+        const label = document.createElement('span');
+        label.className = 'slot-block__label';
+        label.textContent = run.label;
+        block.appendChild(label);
+    }
+
+    return block;
+}
+
+function renderDayStats(stats) {
+    if (!stats) return;
+
+    const filled = document.getElementById('filledSlots');
+    const percentage = document.getElementById('fillPercentage');
+    const loggedTime = document.getElementById('loggedTime');
+
+    if (filled) filled.textContent = Math.round(stats.logged_minutes / 10);
+    if (percentage) percentage.textContent = `${stats.fill_percentage}%`;
+    if (loggedTime) {
+        loggedTime.textContent = interpolate(
+            gettext('%(h)s시간 %(m)s분'),
+            { h: Math.floor(stats.logged_minutes / 60), m: stats.logged_minutes % 60 },
+            true
+        );
+    }
+}
+
+// ── 되돌리기 스낵바 ──
+
+let undoTimer = null;
+
+function showUndoSnackbar(message, token) {
+    const snackbar = document.getElementById('undoSnackbar');
+    if (!snackbar || !token) return;
+
+    snackbar.querySelector('[data-undo-message]').textContent = message;
+    snackbar.querySelector('[data-undo-action]').onclick = () => runUndo(token);
+    snackbar.classList.add('is-open');
+
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(hideUndoSnackbar, 5000);
+}
+
+function hideUndoSnackbar() {
+    const snackbar = document.getElementById('undoSnackbar');
+    if (snackbar) snackbar.classList.remove('is-open');
+    clearTimeout(undoTimer);
+}
+
+async function runUndo(token) {
+    hideUndoSnackbar();
+
+    try {
+        const result = await apiCall('/api/time-blocks/undo/', {
+            method: 'POST',
+            data: { undo_token: token }
+        });
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        showNotification(result.message, 'success');
+    } catch (error) {
+        showNotification(
+            interpolate(gettext('되돌리기 실패: %s'), [error.message]),
+            'warning'
+        );
+    }
+}
+
 // ── 저장/삭제 ──
 
 const saveSlot = async () => {
@@ -551,7 +654,11 @@ const saveSlot = async () => {
     }
 
     const saveBtn = document.getElementById('saveBtn');
-    showOverlay(gettext('저장 중입니다...'), 'fa-save');
+    const slotIndexes = Array.from(selectedSlots);
+    const affectedRows = snapshotRows(slotIndexes);
+
+    // 낙관적으로 먼저 칠한다. 실패하면 되돌린다.
+    paintSelectedSlots(selectedTag.color);
 
     try {
         const memo = document.getElementById('memoInput').value.trim();
@@ -560,7 +667,7 @@ const saveSlot = async () => {
         const result = await apiCall('/api/time-blocks/', {
             method: 'POST',
             data: {
-                slot_indexes: Array.from(selectedSlots),
+                slot_indexes: slotIndexes,
                 tag_id: selectedTag.id,
                 memo: memo,
                 date: date
@@ -568,17 +675,67 @@ const saveSlot = async () => {
             loadingElement: saveBtn
         });
 
-        showNotification(result.message, 'success');
-        // 리로드까지 1초 공백 동안 키보드 Enter로 인한 중복 제출 방지
-        if (saveBtn) saveBtn.disabled = true;
-        setTimeout(() => location.reload(), 1000);
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        clearSelection();
+        updateButtons();
+        closeQuickInputSheet();
+        showUndoSnackbar(result.message, result.undo_token);
 
     } catch (error) {
-        hideOverlay();
+        restoreRows(affectedRows);
         showNotification(interpolate(gettext('저장 실패: %s'), [error.message]), 'error');
         console.error('Save error:', error);
     }
 };
+
+/** 실패 시 되돌릴 수 있도록 영향받는 행의 현재 모습을 남긴다. */
+function snapshotRows(slotIndexes) {
+    const hours = new Set(slotIndexes.map(index => Math.floor(index / SLOTS_PER_HOUR)));
+
+    return Array.from(hours).map(hour => {
+        const cells = document
+            .querySelector(`.day-row[data-hour="${hour}"]`)
+            ?.querySelector('.day-row__cells');
+        return { hour, html: cells ? cells.innerHTML : null };
+    });
+}
+
+function restoreRows(snapshots) {
+    snapshots.forEach(({ hour, html }) => {
+        if (html === null) return;
+        const cells = document
+            .querySelector(`.day-row[data-hour="${hour}"]`)
+            ?.querySelector('.day-row__cells');
+        if (cells) cells.innerHTML = html;
+    });
+    renderSelection();
+}
+
+/** 응답을 기다리는 동안 선택 구간을 미리 태그 색으로 덮는다. */
+function paintSelectedSlots(color) {
+    document.querySelectorAll('.day-row[data-hour]').forEach(row => {
+        const hour = parseInt(row.dataset.hour, 10);
+        const selected = [];
+        for (let column = 0; column < SLOTS_PER_HOUR; column++) {
+            if (selectedSlots.has(rowColToSlot(hour, column))) selected.push(column);
+        }
+        if (selected.length === 0) return;
+
+        row.querySelectorAll('.slot-block').forEach(block => {
+            const start = parseInt(block.dataset.start, 10);
+            const span = parseInt(block.dataset.span, 10);
+            const covered = [];
+            for (let index = start; index < start + span; index++) {
+                if (selectedSlots.has(index)) covered.push(index);
+            }
+            if (covered.length !== span) return;
+
+            block.classList.remove('is-empty');
+            block.style.backgroundColor = color;
+        });
+    });
+}
 
 const deleteSlot = async () => {
     if (selectedSlots.size === 0) {
@@ -607,7 +764,7 @@ const deleteSlot = async () => {
         return;
     }
 
-    showOverlay(gettext('삭제 중입니다...'), 'fa-trash');
+    const affectedRows = snapshotRows(filledSlots);
 
     try {
         const date = document.getElementById('dateSelector').value;
@@ -620,14 +777,15 @@ const deleteSlot = async () => {
             }
         });
 
-        showNotification(result.message, 'success');
-        // 리로드까지 1초 공백 동안 선택 상태를 비워 삭제 버튼·저장 버튼 비활성 유지
-        selectedSlots.clear();
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        clearSelection();
         updateButtons();
-        setTimeout(() => location.reload(), 1000);
+        closeQuickInputSheet();
+        showUndoSnackbar(result.message, result.undo_token);
 
     } catch (error) {
-        hideOverlay();
+        restoreRows(affectedRows);
         showNotification(interpolate(gettext('삭제 실패: %s'), [error.message]), 'error');
         console.error('Delete error:', error);
     }

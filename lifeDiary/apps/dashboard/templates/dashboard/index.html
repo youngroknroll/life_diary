@@ -41,7 +41,7 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-check-circle text-success me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ filled_slots }}</div>
+                                <div class="fw-bold" id="filledSlots">{{ filled_slots }}</div>
                                 <small class="text-muted">{% trans "기록된 슬롯" %}</small>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-chart-pie text-info me-2"></i>
                             <div>
-                                <div class="fw-bold">{{ fill_percentage }}%</div>
+                                <div class="fw-bold" id="fillPercentage">{{ fill_percentage }}%</div>
                                 <small class="text-muted">{% trans "기록률" %}</small>
                             </div>
                         </div>
@@ -59,7 +59,7 @@
                         <div class="d-flex align-items-center justify-content-center">
                             <i class="fas fa-hourglass-half text-warning me-2"></i>
                             <div>
-                                <div class="fw-bold">{% blocktrans with h=total_hours m=remaining_minutes %}{{ h }}시간 {{ m }}분{% endblocktrans %}</div>
+                                <div class="fw-bold" id="loggedTime">{% blocktrans with h=total_hours m=remaining_minutes %}{{ h }}시간 {{ m }}분{% endblocktrans %}</div>
                                 <small class="text-muted">{% trans "총 기록 시간" %}</small>
                             </div>
                         </div>
@@ -244,6 +244,14 @@
 
 <!-- 태그 설명 이미지 모달 -->
 {% include 'dashboard/_tag_image_modal.html' %}
+
+<!-- 되돌리기 스낵바 — 저장·삭제 직후 5초간 -->
+<div class="undo-snackbar" id="undoSnackbar" role="status" aria-live="polite">
+    <span data-undo-message></span>
+    <button type="button" class="undo-snackbar__action" data-undo-action>
+        {% trans "되돌리기" %}
+    </button>
+</div>
 
 {% endblock %}
 

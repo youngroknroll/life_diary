@@ -91,6 +91,7 @@ class TestSaveResponse:
         filled = next(run for run in runs if run["tag_id"] is not None)
 
         assert filled["tag_id"] == focus.id
+        assert filled["tag_name"] == "집중"
         assert filled["color"] == "#4E8F63"
 
     def test_save_returns_day_stats(self, logged_in):
