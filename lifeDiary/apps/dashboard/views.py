@@ -8,11 +8,22 @@ import logging
 
 from pydantic import ValidationError
 
+from django.utils import timezone
+
 from apps.tags.repositories import TagRepository
-from .commands import DeleteTimeBlocksCommand, UpsertTimeBlocksCommand
+from .commands import (
+    DeleteTimeBlocksCommand,
+    RestoreTimeBlocksCommand,
+    UpsertTimeBlocksCommand,
+)
 from .repositories import TimeBlockRepository
-from .services import build_slot_rows, build_time_headers
-from .use_cases import DeleteTimeBlocksUseCase, UpsertTimeBlocksUseCase
+from .services import build_slot_rows, build_time_headers, hours_touched, serialize_rows
+from .undo import pop_snapshot, save_snapshot
+from .use_cases import (
+    DeleteTimeBlocksUseCase,
+    RestoreTimeBlocksUseCase,
+    UpsertTimeBlocksUseCase,
+)
 
 from apps.core.utils import (
     safe_date_parse,
@@ -26,6 +37,38 @@ _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
 _upsert_use_case = UpsertTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_repo)
 _delete_use_case = DeleteTimeBlocksUseCase(writer=_time_block_repo)
+_restore_use_case = RestoreTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_repo)
+
+
+def _read_day(user, target_date):
+    """저장 직후의 하루를 다시 읽어 행과 통계를 만든다."""
+    slot_data = {
+        block.slot_index: {"tag": block.tag, "memo": block.memo, "id": block.id}
+        for block in _time_block_repo.find_by_date(user, target_date)
+    }
+    stats = calculate_time_statistics(len(slot_data))
+
+    return build_slot_rows(slot_data), {
+        "logged_minutes": stats["total_minutes"],
+        "fill_percentage": stats["fill_percentage"],
+    }
+
+
+def _mutation_payload(request, target_date, slot_indexes, previous_state, extra=None):
+    """변경된 행과 통계, 그리고 되돌리기 토큰을 함께 싣는다."""
+    rows, stats = _read_day(request.user, target_date)
+    token = save_snapshot(
+        request.session,
+        {"date": target_date.isoformat(), "slots": previous_state},
+        now=timezone.now(),
+    )
+
+    return {
+        **(extra or {}),
+        "runs": serialize_rows(rows, hours_touched(slot_indexes)),
+        "stats": stats,
+        "undo_token": token,
+    }
 
 
 @login_required
@@ -114,12 +157,22 @@ def _handle_upsert(request, data):
             "%(count)d개의 슬롯이 저장되었습니다.",
             saved_count,
         ) % {"count": saved_count},
-        {
-            "created_count": result.created,
-            "updated_count": result.updated,
-            "total_count": len(cmd.slot_indexes),
-            "tag": {"id": result.tag_id, "name": result.tag_name, "color": result.tag_color},
-        },
+        _mutation_payload(
+            request,
+            cmd.target_date,
+            cmd.slot_indexes,
+            result.previous_state,
+            extra={
+                "created_count": result.created,
+                "updated_count": result.updated,
+                "total_count": len(cmd.slot_indexes),
+                "tag": {
+                    "id": result.tag_id,
+                    "name": result.tag_name,
+                    "color": result.tag_color,
+                },
+            },
+        ),
         201,
     )
 
@@ -150,5 +203,67 @@ def _handle_delete(request, data):
             "%(count)d개의 슬롯이 삭제되었습니다.",
             result.deleted,
         ) % {"count": result.deleted},
-        {"deleted_count": result.deleted, "requested_count": result.requested},
+        _mutation_payload(
+            request,
+            cmd.target_date,
+            cmd.slot_indexes,
+            result.previous_state,
+            extra={
+                "deleted_count": result.deleted,
+                "requested_count": result.requested,
+            },
+        ),
+    )
+
+
+@login_required
+@require_http_methods(["POST"])
+def time_block_undo_api(request):
+    """직전 저장/삭제를 되돌린다.
+
+    되돌릴 대상은 오직 세션에 보관된 스냅샷에서만 온다. 요청 본문의 날짜나
+    슬롯은 읽지 않는다 — 읽으면 오래된 스냅샷을 엉뚱한 날짜에 덮어쓸 수 있다.
+    """
+    logger = logging.getLogger(__name__)
+
+    try:
+        data = json.loads(request.body)
+    except json.JSONDecodeError:
+        return error_response(gettext("올바른 JSON 형식이 아닙니다."), "INVALID_JSON")
+
+    snapshot = pop_snapshot(
+        request.session, data.get("undo_token") or "", now=timezone.now()
+    )
+    if snapshot is None:
+        return error_response(
+            gettext("되돌릴 수 있는 시간이 지났습니다."), "UNDO_UNAVAILABLE", 404
+        )
+
+    try:
+        cmd = RestoreTimeBlocksCommand(
+            target_date=snapshot["date"], slots=snapshot["slots"]
+        )
+    except ValidationError as exc:
+        return error_response(exc.errors()[0]["msg"], "VALIDATION_ERROR")
+
+    try:
+        _restore_use_case.execute(cmd, request.user)
+    except PermissionError as exc:
+        return error_response(str(exc), "TAG_NOT_FOUND", 404)
+    except Exception:
+        logger.exception("되돌리기 중 오류")
+        return error_response(
+            gettext("되돌리는 중 오류가 발생했습니다."), "SERVER_ERROR", 500
+        )
+
+    rows, stats = _read_day(request.user, cmd.target_date)
+
+    return success_response(
+        gettext("되돌렸습니다."),
+        {
+            "runs": serialize_rows(
+                rows, hours_touched([slot.slot_index for slot in cmd.slots])
+            ),
+            "stats": stats,
+        },
     )

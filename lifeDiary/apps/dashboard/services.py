@@ -41,6 +41,34 @@ def build_slot_rows(slot_data):
     return rows
 
 
+def serialize_rows(rows, hours=None):
+    """행을 JSON으로 옮긴다. hours 를 주면 그 시간대만 골라 낸다."""
+    wanted = None if hours is None else set(hours)
+
+    return [
+        {
+            "hour": row["hour"],
+            "runs": [
+                {
+                    "start_index": run["start_index"],
+                    "span": run["span"],
+                    "tag_id": run["tag"].id if run["tag"] else None,
+                    "color": run["tag"].color if run["tag"] else None,
+                    "label": run["label"],
+                    "memo": run["memo"],
+                }
+                for run in row["runs"]
+            ],
+        }
+        for row in rows
+        if wanted is None or row["hour"] in wanted
+    ]
+
+
+def hours_touched(slot_indexes):
+    return sorted({index // SLOTS_PER_HOUR for index in slot_indexes})
+
+
 def _merge_hour_runs(slot_data, hour):
     """한 시간(6칸) 안에서 같은 태그가 이어지는 칸을 하나의 run 으로 묶는다."""
     runs = []
