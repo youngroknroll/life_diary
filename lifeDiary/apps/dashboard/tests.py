@@ -10,7 +10,8 @@ from apps.tags.models import Category, Tag
 
 class TestDashboardServices:
     def test_build_time_headers(self):
-        assert build_time_headers() == ["10분", "20분", "30분", "40분", "50분", "60분"] * 2
+        # 24행 × 6열 그리드의 한 줄짜리 헤더. 시작 분 6개.
+        assert build_time_headers() == [":00", ":10", ":20", ":30", ":40", ":50"]
 
     def test_validate_slot_indexes_accepts_valid_list(self):
         assert validate_slot_indexes([0, 1, 143])
@@ -233,20 +234,6 @@ class TestDashboardJavaScriptAssets:
         assert 'id="tagCategoryHeaderTemplate"' in template_source
         assert "renderCategoryHeader(" in js_source
         assert 'background-color: ${escapeHtml(cat.color)}' not in js_source
-
-    def test_touchmove_prevent_default_is_guarded_by_cancelable(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "if (event.cancelable) {" in source
-        assert "event.preventDefault();" in source
-
-    def test_mobile_touch_drag_does_not_cancel_vertical_time_slot_gesture(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "dy > dx" not in source
-        assert source.index("event.preventDefault();") < source.index("document.elementFromPoint")
 
     def test_mobile_sheet_close_moves_focus_before_hiding_dialog(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"

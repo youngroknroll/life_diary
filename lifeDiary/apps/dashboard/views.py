@@ -11,7 +11,7 @@ from pydantic import ValidationError
 from apps.tags.repositories import TagRepository
 from .commands import DeleteTimeBlocksCommand, UpsertTimeBlocksCommand
 from .repositories import TimeBlockRepository
-from .services import build_time_headers
+from .services import build_slot_rows, build_time_headers
 from .use_cases import DeleteTimeBlocksUseCase, UpsertTimeBlocksUseCase
 
 from apps.core.utils import (
@@ -20,7 +20,6 @@ from apps.core.utils import (
     success_response,
     error_response,
     TOTAL_SLOTS_PER_DAY,
-    get_time_from_slot,
 )
 
 _time_block_repo = TimeBlockRepository()
@@ -44,19 +43,8 @@ def dashboard_view(request):
         for block in time_blocks
     }
 
-    # 144개 슬롯 생성 (00:00 ~ 23:50, 10분 단위)
-    slots = []
-    for i in range(TOTAL_SLOTS_PER_DAY):
-        hour, minute = get_time_from_slot(i)
-        slots.append(
-            {
-                "index": i,
-                "hour": hour,
-                "minute": minute,
-                "time_str": f"{hour:02d}:{minute:02d}",
-                "data": slot_data.get(i),
-            }
-        )
+    # 24행 × 6열. 같은 태그 연속 칸은 하나의 블록(run)으로 병합해 내려준다.
+    slot_rows = build_slot_rows(slot_data)
 
     # 사용자의 모든 태그 + 공용 기본 태그 조회 (기본 태그 우선)
     user_tags = _tag_repo.find_accessible_ordered(request.user)
@@ -67,9 +55,9 @@ def dashboard_view(request):
     context = {
         "page_title": gettext("대시보드"),
         "selected_date": selected_date,
-        "slots": slots,
+        "slot_rows": slot_rows,
         "user_tags": user_tags,
-        "total_slots": len(slots),
+        "total_slots": TOTAL_SLOTS_PER_DAY,
         "filled_slots": len(slot_data),
         "fill_percentage": stats["fill_percentage"],
         "total_hours": stats["hours"],
