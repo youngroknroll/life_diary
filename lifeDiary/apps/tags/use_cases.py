@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from django.db import transaction
+
+from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
 from django.utils.translation import gettext
 
 from .domain_services import _tag_policy_service
@@ -23,11 +25,15 @@ class TagData:
     category_id: int | None
     can_edit: bool
     can_delete: bool
+    block_count: int = 0
+    total_hours: float = 0.0
 
 
 class ListTagsUseCase:
     def execute(self, user) -> list[TagData]:
         tags = _tag_repo.find_accessible(user).order_by("is_default", "name")
+        blocks_by_tag = _time_block_repo.count_blocks_by_tag(user)
+
         return [
             TagData(
                 id=tag.id,
@@ -37,6 +43,10 @@ class ListTagsUseCase:
                 category_id=tag.category_id,
                 can_edit=_tag_policy_service.can_edit(user, tag),
                 can_delete=_tag_policy_service.can_delete(user, tag),
+                block_count=blocks_by_tag.get(tag.id, 0),
+                total_hours=round(
+                    blocks_by_tag.get(tag.id, 0) * MINUTES_PER_SLOT / MINUTES_PER_HOUR, 1
+                ),
             )
             for tag in tags
         ]

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 18:51+0900\n"
+"POT-Creation-Date: 2026-08-02 05:29+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -437,6 +437,7 @@ msgstr ""
 msgid "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
@@ -901,7 +902,7 @@ msgstr "관리자가 등록한 모든 사용자 공용 태그"
 msgid "태그들"
 msgstr "태그들"
 
-#: apps/tags/models.py:120 apps/tags/use_cases.py:60 apps/tags/use_cases.py:77
+#: apps/tags/models.py:120 apps/tags/use_cases.py:70 apps/tags/use_cases.py:87
 msgid "이미 같은 이름의 태그가 존재합니다."
 msgstr "이미 같은 이름의 태그가 존재합니다."
 
@@ -934,6 +935,7 @@ msgid "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다
 msgstr "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
 
 #: apps/tags/templates/tags/_tag_modal.html:51
+#: apps/tags/templates/tags/index.html:65
 #: apps/users/templates/users/account_delete_confirm.html:28
 #: templates/shared/confirm_delete.html:12
 msgid "취소"
@@ -994,27 +996,43 @@ msgstr "태그 목록 불러오는 중..."
 msgid "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 msgstr "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 
-#: apps/tags/use_cases.py:50 apps/tags/use_cases.py:74
+#: apps/tags/templates/tags/index.html:50
+msgid "기록이 있는 태그를 지울 때"
+msgstr "기록이 있는 태그를 지울 때"
+
+#: apps/tags/templates/tags/index.html:54
+msgid "옮길 태그"
+msgstr "옮길 태그"
+
+#: apps/tags/templates/tags/index.html:60
+msgid "옮기고 태그 삭제"
+msgstr "옮기고 태그 삭제"
+
+#: apps/tags/templates/tags/index.html:63
+msgid "기록까지 함께 삭제"
+msgstr "기록까지 함께 삭제"
+
+#: apps/tags/use_cases.py:60 apps/tags/use_cases.py:84
 msgid "태그명과 색상을 입력해주세요."
 msgstr "태그명과 색상을 입력해주세요."
 
-#: apps/tags/use_cases.py:53
+#: apps/tags/use_cases.py:63
 msgid "카테고리를 선택해주세요."
 msgstr "카테고리를 선택해주세요."
 
-#: apps/tags/use_cases.py:57 apps/tags/use_cases.py:82
+#: apps/tags/use_cases.py:67 apps/tags/use_cases.py:92
 msgid "존재하지 않는 카테고리입니다."
 msgstr "존재하지 않는 카테고리입니다."
 
-#: apps/tags/use_cases.py:104
+#: apps/tags/use_cases.py:114
 msgid "이 기본 태그는 사용 중이어서 삭제할 수 없습니다."
 msgstr "이 기본 태그는 사용 중이어서 삭제할 수 없습니다."
 
-#: apps/tags/use_cases.py:115
+#: apps/tags/use_cases.py:125
 msgid "같은 태그로는 옮길 수 없습니다."
 msgstr "같은 태그로는 옮길 수 없습니다."
 
-#: apps/tags/use_cases.py:119 apps/tags/views.py:38
+#: apps/tags/use_cases.py:129 apps/tags/views.py:38
 msgid "옮길 태그를 찾을 수 없습니다."
 msgstr "옮길 태그를 찾을 수 없습니다."
 

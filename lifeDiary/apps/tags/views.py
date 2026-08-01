@@ -98,6 +98,8 @@ def tag_list_create(request):
                             "category_id": t.category_id,
                             "can_edit": t.can_edit,
                             "can_delete": t.can_delete,
+                            "block_count": t.block_count,
+                            "total_hours": t.total_hours,
                         }
                         for t in tags
                     ]

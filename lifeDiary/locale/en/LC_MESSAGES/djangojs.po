@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 18:41+0900\n"
+"POT-Creation-Date: 2026-08-02 05:29+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -41,24 +41,21 @@ msgstr "Please select a category."
 msgid "태그 저장 실패: %s"
 msgstr "Failed to save tag: %s"
 
-#: apps/core/static/core/js/tag.js:152
-#, javascript-format
-msgid ""
-"'%s'에 붙은 기록을 옮길 태그 번호를 입력하세요. 비워 두면 그 구간은 미기록이 "
-"됩니다.\n"
-"\n"
-"%s"
-msgstr ""
-
-#: apps/core/static/core/js/tag.js:162
-#, javascript-format
-msgid "'%s' 태그를 정말 삭제하시겠습니까?"
-msgstr "Are you sure you want to delete the '%s' tag?"
-
-#: apps/core/static/core/js/tag.js:181
+#: apps/core/static/core/js/tag.js:155
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "Failed to delete tag: %s"
+
+#: apps/core/static/core/js/tag.js:176
+msgid ""
+"'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
+"간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:200
+#, javascript-format
+msgid "'%s' 태그를 정말 삭제하시겠습니까?"
+msgstr "Are you sure you want to delete the '%s' tag?"
 
 #: apps/core/static/core/js/utils.js:104
 msgid "정말 삭제하시겠습니까?"

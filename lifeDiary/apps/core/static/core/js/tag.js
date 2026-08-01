@@ -139,46 +139,72 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 전역 함수로 태그 삭제 함수 등록 (core utils 사용)
-    /** 기록이 붙은 태그를 그냥 지우면 그 구간이 미기록으로 돌아가 통계
-        수치가 조용히 바뀐다. 옮길 곳을 먼저 묻는다. */
-    function askWhereToMove(tagId, tagName) {
-        const others = (window._tagsCache || [])
-            .filter(tag => tag.id !== tagId)
-            .map(tag => `${tag.id}: ${tag.name}`);
-        if (others.length === 0) return null;
+    const deleteModalEl = document.getElementById('tagDeleteModal');
+    const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
 
-        const answer = window.prompt(
-            interpolate(
-                gettext("'%s'에 붙은 기록을 옮길 태그 번호를 입력하세요. 비워 두면 그 구간은 미기록이 됩니다.\n\n%s"),
-                [tagName, others.join('\n')]
-            ),
-            ''
-        );
-        if (answer === null) return undefined;
-        return answer.trim() === '' ? null : parseInt(answer.trim(), 10);
-    }
-
-    window.deleteTag = async function(tagId, tagName) {
-        if (!confirmDelete(interpolate(gettext("'%s' 태그를 정말 삭제하시겠습니까?"), [tagName]))) {
-            return;
-        }
-
-        const moveToId = askWhereToMove(tagId, tagName);
-        if (moveToId === undefined) return;
-
+    async function requestDelete(tagId, moveToId) {
         try {
             const result = await apiCall(`/api/tags/${tagId}/`, {
                 method: 'DELETE',
                 data: { move_to_id: moveToId }
             });
-
             showNotification(result.message, 'success');
-            // 태그 목록 업데이트가 필요하다는 이벤트를 발생시킴
             document.dispatchEvent(new CustomEvent('tags-updated'));
-
         } catch (error) {
             console.error('태그 삭제 오류:', error);
             showNotification(interpolate(gettext('태그 삭제 실패: %s'), [error.message]), 'error');
+        }
+    }
+
+    /**
+     * 기록이 붙은 태그를 그냥 지우면 그 구간이 미기록으로 돌아가 통계 수치가
+     * 조용히 바뀐다. 옮길 곳을 기본값으로 두고 확인을 받는다.
+     */
+    function openDeleteModal(tag) {
+        const select = document.getElementById('tagDeleteMoveTo');
+        const others = (window._tagsCache || []).filter(other => other.id !== tag.id);
+
+        select.innerHTML = '';
+        others.forEach(other => {
+            const option = document.createElement('option');
+            option.value = other.id;
+            option.textContent = other.name;
+            select.appendChild(option);
+        });
+
+        document.getElementById('tagDeleteSummary').textContent = interpolate(
+            gettext("'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구간이 미기록으로 되돌아가 통계 수치가 바뀝니다."),
+            { name: tag.name, hours: tag.total_hours, blocks: tag.block_count },
+            true
+        );
+
+        const moveButton = document.getElementById('tagDeleteMoveAndDelete');
+        moveButton.disabled = others.length === 0;
+        moveButton.onclick = () => {
+            deleteModal.hide();
+            requestDelete(tag.id, parseInt(select.value, 10));
+        };
+        document.getElementById('tagDeleteOnly').onclick = () => {
+            deleteModal.hide();
+            requestDelete(tag.id, null);
+        };
+
+        deleteModal.show();
+    }
+
+    window.deleteTag = function(tagId) {
+        const tag = (window._tagsCache || []).find(item => item.id === tagId);
+        if (!tag) return;
+
+        if (!tag.block_count) {
+            if (confirmDelete(interpolate(gettext("'%s' 태그를 정말 삭제하시겠습니까?"), [tag.name]))) {
+                requestDelete(tag.id, null);
+            }
+            return;
+        }
+
+        if (deleteModal) {
+            openDeleteModal(tag);
         }
     };
 });

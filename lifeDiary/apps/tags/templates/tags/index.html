@@ -42,6 +42,32 @@
 </div>
 
 {% include 'tags/_tag_modal.html' %}
+
+<div class="modal fade" id="tagDeleteModal" tabindex="-1" aria-labelledby="tagDeleteTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h2 class="danger-panel__title" id="tagDeleteTitle">{% trans "기록이 있는 태그를 지울 때" %}</h2>
+                <p class="danger-panel__text" id="tagDeleteSummary"></p>
+
+                <label class="onboarding__field mb-2">
+                    <span class="onboarding__field-label">{% trans "옮길 태그" %}</span>
+                    <select class="form-select" id="tagDeleteMoveTo"></select>
+                </label>
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn-sian btn-sian--danger" id="tagDeleteMoveAndDelete">
+                        {% trans "옮기고 태그 삭제" %}
+                    </button>
+                    <button type="button" class="danger-panel__link" id="tagDeleteOnly">
+                        {% trans "기록까지 함께 삭제" %}
+                    </button>
+                    <button type="button" class="btn-sian" data-bs-dismiss="modal">{% trans "취소" %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <template id="tagCategoryHeaderTemplate">
     {% include 'shared/_tag_category_header.html' with category_name='' category_count='' category_header_class='mb-3 fw-bold' %}
 </template>
@@ -74,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             </span>
                             ${tag.is_default ? `<small class="badge bg-warning text-dark" style="font-size: 0.75em;">${gettext('기본')}</small>` : ''}
                         </div>
-                        <small class="text-muted">${tag.color}</small>
+                        <small class="text-muted num">${tag.block_count ? interpolate(gettext('누적 %s시간'), [tag.total_hours]) : gettext('아직 기록 없음')}</small>
                     </div>
                     <div class="card-footer bg-transparent py-1 px-3">
                         <div class="d-flex gap-1">
@@ -85,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 </button>` : ''}
                             ${canDelete ? `
                                 <button class="btn btn-outline-danger btn-sm flex-fill py-0"
-                                        onclick="deleteTag(${tag.id}, '${escapeHTML(tag.name)}')">
+                                        onclick="deleteTag(${tag.id})">
                                     <i class="fas fa-trash me-1 d-none d-md-inline"></i>${gettext('삭제')}
                                 </button>` : ''}
                         </div>
