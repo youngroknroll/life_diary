@@ -26,6 +26,7 @@ let isAdditiveDrag = false;
 let dragBaseSelection = new Set();
 
 const SLOTS_PER_HOUR = 6;
+const TOTAL_SLOTS = 144;
 
 function isMobileDashboardLayout() {
     return window.matchMedia('(max-width: 767.98px)').matches;
@@ -97,6 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     initializeDashboard();
     initializeGridDrag();
+    initializeGridKeyboard();
     initializeTagSelectDelegation('tagLegend');
     initializeTagSelectDelegation('tagContainer');
 
@@ -323,6 +325,16 @@ const renderSelection = () => {
             column += span;
         }
     });
+
+    document.querySelectorAll('.slot-block').forEach(block => {
+        const start = parseInt(block.dataset.start, 10);
+        const span = parseInt(block.dataset.span, 10);
+        let covered = 0;
+        for (let index = start; index < start + span; index++) {
+            if (selectedSlots.has(index)) covered += 1;
+        }
+        block.setAttribute('aria-pressed', covered === span ? 'true' : 'false');
+    });
 };
 
 // ── 드래그 ──
@@ -369,6 +381,62 @@ const endDrag = () => {
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
     openQuickInputSheet();
+};
+
+/**
+ * 포인터 없이도 기록할 수 있어야 한다. 기록은 이 제품의 핵심 루프다.
+ * 방향키로 칸을 옮기고, Shift를 누른 채 옮기면 범위가 늘어난다.
+ */
+function initializeGridKeyboard() {
+    const grid = document.getElementById('timeGrid');
+    if (!grid) return;
+
+    const STEP = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -SLOTS_PER_HOUR, ArrowDown: SLOTS_PER_HOUR };
+    let anchorSlot = null;
+
+    grid.addEventListener('keydown', (event) => {
+        const block = event.target.closest('.slot-block');
+        if (!block) return;
+
+        const slotIndex = parseInt(block.dataset.start, 10);
+
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            anchorSlot = slotIndex;
+            selectSlot(slotIndex, event);
+            return;
+        }
+
+        if (!(event.key in STEP)) return;
+        event.preventDefault();
+
+        const target = slotIndex + STEP[event.key];
+        if (target < 0 || target >= TOTAL_SLOTS) return;
+
+        if (event.shiftKey) {
+            if (anchorSlot === null) anchorSlot = slotIndex;
+            selectRange(anchorSlot, target);
+        } else {
+            anchorSlot = target;
+            selectedSlots.clear();
+            selectedSlots.add(target);
+            renderSelection();
+            showSlotInfo(Array.from(selectedSlots));
+            updateButtons();
+        }
+
+        blockForSlot(target)?.focus({ preventScroll: false });
+    });
+}
+
+const selectRange = (from, to) => {
+    selectedSlots.clear();
+    for (let index = Math.min(from, to); index <= Math.max(from, to); index++) {
+        selectedSlots.add(index);
+    }
+    renderSelection();
+    showSlotInfo(Array.from(selectedSlots));
+    updateButtons();
 };
 
 /** 모바일 세로 스와이프는 touch-action:pan-y 가 스크롤로 가져간다. */
@@ -428,10 +496,19 @@ function initializeGridDrag() {
     });
 
     grid.addEventListener('pointercancel', () => {
+        if (!isDragging) return;
+
         isDragging = false;
         startSlot = null;
         isAdditiveDrag = false;
+
+        // pointerdown 이 이미 한 칸을 칠해 뒀다. 스크롤로 넘어간 제스처가
+        // 선택만 남기고 사라지면 화면과 저장 버튼 상태가 어긋난다.
+        selectedSlots = new Set(dragBaseSelection);
         dragBaseSelection = new Set();
+        renderSelection();
+        showSlotInfo(Array.from(selectedSlots));
+        updateButtons();
     });
 }
 
@@ -538,6 +615,10 @@ function buildBlock(run) {
     block.style.gridColumn = `span ${run.span}`;
     block.dataset.start = run.start_index;
     block.dataset.span = run.span;
+
+    block.setAttribute('role', 'button');
+    block.setAttribute('tabindex', '0');
+    block.setAttribute('aria-pressed', 'false');
 
     if (run.tag_id) {
         block.style.backgroundColor = run.color;
