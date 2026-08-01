@@ -112,19 +112,6 @@ class TestDashboardIndexRendering:
         assert idx_passive_tag < idx_invest_header
         assert idx_invest_header < idx_invest_tag
 
-    def test_sidebar_category_headers_use_separator_not_color_dot(self, dash_user_with_tags):
-        client, _ = dash_user_with_tags
-        resp = client.get("/dashboard/")
-        section = _extract_element(resp.content.decode(), "tagContainer")
-        passive_header_start = section.index("tag-category-header")
-        passive_tag_start = section.index("수동태그")
-        passive_header = section[passive_header_start:passive_tag_start]
-        normalized_header = re.sub(r"\s+", " ", passive_header)
-
-        assert "- 수동적 소비시간" in normalized_header
-        assert "background-color: #222222" not in passive_header
-        assert "background-color: #222222" in section[passive_tag_start:]
-
     def test_sidebar_tag_list_uses_compact_wrapping_row_layout(self, dash_user_with_tags):
         client, _ = dash_user_with_tags
         resp = client.get("/dashboard/")

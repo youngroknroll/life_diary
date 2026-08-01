@@ -87,6 +87,7 @@ class Tag(models.Model):
     )
     color = models.CharField(
         max_length=7,
+        blank=True,
         validators=[
             RegexValidator(
                 regex=r"^#[0-9A-Fa-f]{6}$",
@@ -94,7 +95,7 @@ class Tag(models.Model):
             )
         ],
         verbose_name=_("색상"),
-        help_text=_("HEX 색상 코드 (예: #FF5733)"),
+        help_text=_("카테고리에서 자동으로 정해집니다."),
     )
     is_default = models.BooleanField(
         default=False,
@@ -122,6 +123,16 @@ class Tag(models.Model):
             ),
         ]
         ordering = ["name"]
+
+    def save(self, *args, **kwargs):
+        """색은 카테고리가 정한다.
+
+        사용자가 색을 고르면 같은 카테고리끼리 한 덩어리로 읽히는 규칙이
+        깨지므로, 넘어온 값이 있어도 카테고리 색으로 덮어쓴다.
+        """
+        if self.category_id:
+            self.color = self.category.color
+        super().save(*args, **kwargs)
 
     @property
     def text_color(self):

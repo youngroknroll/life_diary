@@ -27,8 +27,8 @@
     --color-accent-sleep: #8A9A91;  /* 수면시간 */
     --color-accent-muted: #dbe8df;
 
-    /* 흰 글자는 밝은 accent 위에서 4.5:1을 넘기지 못한다 */
-    --ink-on-accent: #14211A;
+    /* 시안의 #14211A 는 투자·주도적 색에서 4.5:1에 못 미쳐 한 단계 낮췄다 */
+    --ink-on-accent: #0F1A14;
 
     /* Note (노란 강조 박스) */
     --color-note-bg: #fff7df;
@@ -94,7 +94,7 @@
     --color-accent-sleep: #9AAAA1;
     --color-accent-muted: #2a3a2e;
 
-    --ink-on-accent: #14211A;
+    --ink-on-accent: #0F1A14;
 
     --color-note-bg: #2a2615;
     --color-note-border: #5d4a15;
