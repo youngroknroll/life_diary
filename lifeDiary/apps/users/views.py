@@ -417,18 +417,35 @@ class RateLimitedPasswordResetView(PasswordResetView):
         return super(PasswordResetView, self).form_valid(form)
 
 
+ONBOARDING_STEPS = 3
+
+
 @login_required
 def welcome_view(request):
-    """회원가입 직후 1회 노출되는 환영 화면.
+    """가입 직후 1회 노출되는 온보딩.
 
-    Why: 가입 직후 빈 대시보드로 떨어지면 첫날 이탈률이 높음.
-    가치 제안 + 단일 CTA로 첫 행동(시간 기록)을 유도.
+    읽는 화면이 아니라 고르는 화면이다. 세 스텝 모두 건너뛸 수 있어 가입
+    이탈을 만들지 않는다.
     """
-    return render(
-        request,
-        "users/welcome.html",
-        {"page_title": gettext("환영합니다")},
-    )
+    try:
+        step = int(request.GET.get("step", 1))
+    except (TypeError, ValueError):
+        step = 1
+    step = min(max(step, 1), ONBOARDING_STEPS)
+
+    context = {
+        "page_title": gettext("시작하기"),
+        "step": step,
+        "total_steps": ONBOARDING_STEPS,
+        "step_range": range(1, ONBOARDING_STEPS + 1),
+    }
+    if step == 1:
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+    if step == 3:
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+        context["periods"] = [("daily", gettext("하루")), ("weekly", gettext("한 주"))]
+
+    return render(request, "users/welcome.html", context)
 
 
 @login_required

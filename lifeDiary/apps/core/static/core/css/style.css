@@ -458,6 +458,137 @@ body {
     margin: 0;
 }
 
+/* 온보딩 3스텝 — 읽는 화면이 아니라 고르는 화면이다 */
+.onboarding {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 8px 4px 32px;
+}
+
+.onboarding__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.onboarding__progress {
+    display: flex;
+    gap: 5px;
+}
+
+.onboarding__tick {
+    width: 22px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-border);
+}
+
+.onboarding__tick.is-done {
+    background: var(--color-primary);
+}
+
+.onboarding__skip {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.onboarding__step {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--color-primary);
+    margin: 0 0 8px;
+}
+
+.onboarding__title {
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--color-text);
+    margin: 0 0 8px;
+}
+
+.onboarding__lead {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-text-body);
+    margin: 0 0 16px;
+}
+
+.onboarding__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 20px;
+}
+
+.onboarding__next {
+    width: 100%;
+    min-height: 50px;
+    font-size: 15px;
+}
+
+.onboarding__demo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: 12px 13px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
+}
+
+.onboarding__demo-row {
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.onboarding__demo-cells {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+}
+
+.onboarding__demo-cell {
+    height: 22px;
+    border-radius: 3px;
+    background: var(--color-track);
+}
+
+.onboarding__demo-cell.is-picked {
+    background: var(--color-primary-soft);
+    box-shadow: 0 0 0 2px var(--color-primary) inset;
+}
+
+.onboarding__goal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.onboarding__field {
+    display: block;
+}
+
+.onboarding__field-label {
+    display: block;
+    font-weight: 500;
+    font-size: 11.5px;
+    color: var(--color-text-body);
+    margin-bottom: 5px;
+}
+
+.onboarding__foot {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: 10px 0 0;
+}
+
 .trend-wait {
     padding: 22px 18px;
     border: 1px solid var(--color-border);

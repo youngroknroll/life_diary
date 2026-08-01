@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 18:14+0900\n"
+"POT-Creation-Date: 2026-08-01 18:27+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -450,6 +450,7 @@ msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리�
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #: apps/stats/messages.py:24
@@ -672,6 +673,7 @@ msgid "가장 많은 요일"
 msgstr "가장 많은 요일"
 
 #: apps/stats/templates/stats/index.html:224 apps/users/forms.py:64
+#: apps/users/templates/users/welcome.html:80
 msgid "기간"
 msgstr "기간"
 
@@ -1063,6 +1065,7 @@ msgstr "이미 사용 중인 이메일입니다."
 
 #: apps/users/forms.py:65 apps/users/templates/users/_goal_table_section.html:8
 #: apps/users/templates/users/mypage.html:127
+#: apps/users/templates/users/welcome.html:88
 msgid "목표 시간"
 msgstr "목표 시간"
 
@@ -1132,7 +1135,7 @@ msgstr "%(h)s시간"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
-#: apps/users/templates/users/mypage.html:138 apps/users/views.py:554
+#: apps/users/templates/users/mypage.html:138 apps/users/views.py:571
 msgid "계정 탈퇴"
 msgstr "계정 탈퇴"
 
@@ -1556,54 +1559,78 @@ msgstr "작성일"
 msgid "등록된 특이사항이 없습니다."
 msgstr "등록된 특이사항이 없습니다."
 
-#: apps/users/templates/users/welcome.html:4 apps/users/views.py:430
-msgid "환영합니다"
-msgstr "환영합니다"
+#: apps/users/templates/users/welcome.html:4 apps/users/views.py:437
+msgid "시작하기"
+msgstr "시작하기"
 
-#: apps/users/templates/users/welcome.html:12 apps/users/views.py:233
+#: apps/users/templates/users/welcome.html:10
 #, python-format
-msgid "%(username)s님, 환영합니다!"
-msgstr "%(username)s님, 환영합니다!"
+msgid "%(t)s단계 중 %(s)s단계"
+msgstr "%(t)s단계 중 %(s)s단계"
 
-#: apps/users/templates/users/welcome.html:15
-msgid ""
-"라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
-"도록 돕습니다."
-msgstr ""
-"라이프 다이어리는 하루의 시간을 기록하고, 패턴을 발견해 더 나은 내일을 설계하"
-"도록 돕습니다."
+#: apps/users/templates/users/welcome.html:16
+msgid "나중에"
+msgstr "나중에"
+
+#: apps/users/templates/users/welcome.html:16
+msgid "건너뛰기"
+msgstr "건너뛰기"
+
+#: apps/users/templates/users/welcome.html:20
+#, python-format
+msgid "STEP %(s)s / %(t)s"
+msgstr "STEP %(s)s / %(t)s"
 
 #: apps/users/templates/users/welcome.html:23
-msgid "시간 블록 기록"
-msgstr "시간 블록 기록"
+msgid "쓸 태그부터 골라볼까요"
+msgstr "쓸 태그부터 골라볼까요"
 
 #: apps/users/templates/users/welcome.html:24
-msgid "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
-msgstr "하루를 30분 단위로 나눠 무엇을 했는지 가볍게 체크합니다."
+msgid ""
+"지금 고른 것만 기록 화면에 나옵니다. 나중에 설정에서 얼마든지 바꿀 수 있습니"
+"다."
+msgstr ""
 
-#: apps/users/templates/users/welcome.html:30
-msgid "태그로 분류"
-msgstr "태그로 분류"
+#: apps/users/templates/users/welcome.html:32
+msgid "아직 태그가 없습니다. 다음 단계로 넘어가면 기본 태그로 시작합니다."
+msgstr "아직 태그가 없습니다. 다음 단계로 넘어가면 기본 태그로 시작합니다."
 
-#: apps/users/templates/users/welcome.html:31
-msgid "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
-msgstr "공부·운동·휴식 등 나만의 태그로 시간을 묶어 패턴을 봅니다."
+#: apps/users/templates/users/welcome.html:36
+#: apps/users/templates/users/welcome.html:63
+msgid "다음"
+msgstr "다음"
 
-#: apps/users/templates/users/welcome.html:37
-msgid "통계와 목표"
-msgstr "통계와 목표"
+#: apps/users/templates/users/welcome.html:39
+msgid "한 구간을 직접 채워보세요"
+msgstr "한 구간을 직접 채워보세요"
 
-#: apps/users/templates/users/welcome.html:38
-msgid "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
-msgstr "주·월 단위 통계와 목표 시간 대비 달성률을 한눈에 확인합니다."
+#: apps/users/templates/users/welcome.html:40
+msgid ""
+"기록 화면에서 비어 있는 구간을 끌면 그만큼 선택됩니다. 손을 떼면 태그를 고르"
+"는 자리가 열립니다."
+msgstr ""
 
-#: apps/users/templates/users/welcome.html:46
-msgid "오늘 첫 기록 시작하기"
-msgstr "오늘 첫 기록 시작하기"
+#: apps/users/templates/users/welcome.html:66
+msgid "목표를 하나만 정해둘까요"
+msgstr "목표를 하나만 정해둘까요"
 
-#: apps/users/templates/users/welcome.html:49
-msgid "나중에 하기"
-msgstr "나중에 하기"
+#: apps/users/templates/users/welcome.html:67
+msgid ""
+"분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 "
+"지장이 없습니다."
+msgstr ""
+
+#: apps/users/templates/users/welcome.html:72
+msgid "대상 태그"
+msgstr "대상 태그"
+
+#: apps/users/templates/users/welcome.html:91
+msgid "기록 시작하기"
+msgstr "기록 시작하기"
+
+#: apps/users/templates/users/welcome.html:93
+msgid "설정 › 목표에서 언제든 바꿀 수 있습니다"
+msgstr "설정 › 목표에서 언제든 바꿀 수 있습니다"
 
 #: apps/users/use_cases.py:71
 msgid "접근할 수 없는 태그입니다."
@@ -1620,6 +1647,11 @@ msgstr "성공적으로 로그아웃되었습니다."
 #: apps/users/views.py:208
 msgid "reCAPTCHA 확인 후 다시 로그인해주세요."
 msgstr "reCAPTCHA 확인 후 다시 로그인해주세요."
+
+#: apps/users/views.py:233
+#, python-format
+msgid "%(username)s님, 환영합니다!"
+msgstr "%(username)s님, 환영합니다!"
 
 #: apps/users/views.py:242
 msgid "계정 탈퇴 요청이 취소되었습니다. 다시 로그인되었습니다."
@@ -1649,7 +1681,15 @@ msgstr "이메일을 입력해주세요."
 msgid "올바른 이메일 형식이 아닙니다."
 msgstr "올바른 이메일 형식이 아닙니다."
 
-#: apps/users/views.py:548
+#: apps/users/views.py:446
+msgid "하루"
+msgstr "하루"
+
+#: apps/users/views.py:446
+msgid "한 주"
+msgstr "한 주"
+
+#: apps/users/views.py:565
 msgid "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."
 msgstr "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."
 
