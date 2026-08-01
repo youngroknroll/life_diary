@@ -19,29 +19,6 @@ class TestStatsTabsStructure:
         assert 'id="statsTabs"' in h
         assert 'data-bs-toggle="tab"' in h
 
-    def test_four_tab_buttons_present(self, auth_client):
-        response = auth_client.get(reverse("stats:index"))
-        h = response.content.decode()
-        for target in ("#daily", "#weekly", "#monthly", "#tags"):
-            assert f'data-bs-target="{target}"' in h, f"{target} 탭 버튼 누락"
-
-    def test_four_tab_panes_present(self, auth_client):
-        response = auth_client.get(reverse("stats:index"))
-        h = response.content.decode()
-        for pane_id in ("daily", "weekly", "monthly", "tags"):
-            assert f'id="{pane_id}"' in h, f"pane {pane_id} 누락"
-
-    def test_only_daily_active_by_default(self, auth_client):
-        response = auth_client.get(reverse("stats:index"))
-        h = response.content.decode()
-        # 첫 번째 pane만 active+show
-        assert 'id="daily" role="tabpanel"' in h
-        m = re.search(r'class="([^"]+)" id="daily"', h)
-        assert m and "show active" in m.group(1)
-
-
-@pytest.mark.django_db
-class TestLifeFeedbackToggleStructure:
     def test_life_feedback_list_collapsed_by_default(self, auth_client, monkeypatch):
         monkeypatch.setattr(
             "apps.stats.views.generate_feedback",

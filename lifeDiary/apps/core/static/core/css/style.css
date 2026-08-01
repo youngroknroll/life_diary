@@ -276,6 +276,129 @@ footer {
     }
 }
 
+/* Summary tab — 수치 타일 · 관찰 · 기록 밀도 */
+.summary-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.summary-tile {
+    background: var(--color-surface);
+    padding: 12px 14px;
+}
+
+.summary-tile__label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.summary-tile__value {
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.summary-tile__value--empty {
+    color: var(--color-text-muted);
+}
+
+.summary-tile__unit {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-left: 2px;
+}
+
+.summary-tile__note {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-top: 3px;
+}
+
+.observation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.observation {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 14px;
+}
+
+.observation + .observation {
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.observation__mark {
+    flex: none;
+    width: 3px;
+    align-self: stretch;
+    border-radius: 2px;
+}
+
+.observation__headline {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.observation__detail {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+.density__grid {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: 1px;
+}
+
+.density__cell {
+    display: block;
+    height: 14px;
+    background: var(--color-border-muted);
+}
+
+/* 다섯 단계 단일 색조. 카테고리 색과 섞이면 의미가 겹친다. */
+.density__cell[data-minutes="0"] { background: #E7EAE6; }
+.density__cell:not([data-minutes="0"]) { background: #C3D8CB; }
+.density__cell[data-minutes="30"],
+.density__cell[data-minutes="40"] { background: #8FBBA0; }
+.density__cell[data-minutes="50"] { background: #4E8F63; }
+.density__cell[data-minutes="60"] { background: #2C6E4A; }
+
+.density__legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
+
+.density__legend .density__cell {
+    width: 14px;
+}
+
+@media (max-width: 767.98px) {
+    .summary-tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* Undo Snackbar */
 .undo-snackbar {
     position: fixed;
@@ -1195,9 +1318,8 @@ footer {
     width: 100%;
     height: auto;
 }
-:where(.tag-stats-list, .tag-analysis-scroll, #tags .table-responsive) {
-    overflow-y: auto;
-}
+/* 내부 스크롤 패널을 두지 않는다. 키보드로는 캡 너머를 볼 방법이 없고,
+   터치에서는 페이지 스크롤과 겹친다. 목록은 서버에서 잘라 내려준다. */
 
 /* 차트 변형 */
 .chart-container {
@@ -1210,52 +1332,8 @@ footer {
 }
 
 /* 스크롤 패널 변형 */
-.tag-stats-list {
-    max-height: var(--panel-h-sm);
-}
-
-/* #tags 탭 — 차트와 Top tags(.tag-analysis-scroll)를 같은 캡으로 통일.
-   .tag-analysis-scroll은 현재 #tags 내부에서만 쓰이므로 base 규칙 없이
-   여기서 직접 정의. 다른 곳에서 재사용 시 base로 승격 가능. */
-#tags .chart-container,
-#tags .tag-analysis-scroll {
-    height: auto;
-    max-height: var(--chart-cap-sm);
-}
-
-/* Top tags 항목 압축 + 구분선 */
-#tags .tag-analysis-scroll > div {
-    padding: 0.4rem 0.5rem !important;
-    margin-bottom: 0 !important;
-    border-bottom: 1px solid var(--color-border-soft);
-}
-#tags .tag-analysis-scroll > div:last-child {
-    border-bottom: none;
-}
-#tags .tag-analysis-scroll small {
-    font-size: 0.7rem;
-}
 
 /* 상세 분석 테이블 — 컴팩트 셀 + sticky 헤더 */
-#tags .table-responsive {
-    max-height: var(--panel-h-lg);
-}
-#tags .table-responsive table {
-    font-size: 0.875rem;
-    margin-bottom: 0;
-}
-#tags .table-responsive th,
-#tags .table-responsive td {
-    padding: 0.4rem 0.6rem;
-    vertical-align: middle;
-}
-#tags .table-responsive thead th {
-    position: sticky;
-    top: 0;
-    background: var(--color-surface);
-    z-index: 1;
-    border-bottom: 2px solid var(--color-border);
-}
 
 /* Life Feedback 토글 목록 */
 .life-feedback-panel {

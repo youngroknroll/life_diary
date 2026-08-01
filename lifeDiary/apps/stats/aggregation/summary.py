@@ -30,15 +30,19 @@ def build_summary(user, selected_date, today=None):
     goal = _goal_tile(user, selected_date)
 
     return {
-        "today": day["current"],
+        "today": _with_hours(day["current"]),
         "today_delta": day,
-        "rolling_week": rolling_week,
-        "month": month["current"],
+        "rolling_week": _with_hours(rolling_week),
+        "month": _with_hours(month["current"]),
         "month_delta": month,
         "goal": goal,
         "density": {"grid": grid, "pattern": pattern},
         "observations": _observations(rolling_week, pattern, goal),
     }
+
+
+def _with_hours(tile):
+    return {**tile, "hours": _hours(tile["total_minutes"])}
 
 
 def _rolling_week(user, selected_date, grid):

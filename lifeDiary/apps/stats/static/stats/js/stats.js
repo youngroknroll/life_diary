@@ -83,7 +83,6 @@ document.addEventListener('DOMContentLoaded', function() {
         renderWeeklyLineChart(weekly.tag_weekly_stats, weekly.weekly_data);
         renderWeeklyBarChart(weekly.weekly_data);
         renderMonthlyLineChart(monthly);
-        renderTagTotalChart(tagAnalysis);
     } catch (error) {
         console.error('차트 렌더링 오류:', error);
     }
@@ -314,31 +313,3 @@ function renderMonthlyLineChart(monthlyData) {
     });
 }
 
-function renderTagTotalChart(tagAnalysis) {
-    const ctx = prepareChart('tagTotalChart', 'tagTotal');
-    const top10 = tagAnalysis.slice(0, 10);
-
-    charts.tagTotal = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: top10.map(tag => tag.name),
-            datasets: [{
-                label: gettext('Total hours'),
-                data: top10.map(tag => tag.total_hours),
-                backgroundColor: top10.map(tag => tag.color),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { beginAtZero: true }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-}

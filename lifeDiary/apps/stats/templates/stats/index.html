@@ -16,46 +16,6 @@
                 {% trans "목표 확인" as view_goals_label %}
                 {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label=view_goals_label %}
             </div>
-            <div class="card-body">
-                <div class="row text-center dashboard-stats">
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-clock text-primary me-2"></i>
-                            <div>
-                                <div class="fw-bold">{% blocktrans with h=total_hours %}{{ h }}h{% endblocktrans %}</div>
-                                <small class="text-muted">{% blocktrans with m=selected_date|date:"YEAR_MONTH_FORMAT" %}{{ m }} logged hours{% endblocktrans %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-calendar-check text-success me-2"></i>
-                            <div>
-                                <div class="fw-bold">{% blocktrans with d=monthly_stats.active_days %}{{ d }} days{% endblocktrans %}</div>
-                                <small class="text-muted">{% blocktrans with m=selected_date|date:"YEAR_MONTH_FORMAT" %}{{ m }} active days{% endblocktrans %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-chart-pie text-info me-2"></i>
-                            <div>
-                                <div class="fw-bold">{{ daily_stats.fill_percentage }}%</div>
-                                <small class="text-muted">{% trans "Today's logged rate" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-chart-line text-warning me-2"></i>
-                            <div>
-                                <div class="fw-bold">{% blocktrans with h=daily_stats.active_hours %}{{ h }}h{% endblocktrans %}</div>
-                                <small class="text-muted">{% trans "Today's active hours" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -67,7 +27,12 @@
             <div class="card-header">
                 <ul class="nav nav-tabs card-header-tabs" id="statsTabs" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
+                        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
+                            <i class="fas fa-list-ul me-1"></i>{% trans "요약" %}
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
                             <i class="fas fa-calendar-day me-1"></i>{% trans "Daily stats" %}
                         </button>
                     </li>
@@ -81,17 +46,96 @@
                             <i class="fas fa-calendar-alt me-1"></i>{% trans "Monthly stats" %}
                         </button>
                     </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="tags-tab" data-bs-toggle="tab" data-bs-target="#tags" type="button" role="tab">
-                            <i class="fas fa-tags me-1"></i>{% trans "Tag analysis" %}
-                        </button>
-                    </li>
                 </ul>
             </div>
             <div class="card-body">
                 <div class="tab-content" id="statsTabContent">
-                    
-                    <div class="tab-pane fade show active" id="daily" role="tabpanel">
+
+                    <div class="tab-pane fade show active" id="summary" role="tabpanel">
+                        <div class="summary-tiles mb-4">
+                            <div class="summary-tile">
+                                <div class="summary-tile__label">{% blocktrans with d=selected_date|date:"n/j" %}오늘 {{ d }}{% endblocktrans %}</div>
+                                <div class="summary-tile__value num">{{ summary.today.hours }}<span class="summary-tile__unit">h</span></div>
+                                <div class="summary-tile__note">{% blocktrans with p=summary.today.fill_percentage %}기록률 {{ p }}%{% endblocktrans %}</div>
+                            </div>
+                            <div class="summary-tile">
+                                <div class="summary-tile__label">{% trans "지난 7일" %}</div>
+                                <div class="summary-tile__value num">{{ summary.rolling_week.hours }}<span class="summary-tile__unit">h</span></div>
+                                <div class="summary-tile__note">{% blocktrans with d=summary.rolling_week.start|date:"n/j" %}{{ d }}부터{% endblocktrans %}</div>
+                            </div>
+                            <div class="summary-tile">
+                                <div class="summary-tile__label">{{ selected_date|date:"YEAR_MONTH_FORMAT" }}</div>
+                                <div class="summary-tile__value num">{{ summary.month.hours }}<span class="summary-tile__unit">h</span></div>
+                                <div class="summary-tile__note">
+                                    {% if summary.month.is_partial %}
+                                        {% blocktrans with e=summary.month.elapsed_days t=summary.month.days %}{{ e }}/{{ t }}일 경과{% endblocktrans %}
+                                    {% else %}
+                                        {% blocktrans with p=summary.month.fill_percentage %}기록률 {{ p }}%{% endblocktrans %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="summary-tile">
+                                <div class="summary-tile__label">{% trans "목표 달성" %}</div>
+                                {% if summary.goal %}
+                                    <div class="summary-tile__value num">{{ summary.goal.hit_days }}<span class="summary-tile__unit">/{{ summary.goal.total_days }}일</span></div>
+                                    <div class="summary-tile__note">{% blocktrans with t=summary.goal.tag_name h=summary.goal.target_hours %}{{ t }} {{ h }}시간 기준{% endblocktrans %}</div>
+                                {% else %}
+                                    <div class="summary-tile__value summary-tile__value--empty">—</div>
+                                    <div class="summary-tile__note">
+                                        <a href="{% url 'users:usergoal_list' %}">{% trans "설정된 목표가 없습니다" %}</a>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if summary.observations %}
+                            <h6 class="mb-2">{% trans "관찰" %}</h6>
+                            <ul class="observation-list mb-4">
+                                {% for item in summary.observations %}
+                                    <li class="observation">
+                                        <span class="observation__mark" style="background-color: {{ item.color }}" aria-hidden="true"></span>
+                                        <span>
+                                            <span class="observation__headline">{{ item.headline }}</span>
+                                            {% if item.detail %}<span class="observation__detail">{{ item.detail }}</span>{% endif %}
+                                        </span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+
+                        <h6 class="mb-1">{% trans "기록 밀도" %}</h6>
+                        <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다." %}</p>
+                        <figure class="density m-0" role="group" aria-labelledby="densityCaption">
+                            <div class="density__grid" aria-hidden="true">
+                                {% for row in summary.density.grid %}
+                                    {% for minutes in row %}
+                                        <span class="density__cell" data-minutes="{{ minutes }}"></span>
+                                    {% endfor %}
+                                {% endfor %}
+                            </div>
+                            <figcaption id="densityCaption" class="density__legend">
+                                <span>{% trans "0분" %}</span>
+                                <span class="density__cell" data-minutes="0"></span>
+                                <span class="density__cell" data-minutes="15"></span>
+                                <span class="density__cell" data-minutes="30"></span>
+                                <span class="density__cell" data-minutes="45"></span>
+                                <span class="density__cell" data-minutes="60"></span>
+                                <span>{% trans "60분" %}</span>
+                            </figcaption>
+                            {% if summary.density.pattern.best_range or summary.density.pattern.worst_range %}
+                                <p class="small text-muted mt-2 mb-0">
+                                    {% if summary.density.pattern.best_range %}
+                                        {% blocktrans with s=summary.density.pattern.best_range.0 e=summary.density.pattern.best_range.1 %}규칙적 {{ s }}–{{ e }}시{% endblocktrans %}
+                                    {% endif %}
+                                    {% if summary.density.pattern.worst_range %}
+                                        · {% blocktrans with s=summary.density.pattern.worst_range.0 e=summary.density.pattern.worst_range.1 %}공백 {{ s }}–{{ e }}시{% endblocktrans %}
+                                    {% endif %}
+                                </p>
+                            {% endif %}
+                        </figure>
+                    </div>
+
+                    <div class="tab-pane fade" id="daily" role="tabpanel">
                         <div class="row">
                             <div class="col-lg-6">
                                 <h6 class="mb-3">{% trans "Tag time distribution" %}</h6>
@@ -272,64 +316,7 @@
                     </div>
 
                     
-                    <div class="tab-pane fade" id="tags" role="tabpanel">
-                        <div class="row">
-                            <div class="col-lg-8">
-                                <h6 class="mb-3">{% trans "Total time per tag" %}</h6>
-                                <div class="chart-container">
-                                    <canvas id="tagTotalChart"></canvas>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <h6 class="mb-3">{% trans "Top tags" %}</h6>
-                                <div class="tag-analysis-scroll">
-                                    {% for tag in tag_analysis|slice:":10" %}
-                                    {% if not tag.is_unclassified %}
-                                        <div class="d-flex justify-content-between align-items-center mb-2 p-2 border-bottom">
-                                            <div>
-                                                {% tag_dot tag.color %}
-                                                <span>{{ tag.name }}</span>
-                                            </div>
-                                            <div class="text-end">
-                                                <strong>{% blocktrans with h=tag.total_hours %}{{ h }}h{% endblocktrans %}</strong><br>
-                                                <small class="text-muted">{% blocktrans with b=tag.total_blocks %}{{ b }} blocks{% endblocktrans %}</small>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <h6 class="mb-2">{% trans "Tag detail analysis" %}</h6>
-                                <div class="table-responsive">
-                                    <table class="table table-hover">
-                                        <thead>
-                                            <tr>
-                                                <th>{% trans "Tag" %}</th>
-                                                <th>{% trans "Total time" %}</th>
-                                                <th>{% trans "Total blocks" %}</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for tag in tag_analysis %}
-                                            {% if not tag.is_unclassified %}
-                                                <tr>
-                                                    <td>
-                                                        {% tag_dot tag.color %}{{ tag.name }}
-                                                    </td>
-                                                    <td><strong>{% blocktrans with h=tag.total_hours %}{{ h }}h{% endblocktrans %}</strong></td>
-                                                    <td>{% blocktrans with c=tag.total_blocks %}{{ c }} blocks{% endblocktrans %}</td>
-                                                </tr>
-                                            {% endif %}
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    
                 </div>
             </div>
             {% include 'stats/life_feedback.html' %}
