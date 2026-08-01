@@ -75,7 +75,7 @@
                                     <div class="slot-block{% if not run.tag %} is-empty{% endif %}"
                                          role="button"
                                          tabindex="0"
-                                         style="grid-column: span {{ run.span }}{% if run.tag %};background-color:{{ run.tag.color }}{% endif %}"
+                                         style="grid-column: span {{ run.span }};--slot-span: {{ run.span }}{% if run.tag %};background-color:{{ run.tag.color }}{% endif %}"
                                          data-start="{{ run.start_index }}"
                                          data-span="{{ run.span }}"
                                          {% if run.tag %}data-tag-id="{{ run.tag.id }}"{% endif %}

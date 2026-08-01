@@ -24,13 +24,13 @@
     --color-border-soft: #EDEFEB;
     --color-border-muted: #F2F4F1;
 
-    /* 소비시간 5분류 */
-    --color-accent-work: #4E8F63;   /* 투자시간 */
-    --color-accent-move: #4F8B9E;   /* 주도적 사용시간 */
-    --color-accent-care: #C1715A;   /* 수동적 소비시간 */
-    --color-accent-rest: #C99A2E;   /* 기초 생활시간 */
-    --color-accent-sleep: #8A9A91;  /* 수면시간 */
-    --color-accent-muted: #dbe8df;
+    /* 소비시간 5분류. 회색은 미분류 전용이라 어느 카테고리에도 쓰지 않는다. */
+    --color-accent-work: #7CD9A0;   /* 투자시간 */
+    --color-accent-move: #7DCFE8;   /* 주도적 사용시간 */
+    --color-accent-care: #FFA98C;   /* 수동적 소비시간 */
+    --color-accent-rest: #FFD166;   /* 기초 생활시간 */
+    --color-accent-sleep: #B8A6F0;  /* 수면시간 */
+    --color-accent-muted: #D5DBD7;  /* 미분류 */
 
     /* 시안의 #14211A 는 투자·주도적 색에서 4.5:1에 못 미쳐 한 단계 낮췄다 */
     --ink-on-accent: #0F1A14;
@@ -100,12 +100,12 @@
     --color-border-soft: #2e3a32;
     --color-border-muted: #2a3630;
 
-    --color-accent-work: #5cb87e;
-    --color-accent-move: #5a9fb0;
-    --color-accent-care: #c97a5f;
-    --color-accent-rest: #d4a93a;
-    --color-accent-sleep: #9AAAA1;
-    --color-accent-muted: #2a3a2e;
+    --color-accent-work: #7CD9A0;
+    --color-accent-move: #7DCFE8;
+    --color-accent-care: #FFA98C;
+    --color-accent-rest: #FFD166;
+    --color-accent-sleep: #B8A6F0;
+    --color-accent-muted: #4A554E;
 
     --ink-on-accent: #0F1A14;
 
@@ -383,6 +383,70 @@ body {
 .home-daygrid__block.is-rest { background: var(--color-accent-rest); }
 .home-daygrid__block.is-sleep { background: var(--color-accent-sleep); }
 
+/* 모바일 하단 탭바 — 시안 6b·4a. 데스크톱에는 상단 내비게이션이 있다 */
+.tabbar {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .tabbar {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 1030;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        height: 58px;
+        background: var(--color-surface);
+        border-top: 1px solid var(--color-border);
+    }
+
+    .tabbar__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-size: 10px;
+        color: var(--color-text-meta);
+        text-decoration: none;
+    }
+
+    .tabbar__item.is-active {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .tabbar__icon {
+        font-size: 15px;
+    }
+
+    /* 탭바가 본문 끝을 가리지 않게 자리를 비운다 */
+    body {
+        padding-bottom: 58px;
+    }
+
+    .app-nav__tabs {
+        display: none;
+    }
+}
+
+.tag-color-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 9px;
+    background: var(--color-surface-soft);
+}
+
+.tag-color-preview__text {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+}
+
 .auth-panel {
     max-width: 420px;
     margin: 0 auto;
@@ -639,8 +703,25 @@ footer {
 }
 
 .slot-block.is-empty {
-    background: #F1F3F0;
+    background: var(--color-track);
     padding: 0;
+}
+
+/* 칸 경계가 보여야 한 칸이 10분이라는 게 읽힌다. 병합된 블록 안에서도
+   10분 눈금을 세로선으로 남긴다. */
+.slot-block {
+    box-shadow: 0 0 0 1px var(--color-border) inset;
+    background-image: repeating-linear-gradient(
+        90deg,
+        transparent 0,
+        transparent calc(100% / var(--slot-span, 1) - 1px),
+        rgba(20, 33, 26, 0.14) calc(100% / var(--slot-span, 1) - 1px),
+        rgba(20, 33, 26, 0.14) calc(100% / var(--slot-span, 1))
+    );
+}
+
+.slot-block.is-empty {
+    box-shadow: 0 0 0 1px var(--color-border-soft) inset;
 }
 
 .slot-block__label {

@@ -87,7 +87,7 @@ class TestSaveResponse:
 
         assert filled["tag_id"] == focus.id
         assert filled["tag_name"] == "집중"
-        assert filled["color"] == "#4E8F63"
+        assert filled["color"] == Category.objects.get(slug="investment").color
 
     def test_save_returns_day_stats(self, logged_in):
         client, _, focus, _ = logged_in

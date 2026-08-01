@@ -25,28 +25,13 @@
                         <input type="text" class="form-control" id="tagFormName" maxlength="50" required>
                     </div>
                     <div class="mb-3">
-                        <label for="tagFormColor" class="form-label">{% trans "색상" %}</label>
-                        <div class="d-flex align-items-center gap-2">
-                            <input type="color" class="form-control form-control-color" id="tagFormColor" value="#2f7d4f">
-                            <input type="text" class="form-control" id="tagFormColorText" placeholder="#2f7d4f" maxlength="7">
+                        <div class="form-label">{% trans "색상" %}</div>
+                        <div class="tag-color-preview" id="tagFormColorPreview">
+                            <span class="chip__swatch" id="tagFormColorSwatch"></span>
+                            <span class="tag-color-preview__text">{% trans "색은 카테고리를 따릅니다. 같은 카테고리 태그와 같은 색으로 저장됩니다." %}</span>
                         </div>
-                        <div class="tag-color-recommendations mt-2" aria-label="{% trans '추천색상' %}">
-                            <span class="tag-color-recommendations__label">{% trans "추천색상:" %}</span>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#e85d5d" style="background-color: #e85d5d;" aria-label="{% trans '추천색상' %} #e85d5d"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#c94a4a" style="background-color: #c94a4a;" aria-label="{% trans '추천색상' %} #c94a4a"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#e48f4f" style="background-color: #e48f4f;" aria-label="{% trans '추천색상' %} #e48f4f"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#c9783f" style="background-color: #c9783f;" aria-label="{% trans '추천색상' %} #c9783f"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#f0c24b" style="background-color: #f0c24b;" aria-label="{% trans '추천색상' %} #f0c24b"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#d4a93a" style="background-color: #d4a93a;" aria-label="{% trans '추천색상' %} #d4a93a"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#4f9f68" style="background-color: #4f9f68;" aria-label="{% trans '추천색상' %} #4f9f68"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#3f8757" style="background-color: #3f8757;" aria-label="{% trans '추천색상' %} #3f8757"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#5a9fd6" style="background-color: #5a9fd6;" aria-label="{% trans '추천색상' %} #5a9fd6"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#477fb3" style="background-color: #477fb3;" aria-label="{% trans '추천색상' %} #477fb3"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#5d6fc2" style="background-color: #5d6fc2;" aria-label="{% trans '추천색상' %} #5d6fc2"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#4858a3" style="background-color: #4858a3;" aria-label="{% trans '추천색상' %} #4858a3"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#9b6ccf" style="background-color: #9b6ccf;" aria-label="{% trans '추천색상' %} #9b6ccf"></button>
-                            <button type="button" class="tag-color-swatch" data-tag-color-swatch data-color="#7d55ad" style="background-color: #7d55ad;" aria-label="{% trans '추천색상' %} #7d55ad"></button>
-                        </div>
+                        <input type="hidden" id="tagFormColor" value="">
+                        <input type="hidden" id="tagFormColorText" value="">
                     </div>
                     {% if user.is_superuser %}
                     <div class="mb-3" id="tagFormDefaultOption">

@@ -15,31 +15,30 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const tagFormModal = new bootstrap.Modal(tagFormModalEl);
     
-    // 색상 입력 동기화 로직 추가
     const colorPicker = document.getElementById('tagFormColor');
     const colorText = document.getElementById('tagFormColorText');
+    const colorSwatch = document.getElementById('tagFormColorSwatch');
 
+    /** 색은 카테고리가 정한다. 사용자가 고르면 같은 카테고리끼리 묶여
+        읽히는 규칙이 깨지므로 미리보기만 보여 준다. */
     function syncTagColorInputs(color) {
-        if (!/^#[0-9a-fA-F]{6}$/.test(color)) return;
+        if (!/^#[0-9a-fA-F]{6}$/.test(color || '')) return;
         if (colorPicker) colorPicker.value = color;
         if (colorText) colorText.value = color;
+        if (colorSwatch) colorSwatch.style.backgroundColor = color;
     }
 
-    if(colorPicker && colorText) {
-        colorPicker.addEventListener('input', () => colorText.value = colorPicker.value);
-        colorText.addEventListener('input', () => {
-            if (/^#[0-9a-fA-F]{6}$/.test(colorText.value)) {
-                colorPicker.value = colorText.value;
-            }
-        });
+    function syncColorFromCategory() {
+        const select = document.getElementById('tagFormCategory');
+        if (!select || !window._categories) return;
+        const chosen = window._categories.find(cat => String(cat.id) === select.value);
+        syncTagColorInputs(chosen && chosen.color);
     }
 
-    tagFormModalEl.addEventListener('click', function(event) {
-        const swatch = event.target.closest('[data-tag-color-swatch]');
-        if (!swatch || !tagFormModalEl.contains(swatch)) return;
-        const color = swatch.dataset.color;
-        syncTagColorInputs(color);
-    });
+    const categorySelect = document.getElementById('tagFormCategory');
+    if (categorySelect) {
+        categorySelect.addEventListener('change', syncColorFromCategory);
+    }
 
     // 카테고리 드롭다운 초기화
     function populateCategorySelect(selectedCategoryId) {
@@ -55,6 +54,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             select.appendChild(option);
         });
+        syncColorFromCategory();
     }
 
     // 전역 함수로 모달 열기 함수 등록

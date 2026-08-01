@@ -128,6 +128,29 @@
         </main>
     </div>
     
+    {% if user.is_authenticated %}
+    {% with app=request.resolver_match.app_name %}
+    <nav class="tabbar" aria-label="{% trans '주요 화면' %}">
+        <a class="tabbar__item{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">
+            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-house"></i></span>
+            {% trans "홈" %}
+        </a>
+        <a class="tabbar__item{% if app == 'dashboard' %} is-active{% endif %}" href="{% url 'dashboard:index' %}">
+            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-table-cells"></i></span>
+            {% trans "기록" %}
+        </a>
+        <a class="tabbar__item{% if app == 'stats' %} is-active{% endif %}" href="{% url 'stats:index' %}">
+            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-chart-simple"></i></span>
+            {% trans "분석" %}
+        </a>
+        <a class="tabbar__item{% if app == 'users' or app == 'tags' %} is-active{% endif %}" href="{% url 'users:mypage' %}">
+            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-gear"></i></span>
+            {% trans "설정" %}
+        </a>
+    </nav>
+    {% endwith %}
+    {% endif %}
+
     <!-- Footer -->
     <footer class="mt-5 py-4 border-top">
         <div class="container text-center">

@@ -231,42 +231,6 @@ class TestTagModalTemplate:
         assert "renderCategoryHeader(" in template_source
         assert 'background-color: ${cat.color}' not in template_source
 
-    def test_tag_modal_has_one_line_recommended_color_swatches(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/_tag_modal.html"
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        template_source = template_path.read_text()
-        css_source = css_path.read_text()
-        expected_colors = [
-            "#e85d5d", "#c94a4a",
-            "#e48f4f", "#c9783f",
-            "#f0c24b", "#d4a93a",
-            "#4f9f68", "#3f8757",
-            "#5a9fd6", "#477fb3",
-            "#5d6fc2", "#4858a3",
-            "#9b6ccf", "#7d55ad",
-        ]
-
-        assert "추천색상:" in template_source
-        assert "tag-color-recommendations" in template_source
-        assert template_source.count("data-tag-color-swatch") == 14
-        for color in expected_colors:
-            assert f'data-color="{color}"' in template_source
-
-        assert ".tag-color-recommendations" in css_source
-        assert ".tag-color-swatch" in css_source
-
-    def test_tag_modal_swatch_js_syncs_existing_color_inputs(self):
-        js_path = settings.BASE_DIR / "apps/core/static/core/js/tag.js"
-        js_source = js_path.read_text()
-
-        assert "data-tag-color-swatch" in js_source
-        assert "syncTagColorInputs" in js_source
-        assert "colorPicker.value = color" in js_source
-        assert "colorText.value = color" in js_source
-
-
-# === Seed Data Migration Tests ===
-
 
 @pytest.mark.django_db
 class TestSeedCategory:

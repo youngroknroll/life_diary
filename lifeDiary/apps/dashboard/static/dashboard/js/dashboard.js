@@ -612,6 +612,7 @@ function buildBlock(run) {
     const block = document.createElement('div');
     block.className = run.tag_id ? 'slot-block' : 'slot-block is-empty';
     block.style.gridColumn = `span ${run.span}`;
+    block.style.setProperty('--slot-span', run.span);
     block.dataset.start = run.start_index;
     block.dataset.span = run.span;
 

@@ -6,11 +6,11 @@ from apps.tags.models import INK_ON_ACCENT, Category, Tag
 
 
 SIAN_PALETTE = {
-    "investment": "#4E8F63",
-    "proactive": "#4F8B9E",
-    "passive": "#C1715A",
-    "basic_life": "#C99A2E",
-    "sleep": "#8A9A91",
+    "investment": "#7CD9A0",
+    "proactive": "#7DCFE8",
+    "passive": "#FFA98C",
+    "basic_life": "#FFD166",
+    "sleep": "#B8A6F0",
 }
 
 
@@ -38,7 +38,7 @@ class TestTagFollowsItsCategory:
             category=Category.objects.get(slug="investment"),
         )
 
-        assert tag.color == "#4E8F63"
+        assert tag.color == "#7CD9A0"
 
     def test_a_requested_color_is_ignored(self, make_user):
         """색 선택기를 없앴으므로 넘어온 값은 의미를 깨뜨릴 뿐이다."""
@@ -52,7 +52,7 @@ class TestTagFollowsItsCategory:
             category=Category.objects.get(slug="investment"),
         )
 
-        assert tag.color == "#4E8F63"
+        assert tag.color == "#7CD9A0"
 
     def test_moving_a_tag_to_another_category_recolors_it(self, make_user):
         user = make_user(username="paletteuser")
@@ -66,7 +66,7 @@ class TestTagFollowsItsCategory:
         tag.category = Category.objects.get(slug="passive")
         tag.save()
 
-        assert tag.color == "#C1715A"
+        assert tag.color == "#FFA98C"
 
     def test_tags_in_one_category_share_a_color(self, make_user):
         user = make_user(username="paletteuser")

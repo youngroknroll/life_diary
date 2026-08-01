@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 16:42+0900\n"
+"POT-Creation-Date: 2026-08-01 18:02+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -303,7 +303,7 @@ msgid "메모 (선택사항)"
 msgstr "메모 (선택사항)"
 
 #: apps/dashboard/templates/dashboard/index.html:207
-#: apps/tags/templates/tags/_tag_modal.html:67
+#: apps/tags/templates/tags/_tag_modal.html:52
 #: apps/users/templates/users/usergoal_form.html:51
 #: apps/users/templates/users/usernote_form.html:13
 msgid "저장"
@@ -432,6 +432,8 @@ msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리�
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #: apps/stats/messages.py:24
@@ -498,6 +500,7 @@ msgid "라이프 다이어리"
 msgstr "라이프 다이어리"
 
 #: apps/stats/templates/stats/index.html:10 templates/base.html:81
+#: templates/base.html:144
 msgid "분석"
 msgstr "분석"
 
@@ -865,37 +868,19 @@ msgstr "새 태그 생성"
 msgid "카테고리를 선택하세요"
 msgstr "카테고리를 선택하세요"
 
-#: apps/tags/templates/tags/_tag_modal.html:33
-#: apps/tags/templates/tags/_tag_modal.html:35
-#: apps/tags/templates/tags/_tag_modal.html:36
-#: apps/tags/templates/tags/_tag_modal.html:37
-#: apps/tags/templates/tags/_tag_modal.html:38
-#: apps/tags/templates/tags/_tag_modal.html:39
-#: apps/tags/templates/tags/_tag_modal.html:40
-#: apps/tags/templates/tags/_tag_modal.html:41
+#: apps/tags/templates/tags/_tag_modal.html:31
+msgid "색은 카테고리를 따릅니다. 같은 카테고리 태그와 같은 색으로 저장됩니다."
+msgstr "색은 카테고리를 따릅니다. 같은 카테고리 태그와 같은 색으로 저장됩니다."
+
 #: apps/tags/templates/tags/_tag_modal.html:42
-#: apps/tags/templates/tags/_tag_modal.html:43
-#: apps/tags/templates/tags/_tag_modal.html:44
-#: apps/tags/templates/tags/_tag_modal.html:45
-#: apps/tags/templates/tags/_tag_modal.html:46
-#: apps/tags/templates/tags/_tag_modal.html:47
-#: apps/tags/templates/tags/_tag_modal.html:48
-msgid "추천색상"
-msgstr "추천색상"
-
-#: apps/tags/templates/tags/_tag_modal.html:34
-msgid "추천색상:"
-msgstr "추천색상:"
-
-#: apps/tags/templates/tags/_tag_modal.html:57
 msgid "기본 태그로 설정 (모든 사용자가 사용 가능)"
 msgstr "기본 태그로 설정 (모든 사용자가 사용 가능)"
 
-#: apps/tags/templates/tags/_tag_modal.html:60
+#: apps/tags/templates/tags/_tag_modal.html:45
 msgid "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
 msgstr "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다."
 
-#: apps/tags/templates/tags/_tag_modal.html:66
+#: apps/tags/templates/tags/_tag_modal.html:51
 #: apps/users/templates/users/account_delete_confirm.html:28
 #: templates/shared/confirm_delete.html:12
 msgid "취소"
@@ -907,7 +892,7 @@ msgstr "현재 위치"
 
 #: apps/tags/templates/tags/index.html:8
 #: apps/users/templates/users/mypage.html:13 templates/base.html:83
-#: templates/base.html:96
+#: templates/base.html:96 templates/base.html:148
 msgid "설정"
 msgstr "설정"
 
@@ -1614,11 +1599,11 @@ msgstr "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌�
 msgid "페이지를 불러오는 중입니다..."
 msgstr "페이지를 불러오는 중입니다..."
 
-#: templates/base.html:77
+#: templates/base.html:77 templates/base.html:136
 msgid "홈"
 msgstr "홈"
 
-#: templates/base.html:79
+#: templates/base.html:79 templates/base.html:140
 msgid "기록"
 msgstr "기록"
 
@@ -1634,21 +1619,25 @@ msgstr "로그아웃"
 msgid "무료로 시작"
 msgstr "무료로 시작"
 
-#: templates/base.html:135 templates/legal/privacy.html:4
+#: templates/base.html:133
+msgid "주요 화면"
+msgstr "주요 화면"
+
+#: templates/base.html:158 templates/legal/privacy.html:4
 #: templates/legal/privacy.html:10
 msgid "개인정보처리방침"
 msgstr "개인정보처리방침"
 
-#: templates/base.html:137 templates/legal/terms.html:4
+#: templates/base.html:160 templates/legal/terms.html:4
 #: templates/legal/terms.html:10
 msgid "이용약관"
 msgstr "이용약관"
 
-#: templates/base.html:143
+#: templates/base.html:166
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 msgstr "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 
-#: templates/base.html:145
+#: templates/base.html:168
 #, python-format
 msgid ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
