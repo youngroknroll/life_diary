@@ -156,66 +156,62 @@
                     </div>
 
                     <div class="tab-pane fade" id="daily" role="tabpanel">
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h6 class="mb-3">{% trans "Tag time distribution" %}</h6>
-                                <div class="text-center chart-container">
-                                    <canvas id="dailyPieChart"></canvas>
-                                </div>
+                        <div class="inline-stats mb-4">
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ daily_stats.active_hours }}<span class="inline-stat__unit">h</span></div>
+                                <div class="inline-stat__label">{% trans "기록 시간" %}</div>
                             </div>
-                            <div class="col-lg-6">
-                                <h6 class="mb-3">{% trans "Activity by hour" %}</h6>
-                                <div class="text-center chart-container">
-                                    <canvas id="hourlyBarChart"></canvas>
-                                </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{{ daily_stats.fill_percentage }}<span class="inline-stat__unit">%</span></div>
+                                <div class="inline-stat__label">{% trans "기록률" %}</div>
                             </div>
-                        </div>
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <h6 class="mb-3">{% trans "Daily summary" %}</h6>
-                                <div class="p-4 mb-4 text-info-emphasis bg-info-subtle border border-info-subtle rounded-3">
-                                    {% if daily_stats.total_blocks == 0 %}
-                                        <i class="fas fa-info-circle me-2"></i>{% trans "No data logged on the selected date." %}
-                                    {% else %}
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <strong>{% trans "Total logged time:" %}</strong> {% blocktrans with h=daily_stats.total_hours %}{{ h }}h{% endblocktrans %}<br>
-                                                <strong>{% trans "Logged rate:" %}</strong> {{ daily_stats.fill_percentage }}%<br>
-                                                <strong>{% trans "Tags used:" %}</strong> {% blocktrans with c=daily_stats.tag_stats|length %}{{ c }} tags{% endblocktrans %}<br>
-                                                {% if daily_stats.top_tag %}
-                                                    <strong>{% trans "Top tag:" %}</strong> {{ daily_stats.top_tag.name }} ({% blocktrans with h=daily_stats.top_tag.hours %}{{ h }}h{% endblocktrans %})<br>
-                                                {% endif %}
-                                                {% if daily_stats.peak_hour != -1 %}
-                                                    <strong>{% trans "Peak hour:" %}</strong> {% blocktrans with start=daily_stats.peak_hour end=daily_stats.peak_hour|add:1 m=daily_stats.max_minutes %}{{ start }}:00–{{ end }}:00 ({{ m }} min){% endblocktrans %}
-                                                {% endif %}
-                                            </div>
-                                            <div class="col-md-8">
-                                                <h6 class="mb-2">{% trans "Tag time usage" %}</h6>
-                                                <div class="tag-stats-list">
-                                                    {% for tag in daily_stats.tag_stats %}
-                                                        {% with percentage=tag.hours|floatformat:1 %}
-                                                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                                                <div>
-                                                                    {% tag_dot tag.color %}
-                                                                    <span>{{ tag.name }}</span>
-                                                                </div>
-                                                                <div class="text-end">
-                                                                    <strong>{% blocktrans with h=tag.hours %}{{ h }}h{% endblocktrans %}</strong>
-                                                                    <small class="text-muted">({% widthratio tag.hours 24 100 %}%)</small>
-                                                                </div>
-                                                            </div>
-                                                        {% endwith %}
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endif %}
-                                </div>
+                            <div class="inline-stat">
+                                <div class="inline-stat__value num">{% if daily_stats.peak_hour != -1 %}{{ daily_stats.peak_hour|stringformat:"02d" }}:00{% else %}—{% endif %}</div>
+                                <div class="inline-stat__label">{% trans "피크 시간" %}</div>
+                            </div>
+                            <div class="inline-stat">
+                                {% if summary.today_delta.has_previous %}
+                                    <div class="inline-stat__value num{% if summary.today_delta.delta_minutes >= 0 %} is-up{% endif %}">{{ summary.today_delta.delta_hours }}</div>
+                                    <div class="inline-stat__label">{% trans "전날 대비" %}</div>
+                                {% else %}
+                                    <div class="inline-stat__value num inline-stat__value--empty">—</div>
+                                    <div class="inline-stat__label">{% trans "지난 기간 없음" %}</div>
+                                {% endif %}
                             </div>
                         </div>
+
+                        <div class="section-title">{% trans "시간대별 기록" %}<span class="section-title__note">{% trans "태그 스택 · 한 칸 최대 60분" %}</span></div>
+                        <div class="chart-panel mb-4">
+                            <canvas id="hourlyBarChart"></canvas>
+                        </div>
+
+                        <div class="section-title">{% trans "하루 구성" %}<span class="section-title__note">{% trans "24시간 기준 · 미기록 포함" %}</span></div>
+                        <div class="composition-bar mb-3">
+                            {% for tag in daily_stats.tag_stats %}
+                                <span style="width: {% widthratio tag.hours 24 100 %}%; background-color: {% if tag.is_unclassified %}var(--color-track){% else %}{{ tag.color }}{% endif %}"
+                                      title="{{ tag.name }}"></span>
+                            {% endfor %}
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">{% trans "태그" %}</th>
+                                    <th scope="col" class="is-num">{% trans "시간" %}</th>
+                                    <th scope="col" class="is-num">{% trans "24h 비율" %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tag in daily_stats.tag_stats %}
+                                    <tr{% if tag.is_unclassified %} class="is-rest"{% endif %}>
+                                        <td><span class="chip__swatch" style="background-color: {% if tag.is_unclassified %}var(--color-track){% else %}{{ tag.color }}{% endif %}"></span>{{ tag.name }}</td>
+                                        <td class="is-num num">{{ tag.hours }}h</td>
+                                        <td class="is-num num">{% widthratio tag.hours 24 100 %}%</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
 
-                    
                     <div class="tab-pane fade" id="weekly" role="tabpanel">
                         <div class="row">
                             <div class="col-lg-8">

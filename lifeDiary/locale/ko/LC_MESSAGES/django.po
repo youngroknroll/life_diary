@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 14:55+0900\n"
+"POT-Creation-Date: 2026-08-01 15:11+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,8 @@ msgstr "슬롯 인덱스"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 
-#: apps/dashboard/models.py:27 apps/tags/models.py:114 apps/users/forms.py:63
+#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:198
+#: apps/tags/models.py:114 apps/users/forms.py:63
 #: apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr "태그"
@@ -163,6 +164,7 @@ msgid "전체 %(t)s칸"
 msgstr "전체 %(t)s칸"
 
 #: apps/dashboard/templates/dashboard/index.html:33
+#: apps/stats/templates/stats/index.html:166
 msgid "기록률"
 msgstr "기록률"
 
@@ -428,6 +430,7 @@ msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리�
 "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #: apps/stats/messages.py:24
@@ -592,161 +595,163 @@ msgstr "규칙적 %(s)s–%(e)s시"
 msgid "공백 %(s)s–%(e)s시"
 msgstr "공백 %(s)s–%(e)s시"
 
-#: apps/stats/templates/stats/index.html:161
-msgid "Tag time distribution"
-msgstr "태그별 시간 분포"
+#: apps/stats/templates/stats/index.html:162
+#, fuzzy
+#| msgid "총 기록 시간"
+msgid "기록 시간"
+msgstr "총 기록 시간"
 
-#: apps/stats/templates/stats/index.html:167
-msgid "Activity by hour"
-msgstr "시간대별 활동량"
+#: apps/stats/templates/stats/index.html:170
+msgid "피크 시간"
+msgstr "피크 시간"
 
 #: apps/stats/templates/stats/index.html:175
-msgid "Daily summary"
-msgstr "일간 요약"
+msgid "전날 대비"
+msgstr "전날 대비"
 
 #: apps/stats/templates/stats/index.html:178
-msgid "No data logged on the selected date."
-msgstr "선택한 날짜에 기록된 데이터가 없습니다."
+msgid "지난 기간 없음"
+msgstr "지난 기간 없음"
 
-#: apps/stats/templates/stats/index.html:182
-msgid "Total logged time:"
-msgstr "총 기록 시간:"
+#: apps/stats/templates/stats/index.html:183
+#, fuzzy
+#| msgid "지난 7일 시간대별 기록 분"
+msgid "시간대별 기록"
+msgstr "지난 7일 시간대별 기록 분"
 
-#: apps/stats/templates/stats/index.html:182
-#: apps/stats/templates/stats/index.html:186
-#: apps/stats/templates/stats/index.html:203
-#: apps/stats/templates/stats/index.html:241
-#: apps/stats/templates/stats/index.html:246
-#: apps/stats/templates/stats/index.html:260
-#: apps/stats/templates/stats/index.html:289
-#: apps/stats/templates/stats/index.html:291
-#: apps/stats/templates/stats/index.html:298
-#: apps/stats/templates/stats/index.html:309
-#: apps/stats/templates/stats/index.html:325
+#: apps/stats/templates/stats/index.html:183
+msgid "태그 스택 · 한 칸 최대 60분"
+msgstr "태그 스택 · 한 칸 최대 60분"
+
+#: apps/stats/templates/stats/index.html:188
+msgid "하루 구성"
+msgstr "하루 구성"
+
+#: apps/stats/templates/stats/index.html:188
+#, fuzzy
+#| msgid "%(h)s시간"
+msgid "24시간 기준 · 미기록 포함"
+msgstr "%(h)s시간"
+
+#: apps/stats/templates/stats/index.html:199
+#: apps/users/templates/users/mypage.html:96
+#: apps/users/templates/users/usergoal_form.html:43
+msgid "시간"
+msgstr "시간"
+
+#: apps/stats/templates/stats/index.html:200
+msgid "24h 비율"
+msgstr "24h 비율"
+
+#: apps/stats/templates/stats/index.html:218
+msgid "Weekly tag trend"
+msgstr "주간 태그 추세"
+
+#: apps/stats/templates/stats/index.html:224
+msgid "Activity by weekday"
+msgstr "요일별 활동량"
+
+#: apps/stats/templates/stats/index.html:232
+msgid "Weekly summary"
+msgstr "주간 요약"
+
+#: apps/stats/templates/stats/index.html:237
+msgid "Weekly total:"
+msgstr "주간 합계:"
+
+#: apps/stats/templates/stats/index.html:237
+#: apps/stats/templates/stats/index.html:242
+#: apps/stats/templates/stats/index.html:256
+#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:287
+#: apps/stats/templates/stats/index.html:294
+#: apps/stats/templates/stats/index.html:305
+#: apps/stats/templates/stats/index.html:321
 #, python-format
 msgid "%(h)sh"
 msgstr "%(h)s시간"
 
-#: apps/stats/templates/stats/index.html:183
-msgid "Logged rate:"
-msgstr "기록률:"
+#: apps/stats/templates/stats/index.html:238
+#: apps/stats/templates/stats/index.html:287
+msgid "Daily average:"
+msgstr "일 평균:"
 
-#: apps/stats/templates/stats/index.html:184
-#: apps/stats/templates/stats/index.html:294
-msgid "Tags used:"
-msgstr "사용된 태그:"
+#: apps/stats/templates/stats/index.html:239
+msgid "Active weekdays:"
+msgstr "활동 요일:"
 
-#: apps/stats/templates/stats/index.html:184
-#: apps/stats/templates/stats/index.html:248
-#: apps/stats/templates/stats/index.html:294
+#: apps/stats/templates/stats/index.html:242
+msgid "Most active day:"
+msgstr "가장 활동적인 요일:"
+
+#: apps/stats/templates/stats/index.html:243
+msgid "Week range:"
+msgstr "주간 범위:"
+
+#: apps/stats/templates/stats/index.html:244
+msgid "Tag count:"
+msgstr "태그 수:"
+
+#: apps/stats/templates/stats/index.html:244
+#: apps/stats/templates/stats/index.html:290
 #, python-format
 msgid "%(c)s tags"
 msgstr "태그 %(c)s개"
 
-#: apps/stats/templates/stats/index.html:186
-msgid "Top tag:"
-msgstr "최다 태그:"
-
-#: apps/stats/templates/stats/index.html:189
-msgid "Peak hour:"
-msgstr "최다 시간대:"
-
-#: apps/stats/templates/stats/index.html:189
-#, python-format
-msgid "%(start)s:00–%(end)s:00 (%(m)s min)"
-msgstr "%(start)s:00–%(end)s:00 (%(m)s분)"
-
-#: apps/stats/templates/stats/index.html:193
-msgid "Tag time usage"
-msgstr "태그별 시간 사용"
-
-#: apps/stats/templates/stats/index.html:222
-msgid "Weekly tag trend"
-msgstr "주간 태그 추세"
-
-#: apps/stats/templates/stats/index.html:228
-msgid "Activity by weekday"
-msgstr "요일별 활동량"
-
-#: apps/stats/templates/stats/index.html:236
-msgid "Weekly summary"
-msgstr "주간 요약"
-
-#: apps/stats/templates/stats/index.html:241
-msgid "Weekly total:"
-msgstr "주간 합계:"
-
-#: apps/stats/templates/stats/index.html:242
-#: apps/stats/templates/stats/index.html:291
-msgid "Daily average:"
-msgstr "일 평균:"
-
-#: apps/stats/templates/stats/index.html:243
-msgid "Active weekdays:"
-msgstr "활동 요일:"
-
-#: apps/stats/templates/stats/index.html:246
-msgid "Most active day:"
-msgstr "가장 활동적인 요일:"
-
-#: apps/stats/templates/stats/index.html:247
-msgid "Week range:"
-msgstr "주간 범위:"
-
-#: apps/stats/templates/stats/index.html:248
-msgid "Tag count:"
-msgstr "태그 수:"
-
-#: apps/stats/templates/stats/index.html:254
+#: apps/stats/templates/stats/index.html:250
 msgid "Average hours per tag (by active weekdays)"
 msgstr "태그별 평균 시간 (활동 요일 기준)"
 
-#: apps/stats/templates/stats/index.html:277
+#: apps/stats/templates/stats/index.html:273
 msgid "Monthly daily usage trend by tag"
 msgstr "태그별 월간 일자 사용 추세"
 
-#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:281
 msgid "Monthly summary"
 msgstr "월간 요약"
 
-#: apps/stats/templates/stats/index.html:289
+#: apps/stats/templates/stats/index.html:285
 msgid "Monthly total:"
 msgstr "월간 합계:"
 
-#: apps/stats/templates/stats/index.html:290
+#: apps/stats/templates/stats/index.html:286
 msgid "Active days:"
 msgstr "활동일:"
 
-#: apps/stats/templates/stats/index.html:295
+#: apps/stats/templates/stats/index.html:290
+msgid "Tags used:"
+msgstr "사용된 태그:"
+
+#: apps/stats/templates/stats/index.html:291
 msgid "Month range:"
 msgstr "월간 범위:"
 
-#: apps/stats/templates/stats/index.html:296
+#: apps/stats/templates/stats/index.html:292
 msgid "Most active tag:"
 msgstr "가장 활동적인 태그:"
 
-#: apps/stats/templates/stats/index.html:300
+#: apps/stats/templates/stats/index.html:296
 msgid "None"
 msgstr "없음"
 
-#: apps/stats/templates/stats/index.html:304
+#: apps/stats/templates/stats/index.html:300
 msgid "Peak day:"
 msgstr "최고 기록일:"
 
-#: apps/stats/templates/stats/index.html:311
+#: apps/stats/templates/stats/index.html:307
 msgid "Month:"
 msgstr "월:"
 
-#: apps/stats/templates/stats/index.html:312
+#: apps/stats/templates/stats/index.html:308
 msgid "Total days:"
 msgstr "전체 일수:"
 
-#: apps/stats/templates/stats/index.html:312
+#: apps/stats/templates/stats/index.html:308
 #, python-format
 msgid "%(d)s days"
 msgstr "%(d)s일"
 
-#: apps/stats/templates/stats/index.html:318
+#: apps/stats/templates/stats/index.html:314
 msgid "Average hours per tag (by active days)"
 msgstr "태그별 평균 시간 (활동일 기준)"
 
@@ -1268,11 +1273,6 @@ msgstr ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
 "                        • 월간: 한 달 총 목표 시간 (최대 300시간)"
-
-#: apps/users/templates/users/mypage.html:96
-#: apps/users/templates/users/usergoal_form.html:43
-msgid "시간"
-msgstr "시간"
 
 #: apps/users/templates/users/mypage.html:105
 msgid "저장완료!"

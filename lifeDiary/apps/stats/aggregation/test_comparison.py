@@ -112,6 +112,21 @@ class TestTotalsAndDelta:
 
         assert result["delta_minutes"] == -30
 
+    def test_delta_carries_a_signed_hour_label(self, user, focus):
+        record(user, focus, SATURDAY, slots=9)
+        record(user, focus, SATURDAY - timedelta(days=1), slots=3)
+
+        result = get_period_delta(user, "day", SATURDAY, today=SATURDAY)
+
+        assert result["delta_hours"] == "+1.0h"
+
+    def test_a_drop_keeps_the_minus_sign(self, user, focus):
+        record(user, focus, SATURDAY - timedelta(days=1), slots=6)
+
+        result = get_period_delta(user, "day", SATURDAY, today=SATURDAY)
+
+        assert result["delta_hours"] == "-1.0h"
+
     def test_tag_minutes_are_broken_out(self, user, focus, leisure):
         record(user, focus, SATURDAY, slots=3, first_slot=0)
         record(user, leisure, SATURDAY, slots=6, first_slot=10)

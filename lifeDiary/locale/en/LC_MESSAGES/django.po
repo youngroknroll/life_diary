@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 14:55+0900\n"
+"POT-Creation-Date: 2026-08-01 15:11+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -80,7 +80,8 @@ msgstr "Slot index"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0–143 (0: 00:00–00:10, 143: 23:50–24:00)"
 
-#: apps/dashboard/models.py:27 apps/tags/models.py:114 apps/users/forms.py:63
+#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:198
+#: apps/tags/models.py:114 apps/users/forms.py:63
 #: apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr "Tag"
@@ -161,6 +162,7 @@ msgid "전체 %(t)s칸"
 msgstr "%(t)s slots total"
 
 #: apps/dashboard/templates/dashboard/index.html:33
+#: apps/stats/templates/stats/index.html:166
 msgid "기록률"
 msgstr "Logged rate"
 
@@ -584,161 +586,163 @@ msgstr "Steady %(s)s:00–%(e)s:00"
 msgid "공백 %(s)s–%(e)s시"
 msgstr "Gap %(s)s:00–%(e)s:00"
 
-#: apps/stats/templates/stats/index.html:161
-msgid "Tag time distribution"
-msgstr "Tag time distribution"
+#: apps/stats/templates/stats/index.html:162
+#, fuzzy
+#| msgid "총 기록 시간"
+msgid "기록 시간"
+msgstr "Total time logged"
 
-#: apps/stats/templates/stats/index.html:167
-msgid "Activity by hour"
-msgstr "Activity by hour"
+#: apps/stats/templates/stats/index.html:170
+msgid "피크 시간"
+msgstr "Peak hour"
 
 #: apps/stats/templates/stats/index.html:175
-msgid "Daily summary"
-msgstr "Daily summary"
+msgid "전날 대비"
+msgstr "vs yesterday"
 
 #: apps/stats/templates/stats/index.html:178
-msgid "No data logged on the selected date."
-msgstr "No data logged on the selected date."
+msgid "지난 기간 없음"
+msgstr "No prior period"
 
-#: apps/stats/templates/stats/index.html:182
-msgid "Total logged time:"
-msgstr "Total logged time:"
+#: apps/stats/templates/stats/index.html:183
+#, fuzzy
+#| msgid "지난 7일 시간대별 기록 분"
+msgid "시간대별 기록"
+msgstr "Minutes logged by hour over the last 7 days"
 
-#: apps/stats/templates/stats/index.html:182
-#: apps/stats/templates/stats/index.html:186
-#: apps/stats/templates/stats/index.html:203
-#: apps/stats/templates/stats/index.html:241
-#: apps/stats/templates/stats/index.html:246
-#: apps/stats/templates/stats/index.html:260
-#: apps/stats/templates/stats/index.html:289
-#: apps/stats/templates/stats/index.html:291
-#: apps/stats/templates/stats/index.html:298
-#: apps/stats/templates/stats/index.html:309
-#: apps/stats/templates/stats/index.html:325
+#: apps/stats/templates/stats/index.html:183
+msgid "태그 스택 · 한 칸 최대 60분"
+msgstr "Stacked by tag · 60 min max per bar"
+
+#: apps/stats/templates/stats/index.html:188
+msgid "하루 구성"
+msgstr "Day composition"
+
+#: apps/stats/templates/stats/index.html:188
+#, fuzzy
+#| msgid "%(h)s시간"
+msgid "24시간 기준 · 미기록 포함"
+msgstr "%(h)sh"
+
+#: apps/stats/templates/stats/index.html:199
+#: apps/users/templates/users/mypage.html:96
+#: apps/users/templates/users/usergoal_form.html:43
+msgid "시간"
+msgstr "h"
+
+#: apps/stats/templates/stats/index.html:200
+msgid "24h 비율"
+msgstr "Share of 24h"
+
+#: apps/stats/templates/stats/index.html:218
+msgid "Weekly tag trend"
+msgstr "Weekly tag trend"
+
+#: apps/stats/templates/stats/index.html:224
+msgid "Activity by weekday"
+msgstr "Activity by weekday"
+
+#: apps/stats/templates/stats/index.html:232
+msgid "Weekly summary"
+msgstr "Weekly summary"
+
+#: apps/stats/templates/stats/index.html:237
+msgid "Weekly total:"
+msgstr "Weekly total:"
+
+#: apps/stats/templates/stats/index.html:237
+#: apps/stats/templates/stats/index.html:242
+#: apps/stats/templates/stats/index.html:256
+#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:287
+#: apps/stats/templates/stats/index.html:294
+#: apps/stats/templates/stats/index.html:305
+#: apps/stats/templates/stats/index.html:321
 #, python-format
 msgid "%(h)sh"
 msgstr "%(h)sh"
 
-#: apps/stats/templates/stats/index.html:183
-msgid "Logged rate:"
-msgstr "Logged rate:"
+#: apps/stats/templates/stats/index.html:238
+#: apps/stats/templates/stats/index.html:287
+msgid "Daily average:"
+msgstr "Daily average:"
 
-#: apps/stats/templates/stats/index.html:184
-#: apps/stats/templates/stats/index.html:294
-msgid "Tags used:"
-msgstr "Tags used:"
+#: apps/stats/templates/stats/index.html:239
+msgid "Active weekdays:"
+msgstr "Active weekdays:"
 
-#: apps/stats/templates/stats/index.html:184
-#: apps/stats/templates/stats/index.html:248
-#: apps/stats/templates/stats/index.html:294
+#: apps/stats/templates/stats/index.html:242
+msgid "Most active day:"
+msgstr "Most active day:"
+
+#: apps/stats/templates/stats/index.html:243
+msgid "Week range:"
+msgstr "Week range:"
+
+#: apps/stats/templates/stats/index.html:244
+msgid "Tag count:"
+msgstr "Tag count:"
+
+#: apps/stats/templates/stats/index.html:244
+#: apps/stats/templates/stats/index.html:290
 #, python-format
 msgid "%(c)s tags"
 msgstr "%(c)s tags"
 
-#: apps/stats/templates/stats/index.html:186
-msgid "Top tag:"
-msgstr "Top tag:"
-
-#: apps/stats/templates/stats/index.html:189
-msgid "Peak hour:"
-msgstr "Peak hour:"
-
-#: apps/stats/templates/stats/index.html:189
-#, python-format
-msgid "%(start)s:00–%(end)s:00 (%(m)s min)"
-msgstr "%(start)s:00–%(end)s:00 (%(m)s min)"
-
-#: apps/stats/templates/stats/index.html:193
-msgid "Tag time usage"
-msgstr "Tag time usage"
-
-#: apps/stats/templates/stats/index.html:222
-msgid "Weekly tag trend"
-msgstr "Weekly tag trend"
-
-#: apps/stats/templates/stats/index.html:228
-msgid "Activity by weekday"
-msgstr "Activity by weekday"
-
-#: apps/stats/templates/stats/index.html:236
-msgid "Weekly summary"
-msgstr "Weekly summary"
-
-#: apps/stats/templates/stats/index.html:241
-msgid "Weekly total:"
-msgstr "Weekly total:"
-
-#: apps/stats/templates/stats/index.html:242
-#: apps/stats/templates/stats/index.html:291
-msgid "Daily average:"
-msgstr "Daily average:"
-
-#: apps/stats/templates/stats/index.html:243
-msgid "Active weekdays:"
-msgstr "Active weekdays:"
-
-#: apps/stats/templates/stats/index.html:246
-msgid "Most active day:"
-msgstr "Most active day:"
-
-#: apps/stats/templates/stats/index.html:247
-msgid "Week range:"
-msgstr "Week range:"
-
-#: apps/stats/templates/stats/index.html:248
-msgid "Tag count:"
-msgstr "Tag count:"
-
-#: apps/stats/templates/stats/index.html:254
+#: apps/stats/templates/stats/index.html:250
 msgid "Average hours per tag (by active weekdays)"
 msgstr "Average hours per tag (by active weekdays)"
 
-#: apps/stats/templates/stats/index.html:277
+#: apps/stats/templates/stats/index.html:273
 msgid "Monthly daily usage trend by tag"
 msgstr "Monthly daily usage trend by tag"
 
-#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:281
 msgid "Monthly summary"
 msgstr "Monthly summary"
 
-#: apps/stats/templates/stats/index.html:289
+#: apps/stats/templates/stats/index.html:285
 msgid "Monthly total:"
 msgstr "Monthly total:"
 
-#: apps/stats/templates/stats/index.html:290
+#: apps/stats/templates/stats/index.html:286
 msgid "Active days:"
 msgstr "Active days:"
 
-#: apps/stats/templates/stats/index.html:295
+#: apps/stats/templates/stats/index.html:290
+msgid "Tags used:"
+msgstr "Tags used:"
+
+#: apps/stats/templates/stats/index.html:291
 msgid "Month range:"
 msgstr "Month range:"
 
-#: apps/stats/templates/stats/index.html:296
+#: apps/stats/templates/stats/index.html:292
 msgid "Most active tag:"
 msgstr "Most active tag:"
 
-#: apps/stats/templates/stats/index.html:300
+#: apps/stats/templates/stats/index.html:296
 msgid "None"
 msgstr "None"
 
-#: apps/stats/templates/stats/index.html:304
+#: apps/stats/templates/stats/index.html:300
 msgid "Peak day:"
 msgstr "Peak day:"
 
-#: apps/stats/templates/stats/index.html:311
+#: apps/stats/templates/stats/index.html:307
 msgid "Month:"
 msgstr "Month:"
 
-#: apps/stats/templates/stats/index.html:312
+#: apps/stats/templates/stats/index.html:308
 msgid "Total days:"
 msgstr "Total days:"
 
-#: apps/stats/templates/stats/index.html:312
+#: apps/stats/templates/stats/index.html:308
 #, python-format
 msgid "%(d)s days"
 msgstr "%(d)s days"
 
-#: apps/stats/templates/stats/index.html:318
+#: apps/stats/templates/stats/index.html:314
 msgid "Average hours per tag (by active days)"
 msgstr "Average hours per tag (by active days)"
 
@@ -1269,11 +1273,6 @@ msgstr ""
 "• Daily: hours per day (max 24)<br>\n"
 "                        • Weekly: total hours per week (max 100)<br>\n"
 "                        • Monthly: total hours per month (max 300)"
-
-#: apps/users/templates/users/mypage.html:96
-#: apps/users/templates/users/usergoal_form.html:43
-msgid "시간"
-msgstr "h"
 
 #: apps/users/templates/users/mypage.html:105
 msgid "저장완료!"

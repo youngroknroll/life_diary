@@ -39,10 +39,19 @@ def get_period_delta(user, kind, end_date, today=None, with_trend=True):
         "current": current,
         "previous": previous,
         "delta_minutes": current["total_minutes"] - previous["total_minutes"],
+        "delta_hours": _signed_hours(
+            current["total_minutes"] - previous["total_minutes"]
+        ),
         "has_previous": previous["total_minutes"] > 0,
         "baseline": _baseline(user, start) if with_trend else None,
         "sparkline": _sparkline(user, end_date) if with_trend else None,
     }
+
+
+def _signed_hours(minutes):
+    """증감은 부호를 앞에 붙여야 방향이 즉시 읽힌다."""
+    hours = minutes / 60
+    return f"{hours:+.1f}h"
 
 
 def _period_bounds(kind, end_date):
