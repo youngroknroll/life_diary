@@ -70,6 +70,15 @@ class TestGapPattern:
 
         assert get_gap_pattern(grid)["missing_days"] == 0
 
+    def test_ties_are_broken_by_the_earlier_window(self):
+        """같은 날 수로 비는 구간이 둘이면 이른 시간대를 말한다."""
+        grid = [[60] * 24 for _ in range(7)]
+        for day in range(7):
+            grid[day][3] = grid[day][4] = 0
+            grid[day][20] = grid[day][21] = 0
+
+        assert get_gap_pattern(grid)["worst_range"] == (3, 5)
+
     def test_no_days_yields_empty_pattern(self):
         pattern = get_gap_pattern([])
 
