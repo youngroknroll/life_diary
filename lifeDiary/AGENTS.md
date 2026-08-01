@@ -663,6 +663,10 @@ exempt from the backend TDD cycle.
 
 - Do not create automated tests for purely presentational layout, spacing,
   sizing, visual state, transition, animation, or markup rearrangement.
+- Do not assert on rendered markup strings, CSS rule text, or JavaScript source
+  text. Such tests track the implementation, not the contract, and break on
+  every rewrite while proving nothing. Delete them when the code they mirror is
+  replaced.
 - Verify frontend work with HTTP render checks, browser screenshots at agreed
   viewports, interaction click-through, console inspection, `node --check` on
   changed JS, and accessibility checks appropriate to scope.
@@ -878,7 +882,13 @@ Rules:
 - Wrap body lines at 72 characters and explain what changed and why.
 - The footer is optional and may use `Closes`, `Fixes`, `Resolves`, `Ref`, or
   `Related to`.
-- The user executes all Git commands; prepare the message and a copy-ready
-  command block.
+
+Execution:
+
+- The agent runs Git itself. Commit in small feature units — one commit is one
+  behavior that already passed its verification, not a day's worth of edits.
+- Never commit on `main`. Open a branch per large track (`feat/<track>`), push
+  it, and open a PR for that track.
+- Merging and release tagging stay with the user.
 
 Convention source: https://nohack.tistory.com/17

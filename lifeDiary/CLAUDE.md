@@ -115,8 +115,11 @@ targeted test before broad regression.
 - Never create permanent objects in the dev database from verification
   scripts; verify through pytest or roll changes back.
 - Never overwrite `prompt_plan.md`; it is a superseded historical i18n record.
-- Do not commit, push, merge, or open a PR. The user executes Git actions;
-  present copy-ready commands and messages instead.
+- Commit in small feature units and push a branch per large track, opening a
+  PR for it. Never work directly on `main`. Merging stays with the user.
+- Frontend work carries no automated tests. Templates, CSS, and browser
+  JavaScript are verified in the browser, not by asserting markup strings,
+  CSS rules, or JS source text. See `AGENTS.md` Frontend Work Policy.
 - Report failed and unverified checks directly; confidence is not evidence.
 
 ## Instruction Placement
