@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 15:31+0900\n"
+"POT-Creation-Date: 2026-08-01 16:18+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -147,8 +147,8 @@ msgid "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
 msgstr "%(h)sh %(m)sm logged · %(p)s%% logged rate"
 
 #: apps/dashboard/templates/dashboard/index.html:22
-#: apps/users/templates/users/mypage.html:63
-#: apps/users/templates/users/mypage.html:104
+#: apps/users/templates/users/mypage.html:73
+#: apps/users/templates/users/mypage.html:112
 #: apps/users/templates/users/usergoal_form.html:12
 msgid "목표 추가"
 msgstr "Add goal"
@@ -226,8 +226,9 @@ msgstr "New tag"
 
 #: apps/dashboard/templates/dashboard/index.html:138
 #: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:13
+#: apps/users/templates/users/mypage.html:24
 msgid "태그 관리"
-msgstr "Tags"
+msgstr "Manage tags"
 
 #: apps/dashboard/templates/dashboard/index.html:142
 msgid "사용법 도움말"
@@ -478,7 +479,7 @@ msgstr "Stats"
 msgid "라이프 다이어리"
 msgstr "Life Diary"
 
-#: apps/stats/templates/stats/index.html:10 templates/base.html:79
+#: apps/stats/templates/stats/index.html:10 templates/base.html:81
 msgid "분석"
 msgstr "Analysis"
 
@@ -610,7 +611,7 @@ msgid "24시간 기준 · 미기록 포함"
 msgstr "Out of 24 hours · unlogged included"
 
 #: apps/stats/templates/stats/index.html:192
-#: apps/users/templates/users/mypage.html:96
+#: apps/users/templates/users/mypage.html:104
 #: apps/users/templates/users/usergoal_form.html:43
 msgid "시간"
 msgstr "h"
@@ -883,7 +884,7 @@ msgstr "Default tags can only be edited/deleted by admins."
 msgid "취소"
 msgstr "Cancel"
 
-#: apps/tags/templates/tags/index.html:15 templates/base.html:92
+#: apps/tags/templates/tags/index.html:15 templates/base.html:94
 msgid "관리자"
 msgstr "Admin"
 
@@ -988,6 +989,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "This email is already in use."
 
 #: apps/users/forms.py:65 apps/users/templates/users/_goal_table_section.html:8
+#: apps/users/templates/users/mypage.html:123
 msgid "목표 시간"
 msgstr "Target hours"
 
@@ -1057,7 +1059,7 @@ msgstr "%(h)sh"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
-#: apps/users/templates/users/mypage.html:128 apps/users/views.py:554
+#: apps/users/templates/users/mypage.html:134 apps/users/views.py:554
 msgid "계정 탈퇴"
 msgstr "Account deletion"
 
@@ -1098,7 +1100,7 @@ msgstr "Request deletion"
 #: apps/users/templates/users/login.html:69
 #: apps/users/templates/users/password/password_reset_complete.html:14
 #: apps/users/templates/users/signup.html:106 apps/users/views.py:216
-#: apps/users/views.py:261 templates/base.html:106
+#: apps/users/views.py:261 templates/base.html:108
 msgid "로그인"
 msgstr "Log in"
 
@@ -1151,49 +1153,62 @@ msgstr "Don't have an account?"
 msgid "회원가입"
 msgstr "Sign up"
 
-#: apps/users/templates/users/mypage.html:15
-msgid "표시"
-msgstr "Display order"
+#: apps/users/templates/users/mypage.html:13 templates/base.html:83
+#: templates/base.html:96
+msgid "설정"
+msgstr "Settings"
 
-#: apps/users/templates/users/mypage.html:17
+#: apps/users/templates/users/mypage.html:22
+msgid "태그와 카테고리"
+msgstr "Tag category guide"
+
+#: apps/users/templates/users/mypage.html:22
+msgid "색은 카테고리를 따릅니다"
+msgstr "Color follows the category"
+
+#: apps/users/templates/users/mypage.html:25
+msgid "열기"
+msgstr "Open"
+
+#: apps/users/templates/users/mypage.html:36
+msgid "표시"
+msgstr "Display"
+
+#: apps/users/templates/users/mypage.html:38
 msgid "언어"
 msgstr "Language"
 
-#: apps/users/templates/users/mypage.html:24
+#: apps/users/templates/users/mypage.html:45
 msgid "언어 선택"
 msgstr "Language"
 
-#: apps/users/templates/users/mypage.html:33
+#: apps/users/templates/users/mypage.html:54
 msgid "테마"
 msgstr "Theme"
 
-#: apps/users/templates/users/mypage.html:35
-#: apps/users/templates/users/mypage.html:37
+#: apps/users/templates/users/mypage.html:56
+#: apps/users/templates/users/mypage.html:58
 msgid "다크 모드로 전환"
 msgstr "Switch to dark mode"
 
-#: apps/users/templates/users/mypage.html:36
-#: apps/users/templates/users/mypage.html:39
+#: apps/users/templates/users/mypage.html:57
+#: apps/users/templates/users/mypage.html:60
 msgid "다크"
 msgstr "Dark"
 
-#: apps/users/templates/users/mypage.html:36
+#: apps/users/templates/users/mypage.html:57
 msgid "라이트"
 msgstr "Light"
 
-#: apps/users/templates/users/mypage.html:38
+#: apps/users/templates/users/mypage.html:59
 msgid "라이트 모드로 전환"
 msgstr "Switch to light mode"
 
-#: apps/users/templates/users/mypage.html:52
-msgid "마이페이지"
-msgstr "My page"
-
-#: apps/users/templates/users/mypage.html:71
+#: apps/users/templates/users/mypage.html:79
 msgid "목표 시간 입력 안내"
 msgstr "Target-hours input guide"
 
-#: apps/users/templates/users/mypage.html:75
+#: apps/users/templates/users/mypage.html:83
 msgid ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
@@ -1203,15 +1218,15 @@ msgstr ""
 "                        • Weekly: total hours per week (max 100)<br>\n"
 "                        • Monthly: total hours per month (max 300)"
 
-#: apps/users/templates/users/mypage.html:105
+#: apps/users/templates/users/mypage.html:113
 msgid "저장완료!"
 msgstr "Saved!"
 
-#: apps/users/templates/users/mypage.html:115
-msgid "나의 목표 목록"
-msgstr "My goals"
+#: apps/users/templates/users/mypage.html:123
+msgid "분석 화면의 달성 일수 기준"
+msgstr "Basis for the goal-met day count in Analysis"
 
-#: apps/users/templates/users/mypage.html:132
+#: apps/users/templates/users/mypage.html:136
 msgid ""
 "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정"
 "과 개인 기록이 완전히 삭제됩니다."
@@ -1220,7 +1235,7 @@ msgstr ""
 "will be cancelled. After 15 days, your account and personal records will be "
 "permanently deleted."
 
-#: apps/users/templates/users/mypage.html:135
+#: apps/users/templates/users/mypage.html:139
 msgid "계정 탈퇴 진행"
 msgstr "Delete account"
 
@@ -1577,49 +1592,50 @@ msgstr ""
 
 #: templates/base.html:19
 msgid "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌아보는 서비스입니다."
-msgstr "Log how your day was spent, classify it with tags, and look back on the pattern."
+msgstr ""
 "Log how your day was spent, classify it with tags, and look back on the "
-"pattern."
+"pattern.Log how your day was spent, classify it with tags, and look back on "
+"the pattern."
 
 #: templates/base.html:62
 msgid "페이지를 불러오는 중입니다..."
 msgstr "Loading the page..."
 
 #: templates/base.html:77
+msgid "홈"
+msgstr "Home"
+
+#: templates/base.html:79
 msgid "기록"
-msgstr "Logged rate"
+msgstr "Record"
 
-#: templates/base.html:81 templates/base.html:94
-msgid "설정"
-msgstr "Edit"
-
-#: templates/base.html:87
+#: templates/base.html:89
 msgid "계정 메뉴"
 msgstr "Account menu"
 
-#: templates/base.html:99
+#: templates/base.html:101
 msgid "로그아웃"
 msgstr "Log out"
 
-#: templates/base.html:107
+#: templates/base.html:109
 msgid "무료로 시작"
 msgstr "Start free"
 
-#: templates/base.html:133 templates/legal/privacy.html:4
+#: templates/base.html:135 templates/legal/privacy.html:4
 #: templates/legal/privacy.html:10
 msgid "개인정보처리방침"
 msgstr "Privacy Policy"
 
-#: templates/base.html:135 templates/legal/terms.html:4
+#: templates/base.html:137 templates/legal/terms.html:4
 #: templates/legal/terms.html:10
 msgid "이용약관"
 msgstr "Terms of Service"
 
-#: templates/base.html:141
+#: templates/base.html:143
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 msgstr "Life Diary &copy; 2025 LogBetter. All rights reserved."
 
-#: templates/base.html:143
+#: templates/base.html:145
 #, python-format
 msgid ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."

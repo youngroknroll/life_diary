@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 15:31+0900\n"
+"POT-Creation-Date: 2026-08-01 16:18+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -149,8 +149,8 @@ msgid "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
 msgstr "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
 
 #: apps/dashboard/templates/dashboard/index.html:22
-#: apps/users/templates/users/mypage.html:63
-#: apps/users/templates/users/mypage.html:104
+#: apps/users/templates/users/mypage.html:73
+#: apps/users/templates/users/mypage.html:112
 #: apps/users/templates/users/usergoal_form.html:12
 msgid "목표 추가"
 msgstr "목표 추가"
@@ -228,6 +228,7 @@ msgstr "새 태그"
 
 #: apps/dashboard/templates/dashboard/index.html:138
 #: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:13
+#: apps/users/templates/users/mypage.html:24
 msgid "태그 관리"
 msgstr "태그 관리"
 
@@ -424,6 +425,8 @@ msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리�
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #: apps/stats/messages.py:24
@@ -489,7 +492,7 @@ msgstr "통계"
 msgid "라이프 다이어리"
 msgstr "라이프 다이어리"
 
-#: apps/stats/templates/stats/index.html:10 templates/base.html:79
+#: apps/stats/templates/stats/index.html:10 templates/base.html:81
 msgid "분석"
 msgstr "분석"
 
@@ -621,7 +624,7 @@ msgid "24시간 기준 · 미기록 포함"
 msgstr "24시간 기준 · 미기록 포함"
 
 #: apps/stats/templates/stats/index.html:192
-#: apps/users/templates/users/mypage.html:96
+#: apps/users/templates/users/mypage.html:104
 #: apps/users/templates/users/usergoal_form.html:43
 msgid "시간"
 msgstr "시간"
@@ -894,7 +897,7 @@ msgstr "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니�
 msgid "취소"
 msgstr "취소"
 
-#: apps/tags/templates/tags/index.html:15 templates/base.html:92
+#: apps/tags/templates/tags/index.html:15 templates/base.html:94
 msgid "관리자"
 msgstr "관리자"
 
@@ -999,6 +1002,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "이미 사용 중인 이메일입니다."
 
 #: apps/users/forms.py:65 apps/users/templates/users/_goal_table_section.html:8
+#: apps/users/templates/users/mypage.html:123
 msgid "목표 시간"
 msgstr "목표 시간"
 
@@ -1068,7 +1072,7 @@ msgstr "%(h)s시간"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
-#: apps/users/templates/users/mypage.html:128 apps/users/views.py:554
+#: apps/users/templates/users/mypage.html:134 apps/users/views.py:554
 msgid "계정 탈퇴"
 msgstr "계정 탈퇴"
 
@@ -1100,7 +1104,7 @@ msgstr "탈퇴 요청"
 #: apps/users/templates/users/login.html:69
 #: apps/users/templates/users/password/password_reset_complete.html:14
 #: apps/users/templates/users/signup.html:106 apps/users/views.py:216
-#: apps/users/views.py:261 templates/base.html:106
+#: apps/users/views.py:261 templates/base.html:108
 msgid "로그인"
 msgstr "로그인"
 
@@ -1153,49 +1157,62 @@ msgstr "계정이 없으신가요?"
 msgid "회원가입"
 msgstr "회원가입"
 
-#: apps/users/templates/users/mypage.html:15
+#: apps/users/templates/users/mypage.html:13 templates/base.html:83
+#: templates/base.html:96
+msgid "설정"
+msgstr "설정"
+
+#: apps/users/templates/users/mypage.html:22
+msgid "태그와 카테고리"
+msgstr "태그와 카테고리"
+
+#: apps/users/templates/users/mypage.html:22
+msgid "색은 카테고리를 따릅니다"
+msgstr "색은 카테고리를 따릅니다"
+
+#: apps/users/templates/users/mypage.html:25
+msgid "열기"
+msgstr "열기"
+
+#: apps/users/templates/users/mypage.html:36
 msgid "표시"
 msgstr "표시"
 
-#: apps/users/templates/users/mypage.html:17
+#: apps/users/templates/users/mypage.html:38
 msgid "언어"
 msgstr "언어"
 
-#: apps/users/templates/users/mypage.html:24
+#: apps/users/templates/users/mypage.html:45
 msgid "언어 선택"
 msgstr "언어 선택"
 
-#: apps/users/templates/users/mypage.html:33
+#: apps/users/templates/users/mypage.html:54
 msgid "테마"
 msgstr "테마"
 
-#: apps/users/templates/users/mypage.html:35
-#: apps/users/templates/users/mypage.html:37
+#: apps/users/templates/users/mypage.html:56
+#: apps/users/templates/users/mypage.html:58
 msgid "다크 모드로 전환"
 msgstr "다크 모드로 전환"
 
-#: apps/users/templates/users/mypage.html:36
-#: apps/users/templates/users/mypage.html:39
+#: apps/users/templates/users/mypage.html:57
+#: apps/users/templates/users/mypage.html:60
 msgid "다크"
 msgstr "다크"
 
-#: apps/users/templates/users/mypage.html:36
+#: apps/users/templates/users/mypage.html:57
 msgid "라이트"
 msgstr "라이트"
 
-#: apps/users/templates/users/mypage.html:38
+#: apps/users/templates/users/mypage.html:59
 msgid "라이트 모드로 전환"
 msgstr "라이트 모드로 전환"
 
-#: apps/users/templates/users/mypage.html:52
-msgid "마이페이지"
-msgstr "마이페이지"
-
-#: apps/users/templates/users/mypage.html:71
+#: apps/users/templates/users/mypage.html:79
 msgid "목표 시간 입력 안내"
 msgstr "목표 시간 입력 안내"
 
-#: apps/users/templates/users/mypage.html:75
+#: apps/users/templates/users/mypage.html:83
 msgid ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
@@ -1205,21 +1222,21 @@ msgstr ""
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
 "                        • 월간: 한 달 총 목표 시간 (최대 300시간)"
 
-#: apps/users/templates/users/mypage.html:105
+#: apps/users/templates/users/mypage.html:113
 msgid "저장완료!"
 msgstr "저장완료!"
 
-#: apps/users/templates/users/mypage.html:115
-msgid "나의 목표 목록"
-msgstr "나의 목표 목록"
+#: apps/users/templates/users/mypage.html:123
+msgid "분석 화면의 달성 일수 기준"
+msgstr "분석 화면의 달성 일수 기준"
 
-#: apps/users/templates/users/mypage.html:132
+#: apps/users/templates/users/mypage.html:136
 msgid ""
 "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정"
 "과 개인 기록이 완전히 삭제됩니다."
 msgstr ""
 
-#: apps/users/templates/users/mypage.html:135
+#: apps/users/templates/users/mypage.html:139
 msgid "계정 탈퇴 진행"
 msgstr "계정 탈퇴 진행"
 
@@ -1580,40 +1597,40 @@ msgid "페이지를 불러오는 중입니다..."
 msgstr "페이지를 불러오는 중입니다..."
 
 #: templates/base.html:77
+msgid "홈"
+msgstr "홈"
+
+#: templates/base.html:79
 msgid "기록"
 msgstr "기록"
 
-#: templates/base.html:81 templates/base.html:94
-msgid "설정"
-msgstr "설정"
-
-#: templates/base.html:87
+#: templates/base.html:89
 msgid "계정 메뉴"
 msgstr "계정 메뉴"
 
-#: templates/base.html:99
+#: templates/base.html:101
 msgid "로그아웃"
 msgstr "로그아웃"
 
-#: templates/base.html:107
+#: templates/base.html:109
 msgid "무료로 시작"
 msgstr "무료로 시작"
 
-#: templates/base.html:133 templates/legal/privacy.html:4
+#: templates/base.html:135 templates/legal/privacy.html:4
 #: templates/legal/privacy.html:10
 msgid "개인정보처리방침"
 msgstr "개인정보처리방침"
 
-#: templates/base.html:135 templates/legal/terms.html:4
+#: templates/base.html:137 templates/legal/terms.html:4
 #: templates/legal/terms.html:10
 msgid "이용약관"
 msgstr "이용약관"
 
-#: templates/base.html:141
+#: templates/base.html:143
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 msgstr "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 
-#: templates/base.html:143
+#: templates/base.html:145
 #, python-format
 msgid ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."

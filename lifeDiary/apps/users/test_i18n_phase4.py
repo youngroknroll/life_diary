@@ -34,15 +34,15 @@ class TestMypageEnglish:
     def test_mypage_renders_english(self, auth_en_client):
         response = auth_en_client.get(reverse("users:mypage"))
         body = response.content.decode()
-        assert "My page" in body
+        assert "Settings" in body
         assert "Add goal" in body
-        assert "My goals" in body
+        assert "Manage tags" in body
         assert "Tag" in body
         assert "Period" in body
         assert "Target hours" in body
         assert "Delete account" in body
         assert "Account deletion" in body
-        assert "마이페이지" not in body
+        assert "설정된" not in body
         assert "목표 추가" not in body
         assert "계정 탈퇴" not in body
 

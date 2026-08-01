@@ -73,6 +73,8 @@
             {% if user.is_authenticated %}
                 {% with app=request.resolver_match.app_name %}
                 <div class="app-nav__tabs">
+                    <a class="app-nav__tab{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}"
+                       href="{% url 'home' %}">{% trans "홈" %}</a>
                     <a class="app-nav__tab{% if app == 'dashboard' %} is-active{% endif %}"
                        href="{% url 'dashboard:index' %}">{% trans "기록" %}</a>
                     <a class="app-nav__tab{% if app == 'stats' %} is-active{% endif %}"

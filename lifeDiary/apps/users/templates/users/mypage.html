@@ -8,6 +8,27 @@
   }
 </style>
 
+<div class="page-head mb-3">
+    <div>
+        <h1 class="page-title">{% trans "설정" %}</h1>
+        <p class="page-subtitle">{{ user.username }}</p>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="section-title">{% trans "태그와 카테고리" %}<span class="section-title__note">{% trans "색은 카테고리를 따릅니다" %}</span></div>
+                <div class="settings-row">
+                    <span class="settings-row__label">{% trans "태그 관리" %}</span>
+                    <a class="settings-row__control btn-sian" href="{% url 'tags:index' %}">{% trans "열기" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
@@ -44,25 +65,12 @@
     </div>
 </div>
 
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-user-cog me-2"></i>{% trans "마이페이지" %}
-                </h5>
-            </div>
-        </div>
-    </div>
-</div>
 
 <div class="row">
     <div class="col-md-6 mb-4">
         <div class="card h-100">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-plus-circle me-1"></i>{% trans "목표 추가" %}</h6>
-            </div>
             <div class="card-body">
+                <div class="section-title">{% trans "목표 추가" %}</div>
                 <div class="mb-3 goal-guide-panel">
                     <button class="btn w-100 text-start py-2 px-3" type="button"
                             data-bs-toggle="collapse" data-bs-target="#goalGuide"
@@ -111,10 +119,8 @@
 
     <div class="col-md-6 mb-4">
         <div class="card h-100">
-            <div class="card-header">
-                <h6 class="mb-0"><i class="fas fa-bullseye me-1"></i>{% trans "나의 목표 목록" %}</h6>
-            </div>
             <div class="card-body" id="goalListBlock">
+                <div class="section-title">{% trans "목표 시간" %}<span class="section-title__note">{% trans "분석 화면의 달성 일수 기준" %}</span></div>
                 {% include 'users/usergoal_list.html' with goals=goals %}
             </div>
         </div>
@@ -123,11 +129,9 @@
 
 <div class="row">
     <div class="col-12">
-        <div class="card border-danger">
-            <div class="card-header bg-transparent">
-                <h6 class="mb-0 text-danger"><i class="fas fa-user-slash me-1"></i>{% trans "계정 탈퇴" %}</h6>
-            </div>
+        <div class="card">
             <div class="card-body">
+                <div class="section-title settings-danger">{% trans "계정 탈퇴" %}</div>
                 <p class="text-muted mb-3">
                     {% trans "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정과 개인 기록이 완전히 삭제됩니다." %}
                 </p>
