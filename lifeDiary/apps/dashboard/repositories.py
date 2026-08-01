@@ -47,6 +47,23 @@ class TimeBlockRepository:
     def bulk_update(self, blocks, fields):
         TimeBlock.objects.bulk_update(blocks, fields)
 
+    def snapshot_slots(self, user, date, slot_indexes):
+        """지정 슬롯들의 현재 상태. 되돌리기용이라 없는 슬롯도 자리를 채운다."""
+        stored = {
+            block.slot_index: block
+            for block in TimeBlock.objects.filter(
+                user=user, date=date, slot_index__in=slot_indexes
+            )
+        }
+        return [
+            {
+                "slot_index": slot_index,
+                "tag_id": stored[slot_index].tag_id if slot_index in stored else None,
+                "memo": stored[slot_index].memo if slot_index in stored else "",
+            }
+            for slot_index in slot_indexes
+        ]
+
     def delete_by_slots(self, user, date, slot_indexes):
         deleted_count, _ = TimeBlock.objects.filter(
             user=user, date=date, slot_index__in=slot_indexes

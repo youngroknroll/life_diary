@@ -20,6 +20,32 @@ class UpsertTimeBlocksCommand(BaseModel):
         return v
 
 
+class SlotSnapshot(BaseModel):
+    """되돌릴 슬롯 하나의 직전 상태. tag_id 가 None 이면 비어 있었다는 뜻."""
+
+    slot_index: int
+    tag_id: int | None = None
+    memo: str = Field(default="", max_length=500)
+
+    @field_validator("slot_index")
+    @classmethod
+    def validate_slot(cls, v: int) -> int:
+        if not 0 <= v < 144:
+            raise ValueError("슬롯 인덱스는 0~143 범위여야 합니다.")
+        return v
+
+
+class RestoreTimeBlocksCommand(BaseModel):
+    """복원 대상은 전부 서버가 보관한 스냅샷에서 온다.
+
+    요청 본문에서 날짜나 슬롯을 받지 않는다. 받으면 오래된 스냅샷을 엉뚱한
+    날짜에 덮어쓸 수 있다.
+    """
+
+    target_date: date
+    slots: list[SlotSnapshot] = Field(min_length=1)
+
+
 class DeleteTimeBlocksCommand(BaseModel):
     user_id: int
     target_date: date
