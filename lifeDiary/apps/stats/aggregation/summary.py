@@ -36,13 +36,31 @@ def build_summary(user, selected_date, today=None):
         "month": _with_hours(month["current"]),
         "month_delta": month,
         "goal": goal,
-        "density": {"grid": grid, "pattern": pattern},
+        "density": {
+            "grid": grid,
+            "pattern": pattern,
+            "rows": _density_rows(grid, selected_date),
+        },
         "observations": _observations(rolling_week, pattern, goal),
     }
 
 
 def _with_hours(tile):
     return {**tile, "hours": _hours(tile["total_minutes"])}
+
+
+def _density_rows(grid, end_date):
+    """히트맵을 표로도 읽을 수 있게 날짜와 6시간 구간 합을 함께 낸다."""
+    start = end_date - timedelta(days=len(grid) - 1)
+
+    return [
+        {
+            "date": start + timedelta(days=index),
+            "blocks": [sum(row[block * 6 : block * 6 + 6]) for block in range(4)],
+            "total_minutes": sum(row),
+        }
+        for index, row in enumerate(grid)
+    ]
 
 
 def _rolling_week(user, selected_date, grid):

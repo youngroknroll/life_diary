@@ -326,15 +326,6 @@ const renderSelection = () => {
         }
     });
 
-    document.querySelectorAll('.slot-block').forEach(block => {
-        const start = parseInt(block.dataset.start, 10);
-        const span = parseInt(block.dataset.span, 10);
-        let covered = 0;
-        for (let index = start; index < start + span; index++) {
-            if (selectedSlots.has(index)) covered += 1;
-        }
-        block.setAttribute('aria-pressed', covered === span ? 'true' : 'false');
-    });
 };
 
 // ── 드래그 ──
@@ -393,25 +384,33 @@ function initializeGridKeyboard() {
 
     const STEP = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -SLOTS_PER_HOUR, ArrowDown: SLOTS_PER_HOUR };
     let anchorSlot = null;
+    let cursorSlot = null;
 
     grid.addEventListener('keydown', (event) => {
         const block = event.target.closest('.slot-block');
         if (!block) return;
 
-        const slotIndex = parseInt(block.dataset.start, 10);
+        // 블록 하나가 여러 칸을 덮으므로 커서를 따로 든다. 블록의 시작점을
+        // 쓰면 넓은 블록 안에서 방향키가 제자리를 맴돈다.
+        const blockStart = parseInt(block.dataset.start, 10);
+        const blockSpan = parseInt(block.dataset.span, 10);
+        if (cursorSlot === null || cursorSlot < blockStart || cursorSlot >= blockStart + blockSpan) {
+            cursorSlot = blockStart;
+        }
 
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
-            anchorSlot = slotIndex;
-            selectSlot(slotIndex, event);
+            anchorSlot = cursorSlot;
+            selectSlot(cursorSlot, event);
             return;
         }
 
         if (!(event.key in STEP)) return;
         event.preventDefault();
 
-        const target = slotIndex + STEP[event.key];
+        const target = cursorSlot + STEP[event.key];
         if (target < 0 || target >= TOTAL_SLOTS) return;
+        cursorSlot = target;
 
         if (event.shiftKey) {
             if (anchorSlot === null) anchorSlot = slotIndex;
@@ -618,7 +617,6 @@ function buildBlock(run) {
 
     block.setAttribute('role', 'button');
     block.setAttribute('tabindex', '0');
-    block.setAttribute('aria-pressed', 'false');
 
     if (run.tag_id) {
         block.style.backgroundColor = run.color;

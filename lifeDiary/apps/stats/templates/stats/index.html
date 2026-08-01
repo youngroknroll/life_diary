@@ -116,12 +116,32 @@
                             <figcaption id="densityCaption" class="density__legend">
                                 <span>{% trans "0분" %}</span>
                                 <span class="density__cell" data-minutes="0"></span>
-                                <span class="density__cell" data-minutes="15"></span>
+                                <span class="density__cell" data-minutes="10"></span>
                                 <span class="density__cell" data-minutes="30"></span>
-                                <span class="density__cell" data-minutes="45"></span>
+                                <span class="density__cell" data-minutes="50"></span>
                                 <span class="density__cell" data-minutes="60"></span>
                                 <span>{% trans "60분" %}</span>
                             </figcaption>
+                            <table class="visually-hidden">
+                                <caption>{% trans "지난 7일 시간대별 기록 분" %}</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% trans "날짜" %}</th>
+                                        <th scope="col">00–06</th>
+                                        <th scope="col">06–12</th>
+                                        <th scope="col">12–18</th>
+                                        <th scope="col">18–24</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for row in summary.density.rows %}
+                                        <tr>
+                                            <th scope="row">{{ row.date|date:"n/j" }}</th>
+                                            {% for minutes in row.blocks %}<td>{{ minutes }}</td>{% endfor %}
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             {% if summary.density.pattern.best_range or summary.density.pattern.worst_range %}
                                 <p class="small text-muted mt-2 mb-0">
                                     {% if summary.density.pattern.best_range %}

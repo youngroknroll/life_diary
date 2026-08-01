@@ -373,12 +373,20 @@ footer {
 }
 
 /* 다섯 단계 단일 색조. 카테고리 색과 섞이면 의미가 겹친다. */
-.density__cell[data-minutes="0"] { background: #E7EAE6; }
 .density__cell:not([data-minutes="0"]) { background: #C3D8CB; }
+.density__cell[data-minutes="0"] { background: #E7EAE6; }
 .density__cell[data-minutes="30"],
 .density__cell[data-minutes="40"] { background: #8FBBA0; }
 .density__cell[data-minutes="50"] { background: #4E8F63; }
 .density__cell[data-minutes="60"] { background: #2C6E4A; }
+
+/* 다크에서 밝은 회색을 그대로 쓰면 빈 칸이 제일 도드라져 의미가 뒤집힌다. */
+[data-theme="dark"] .density__cell:not([data-minutes="0"]) { background: #2E5E44; }
+[data-theme="dark"] .density__cell[data-minutes="0"] { background: #272E29; }
+[data-theme="dark"] .density__cell[data-minutes="30"],
+[data-theme="dark"] .density__cell[data-minutes="40"] { background: #3C7A55; }
+[data-theme="dark"] .density__cell[data-minutes="50"] { background: #4E8F63; }
+[data-theme="dark"] .density__cell[data-minutes="60"] { background: #6BB183; }
 
 .density__legend {
     display: flex;
