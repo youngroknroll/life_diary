@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 13:03+0900\n"
+"POT-Creation-Date: 2026-08-01 18:41+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/core/static/core/js/tag.js:48
+#: apps/core/static/core/js/tag.js:47
 msgid "카테고리를 선택하세요"
 msgstr "카테고리를 선택하세요"
 
@@ -43,12 +43,21 @@ msgstr "카테고리를 선택해주세요."
 msgid "태그 저장 실패: %s"
 msgstr "태그 저장 실패: %s"
 
-#: apps/core/static/core/js/tag.js:143
+#: apps/core/static/core/js/tag.js:152
+#, javascript-format
+msgid ""
+"'%s'에 붙은 기록을 옮길 태그 번호를 입력하세요. 비워 두면 그 구간은 미기록이 "
+"됩니다.\n"
+"\n"
+"%s"
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:162
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr "'%s' 태그를 정말 삭제하시겠습니까?"
 
-#: apps/core/static/core/js/tag.js:158
+#: apps/core/static/core/js/tag.js:181
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "태그 삭제 실패: %s"
@@ -61,141 +70,137 @@ msgstr "정말 삭제하시겠습니까?"
 msgid "처리 중..."
 msgstr "처리 중..."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:522
+#: apps/dashboard/static/dashboard/js/dashboard.js:537
 msgid "그리드에서 시간을 선택하세요"
 msgstr "그리드에서 시간을 선택하세요"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:531
+#: apps/dashboard/static/dashboard/js/dashboard.js:546
 msgid "시간을 선택했어요. 원하는 태그를 선택하세요."
 msgstr "시간을 선택했어요. 원하는 태그를 선택하세요."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:537
+#: apps/dashboard/static/dashboard/js/dashboard.js:552
 msgid "빈 슬롯"
 msgstr "빈 슬롯"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:540
+#: apps/dashboard/static/dashboard/js/dashboard.js:555
 msgid "시간:"
 msgstr "시간:"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:541
+#: apps/dashboard/static/dashboard/js/dashboard.js:556
 msgid "상태:"
 msgstr "상태:"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:542
-#: apps/dashboard/static/dashboard/js/dashboard.js:566
+#: apps/dashboard/static/dashboard/js/dashboard.js:557
+#: apps/dashboard/static/dashboard/js/dashboard.js:581
 msgid "삭제"
 msgstr "삭제"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:558
+#: apps/dashboard/static/dashboard/js/dashboard.js:573
 #, javascript-format
 msgid "%s개 슬롯"
 msgid_plural "%s개 슬롯"
 msgstr[0] "%s개 슬롯"
 msgstr[1] "%s개 슬롯"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:562
-#: apps/dashboard/static/dashboard/js/dashboard.js:652
+#: apps/dashboard/static/dashboard/js/dashboard.js:577
+#: apps/dashboard/static/dashboard/js/dashboard.js:670
 msgid "%(h)s시간 %(m)s분"
 msgstr "%(h)s시간 %(m)s분"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:628
+#: apps/dashboard/static/dashboard/js/dashboard.js:643
 msgid "빈 구간"
 msgstr "빈 구간"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:692
+#: apps/dashboard/static/dashboard/js/dashboard.js:710
 #, javascript-format
 msgid "되돌리기 실패: %s"
 msgstr "되돌리기 실패: %s"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:702
+#: apps/dashboard/static/dashboard/js/dashboard.js:720
 msgid "슬롯을 선택해주세요."
 msgstr "슬롯을 선택해주세요."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:707
+#: apps/dashboard/static/dashboard/js/dashboard.js:725
 msgid "태그를 선택해주세요."
 msgstr "태그를 선택해주세요."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:741
+#: apps/dashboard/static/dashboard/js/dashboard.js:759
 #, javascript-format
 msgid "저장 실패: %s"
 msgstr "저장 실패: %s"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:794
+#: apps/dashboard/static/dashboard/js/dashboard.js:812
 msgid "삭제할 슬롯을 선택해주세요."
 msgstr "삭제할 슬롯을 선택해주세요."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:803
+#: apps/dashboard/static/dashboard/js/dashboard.js:821
 msgid "삭제할 기록이 없습니다."
 msgstr "삭제할 기록이 없습니다."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:809
+#: apps/dashboard/static/dashboard/js/dashboard.js:827
 #, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[0] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[1] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:841
+#: apps/dashboard/static/dashboard/js/dashboard.js:859
 #, javascript-format
 msgid "삭제 실패: %s"
 msgstr "삭제 실패: %s"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:854
+#: apps/dashboard/static/dashboard/js/dashboard.js:872
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr "태그 로드 중 오류가 발생했습니다."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:868
+#: apps/dashboard/static/dashboard/js/dashboard.js:886
 msgid "기본 태그"
 msgstr "기본 태그"
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:900
+#: apps/dashboard/static/dashboard/js/dashboard.js:918
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 msgstr "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:940
+#: apps/dashboard/static/dashboard/js/dashboard.js:958
 msgid "생성된 태그가 없습니다."
 msgstr "생성된 태그가 없습니다."
 
-#: apps/stats/static/stats/js/stats.js:30
+#: apps/stats/static/stats/js/stats.js:35
 msgid "데이터가 없습니다"
 msgstr "데이터가 없습니다"
 
-#: apps/stats/static/stats/js/stats.js:123
-msgid "%(label)s: %(h)sh (%(p)s%%)"
-msgstr "%(label)s: %(h)s시간 (%(p)s%%)"
-
-#: apps/stats/static/stats/js/stats.js:142
+#: apps/stats/static/stats/js/stats.js:102
 #, javascript-format
 msgid "%s:00"
 msgstr "%s:00"
 
-#: apps/stats/static/stats/js/stats.js:176
+#: apps/stats/static/stats/js/stats.js:136
 #, javascript-format
 msgid "%s min"
 msgstr "%s분"
 
-#: apps/stats/static/stats/js/stats.js:187
+#: apps/stats/static/stats/js/stats.js:147
 msgid "%(label)s: %(m)s min"
 msgstr "%(label)s: %(m)s분"
 
-#: apps/stats/static/stats/js/stats.js:236
+#: apps/stats/static/stats/js/stats.js:196
 msgid "Active hours"
 msgstr "활동 시간"
 
-#: apps/stats/static/stats/js/stats.js:282
+#: apps/stats/static/stats/js/stats.js:242
 msgid "Date"
 msgstr "날짜"
 
-#: apps/stats/static/stats/js/stats.js:286
+#: apps/stats/static/stats/js/stats.js:246
 msgid "Hours"
 msgstr "시간"
 
-#: apps/stats/static/stats/js/stats.js:289
+#: apps/stats/static/stats/js/stats.js:249
 #, javascript-format
 msgid "%sh"
 msgstr "%s시간"
 
-#: apps/stats/static/stats/js/stats.js:300
+#: apps/stats/static/stats/js/stats.js:260
 msgid "%(label)s: %(h)sh"
 msgstr "%(label)s: %(h)s시간"
 

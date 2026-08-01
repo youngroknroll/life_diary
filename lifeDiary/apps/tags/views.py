@@ -22,6 +22,22 @@ _update_tag = UpdateTagUseCase()
 _delete_tag = DeleteTagUseCase()
 
 
+def _parse_move_to(request):
+    """삭제 시 기록을 옮길 태그. 없으면 그 구간은 미기록으로 돌아간다."""
+    try:
+        payload = json.loads(request.body or b"{}")
+    except json.JSONDecodeError:
+        return None
+
+    raw = payload.get("move_to_id")
+    if raw in (None, ""):
+        return None
+    try:
+        return int(raw)
+    except (TypeError, ValueError):
+        raise ValueError(gettext("옮길 태그를 찾을 수 없습니다."))
+
+
 @login_required
 def index(request):
     return render(request, "tags/index.html")
@@ -146,7 +162,14 @@ def tag_detail_update_delete(request, tag_id):
             return error_response(gettext("태그 수정 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
 
     try:
-        tag_name = _delete_tag.execute(user=request.user, tag_id=tag_id)
+        move_to = _parse_move_to(request)
+    except ValueError as exc:
+        return error_response(str(exc), "VALIDATION_ERROR")
+
+    try:
+        tag_name = _delete_tag.execute(
+            user=request.user, tag_id=tag_id, move_to_id=move_to
+        )
         return success_response(
             gettext('"%(name)s" 태그가 삭제되었습니다.') % {"name": tag_name}
         )

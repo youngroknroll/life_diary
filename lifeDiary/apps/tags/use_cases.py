@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from django.db import transaction
 from django.utils.translation import gettext
 
 from .domain_services import _tag_policy_service
@@ -91,10 +92,29 @@ class UpdateTagUseCase:
 
 
 class DeleteTagUseCase:
-    def execute(self, user, tag_id: int) -> str:
+    @transaction.atomic
+    def execute(self, user, tag_id: int, move_to_id: int | None = None) -> str:
+        """옮길 곳을 주면 기록을 살린 뒤 지운다.
+
+        그냥 지우면 붙어 있던 구간이 미기록으로 되돌아가 통계 수치가 조용히
+        바뀐다. 사용자는 태그 하나를 정리했을 뿐인데 지난달 기록률이 달라진다.
+        """
         tag = _tag_repo.get_for_owner_or_404(tag_id, user)
         if tag.is_default and _time_block_repo.is_tag_in_use(tag):
             raise ValueError(gettext("이 기본 태그는 사용 중이어서 삭제할 수 없습니다."))
+
+        if move_to_id is not None:
+            _time_block_repo.move_blocks_to_tag(tag, self._destination(user, tag, move_to_id))
+
         tag_name = tag.name
         _tag_repo.delete(tag)
         return tag_name
+
+    def _destination(self, user, tag, move_to_id: int):
+        if move_to_id == tag.id:
+            raise ValueError(gettext("같은 태그로는 옮길 수 없습니다."))
+
+        destination = _tag_repo.find_by_id_accessible(move_to_id, user)
+        if not destination:
+            raise ValueError(gettext("옮길 태그를 찾을 수 없습니다."))
+        return destination

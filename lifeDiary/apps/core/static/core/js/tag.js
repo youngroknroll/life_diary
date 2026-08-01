@@ -139,14 +139,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 전역 함수로 태그 삭제 함수 등록 (core utils 사용)
+    /** 기록이 붙은 태그를 그냥 지우면 그 구간이 미기록으로 돌아가 통계
+        수치가 조용히 바뀐다. 옮길 곳을 먼저 묻는다. */
+    function askWhereToMove(tagId, tagName) {
+        const others = (window._tagsCache || [])
+            .filter(tag => tag.id !== tagId)
+            .map(tag => `${tag.id}: ${tag.name}`);
+        if (others.length === 0) return null;
+
+        const answer = window.prompt(
+            interpolate(
+                gettext("'%s'에 붙은 기록을 옮길 태그 번호를 입력하세요. 비워 두면 그 구간은 미기록이 됩니다.\n\n%s"),
+                [tagName, others.join('\n')]
+            ),
+            ''
+        );
+        if (answer === null) return undefined;
+        return answer.trim() === '' ? null : parseInt(answer.trim(), 10);
+    }
+
     window.deleteTag = async function(tagId, tagName) {
         if (!confirmDelete(interpolate(gettext("'%s' 태그를 정말 삭제하시겠습니까?"), [tagName]))) {
             return;
         }
 
+        const moveToId = askWhereToMove(tagId, tagName);
+        if (moveToId === undefined) return;
+
         try {
             const result = await apiCall(`/api/tags/${tagId}/`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                data: { move_to_id: moveToId }
             });
 
             showNotification(result.message, 'success');

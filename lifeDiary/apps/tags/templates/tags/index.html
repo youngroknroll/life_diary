@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderTags(tags) {
+        window._tagsCache = tags;
         const container = document.getElementById('tagListContainer');
         const emptyState = document.getElementById('tagEmptyState');
         if (!tags || tags.length === 0) {
