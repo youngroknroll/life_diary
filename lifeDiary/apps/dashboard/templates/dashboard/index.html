@@ -23,6 +23,16 @@
     {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
 </div>
 
+{% if filled_slots == 0 %}
+<div class="empty-nudge mb-4">
+    <div>
+        <div class="empty-nudge__title">{% trans "방금 한 일부터 채워 보세요" %}</div>
+        <p class="empty-nudge__text">{% trans "지금 시각 근처 한 칸이면 충분합니다. 한 칸(10분)만 채워도 아래 수치와 분석 화면이 함께 움직입니다." %}</p>
+    </div>
+    <button type="button" class="btn-sian btn-sian--primary" id="fillNowBtn">{% trans "지금 시각 채우기" %}</button>
+</div>
+{% endif %}
+
 <div class="summary-tiles mb-4">
     <div class="summary-tile">
         <div class="summary-tile__label">{% trans "기록된 슬롯" %}</div>

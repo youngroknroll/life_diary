@@ -108,6 +108,32 @@ class TestHeatmap:
 
 
 @pytest.mark.django_db
+class TestTrendReadiness:
+    def test_an_untouched_week_needs_a_full_week_more(self, user):
+        summary = build_summary(user, SATURDAY, today=SATURDAY)
+
+        assert summary["logged_days"] == 0
+        assert summary["days_until_trend"] == 7
+
+    def test_each_logged_day_shortens_the_wait(self, user, focus):
+        record(user, focus, SATURDAY, slots=6)
+        record(user, focus, SATURDAY - timedelta(days=1), slots=6)
+
+        summary = build_summary(user, SATURDAY, today=SATURDAY)
+
+        assert summary["logged_days"] == 2
+        assert summary["days_until_trend"] == 5
+
+    def test_a_full_week_needs_no_more(self, user, focus):
+        for offset in range(7):
+            record(user, focus, SATURDAY - timedelta(days=offset), slots=6)
+
+        summary = build_summary(user, SATURDAY, today=SATURDAY)
+
+        assert summary["days_until_trend"] == 0
+
+
+@pytest.mark.django_db
 class TestObservations:
     def test_no_records_yields_no_observations(self, user):
         summary = build_summary(user, SATURDAY, today=SATURDAY)

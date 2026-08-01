@@ -17,6 +17,9 @@ _time_block_repo = TimeBlockRepository()
 
 ROLLING_DAYS = 7
 MAX_OBSERVATIONS = 4
+
+# 선으로 읽히려면 점이 이만큼은 있어야 한다. 이틀은 선이 아니라 점 두 개다.
+MIN_DAYS_FOR_TREND = 7
 NEUTRAL_COLOR = "#8A9A91"
 
 
@@ -36,6 +39,8 @@ def build_summary(user, selected_date, today=None):
         "month": _with_hours(month["current"]),
         "month_delta": month,
         "goal": goal,
+        "logged_days": _logged_days(grid),
+        "days_until_trend": max(0, MIN_DAYS_FOR_TREND - _logged_days(grid)),
         "density": {
             "grid": grid,
             "pattern": pattern,
@@ -47,6 +52,10 @@ def build_summary(user, selected_date, today=None):
 
 def _with_hours(tile):
     return {**tile, "hours": _hours(tile["total_minutes"])}
+
+
+def _logged_days(grid):
+    return sum(1 for row in grid if any(row))
 
 
 def _density_rows(grid, end_date):

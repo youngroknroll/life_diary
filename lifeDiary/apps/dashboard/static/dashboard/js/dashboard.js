@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDashboard();
     initializeGridDrag();
     initializeGridKeyboard();
+    initializeFillNow();
     initializeTagSelectDelegation('tagLegend');
     initializeTagSelectDelegation('tagContainer');
 
@@ -437,6 +438,21 @@ const selectRange = (from, to) => {
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
 };
+
+/** 빈 화면에서 다음 동작 하나만 제시한다 — 지금 시각 한 칸을 고른다. */
+function initializeFillNow() {
+    const button = document.getElementById('fillNowBtn');
+    if (!button) return;
+
+    button.addEventListener('click', () => {
+        const now = new Date();
+        const slotIndex = now.getHours() * SLOTS_PER_HOUR
+            + Math.floor(now.getMinutes() / 10);
+
+        selectSlot(slotIndex, null);
+        blockForSlot(slotIndex)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    });
+}
 
 /** 모바일 세로 스와이프는 touch-action:pan-y 가 스크롤로 가져간다. */
 function initializeGridDrag() {

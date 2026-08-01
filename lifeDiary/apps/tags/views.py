@@ -29,6 +29,17 @@ def index(request):
 
 @login_required
 @require_GET
+def category_guide(request):
+    """소비시간 다섯 분류 설명. 색이 무엇을 뜻하는지 읽는 화면이다."""
+    return render(
+        request,
+        "tags/category_guide.html",
+        {"categories": _category_repo.find_all()},
+    )
+
+
+@login_required
+@require_GET
 def category_list(request):
     try:
         categories = _category_repo.find_all()
