@@ -1,5 +1,7 @@
 # Life Diary P0 시안 구현 계획
 
+실행 로그: `docs/refactoring/2026-08-01_p0-sian-redesign.md`
+
 출처: Claude Design 프로젝트 `a76fc6a6-816e-4865-a42d-d673ab2bca93`
 - `Life Diary P0 시안.dc.html` — 화면 시안 22종 (섹션 2~7)
 - `Life Diary P0 구현 명세.dc.html` — 파일 단위 핸드오프 명세, 7단계 작업 순서
@@ -27,14 +29,16 @@
 
 ## 남은 일
 
-- 명세 §3.1 어포던스: 빈 행 hover 힌트, 첫 방문 코치마크
-- 시안 5a·5b 홈 재구성, 6a 태그 관리 설정 하위 이동, 6c·6d 빈 상태,
-  6e 온보딩 3스텝, 6f 로그인·회원가입
-- 모바일 하단 탭바(기록·분석·설정)와 로그인 후 진입점 변경
-- 일·주·월 탭 본문은 기존 구조 유지. 시안의 시간대 스택 막대·태그 선그래프
-  재구성과 차트 색 교체는 미착수
-- 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부 결정
-- 태그 이관 후 삭제 API (시안 6a)
+명세 7단계와 시안 화면은 모두 끝났다. 화면별 상세는
+`docs/plans/2026-08-01_sian-screen-inventory.md`, 전체 요약은
+`docs/refactoring/2026-08-01_p0-sian-redesign.md`.
+
+- 명세 §3.1 어포던스: 빈 행 hover 힌트, 첫 방문 코치마크 — 미착수
+- 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부 — 결정 대기
+- `Tag.color` 컬럼 드롭 여부 — 결정 대기
+- 로그인 후 진입점을 홈 → 오늘 기록으로 바꾸는 건 내비게이션에 홈 탭을
+  두는 쪽으로 갈음했다(사용자 지시). 시안 5a의 "홈은 비로그인 전용"은
+  적용하지 않았다
 
 ## 1단계 완료 내역
 

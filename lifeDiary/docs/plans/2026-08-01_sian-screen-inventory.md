@@ -1,5 +1,7 @@
 # 시안 화면 인벤토리와 공통 스펙
 
+실행 로그: `docs/refactoring/2026-08-01_p0-sian-redesign.md`
+
 `Life Diary P0 시안.dc.html`을 전수 분석해 화면 목록과 반복 컴포넌트를 추렸다.
 구현 명세(`Life Diary P0 구현 명세.dc.html`)는 기계장치 핸드오프 문서라 화면
 구성을 다루지 않는다. 모양의 기준은 이 문서다.
