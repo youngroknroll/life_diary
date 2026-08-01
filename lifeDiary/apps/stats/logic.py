@@ -10,6 +10,7 @@ from .aggregation.daily import get_daily_stats_data
 from .aggregation.weekly import get_weekly_stats_data
 from .aggregation.monthly import get_monthly_stats_data
 from .aggregation.analysis import get_tag_analysis_data
+from .aggregation.summary import build_summary
 
 __all__ = [
     "StatsCalculator",
@@ -17,6 +18,7 @@ __all__ = [
     "get_weekly_stats_data",
     "get_monthly_stats_data",
     "get_tag_analysis_data",
+    "build_summary",
     "get_stats_context",
 ]
 
@@ -30,6 +32,7 @@ def get_stats_context(user, selected_date):
     weekly_stats = get_weekly_stats_data(user, selected_date, calculator)
     monthly_stats = get_monthly_stats_data(user, selected_date, calculator)
     tag_analysis = get_tag_analysis_data(user, selected_date, calculator)
+    summary = build_summary(user, selected_date)
 
     context = {
         "page_title": "통계",
@@ -37,6 +40,7 @@ def get_stats_context(user, selected_date):
         "total_blocks": len(daily_stats["tag_stats"]),
         "total_days": monthly_stats["total_days"],
         "total_hours": monthly_stats["total_hours"],
+        "summary": summary,
         "daily_stats": daily_stats,
         "weekly_stats": weekly_stats,
         "monthly_stats": monthly_stats,

@@ -3,7 +3,7 @@
 
 목적:
 - StatsCalculator의 월간 데이터 lazy 캐시 동작 보장
-- get_stats_context의 쿼리 수가 목표치(<=8) 이하 유지
+- get_stats_context의 쿼리 수가 목표치 이하 유지
 
 실행:
     conda run -n knou-life-diary python -m pytest apps/stats/test_stats_perf.py -v
@@ -21,8 +21,11 @@ from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
 from apps.tags.models import Category, Tag
 
-# 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6.
-TARGET_MAX_QUERIES = 6
+# 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6
+# → 2026-08-01 요약 탭 16. 늘어난 10개는 기간 비교(일·월 각각 현재/직전),
+#   기준선 12주 1회, 스파크라인, 밀도 격자, 태그별 합, 목표 달성일이다.
+#   전부 상수 개수이며 기록량에 따라 늘지 않는다.
+TARGET_MAX_QUERIES = 16
 
 
 @pytest.fixture

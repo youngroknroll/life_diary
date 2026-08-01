@@ -19,11 +19,12 @@ BASELINE_MAX_WEEKS = 12
 MINUTES_PER_DAY = TOTAL_SLOTS_PER_DAY * MINUTES_PER_SLOT
 
 
-def get_period_delta(user, kind, end_date, today=None):
+def get_period_delta(user, kind, end_date, today=None, with_trend=True):
     """기준 기간과 직전 동일 기간, 기준선, 스파크라인.
 
     시각을 인자로 받는 이유는 진행 중인 기간을 판정해야 하는데 전역 시간을
-    모킹하지 않기 위해서다.
+    모킹하지 않기 위해서다. 기준선과 스파크라인은 종료일이 같으면 값도 같아,
+    한 화면에서 여러 기간을 볼 때 with_trend=False 로 중복 조회를 뺀다.
     """
     today = today or timezone.localdate()
 
@@ -39,8 +40,8 @@ def get_period_delta(user, kind, end_date, today=None):
         "previous": previous,
         "delta_minutes": current["total_minutes"] - previous["total_minutes"],
         "has_previous": previous["total_minutes"] > 0,
-        "baseline": _baseline(user, start),
-        "sparkline": _sparkline(user, end_date),
+        "baseline": _baseline(user, start) if with_trend else None,
+        "sparkline": _sparkline(user, end_date) if with_trend else None,
     }
 
 
@@ -108,16 +109,21 @@ def _elapsed_days(start, end, today):
 
 
 def _baseline(user, start):
-    """기준 기간 직전의 완결된 주들. 진행 중인 기간은 자기 기준선에 못 든다."""
+    """기준 기간 직전의 완결된 주들. 진행 중인 기간은 자기 기준선에 못 든다.
+
+    12주를 주마다 따로 조회하면 쿼리가 12개가 된다. 한 번에 읽고 주 단위로
+    나눈다.
+    """
     week_start, _ = get_week_date_range(start)
-    weekly_totals = [
-        _total_minutes(
-            user,
-            week_start - timedelta(weeks=weeks_back),
-            week_start - timedelta(weeks=weeks_back) + timedelta(days=6),
-        )
-        for weeks_back in range(1, BASELINE_MAX_WEEKS + 1)
-    ]
+    oldest_start = week_start - timedelta(weeks=BASELINE_MAX_WEEKS)
+
+    weekly_totals = [0] * BASELINE_MAX_WEEKS
+    for block in _time_block_repo.find_by_date_range(
+        user, oldest_start, week_start - timedelta(days=1)
+    ):
+        weeks_back = ((week_start - block.date).days - 1) // 7
+        if 0 <= weeks_back < BASELINE_MAX_WEEKS:
+            weekly_totals[weeks_back] += MINUTES_PER_SLOT
 
     recent_four = weekly_totals[:BASELINE_AVG_WEEKS]
 
@@ -137,9 +143,3 @@ def _sparkline(user, end_date):
             daily[index] += MINUTES_PER_SLOT
 
     return daily
-
-
-def _total_minutes(user, start, end):
-    return sum(
-        MINUTES_PER_SLOT for _ in _time_block_repo.find_by_date_range(user, start, end)
-    )
