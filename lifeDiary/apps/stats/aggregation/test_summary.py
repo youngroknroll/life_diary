@@ -108,6 +108,64 @@ class TestHeatmap:
 
 
 @pytest.mark.django_db
+class TestCategoryShare:
+    def test_a_category_carries_the_minutes_of_its_tags(self, user, focus):
+        record(user, focus, SATURDAY, slots=6)
+
+        shares = build_summary(user, SATURDAY, today=SATURDAY)["category_share"]
+        investment = next(s for s in shares if s["slug"] == "investment")
+
+        assert investment["total_minutes"] == 60
+
+    def test_tags_in_one_category_are_summed_together(self, user, focus):
+        sibling = Tag.objects.create(
+            user=user, name="회의", is_default=False,
+            category=Category.objects.get(slug="investment"),
+        )
+        record(user, focus, SATURDAY, slots=3)
+        record(user, sibling, SATURDAY, slots=3, first_slot=10)
+
+        shares = build_summary(user, SATURDAY, today=SATURDAY)["category_share"]
+        investment = next(s for s in shares if s["slug"] == "investment")
+
+        assert investment["total_minutes"] == 60
+
+    def test_shares_are_sorted_by_size(self, user, focus):
+        leisure = Tag.objects.create(
+            user=user, name="여가", is_default=False,
+            category=Category.objects.get(slug="passive"),
+        )
+        record(user, focus, SATURDAY, slots=3)
+        record(user, leisure, SATURDAY, slots=9, first_slot=10)
+
+        shares = build_summary(user, SATURDAY, today=SATURDAY)["category_share"]
+
+        assert shares[0]["slug"] == "passive"
+
+    def test_empty_categories_are_left_out(self, user, focus):
+        record(user, focus, SATURDAY, slots=6)
+
+        shares = build_summary(user, SATURDAY, today=SATURDAY)["category_share"]
+
+        assert [s["slug"] for s in shares] == ["investment"]
+
+    def test_percentages_add_up_to_a_hundred(self, user, focus):
+        leisure = Tag.objects.create(
+            user=user, name="여가", is_default=False,
+            category=Category.objects.get(slug="passive"),
+        )
+        record(user, focus, SATURDAY, slots=6)
+        record(user, leisure, SATURDAY, slots=6, first_slot=10)
+
+        shares = build_summary(user, SATURDAY, today=SATURDAY)["category_share"]
+
+        assert sum(s["percentage"] for s in shares) == pytest.approx(100.0, abs=0.2)
+
+    def test_no_records_yields_no_share(self, user):
+        assert build_summary(user, SATURDAY, today=SATURDAY)["category_share"] == []
+
+
+@pytest.mark.django_db
 class TestTrendReadiness:
     def test_an_untouched_week_needs_a_full_week_more(self, user):
         summary = build_summary(user, SATURDAY, today=SATURDAY)

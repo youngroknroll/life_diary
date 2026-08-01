@@ -39,6 +39,7 @@ def build_summary(user, selected_date, today=None):
         "month": _with_hours(month["current"]),
         "month_delta": month,
         "goal": goal,
+        "category_share": _category_share(rolling_week),
         "logged_days": _logged_days(grid),
         "days_until_trend": max(0, MIN_DAYS_FOR_TREND - _logged_days(grid)),
         "density": {
@@ -52,6 +53,26 @@ def build_summary(user, selected_date, today=None):
 
 def _with_hours(tile):
     return {**tile, "hours": _hours(tile["total_minutes"])}
+
+
+def _category_share(rolling_week):
+    """통계와 피드백은 태그가 아니라 카테고리로 읽는다.
+
+    이름이 달라도 같은 카테고리면 한 덩어리다.
+    """
+    total = rolling_week["total_minutes"]
+    if not total:
+        return []
+
+    shares = sorted(
+        rolling_week["category_minutes"].values(),
+        key=lambda e: e["total_minutes"],
+        reverse=True,
+    )
+    for entry in shares:
+        entry["hours"] = _hours(entry["total_minutes"])
+        entry["percentage"] = round(entry["total_minutes"] / total * 100, 1)
+    return shares
 
 
 def _logged_days(grid):
@@ -73,26 +94,40 @@ def _density_rows(grid, end_date):
 
 
 def _rolling_week(user, selected_date, grid):
-    """달력 주와 나란히 놓기 위해 지난 7일은 롤링으로 둔다."""
+    """달력 주와 나란히 놓기 위해 지난 7일은 롤링으로 둔다.
+
+    태그 합과 카테고리 합을 한 번의 조회에서 함께 낸다.
+    """
     start = selected_date - timedelta(days=ROLLING_DAYS - 1)
-    total_minutes = sum(minutes for row in grid for minutes in row)
-    tag_minutes = _tag_minutes(user, start, selected_date)
+    tag_minutes = {}
+    category_minutes = {}
+
+    for block in _time_block_repo.find_by_date_range(user, start, selected_date):
+        if not (block.tag and block.tag.name):
+            continue
+        tag_minutes[block.tag.name] = (
+            tag_minutes.get(block.tag.name, 0) + MINUTES_PER_SLOT
+        )
+        category = block.tag.category
+        entry = category_minutes.setdefault(
+            category.slug,
+            {
+                "slug": category.slug,
+                "name": category.display_name,
+                "color": category.color,
+                "total_minutes": 0,
+            },
+        )
+        entry["total_minutes"] += MINUTES_PER_SLOT
 
     return {
         "start": start,
         "end": selected_date,
         "days": ROLLING_DAYS,
-        "total_minutes": total_minutes,
+        "total_minutes": sum(minutes for row in grid for minutes in row),
         "tag_minutes": tag_minutes,
+        "category_minutes": category_minutes,
     }
-
-
-def _tag_minutes(user, start, end):
-    minutes = {}
-    for block in _time_block_repo.find_by_date_range(user, start, end):
-        if block.tag and block.tag.name:
-            minutes[block.tag.name] = minutes.get(block.tag.name, 0) + MINUTES_PER_SLOT
-    return minutes
 
 
 def _goal_tile(user, selected_date):

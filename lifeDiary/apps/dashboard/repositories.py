@@ -34,11 +34,24 @@ class TimeBlockRepository:
         return TimeBlock(user=user, date=target_date, slot_index=slot_index, tag=tag, memo=memo)
 
     def find_by_date_range(self, user, start, end):
-        """날짜 범위 단일 쿼리 조회 — 주간 통계 최적화용"""
+        """날짜 범위 단일 쿼리 조회.
+
+        카테고리까지 함께 가져온다 — 통계가 카테고리 단위로 묶으므로
+        빼면 태그마다 조회가 한 번씩 더 난다.
+        """
         return (
             TimeBlock.objects.filter(user=user, date__range=[start, end])
-            .select_related("tag")
-            .only("date", "slot_index", "tag__id", "tag__name", "tag__color")
+            .select_related("tag", "tag__category")
+            .only(
+                "date",
+                "slot_index",
+                "tag__id",
+                "tag__name",
+                "tag__color",
+                "tag__category__slug",
+                "tag__category__name",
+                "tag__category__color",
+            )
         )
 
     def bulk_create(self, blocks):

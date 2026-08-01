@@ -96,6 +96,34 @@
                             </ul>
                         {% endif %}
 
+                        {% if summary.category_share %}
+                            <div class="section-title">{% trans "카테고리 비중" %}<span class="section-title__note">{% trans "지난 7일 · 태그가 아니라 카테고리 단위" %}</span></div>
+                            <div class="composition-bar mb-3">
+                                {% for share in summary.category_share %}
+                                    <span style="width: {{ share.percentage }}%; background-color: {{ share.color }}"
+                                          title="{{ share.name }}"></span>
+                                {% endfor %}
+                            </div>
+                            <table class="data-table mb-4">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% trans "카테고리" %}</th>
+                                        <th scope="col" class="is-num">{% trans "시간" %}</th>
+                                        <th scope="col" class="is-num">{% trans "비중" %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for share in summary.category_share %}
+                                        <tr>
+                                            <td><span class="chip__swatch" style="background-color: {{ share.color }}"></span>{{ share.name }}</td>
+                                            <td class="is-num num">{{ share.hours }}h</td>
+                                            <td class="is-num num">{{ share.percentage }}%</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% endif %}
+
                         <h6 class="mb-1">{% trans "기록 밀도" %}</h6>
                         <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다." %}</p>
                         <figure class="density m-0" role="group" aria-labelledby="densityCaption">
