@@ -14,59 +14,35 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <!-- 날짜 선택 및 통계 -->
-    <div class="col-12 mb-4">
-        <div class="card">
-            <div class="card-header dashboard-date-header">
-                <h5 class="mb-0 dashboard-date-title">
-                    <i class="fas fa-calendar-day me-2"></i>
-                    {{ selected_date|date:"DATE_FORMAT" }} ({{ selected_date|date:"l" }})
-                </h5>
-                {% trans "목표 추가" as add_goal_label %}
-                {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
-            </div>
-            <div class="card-body">
-                <div class="row text-center dashboard-stats">
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-clock text-primary me-2"></i>
-                            <div>
-                                <div class="fw-bold">{{ total_slots }}</div>
-                                <small class="text-muted">{% trans "총 슬롯" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-check-circle text-success me-2"></i>
-                            <div>
-                                <div class="fw-bold" id="filledSlots">{{ filled_slots }}</div>
-                                <small class="text-muted">{% trans "기록된 슬롯" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-chart-pie text-info me-2"></i>
-                            <div>
-                                <div class="fw-bold" id="fillPercentage">{{ fill_percentage }}%</div>
-                                <small class="text-muted">{% trans "기록률" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3 mb-2">
-                        <div class="d-flex align-items-center justify-content-center">
-                            <i class="fas fa-hourglass-half text-warning me-2"></i>
-                            <div>
-                                <div class="fw-bold" id="loggedTime">{% blocktrans with h=total_hours m=remaining_minutes %}{{ h }}시간 {{ m }}분{% endblocktrans %}</div>
-                                <small class="text-muted">{% trans "총 기록 시간" %}</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="page-head mb-3">
+    <div>
+        <h1 class="page-title">{{ selected_date|date:"DATE_FORMAT" }} ({{ selected_date|date:"l" }})</h1>
+        <p class="page-subtitle">{% blocktrans with h=total_hours m=remaining_minutes p=fill_percentage %}{{ h }}시간 {{ m }}분 기록 · 기록률 {{ p }}%{% endblocktrans %}</p>
+    </div>
+    {% trans "목표 추가" as add_goal_label %}
+    {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
+</div>
+
+<div class="summary-tiles mb-4">
+    <div class="summary-tile">
+        <div class="summary-tile__label">{% trans "기록된 슬롯" %}</div>
+        <div class="summary-tile__value num" id="filledSlots">{{ filled_slots }}</div>
+        <div class="summary-tile__note">{% blocktrans with t=total_slots %}전체 {{ t }}칸{% endblocktrans %}</div>
+    </div>
+    <div class="summary-tile">
+        <div class="summary-tile__label">{% trans "기록률" %}</div>
+        <div class="summary-tile__value num" id="fillPercentage">{{ fill_percentage }}%</div>
+        <div class="summary-tile__note">{% trans "24시간 기준" %}</div>
+    </div>
+    <div class="summary-tile">
+        <div class="summary-tile__label">{% trans "총 기록 시간" %}</div>
+        <div class="summary-tile__value num" id="loggedTime">{% blocktrans with h=total_hours m=remaining_minutes %}{{ h }}시간 {{ m }}분{% endblocktrans %}</div>
+        <div class="summary-tile__note">{% trans "한 칸 10분" %}</div>
+    </div>
+    <div class="summary-tile">
+        <div class="summary-tile__label">{% trans "미기록" %}</div>
+        <div class="summary-tile__value num summary-tile__value--empty" id="emptySlots">{{ empty_slots }}</div>
+        <div class="summary-tile__note">{% trans "채우면 기록률이 오릅니다" %}</div>
     </div>
 </div>
 

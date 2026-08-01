@@ -8,16 +8,21 @@
     --color-primary-soft: #EDF3EE;
     --color-primary-border: #98c7aa;
 
-    /* Text */
-    --color-text: #16231b;
-    --color-text-muted: #4c5b52;
+    /* Text — 시안은 네 단계를 쓴다. 두 단계로 줄이면 위계가 뭉갠다. */
+    --color-text: #14211A;
+    --color-text-body: #4C5B52;
+    --color-text-muted: #6C7A70;
+    --color-text-meta: #8B968D;
+    --color-text-disabled: #C4CCC6;
+    --color-danger-text: #B4471F;
 
     /* Surface */
     --color-surface: #ffffff;
     --color-surface-soft: #F5F6F4;
+    --color-track: #F1F3F0;
     --color-border: #E3E6E1;
-    --color-border-soft: #dfe7df;
-    --color-border-muted: #e1e8e1;
+    --color-border-soft: #EDEFEB;
+    --color-border-muted: #F2F4F1;
 
     /* 소비시간 5분류 */
     --color-accent-work: #4E8F63;   /* 투자시간 */
@@ -81,11 +86,16 @@
     --color-primary-soft: #1a2e22;
     --color-primary-border: #3a6b4a;
 
-    --color-text: #e0e8e2;
-    --color-text-muted: #9aab9f;
+    --color-text: #E4EBE6;
+    --color-text-body: #B9C6BD;
+    --color-text-muted: #9AAB9F;
+    --color-text-meta: #7F8F85;
+    --color-text-disabled: #5A6860;
+    --color-danger-text: #E8927A;
 
     --color-surface: #1a1f1c;
     --color-surface-soft: #232a26;
+    --color-track: #2A322D;
     --color-border: #3a4a3e;
     --color-border-soft: #2e3a32;
     --color-border-muted: #2a3630;
@@ -135,8 +145,241 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-.navbar {
-    background-color: var(--color-surface);
+/* App nav — 최상위는 기록·분석·설정 셋뿐이다. 언어와 테마는 설정 안으로 */
+.app-nav {
+    background: var(--color-surface);
+    border-bottom: 1px solid var(--color-border);
+    margin-bottom: 1.5rem;
+}
+
+.app-nav__inner {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    height: 56px;
+}
+
+.app-nav__brand {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-primary);
+    text-decoration: none;
+    flex: none;
+}
+
+.app-nav__tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: auto;
+}
+
+.app-nav__tabs--guest {
+    margin-left: auto;
+    margin-right: 0;
+    gap: 10px;
+}
+
+.app-nav__tab {
+    font-size: 13.5px;
+    color: var(--color-text-body);
+    text-decoration: none;
+    padding: 7px 12px;
+    border-radius: 7px;
+    white-space: nowrap;
+}
+
+.app-nav__tab:hover {
+    color: var(--color-text);
+}
+
+.app-nav__tab.is-active {
+    font-weight: 500;
+    color: var(--color-text);
+    background: var(--color-primary-soft);
+}
+
+.app-nav__account {
+    flex: none;
+}
+
+.app-nav__avatar {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 11px;
+}
+
+.app-nav__account-name {
+    font-size: 12px;
+    color: var(--color-text-meta);
+}
+
+@media (max-width: 575.98px) {
+    .app-nav__inner {
+        gap: 12px;
+    }
+    .app-nav__tab {
+        padding: 7px 9px;
+    }
+}
+
+/* 시안 공통 컴포넌트 */
+.section-title {
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--color-text);
+    margin-bottom: 8px;
+}
+
+.section-title__note {
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--color-text-meta);
+    margin-left: 4px;
+}
+
+.page-title {
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.page-subtitle {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 3px 0 0;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 32px;
+    padding: 0 11px;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    background: var(--color-surface);
+    font-size: 12px;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.chip__swatch {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    flex: none;
+}
+
+.chip.is-selected {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    box-shadow: 0 0 0 1.5px var(--color-primary) inset;
+    font-weight: 500;
+}
+
+.segmented {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border-radius: 8px;
+    background: var(--color-track);
+}
+
+.segmented__item {
+    border: 0;
+    background: transparent;
+    border-radius: 6px;
+    padding: 6px 11px;
+    font-size: 12px;
+    color: var(--color-text-body);
+    text-decoration: none;
+}
+
+.segmented__item.is-active {
+    background: var(--color-surface);
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.btn-sian {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    font-weight: 500;
+    font-size: 13.5px;
+    color: var(--color-text-body);
+    text-decoration: none;
+}
+
+.btn-sian--primary {
+    border-color: transparent;
+    background: var(--color-primary);
+    color: #fff;
+    font-weight: 600;
+}
+
+.btn-sian--primary:hover {
+    background: var(--color-primary-hover);
+    color: #fff;
+}
+
+.page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    padding: 6px 0;
+}
+
+.settings-row + .page-head {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.settings-row {
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.settings-row__label {
+    font-size: 12.5px;
+    color: var(--color-text-body);
+}
+
+.settings-row__control {
+    margin: 0;
+    flex: none;
+}
+
+.btn-sian--danger {
+    border-color: transparent;
+    background: #8A3A18;
+    color: #fff;
+    font-weight: 600;
 }
 
 footer {
@@ -592,10 +835,35 @@ footer {
 /* =========================================================
    Card & Button (전역 공통)
    ========================================================= */
+/* 시안에는 카드 헤더가 없다. 제목은 본문 안의 소제목이고 경계선만 남긴다. */
+.card {
+    border-color: var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(20, 33, 26, 0.06);
+}
+
 .card-header {
     background: var(--color-surface);
     color: var(--color-text);
     border-bottom: 1px solid var(--color-border);
+    padding: 14px 20px;
+    font-size: 13px;
+}
+
+.card-header h5,
+.card-header h6 {
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--color-text);
+}
+
+.card-header .fas,
+.card-header .far {
+    display: none;
+}
+
+.card-body {
+    padding: 18px 20px 20px;
 }
 
 .card-header .nav-link {

@@ -643,7 +643,10 @@ function renderDayStats(stats) {
     const percentage = document.getElementById('fillPercentage');
     const loggedTime = document.getElementById('loggedTime');
 
-    if (filled) filled.textContent = Math.round(stats.logged_minutes / 10);
+    const empty = document.getElementById('emptySlots');
+    const filledCount = Math.round(stats.logged_minutes / 10);
+    if (filled) filled.textContent = filledCount;
+    if (empty) empty.textContent = TOTAL_SLOTS - filledCount;
     if (percentage) percentage.textContent = `${stats.fill_percentage}%`;
     if (loggedTime) {
         loggedTime.textContent = interpolate(

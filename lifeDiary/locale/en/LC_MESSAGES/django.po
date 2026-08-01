@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 14:01+0900\n"
+"POT-Creation-Date: 2026-08-01 14:55+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -139,198 +139,223 @@ msgstr "Close"
 msgid "대시보드 - %(d)s | 라이프 다이어리"
 msgstr "Dashboard - %(d)s | Life Diary"
 
-#: apps/dashboard/templates/dashboard/index.html:26
-#: apps/users/templates/users/mypage.html:27
-#: apps/users/templates/users/mypage.html:68
+#: apps/dashboard/templates/dashboard/index.html:20
+#, python-format
+msgid "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
+msgstr "%(h)sh %(m)sm logged · %(p)s%% logged rate"
+
+#: apps/dashboard/templates/dashboard/index.html:22
+#: apps/users/templates/users/mypage.html:63
+#: apps/users/templates/users/mypage.html:104
 #: apps/users/templates/users/usergoal_form.html:12
 msgid "목표 추가"
 msgstr "Add goal"
 
-#: apps/dashboard/templates/dashboard/index.html:36
-msgid "총 슬롯"
-msgstr "Total slots"
-
-#: apps/dashboard/templates/dashboard/index.html:45
+#: apps/dashboard/templates/dashboard/index.html:28
 msgid "기록된 슬롯"
 msgstr "Logged slots"
 
-#: apps/dashboard/templates/dashboard/index.html:54
+#: apps/dashboard/templates/dashboard/index.html:30
+#, python-format
+msgid "전체 %(t)s칸"
+msgstr "%(t)s slots total"
+
+#: apps/dashboard/templates/dashboard/index.html:33
 msgid "기록률"
 msgstr "Logged rate"
 
-#: apps/dashboard/templates/dashboard/index.html:62
+#: apps/dashboard/templates/dashboard/index.html:35
+#, fuzzy
+#| msgid "%(h)s시간"
+msgid "24시간 기준"
+msgstr "%(h)sh"
+
+#: apps/dashboard/templates/dashboard/index.html:38
+msgid "총 기록 시간"
+msgstr "Total time logged"
+
+#: apps/dashboard/templates/dashboard/index.html:39
 #, python-format
 msgid "%(h)s시간 %(m)s분"
 msgstr "%(h)sh %(m)sm"
 
-#: apps/dashboard/templates/dashboard/index.html:63
-msgid "총 기록 시간"
-msgstr "Total time logged"
+#: apps/dashboard/templates/dashboard/index.html:40
+msgid "한 칸 10분"
+msgstr "10 minutes per slot"
 
-#: apps/dashboard/templates/dashboard/index.html:80
+#: apps/dashboard/templates/dashboard/index.html:43
+#, fuzzy
+#| msgid "기록률"
+msgid "미기록"
+msgstr "Logged rate"
+
+#: apps/dashboard/templates/dashboard/index.html:45
+msgid "채우면 기록률이 오릅니다"
+msgstr "Filling these raises the logged rate"
+
+#: apps/dashboard/templates/dashboard/index.html:56
 msgid "시간 그리드 (10분 단위)"
 msgstr "Time grid (10-min units)"
 
-#: apps/dashboard/templates/dashboard/index.html:106
+#: apps/dashboard/templates/dashboard/index.html:82
 msgid "빈 구간"
 msgstr "Empty slot"
 
-#: apps/dashboard/templates/dashboard/index.html:124
+#: apps/dashboard/templates/dashboard/index.html:100
 msgid "생성된 태그가 없습니다."
 msgstr "No tags yet."
 
-#: apps/dashboard/templates/dashboard/index.html:141
+#: apps/dashboard/templates/dashboard/index.html:117
 msgid "입력정보"
 msgstr "Entry"
 
-#: apps/dashboard/templates/dashboard/index.html:144
+#: apps/dashboard/templates/dashboard/index.html:120
 #, fuzzy
 #| msgid "입력정보"
 msgid "입력정보 닫기"
 msgstr "Entry"
 
-#: apps/dashboard/templates/dashboard/index.html:151
+#: apps/dashboard/templates/dashboard/index.html:127
 msgid "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!"
 msgstr "Pick times on the grid, choose a tag, then save!"
 
-#: apps/dashboard/templates/dashboard/index.html:156
+#: apps/dashboard/templates/dashboard/index.html:132
 msgid "태그 선택"
 msgstr "Select a tag"
 
-#: apps/dashboard/templates/dashboard/index.html:159
+#: apps/dashboard/templates/dashboard/index.html:135
 msgid "새 태그"
 msgstr "New tag"
 
-#: apps/dashboard/templates/dashboard/index.html:162
+#: apps/dashboard/templates/dashboard/index.html:138
 #: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:13
-#: templates/base.html:128
 msgid "태그 관리"
 msgstr "Tags"
 
-#: apps/dashboard/templates/dashboard/index.html:166
+#: apps/dashboard/templates/dashboard/index.html:142
 msgid "사용법 도움말"
 msgstr "How to use"
 
-#: apps/dashboard/templates/dashboard/index.html:176
+#: apps/dashboard/templates/dashboard/index.html:152
 msgid "사용법:"
 msgstr "How to use:"
 
-#: apps/dashboard/templates/dashboard/index.html:177
+#: apps/dashboard/templates/dashboard/index.html:153
 msgid "단일 선택:"
 msgstr "Single select:"
 
-#: apps/dashboard/templates/dashboard/index.html:177
+#: apps/dashboard/templates/dashboard/index.html:153
 msgid "슬롯 클릭"
 msgstr "Click a slot"
 
-#: apps/dashboard/templates/dashboard/index.html:178
+#: apps/dashboard/templates/dashboard/index.html:154
 msgid "드래그 선택:"
 msgstr "Drag select:"
 
-#: apps/dashboard/templates/dashboard/index.html:178
+#: apps/dashboard/templates/dashboard/index.html:154
 msgid "마우스로 드래그"
 msgstr "Drag with the mouse"
 
-#: apps/dashboard/templates/dashboard/index.html:179
+#: apps/dashboard/templates/dashboard/index.html:155
 msgid "다중 선택:"
 msgstr "Multi-select:"
 
-#: apps/dashboard/templates/dashboard/index.html:179
+#: apps/dashboard/templates/dashboard/index.html:155
 msgid "Ctrl/Cmd + 클릭"
 msgstr "Ctrl/Cmd + click"
 
-#: apps/dashboard/templates/dashboard/index.html:180
+#: apps/dashboard/templates/dashboard/index.html:156
 msgid "터치:"
 msgstr "Touch:"
 
-#: apps/dashboard/templates/dashboard/index.html:180
+#: apps/dashboard/templates/dashboard/index.html:156
 msgid "터치 후 드래그"
 msgstr "Touch then drag"
 
-#: apps/dashboard/templates/dashboard/index.html:181
+#: apps/dashboard/templates/dashboard/index.html:157
 msgid "슬롯을 선택했다면?!"
 msgstr "Slots selected?"
 
-#: apps/dashboard/templates/dashboard/index.html:181
+#: apps/dashboard/templates/dashboard/index.html:157
 msgid "해당하는 태그 선택 후 저장 버튼 클릭!"
 msgstr "Pick the matching tag, then click Save!"
 
-#: apps/dashboard/templates/dashboard/index.html:183
+#: apps/dashboard/templates/dashboard/index.html:159
 msgid "💡 이 도움말은 ? 버튼을 다시 클릭하면 닫힙니다."
 msgstr "💡 Click ? again to close this tip."
 
-#: apps/dashboard/templates/dashboard/index.html:185
+#: apps/dashboard/templates/dashboard/index.html:161
 msgid "태그 카테고리 설명"
 msgstr "Tag category guide"
 
-#: apps/dashboard/templates/dashboard/index.html:209 apps/tags/models.py:107
+#: apps/dashboard/templates/dashboard/index.html:185 apps/tags/models.py:107
 msgid "기본 태그"
 msgstr "Default tag"
 
-#: apps/dashboard/templates/dashboard/index.html:218
+#: apps/dashboard/templates/dashboard/index.html:194
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 msgstr "No tags.<br>Add one with the 'New tag' button."
 
-#: apps/dashboard/templates/dashboard/index.html:225
+#: apps/dashboard/templates/dashboard/index.html:201
 msgid "메모 (선택사항)"
 msgstr "Memo (optional)"
 
-#: apps/dashboard/templates/dashboard/index.html:231
+#: apps/dashboard/templates/dashboard/index.html:207
 #: apps/tags/templates/tags/_tag_modal.html:67
 #: apps/users/templates/users/usergoal_form.html:51
 #: apps/users/templates/users/usernote_form.html:13
 msgid "저장"
 msgstr "Save"
 
-#: apps/dashboard/templates/dashboard/index.html:253
+#: apps/dashboard/templates/dashboard/index.html:229
 msgid "되돌리기"
 msgstr "Undo"
 
-#: apps/dashboard/views.py:96 templates/base.html:118
+#: apps/dashboard/views.py:96
 msgid "대시보드"
 msgstr "Dashboard"
 
-#: apps/dashboard/views.py:122 apps/dashboard/views.py:229
+#: apps/dashboard/views.py:123 apps/dashboard/views.py:230
 msgid "올바른 JSON 형식이 아닙니다."
 msgstr "Invalid JSON format."
 
-#: apps/dashboard/views.py:148
+#: apps/dashboard/views.py:149
 msgid "저장 중 오류가 발생했습니다."
 msgstr "An error occurred while saving."
 
-#: apps/dashboard/views.py:153
+#: apps/dashboard/views.py:154
 #, python-format
 msgid "%(count)d개의 슬롯이 저장되었습니다."
 msgid_plural "%(count)d개의 슬롯이 저장되었습니다."
 msgstr[0] "%(count)d slot was saved."
 msgstr[1] "%(count)d slots were saved."
 
-#: apps/dashboard/views.py:192
+#: apps/dashboard/views.py:193
 msgid "삭제 중 오류가 발생했습니다."
 msgstr "An error occurred while deleting."
 
-#: apps/dashboard/views.py:195
+#: apps/dashboard/views.py:196
 msgid "삭제할 기록이 없습니다."
 msgstr "No records to delete."
 
-#: apps/dashboard/views.py:199
+#: apps/dashboard/views.py:200
 #, python-format
 msgid "%(count)d개의 슬롯이 삭제되었습니다."
 msgid_plural "%(count)d개의 슬롯이 삭제되었습니다."
 msgstr[0] "%(count)d slot was deleted."
 msgstr[1] "%(count)d slots were deleted."
 
-#: apps/dashboard/views.py:236
+#: apps/dashboard/views.py:237
 msgid "되돌릴 수 있는 시간이 지났습니다."
 msgstr "The undo window has passed."
 
-#: apps/dashboard/views.py:253
+#: apps/dashboard/views.py:254
 #, fuzzy
 #| msgid "저장 중 오류가 발생했습니다."
 msgid "되돌리는 중 오류가 발생했습니다."
 msgstr "An error occurred while saving."
 
-#: apps/dashboard/views.py:259
+#: apps/dashboard/views.py:260
 msgid "되돌렸습니다."
 msgstr "Undone."
 
@@ -437,7 +462,7 @@ msgstr "Progress:"
 msgid "추가하기"
 msgstr ""
 
-#: apps/stats/templates/stats/index.html:5 templates/base.html:123
+#: apps/stats/templates/stats/index.html:5
 msgid "통계"
 msgstr "Stats"
 
@@ -455,7 +480,7 @@ msgstr "Stats"
 #: apps/users/templates/users/signup.html:4
 #: apps/users/templates/users/signup.html:11
 #: apps/users/templates/users/welcome.html:4 templates/base.html:18
-#: templates/base.html:72 templates/legal/privacy.html:4
+#: templates/base.html:70 templates/legal/privacy.html:4
 #: templates/legal/terms.html:4
 msgid "라이프 다이어리"
 msgstr "Life Diary"
@@ -917,7 +942,7 @@ msgstr "Default tags can only be edited/deleted by admins."
 msgid "취소"
 msgstr "Cancel"
 
-#: apps/tags/templates/tags/index.html:15 templates/base.html:141
+#: apps/tags/templates/tags/index.html:15 templates/base.html:92
 msgid "관리자"
 msgstr "Admin"
 
@@ -1095,7 +1120,7 @@ msgstr "%(h)sh"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
-#: apps/users/templates/users/mypage.html:92 apps/users/views.py:554
+#: apps/users/templates/users/mypage.html:128 apps/users/views.py:554
 msgid "계정 탈퇴"
 msgstr "Account deletion"
 
@@ -1136,7 +1161,7 @@ msgstr "Request deletion"
 #: apps/users/templates/users/login.html:69
 #: apps/users/templates/users/password/password_reset_complete.html:14
 #: apps/users/templates/users/signup.html:106 apps/users/views.py:216
-#: apps/users/views.py:261 templates/base.html:159
+#: apps/users/views.py:261 templates/base.html:106
 msgid "로그인"
 msgstr "Log in"
 
@@ -1185,19 +1210,57 @@ msgstr "Don't have an account?"
 #: apps/users/templates/users/signup.html:4
 #: apps/users/templates/users/signup.html:19
 #: apps/users/templates/users/signup.html:96 apps/users/views.py:189
-#: templates/base.html:164 templates/index.html:244
+#: templates/index.html:244
 msgid "회원가입"
 msgstr "Sign up"
 
-#: apps/users/templates/users/mypage.html:16 templates/base.html:145
+#: apps/users/templates/users/mypage.html:15
+#, fuzzy
+#| msgid "표시 순서"
+msgid "표시"
+msgstr "Display order"
+
+#: apps/users/templates/users/mypage.html:17
+#, fuzzy
+#| msgid "언어 선택"
+msgid "언어"
+msgstr "Language"
+
+#: apps/users/templates/users/mypage.html:24
+msgid "언어 선택"
+msgstr "Language"
+
+#: apps/users/templates/users/mypage.html:33
+msgid "테마"
+msgstr "Theme"
+
+#: apps/users/templates/users/mypage.html:35
+#: apps/users/templates/users/mypage.html:37
+msgid "다크 모드로 전환"
+msgstr "Switch to dark mode"
+
+#: apps/users/templates/users/mypage.html:36
+#: apps/users/templates/users/mypage.html:39
+msgid "다크"
+msgstr "Dark"
+
+#: apps/users/templates/users/mypage.html:36
+msgid "라이트"
+msgstr "Light"
+
+#: apps/users/templates/users/mypage.html:38
+msgid "라이트 모드로 전환"
+msgstr "Switch to light mode"
+
+#: apps/users/templates/users/mypage.html:52
 msgid "마이페이지"
 msgstr "My page"
 
-#: apps/users/templates/users/mypage.html:35
+#: apps/users/templates/users/mypage.html:71
 msgid "목표 시간 입력 안내"
 msgstr "Target-hours input guide"
 
-#: apps/users/templates/users/mypage.html:39
+#: apps/users/templates/users/mypage.html:75
 msgid ""
 "• 일간: 하루 목표 시간 (최대 24시간)<br>\n"
 "                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>\n"
@@ -1207,20 +1270,20 @@ msgstr ""
 "                        • Weekly: total hours per week (max 100)<br>\n"
 "                        • Monthly: total hours per month (max 300)"
 
-#: apps/users/templates/users/mypage.html:60
+#: apps/users/templates/users/mypage.html:96
 #: apps/users/templates/users/usergoal_form.html:43
 msgid "시간"
 msgstr "h"
 
-#: apps/users/templates/users/mypage.html:69
+#: apps/users/templates/users/mypage.html:105
 msgid "저장완료!"
 msgstr "Saved!"
 
-#: apps/users/templates/users/mypage.html:79
+#: apps/users/templates/users/mypage.html:115
 msgid "나의 목표 목록"
 msgstr "My goals"
 
-#: apps/users/templates/users/mypage.html:96
+#: apps/users/templates/users/mypage.html:132
 msgid ""
 "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정"
 "과 개인 기록이 완전히 삭제됩니다."
@@ -1229,7 +1292,7 @@ msgstr ""
 "will be cancelled. After 15 days, your account and personal records will be "
 "permanently deleted."
 
-#: apps/users/templates/users/mypage.html:99
+#: apps/users/templates/users/mypage.html:135
 msgid "계정 탈퇴 진행"
 msgstr "Delete account"
 
@@ -1588,55 +1651,59 @@ msgstr ""
 
 #: templates/base.html:19
 msgid "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌아보는 서비스입니다."
-msgstr "Log how your day was spent, classify it with tags, and look back on the pattern."
+msgstr ""
+"Log how your day was spent, classify it with tags, and look back on the "
+"pattern."
 
 #: templates/base.html:62
 msgid "페이지를 불러오는 중입니다..."
 msgstr "Loading the page..."
 
-#: templates/base.html:80
-msgid "언어 선택"
-msgstr "Language"
+#: templates/base.html:77
+#, fuzzy
+#| msgid "기록률"
+msgid "기록"
+msgstr "Logged rate"
 
-#: templates/base.html:94 templates/base.html:98
-msgid "다크 모드로 전환"
-msgstr "Switch to dark mode"
+#: templates/base.html:79
+#, fuzzy
+#| msgid "0분"
+msgid "분석"
+msgstr "0m"
 
-#: templates/base.html:96 templates/base.html:101
-msgid "다크"
-msgstr "Dark"
+#: templates/base.html:81 templates/base.html:94
+#, fuzzy
+#| msgid "수정"
+msgid "설정"
+msgstr "Edit"
 
-#: templates/base.html:97
-msgid "라이트"
-msgstr "Light"
+#: templates/base.html:87
+msgid "계정 메뉴"
+msgstr "Account menu"
 
 #: templates/base.html:99
-msgid "라이트 모드로 전환"
-msgstr "Switch to light mode"
-
-#: templates/base.html:113
-msgid "홈"
-msgstr "Home"
-
-#: templates/base.html:150
 msgid "로그아웃"
 msgstr "Log out"
 
-#: templates/base.html:193 templates/legal/privacy.html:4
+#: templates/base.html:107
+msgid "무료로 시작"
+msgstr "Start free"
+
+#: templates/base.html:133 templates/legal/privacy.html:4
 #: templates/legal/privacy.html:10
 msgid "개인정보처리방침"
 msgstr "Privacy Policy"
 
-#: templates/base.html:195 templates/legal/terms.html:4
+#: templates/base.html:135 templates/legal/terms.html:4
 #: templates/legal/terms.html:10
 msgid "이용약관"
 msgstr "Terms of Service"
 
-#: templates/base.html:201
+#: templates/base.html:141
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 msgstr "Life Diary &copy; 2025 LogBetter. All rights reserved."
 
-#: templates/base.html:203
+#: templates/base.html:143
 #, python-format
 msgid ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."

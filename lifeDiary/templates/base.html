@@ -64,112 +64,52 @@
         </div>
     </div>
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg shadow-sm mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <i class="fas fa-clock me-2"></i>
+    <nav class="app-nav">
+        <div class="container app-nav__inner">
+            <a class="app-nav__brand" href="{% if user.is_authenticated %}{% url 'dashboard:index' %}{% else %}{% url 'home' %}{% endif %}">
                 {% trans "라이프 다이어리" %}
             </a>
 
-            <div class="navbar-utility-controls">
-                <form action="{% url 'set_language' %}" method="post" class="navbar-language-form">
-                    {% csrf_token %}
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    {% get_current_language as LANGUAGE_CODE %}
-                    <select name="language" onchange="this.form.submit()" class="form-select form-select-sm navbar-language-select" aria-label="{% trans '언어 선택' %}">
-                        {% get_available_languages as LANGUAGES %}
-                        {% for lang_code, lang_name in LANGUAGES %}
-                            <option value="{{ lang_code }}" {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
-                                {{ lang_name }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                </form>
+            {% if user.is_authenticated %}
+                {% with app=request.resolver_match.app_name %}
+                <div class="app-nav__tabs">
+                    <a class="app-nav__tab{% if app == 'dashboard' %} is-active{% endif %}"
+                       href="{% url 'dashboard:index' %}">{% trans "기록" %}</a>
+                    <a class="app-nav__tab{% if app == 'stats' %} is-active{% endif %}"
+                       href="{% url 'stats:index' %}">{% trans "분석" %}</a>
+                    <a class="app-nav__tab{% if app == 'users' or app == 'tags' %} is-active{% endif %}"
+                       href="{% url 'users:mypage' %}">{% trans "설정" %}</a>
+                </div>
+                {% endwith %}
 
-                <button
-                    class="theme-toggle"
-                    id="themeToggle"
-                    type="button"
-                    aria-label="{% trans '다크 모드로 전환' %}"
-                    aria-pressed="false"
-                    data-label-dark="{% trans '다크' %}"
-                    data-label-light="{% trans '라이트' %}"
-                    data-aria-dark="{% trans '다크 모드로 전환' %}"
-                    data-aria-light="{% trans '라이트 모드로 전환' %}"
-                >
-                    <span class="theme-toggle__label">{% trans "다크" %}</span>
-                </button>
-            </div>
-
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">
-                            <i class="fas fa-home me-1"></i>{% trans "홈" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'dashboard:index' %}">
-                            <i class="fas fa-tachometer-alt me-1"></i>{% trans "대시보드" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'stats:index' %}">
-                            <i class="fas fa-chart-bar me-1"></i>{% trans "통계" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'tags:index' %}">
-                            <i class="fas fa-tags me-1"></i>{% trans "태그 관리" %}
-                        </a>
-                    </li>
-                </ul>
-                
-                {% if user.is_authenticated %}
-                <ul class="navbar-nav">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user me-1"></i>{{ user.username }}
-                        </a>
-                        <ul class="dropdown-menu">
-                            {% if user.is_superuser %}
-                            <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% trans "관리자" %}</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-                            {% if not user.is_superuser %}
-                            <li><a class="dropdown-item" href="{% url 'users:mypage' %}"><i class="fas fa-user-circle me-1"></i> {% trans "마이페이지" %}</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-                            <form action="{% url 'users:logout' %}" method="post" class="d-inline">
+                <div class="dropdown app-nav__account">
+                    <button class="app-nav__avatar" type="button" data-bs-toggle="dropdown"
+                            aria-label="{% trans '계정 메뉴' %}">{{ user.username|slice:":2"|upper }}</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li class="dropdown-item-text app-nav__account-name">{{ user.username }}</li>
+                        <li><hr class="dropdown-divider"></li>
+                        {% if user.is_superuser %}
+                        <li><a class="dropdown-item" href="{% url 'admin:index' %}">{% trans "관리자" %}</a></li>
+                        {% else %}
+                        <li><a class="dropdown-item" href="{% url 'users:mypage' %}">{% trans "설정" %}</a></li>
+                        {% endif %}
+                        <li>
+                            <form action="{% url 'users:logout' %}" method="post">
                                 {% csrf_token %}
                                 <button type="submit" class="dropdown-item">{% trans "로그아웃" %}</button>
                             </form>
-                        </ul>
-                    </li>
-                </ul>
-                {% else %}
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:login' %}">
-                            <i class="fas fa-sign-in-alt me-1"></i>{% trans "로그인" %}
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'users:signup' %}">
-                            <i class="fas fa-user-plus me-1"></i>{% trans "회원가입" %}
-                        </a>
-                    </li>
-                </ul>
-                {% endif %}
-            </div>
+                        </li>
+                    </ul>
+                </div>
+            {% else %}
+                <div class="app-nav__tabs app-nav__tabs--guest">
+                    <a class="app-nav__tab" href="{% url 'users:login' %}">{% trans "로그인" %}</a>
+                    <a class="btn-sian btn-sian--primary" href="{% url 'users:signup' %}">{% trans "무료로 시작" %}</a>
+                </div>
+            {% endif %}
         </div>
     </nav>
-    
+
     <!-- Main Content -->
     <div class="container">
         {% if messages %}

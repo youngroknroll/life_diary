@@ -99,6 +99,7 @@ def dashboard_view(request):
         "user_tags": user_tags,
         "total_slots": TOTAL_SLOTS_PER_DAY,
         "filled_slots": len(slot_data),
+        "empty_slots": TOTAL_SLOTS_PER_DAY - len(slot_data),
         "fill_percentage": stats["fill_percentage"],
         "total_hours": stats["hours"],
         "remaining_minutes": stats["remaining_minutes"],
