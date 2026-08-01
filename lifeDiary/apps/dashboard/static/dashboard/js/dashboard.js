@@ -25,9 +25,6 @@ let startSlot = null;
 let isAdditiveDrag = false;
 let dragBaseSelection = new Set();
 
-// ── 그리드 좌표 ──
-// 24행 × 6열 고정. 한 행이 한 시간, 한 칸이 10분.
-
 const SLOTS_PER_HOUR = 6;
 
 function isMobileDashboardLayout() {
@@ -45,7 +42,6 @@ function rowColToSlot(row, col) {
     return row * SLOTS_PER_HOUR + col;
 }
 
-/** 해당 슬롯을 덮고 있는 표시 블록. 블록 하나가 여러 칸을 덮을 수 있다. */
 function blockForSlot(slotIndex) {
     const hour = Math.floor(slotIndex / SLOTS_PER_HOUR);
     const row = document.querySelector(`.day-row[data-hour="${hour}"]`);
@@ -63,7 +59,6 @@ function isSlotFilled(slotIndex) {
     return !!(block && block.dataset.tagId);
 }
 
-/** 기록된 슬롯의 태그명과 메모. 비어 있으면 null. */
 function slotTagInfo(slotIndex) {
     const block = blockForSlot(slotIndex);
     if (!block || !block.dataset.tagId) return null;
@@ -72,11 +67,7 @@ function slotTagInfo(slotIndex) {
     return { tagName, memo };
 }
 
-/**
- * 화면 좌표가 가리키는 슬롯 인덱스를 구한다.
- * 표시용 블록은 여러 칸을 덮고 있어 요소 자체로는 칸을 알 수 없으므로,
- * 행을 찾은 뒤 x 위치를 6등분해 열을 계산한다.
- */
+/** 블록 하나가 여러 칸을 덮으므로 요소가 아니라 x 위치로 칸을 정한다. */
 function slotFromPoint(clientX, clientY) {
     const element = document.elementFromPoint(clientX, clientY);
     const row = element && element.closest('.day-row[data-hour]');
@@ -263,7 +254,6 @@ function closeQuickInputSheet() {
 
     document.removeEventListener('keydown', handleQuickInputSheetKeydown);
 
-    // 시트를 닫으면 방금 다루던 구간으로 초점을 돌려준다.
     const firstSelected = Math.min(...selectedSlots);
     const focusTarget = Number.isFinite(firstSelected) ? blockForSlot(firstSelected) : null;
     if (focusTarget) {
@@ -302,10 +292,6 @@ const clearSelection = () => {
     renderSelection();
 };
 
-/**
- * 선택 상태를 행별 오버레이로 다시 그린다.
- * 연속된 칸은 하나의 덩어리로 합쳐 시안의 선택 표시와 맞춘다.
- */
 const renderSelection = () => {
     document.querySelectorAll('.day-row[data-hour]').forEach(row => {
         const layer = row.querySelector('.day-row__selection');
@@ -355,15 +341,13 @@ const dragOver = (slotIndex) => {
     if (isAdditiveDrag) restoreBaseSelection();
 
     if (startPos.col === endPos.col && startPos.row !== endPos.row) {
-        // 순수 세로 드래그: 같은 열의 각 시간대만 선택 (중간 시간 비우기)
-        const minRow = Math.min(startPos.row, endPos.row);
+                const minRow = Math.min(startPos.row, endPos.row);
         const maxRow = Math.max(startPos.row, endPos.row);
         for (let row = minRow; row <= maxRow; row++) {
             selectedSlots.add(rowColToSlot(row, startPos.col));
         }
     } else {
-        // 대각선/가로 드래그: 시작~끝 슬롯 사이를 연속 선택
-        const minIndex = Math.min(startSlot, slotIndex);
+                const minIndex = Math.min(startSlot, slotIndex);
         const maxIndex = Math.max(startSlot, slotIndex);
         for (let index = minIndex; index <= maxIndex; index++) {
             selectedSlots.add(index);
@@ -387,10 +371,7 @@ const endDrag = () => {
     openQuickInputSheet();
 };
 
-/**
- * 드래그는 그리드 하나에 위임한다. 슬롯마다 핸들러를 붙이지 않는다.
- * 모바일 세로 스와이프는 .day-grid 의 touch-action:pan-y 가 스크롤로 넘긴다.
- */
+/** 모바일 세로 스와이프는 touch-action:pan-y 가 스크롤로 가져간다. */
 function initializeGridDrag() {
     const grid = document.getElementById('timeGrid');
     if (!grid) return;
@@ -435,7 +416,6 @@ function initializeGridDrag() {
             grid.releasePointerCapture(event.pointerId);
         }
 
-        // 움직이지 않았으면 한 칸 선택으로 취급한다.
         if (!movedDuringDrag && startSlot !== null) {
             const clicked = startSlot;
             isDragging = false;
@@ -447,7 +427,6 @@ function initializeGridDrag() {
         endDrag();
     });
 
-    // 스크롤 등으로 포인터가 회수되면 선택을 확정하지 않고 물러난다.
     grid.addEventListener('pointercancel', () => {
         isDragging = false;
         startSlot = null;
@@ -537,9 +516,6 @@ const selectTag = (tagId, tagColor, tagName) => {
     updateButtons();
 };
 
-// ── 부분 갱신 ──
-// 저장 후 페이지를 다시 읽지 않는다. 서버가 돌려준 행만 다시 그린다.
-
 function renderRows(rows) {
     (rows || []).forEach(row => {
         const rowElement = document.querySelector(`.day-row[data-hour="${row.hour}"]`);
@@ -599,8 +575,6 @@ function renderDayStats(stats) {
     }
 }
 
-// ── 되돌리기 스낵바 ──
-
 let undoTimer = null;
 
 function showUndoSnackbar(message, token) {
@@ -657,7 +631,6 @@ const saveSlot = async () => {
     const slotIndexes = Array.from(selectedSlots);
     const affectedRows = snapshotRows(slotIndexes);
 
-    // 낙관적으로 먼저 칠한다. 실패하면 되돌린다.
     paintSelectedSlots(selectedTag.color);
 
     try {
@@ -689,7 +662,6 @@ const saveSlot = async () => {
     }
 };
 
-/** 실패 시 되돌릴 수 있도록 영향받는 행의 현재 모습을 남긴다. */
 function snapshotRows(slotIndexes) {
     const hours = new Set(slotIndexes.map(index => Math.floor(index / SLOTS_PER_HOUR)));
 
@@ -712,7 +684,6 @@ function restoreRows(snapshots) {
     renderSelection();
 }
 
-/** 응답을 기다리는 동안 선택 구간을 미리 태그 색으로 덮는다. */
 function paintSelectedSlots(color) {
     document.querySelectorAll('.day-row[data-hour]').forEach(row => {
         const hour = parseInt(row.dataset.hour, 10);

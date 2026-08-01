@@ -779,6 +779,20 @@ Every backend design and task review must answer:
 If either answer is no or unclear, stop until the plan is revised or the user
 explicitly accepts the tradeoff.
 
+### Comments
+
+Do not comment by default. Code that needs a comment to be understood usually
+needs a better name or a smaller function; fix that first.
+
+- Never restate what the code does. `# 지우기 전에 남긴다` above a line that
+  saves a snapshot adds nothing and goes stale the moment the code moves.
+- Write only what the reader cannot recover from the code: a rule imposed by
+  the spec, a framework behavior being worked around, or the incident that a
+  non-obvious choice prevents.
+- Docstrings follow the same bar. One line stating the contract. Do not
+  enumerate rules the tests already pin down.
+- No section-divider comment banners.
+
 ### Pythonic Code Design
 
 - Prefer explicit, readable Python and framework-native Django extension

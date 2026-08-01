@@ -21,7 +21,6 @@ class UpsertResult:
     tag_id: int
     tag_name: str
     tag_color: str
-    # 덮어쓰기 직전의 슬롯 상태. 되돌리기가 이 값으로 복원한다.
     previous_state: list[dict]
 
 
@@ -52,7 +51,6 @@ class UpsertTimeBlocksUseCase:
         existing_blocks = self._writer.find_by_slots(user, cmd.target_date, cmd.slot_indexes)
         existing_slots = {block.slot_index: block for block in existing_blocks}
 
-        # 덮어쓰기 전에 남긴다. 이미 읽어 둔 값이라 추가 조회가 없다.
         previous_state = [
             {
                 "slot_index": slot_index,
@@ -108,12 +106,7 @@ class UpsertTimeBlocksUseCase:
 
 
 class RestoreTimeBlocksUseCase:
-    """직전 상태로 되돌린다.
-
-    슬롯마다 돌아갈 태그와 메모가 다를 수 있어 저장 use case를 재사용하지
-    않는다. 저장 당시의 태그가 그 사이 사라졌거나 남의 것이 됐다면 절반만
-    복원된 상태를 남기지 않고 통째로 거절한다.
-    """
+    """슬롯마다 돌아갈 태그와 메모가 달라 저장 use case를 재사용하지 않는다."""
 
     def __init__(self, writer: TimeBlockWriter, tags: TagReader):
         self._writer = writer
@@ -140,7 +133,11 @@ class RestoreTimeBlocksUseCase:
         return RestoreResult(restored=restored, cleared=len(to_delete))
 
     def _resolve_tags(self, cmd: RestoreTimeBlocksCommand, user) -> dict:
-        """복원 시점에 다시 소유권을 확인한다. 스냅샷의 tag_id를 믿지 않는다."""
+        """스냅샷의 tag_id 를 믿지 않고 복원 시점에 소유권을 다시 확인한다.
+
+        그사이 지워졌거나 남의 것이 된 태그로 절반만 복원된 상태를 남기지
+        않도록, 하나라도 막히면 통째로 거절한다.
+        """
         tags_by_id = {}
 
         for slot in cmd.slots:
@@ -203,7 +200,6 @@ class DeleteTimeBlocksUseCase:
 
     @transaction.atomic
     def execute(self, cmd: DeleteTimeBlocksCommand, user) -> DeleteResult:
-        # 지우기 전에 무엇을 지우는지 남긴다.
         previous_state = self._writer.snapshot_slots(
             user, cmd.target_date, cmd.slot_indexes
         )

@@ -1,8 +1,4 @@
-"""목표 달성 일수.
-
-시안 4a "목표 집중 4h/일 · 4/7일"과 6d "목표 달성 1/2일"의 근거다.
-하루 단위로 목표 시간을 채운 날이 며칠인지만 센다.
-"""
+"""목표 달성 일수."""
 
 from datetime import date, timedelta
 
@@ -42,7 +38,6 @@ def goal(user, focus):
 
 
 def record_hours(user, tag, on_date, hours):
-    """한 시간은 6칸이다."""
     for slot_index in range(int(hours * 6)):
         TimeBlock.objects.create(
             user=user, date=on_date, slot_index=slot_index, tag=tag

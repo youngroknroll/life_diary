@@ -48,7 +48,7 @@ class TimeBlockRepository:
         TimeBlock.objects.bulk_update(blocks, fields)
 
     def snapshot_slots(self, user, date, slot_indexes):
-        """지정 슬롯들의 현재 상태. 되돌리기용이라 없는 슬롯도 자리를 채운다."""
+        """없는 슬롯도 tag_id=None 으로 자리를 채운다."""
         stored = {
             block.slot_index: block
             for block in TimeBlock.objects.filter(

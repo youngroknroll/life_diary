@@ -1,9 +1,4 @@
-"""직전 상태 복원 규칙.
-
-되돌리기는 슬롯마다 다른 태그·메모로 돌아갈 수 있고, 비어 있던 슬롯은
-지워져야 한다. 저장 당시의 태그가 그 사이 사라졌다면 절반만 복원된 상태를
-남기지 않고 통째로 거절한다.
-"""
+"""직전 상태 복원 규칙."""
 
 from datetime import date
 
@@ -102,7 +97,6 @@ class TestRestore:
     def test_each_slot_can_return_to_a_different_tag(
         self, restore, user, focus, leisure
     ):
-        """한 번의 저장이 서로 다른 태그였던 칸들을 덮었을 수 있다."""
         restore.execute(
             command(
                 [

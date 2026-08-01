@@ -1,9 +1,4 @@
-"""저장/삭제 응답과 되돌리기 엔드포인트의 HTTP 계약.
-
-되돌리기 규칙 자체는 test_undo_store.py(TTL·1회 사용)와
-test_restore_use_case.py(복원 규칙)가 증명한다. 여기서는 엔드포인트가 그
-결과를 올바르게 주고받는지만 확인한다.
-"""
+"""저장·삭제 응답과 되돌리기 엔드포인트의 HTTP 계약."""
 
 import json
 from datetime import date
@@ -198,7 +193,6 @@ class TestUndoEndpoint:
         response = undo(client, token)
 
         assert response.status_code == 404
-        # 절반만 복원된 상태를 남기지 않는다.
         assert tag_ids_by_slot(user) == {54: leisure.id}
 
     def test_undo_requires_login(self, client):

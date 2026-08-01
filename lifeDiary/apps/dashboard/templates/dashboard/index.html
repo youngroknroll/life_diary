@@ -81,7 +81,6 @@
                 </h6>
             </div>
             <div class="card-body">
-                <!-- 분 헤더 한 줄 (그리드 6열과 정렬) -->
                 <div class="day-row day-header mb-2" aria-hidden="true">
                     <div class="day-row__label"></div>
                     <div class="day-row__cells">
@@ -91,7 +90,6 @@
                     </div>
                 </div>
 
-                <!-- 24행 × 6열. 같은 태그 연속 칸은 하나의 블록으로 병합돼 있다. -->
                 <div class="day-grid" id="timeGrid" data-date="{{ selected_date|date:'Y-m-d' }}">
                     {% for row in slot_rows %}
                         <div class="day-row" data-hour="{{ row.hour }}">
@@ -245,7 +243,6 @@
 <!-- 태그 설명 이미지 모달 -->
 {% include 'dashboard/_tag_image_modal.html' %}
 
-<!-- 되돌리기 스낵바 — 저장·삭제 직후 5초간 -->
 <div class="undo-snackbar" id="undoSnackbar" role="status" aria-live="polite">
     <span data-undo-message></span>
     <button type="button" class="undo-snackbar__action" data-undo-action>

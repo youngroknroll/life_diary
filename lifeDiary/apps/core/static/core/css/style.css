@@ -19,7 +19,7 @@
     --color-border-soft: #dfe7df;
     --color-border-muted: #e1e8e1;
 
-    /* Accent — 소비시간 5분류. 색은 카테고리가 정하며 태그별로 고르지 않는다. */
+    /* 소비시간 5분류 */
     --color-accent-work: #4E8F63;   /* 투자시간 */
     --color-accent-move: #4F8B9E;   /* 주도적 사용시간 */
     --color-accent-care: #C1715A;   /* 수동적 소비시간 */
@@ -27,8 +27,7 @@
     --color-accent-sleep: #8A9A91;  /* 수면시간 */
     --color-accent-muted: #dbe8df;
 
-    /* 태그·활동 색 위의 텍스트는 항상 이 잉크를 쓴다.
-       흰 글자는 밝은 accent 위에서 4.5:1을 넘기지 못한다. */
+    /* 흰 글자는 밝은 accent 위에서 4.5:1을 넘기지 못한다 */
     --ink-on-accent: #14211A;
 
     /* Note (노란 강조 박스) */
@@ -63,9 +62,7 @@
     --chart-cap-md: clamp(220px, 35vh, 320px);
     --chart-cap-lg: clamp(260px, 45vh, 420px);
 
-    /* Typography.
-       웹폰트는 아직 싣지 않는다 — 설치돼 있으면 쓰고 없으면 system-ui로 떨어진다.
-       CDN 탑재는 CSP(font-src)에 jsdelivr만 열려 있어 별도 결정 대상. */
+    /* Typography — 웹폰트 CDN 미탑재. CSP font-src가 gstatic을 막는다 */
     --font-body: 'Pretendard Variable', Pretendard, 'Noto Sans KR',
         system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo,
@@ -97,7 +94,6 @@
     --color-accent-sleep: #9AAAA1;
     --color-accent-muted: #2a3a2e;
 
-    /* 다크에서도 accent는 밝게 유지되므로 잉크는 그대로 어두운 값을 쓴다. */
     --ink-on-accent: #14211A;
 
     --color-note-bg: #2a2615;
@@ -125,11 +121,9 @@ body {
     background-color: var(--light-color);
     font-family: var(--font-body);
     color: var(--color-text);
-    /* 공통 수용 기준: 모든 수치는 자릿수가 흔들리지 않아야 한다. */
     font-variant-numeric: tabular-nums;
 }
 
-/* 시간·비율 등 표에서 세로로 줄맞춤이 필요한 수치. */
 .num {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
@@ -171,10 +165,7 @@ footer {
     font-size: 0.8rem;
 }
 
-/* =========================================================
-   Day Grid — 24행 × 6열. 한 행이 한 시간, 한 칸이 10분.
-   열 수는 화면 폭과 무관하게 6으로 고정한다.
-   ========================================================= */
+/* Day Grid — 24행 × 6열. 열 수는 화면 폭과 무관하게 고정 */
 .day-grid {
     display: flex;
     flex-direction: column;
@@ -228,7 +219,6 @@ footer {
     text-overflow: ellipsis;
 }
 
-/* 선택 표시는 별도 레이어에 그린다. 표시용 블록(run)을 건드리지 않는다. */
 .day-row__selection {
     position: absolute;
     inset: 0;
@@ -286,9 +276,7 @@ footer {
     }
 }
 
-/* =========================================================
-   Undo Snackbar — 저장·삭제 직후 되돌릴 기회를 준다
-   ========================================================= */
+/* Undo Snackbar */
 .undo-snackbar {
     position: fixed;
     left: 50%;
@@ -334,7 +322,6 @@ footer {
     background: rgba(255, 255, 255, 0.12);
 }
 
-/* 모바일은 하단 시트·탭바 위로 띄운다. */
 @media (max-width: 767.98px) {
     .undo-snackbar {
         left: 16px;
@@ -484,9 +471,6 @@ footer {
     background: var(--color-primary-hover);
     transform: translateY(-1px);
 }
-
-/* btn-outline-primary 는 --bs-primary 토큰을 그대로 따른다.
-   회색으로 덮어쓰던 !important 블록은 제거했다. */
 
 /* =========================================================
    Welcome Screen — 회원가입 직후 환영 화면
@@ -797,7 +781,6 @@ footer {
     flex: 1 1 0;
     min-width: 0;
 }
-/* 시안 3a–3d·4a–4d: 상자 탭이 아니라 밑줄 탭. 활성 탭만 2px 밑줄. */
 #statsTabs .nav-link {
     width: 100%;
     text-align: center;

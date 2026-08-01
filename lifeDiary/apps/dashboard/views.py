@@ -41,7 +41,6 @@ _restore_use_case = RestoreTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_
 
 
 def _read_day(user, target_date):
-    """저장 직후의 하루를 다시 읽어 행과 통계를 만든다."""
     slot_data = {
         block.slot_index: {"tag": block.tag, "memo": block.memo, "id": block.id}
         for block in _time_block_repo.find_by_date(user, target_date)
@@ -55,7 +54,6 @@ def _read_day(user, target_date):
 
 
 def _mutation_payload(request, target_date, slot_indexes, previous_state, extra=None):
-    """변경된 행과 통계, 그리고 되돌리기 토큰을 함께 싣는다."""
     rows, stats = _read_day(request.user, target_date)
     token = save_snapshot(
         request.session,
@@ -86,7 +84,6 @@ def dashboard_view(request):
         for block in time_blocks
     }
 
-    # 24행 × 6열. 같은 태그 연속 칸은 하나의 블록(run)으로 병합해 내려준다.
     slot_rows = build_slot_rows(slot_data)
 
     # 사용자의 모든 태그 + 공용 기본 태그 조회 (기본 태그 우선)
@@ -219,10 +216,10 @@ def _handle_delete(request, data):
 @login_required
 @require_http_methods(["POST"])
 def time_block_undo_api(request):
-    """직전 저장/삭제를 되돌린다.
+    """되돌릴 대상은 오직 세션 스냅샷에서만 온다.
 
-    되돌릴 대상은 오직 세션에 보관된 스냅샷에서만 온다. 요청 본문의 날짜나
-    슬롯은 읽지 않는다 — 읽으면 오래된 스냅샷을 엉뚱한 날짜에 덮어쓸 수 있다.
+    요청 본문의 날짜나 슬롯을 읽으면 오래된 스냅샷을 엉뚱한 날짜에 덮어쓸
+    수 있다.
     """
     logger = logging.getLogger(__name__)
 

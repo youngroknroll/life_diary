@@ -1,9 +1,4 @@
-"""24행 × 6열 그리드의 run 병합 규칙.
-
-시안 구현 명세 §3. 슬롯 144개를 평면으로 뿌리지 않고 시간(행) 단위로 묶어
-같은 태그 연속 칸을 하나의 블록(run)으로 병합한다. 병합은 뷰가 아니라 여기서
-하며, 저장 후 부분 갱신도 같은 함수를 재사용한다.
-"""
+"""24행 × 6열 그리드의 run 병합 규칙."""
 
 import pytest
 
@@ -54,7 +49,6 @@ def test_empty_day_renders_one_empty_run_per_row():
 
 
 def test_consecutive_same_tag_slots_merge_into_one_run(focus):
-    # 09:00–10:00 전체를 같은 태그로 채운다.
     slot_data = {index: slot(focus) for index in range(54, 60)}
 
     row = find_row(build_slot_rows(slot_data), 9)
@@ -66,7 +60,6 @@ def test_consecutive_same_tag_slots_merge_into_one_run(focus):
 
 
 def test_different_tags_do_not_merge(focus, meal):
-    # 12:00–12:30 식사, 12:30–13:00 집중.
     slot_data = {54 + 18 + i: slot(meal) for i in range(3)}
     slot_data.update({72 + 3 + i: slot(focus) for i in range(3)})
 
@@ -77,7 +70,6 @@ def test_different_tags_do_not_merge(focus, meal):
 
 
 def test_runs_never_cross_an_hour_boundary(focus):
-    # 09:30–10:30 — 두 행에 걸친 하나의 구간.
     slot_data = {index: slot(focus) for index in range(57, 63)}
 
     rows = build_slot_rows(slot_data)
@@ -87,7 +79,6 @@ def test_runs_never_cross_an_hour_boundary(focus):
 
 
 def test_empty_gaps_become_empty_runs(focus):
-    # 08:00–08:20 기록, 08:20–09:00 공백.
     slot_data = {48: slot(focus), 49: slot(focus)}
 
     row = find_row(build_slot_rows(slot_data), 8)
@@ -99,7 +90,6 @@ def test_empty_gaps_become_empty_runs(focus):
 
 
 def test_label_appears_only_from_three_slots(focus):
-    # 2칸(20분)은 라벨 없음, 3칸(30분)은 라벨 있음.
     short = {0: slot(focus), 1: slot(focus)}
     long = {6: slot(focus), 7: slot(focus), 8: slot(focus)}
 
@@ -108,7 +98,6 @@ def test_label_appears_only_from_three_slots(focus):
 
 
 def test_multi_hour_stretch_labels_only_the_first_row(focus):
-    # 09:00–11:00 — 두 행 모두 6칸이지만 라벨은 첫 행에만.
     slot_data = {index: slot(focus) for index in range(54, 66)}
 
     rows = build_slot_rows(slot_data)
@@ -133,7 +122,6 @@ def test_stretch_labels_first_row_that_is_wide_enough(focus):
 
 
 def test_same_tag_in_separate_stretches_labels_each(focus):
-    # 09:00–09:30 과 10:00–10:30 은 떨어져 있으므로 각각 라벨을 받는다.
     slot_data = {index: slot(focus) for index in (54, 55, 56, 60, 61, 62)}
 
     rows = build_slot_rows(slot_data)

@@ -1,12 +1,4 @@
-"""직전 동일 기간 비교.
-
-시안 분석 화면의 증감·스파크라인·기준선이 전부 여기서 나온다. 이 값이 없으면
-"+6.2h" "4주 평균 대비 −1.4h" 같은 표기가 성립하지 않는다.
-
-주 기간은 달력 주(월~일)를 쓴다. 시안은 롤링 7일 기준이지만 사용자가 달력
-주로 결정했다. 그래서 진행 중인 주를 완료된 주와 같은 자리에 두면 항상 낮게
-읽히는 문제가 생기고, is_partial 과 경과일 기준 분모가 그 답이다.
-"""
+"""직전 동일 기간 비교."""
 
 from datetime import date, timedelta
 
@@ -17,7 +9,7 @@ from apps.stats.aggregation.comparison import get_period_delta
 from apps.tags.models import Category, Tag
 
 
-# 2026-08-01 은 토요일. 그 주는 07-27(월)~08-02(일).
+# 2026-08-01 은 토요일. 그 주는 07-27(월)~08-02(일)
 SATURDAY = date(2026, 8, 1)
 SUNDAY = date(2026, 8, 2)
 
@@ -177,7 +169,6 @@ class TestPartialPeriod:
         self, user, focus
     ):
         """진행 중인 주를 7일로 나누면 0%가 실패처럼 읽힌다."""
-        # 토요일까지 6일 경과. 하루를 통째로 채운다.
         for offset in range(6):
             record(
                 user,
@@ -229,7 +220,6 @@ class TestSparkline:
 @pytest.mark.django_db
 class TestBaseline:
     def test_four_week_average_uses_the_four_finished_weeks_before(self, user, focus):
-        # 직전 4주에 각각 하루씩 60분. 평균은 60분.
         for weeks_back in range(1, 5):
             record(user, focus, date(2026, 7, 27) - timedelta(weeks=weeks_back), slots=6)
 

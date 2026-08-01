@@ -1,10 +1,4 @@
-"""기록 밀도 — 요일 × 시간 격자와 공백 패턴.
-
-시안 4a "기록 밀도" 히트맵과 "규칙적 09–11시 · 공백 15–17시" 문구의 근거다.
-태그와 무관하게 "언제 기록이 있었나"만 본다.
-
-격자 계산은 DB가 필요하지만 패턴 판정은 격자만 있으면 되므로 따로 증명한다.
-"""
+"""기록 밀도 — 요일 × 시간 격자와 공백 패턴."""
 
 from datetime import date, timedelta
 
@@ -116,7 +110,6 @@ class TestDensityGrid:
         assert all(minutes == 0 for row in grid for minutes in row)
 
     def test_each_slot_contributes_ten_minutes_to_its_hour(self, user, tag):
-        # 09:00–09:30 = 3칸.
         for slot_index in (54, 55, 56):
             record(user, tag, slot_index)
 
