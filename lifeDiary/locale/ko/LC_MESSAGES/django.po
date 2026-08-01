@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-01 16:18+0900\n"
+"POT-Creation-Date: 2026-08-01 16:42+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -134,7 +134,7 @@ msgid "태그 사용법"
 msgstr "태그 사용법"
 
 #: apps/dashboard/templates/dashboard/_tag_image_modal.html:24
-#: templates/index.html:342
+#: templates/index.html:446
 msgid "닫기"
 msgstr "닫기"
 
@@ -223,11 +223,13 @@ msgid "태그 선택"
 msgstr "태그 선택"
 
 #: apps/dashboard/templates/dashboard/index.html:135
+#: apps/tags/templates/tags/index.html:19
 msgid "새 태그"
 msgstr "새 태그"
 
 #: apps/dashboard/templates/dashboard/index.html:138
-#: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:13
+#: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:10
+#: apps/tags/templates/tags/index.html:15
 #: apps/users/templates/users/mypage.html:24
 msgid "태그 관리"
 msgstr "태그 관리"
@@ -427,6 +429,9 @@ msgstr "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리�
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
+"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
 "'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
 
 #: apps/stats/messages.py:24
@@ -477,7 +482,7 @@ msgstr "통계"
 #: apps/tags/templates/tags/index.html:4
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/login.html:5
-#: apps/users/templates/users/login.html:12
+#: apps/users/templates/users/login.html:11
 #: apps/users/templates/users/password/password_reset_complete.html:4
 #: apps/users/templates/users/password/password_reset_confirm.html:4
 #: apps/users/templates/users/password/password_reset_done.html:4
@@ -485,7 +490,7 @@ msgstr "통계"
 #: apps/users/templates/users/recovery/username_recovery_done.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:4
 #: apps/users/templates/users/signup.html:4
-#: apps/users/templates/users/signup.html:11
+#: apps/users/templates/users/signup.html:10
 #: apps/users/templates/users/welcome.html:4 templates/base.html:18
 #: templates/base.html:70 templates/legal/privacy.html:4
 #: templates/legal/terms.html:4
@@ -853,7 +858,6 @@ msgid "태그명은 공백일 수 없습니다."
 msgstr "태그명은 공백일 수 없습니다."
 
 #: apps/tags/templates/tags/_tag_modal.html:11
-#: apps/tags/templates/tags/index.html:20
 msgid "새 태그 생성"
 msgstr "새 태그 생성"
 
@@ -897,25 +901,35 @@ msgstr "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니�
 msgid "취소"
 msgstr "취소"
 
+#: apps/tags/templates/tags/index.html:7
+msgid "현재 위치"
+msgstr "현재 위치"
+
+#: apps/tags/templates/tags/index.html:8
+#: apps/users/templates/users/mypage.html:13 templates/base.html:83
+#: templates/base.html:96
+msgid "설정"
+msgstr "설정"
+
 #: apps/tags/templates/tags/index.html:15 templates/base.html:94
 msgid "관리자"
 msgstr "관리자"
 
-#: apps/tags/templates/tags/index.html:27
+#: apps/tags/templates/tags/index.html:16
+msgid "색은 카테고리가 정합니다. 같은 카테고리면 이름이 달라도 같은 색입니다."
+msgstr "색은 카테고리가 정합니다. 같은 카테고리면 이름이 달라도 같은 색입니다."
+
+#: apps/tags/templates/tags/index.html:30
 msgid "로딩 중"
 msgstr "로딩 중"
 
-#: apps/tags/templates/tags/index.html:29
+#: apps/tags/templates/tags/index.html:32
 msgid "태그 목록 불러오는 중..."
 msgstr "태그 목록 불러오는 중..."
 
-#: apps/tags/templates/tags/index.html:35
-msgid "등록된 태그가 없습니다."
-msgstr "등록된 태그가 없습니다."
-
-#: apps/tags/templates/tags/index.html:36
-msgid "새 태그를 생성하여 시간 기록을 시작해보세요."
-msgstr "새 태그를 생성하여 시간 기록을 시작해보세요."
+#: apps/tags/templates/tags/index.html:37
+msgid "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
+msgstr "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 
 #: apps/tags/use_cases.py:49 apps/tags/use_cases.py:73
 msgid "태그명과 색상을 입력해주세요."
@@ -981,15 +995,15 @@ msgstr "태그 삭제 중 오류가 발생했습니다."
 #: apps/users/forms.py:14 apps/users/forms.py:53
 #: apps/users/templates/users/password/password_reset_form.html:23
 #: apps/users/templates/users/recovery/username_recovery_form.html:20
-#: apps/users/templates/users/signup.html:44
+#: apps/users/templates/users/signup.html:34
 msgid "이메일"
 msgstr "이메일"
 
-#: apps/users/forms.py:15 apps/users/templates/users/signup.html:52
+#: apps/users/forms.py:15 apps/users/templates/users/signup.html:42
 msgid "아이디/비밀번호 찾기에 사용됩니다."
 msgstr "아이디/비밀번호 찾기에 사용됩니다."
 
-#: apps/users/forms.py:27 apps/users/templates/users/signup.html:38
+#: apps/users/forms.py:27 apps/users/templates/users/signup.html:28
 msgid "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
 msgstr "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
 
@@ -1100,38 +1114,40 @@ msgid "탈퇴 요청"
 msgstr "탈퇴 요청"
 
 #: apps/users/templates/users/login.html:5
-#: apps/users/templates/users/login.html:20
-#: apps/users/templates/users/login.html:69
+#: apps/users/templates/users/login.html:57
 #: apps/users/templates/users/password/password_reset_complete.html:14
-#: apps/users/templates/users/signup.html:106 apps/users/views.py:216
+#: apps/users/templates/users/signup.html:96 apps/users/views.py:216
 #: apps/users/views.py:261 templates/base.html:108
 msgid "로그인"
 msgstr "로그인"
 
-#: apps/users/templates/users/login.html:13
-#: apps/users/templates/users/signup.html:12
-msgid "오늘의 하루를 기록하고, 내일의 나를 만들어가세요."
-msgstr "오늘의 하루를 기록하고, 내일의 나를 만들어가세요."
+#: apps/users/templates/users/login.html:12
+msgid "다시 오셨네요"
+msgstr "다시 오셨네요"
 
-#: apps/users/templates/users/login.html:28
-#: apps/users/templates/users/signup.html:30
+#: apps/users/templates/users/login.html:13
+msgid "어제 기록이 그대로 기다리고 있습니다."
+msgstr "어제 기록이 그대로 기다리고 있습니다."
+
+#: apps/users/templates/users/login.html:18
+#: apps/users/templates/users/signup.html:20
 msgid "사용자명"
 msgstr "사용자명"
 
-#: apps/users/templates/users/login.html:38
-#: apps/users/templates/users/signup.html:58
+#: apps/users/templates/users/login.html:28
+#: apps/users/templates/users/signup.html:48
 msgid "비밀번호"
 msgstr "비밀번호"
 
-#: apps/users/templates/users/login.html:62
+#: apps/users/templates/users/login.html:52
 msgid "로그인 상태 유지"
 msgstr "로그인 상태 유지"
 
-#: apps/users/templates/users/login.html:75
+#: apps/users/templates/users/login.html:62
 msgid "Google로 계속하기"
 msgstr "Google로 계속하기"
 
-#: apps/users/templates/users/login.html:84
+#: apps/users/templates/users/login.html:70
 #: apps/users/templates/users/recovery/username_recovery_done.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:11
@@ -1139,28 +1155,22 @@ msgstr "Google로 계속하기"
 msgid "아이디 찾기"
 msgstr "아이디 찾기"
 
-#: apps/users/templates/users/login.html:88
+#: apps/users/templates/users/login.html:74
 #: apps/users/templates/users/password/password_reset_form.html:4
 #: apps/users/templates/users/password/password_reset_form.html:13
 msgid "비밀번호 찾기"
 msgstr "비밀번호 찾기"
 
-#: apps/users/templates/users/login.html:92
+#: apps/users/templates/users/login.html:78
 msgid "계정이 없으신가요?"
 msgstr "계정이 없으신가요?"
 
-#: apps/users/templates/users/login.html:94
+#: apps/users/templates/users/login.html:80
 #: apps/users/templates/users/signup.html:4
-#: apps/users/templates/users/signup.html:19
-#: apps/users/templates/users/signup.html:96 apps/users/views.py:189
-#: templates/index.html:244
+#: apps/users/templates/users/signup.html:86 apps/users/views.py:189
+#: templates/index.html:245
 msgid "회원가입"
 msgstr "회원가입"
-
-#: apps/users/templates/users/mypage.html:13 templates/base.html:83
-#: templates/base.html:96
-msgid "설정"
-msgstr "설정"
 
 #: apps/users/templates/users/mypage.html:22
 msgid "태그와 카테고리"
@@ -1378,7 +1388,15 @@ msgstr "아이디 받기"
 msgid "[라이프 다이어리] 아이디 찾기 안내"
 msgstr "[라이프 다이어리] 아이디 찾기 안내"
 
-#: apps/users/templates/users/signup.html:66
+#: apps/users/templates/users/signup.html:11
+msgid "30초면 됩니다"
+msgstr "30초면 됩니다"
+
+#: apps/users/templates/users/signup.html:12
+msgid "아이디와 비밀번호만 있으면 바로 기록을 시작할 수 있습니다."
+msgstr "아이디와 비밀번호만 있으면 바로 기록을 시작할 수 있습니다."
+
+#: apps/users/templates/users/signup.html:56
 msgid ""
 "• 8자 이상이어야 합니다<br>\n"
 "                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
@@ -1390,15 +1408,15 @@ msgstr ""
 "<br>\n"
 "                                • 숫자로만 구성될 수 없습니다"
 
-#: apps/users/templates/users/signup.html:74
+#: apps/users/templates/users/signup.html:64
 msgid "비밀번호 확인"
 msgstr "비밀번호 확인"
 
-#: apps/users/templates/users/signup.html:82
+#: apps/users/templates/users/signup.html:72
 msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
 msgstr "확인을 위해 동일한 비밀번호를 입력해주세요."
 
-#: apps/users/templates/users/signup.html:104
+#: apps/users/templates/users/signup.html:94
 msgid "이미 계정이 있으신가요?"
 msgstr "이미 계정이 있으신가요?"
 
@@ -1637,6 +1655,10 @@ msgid ""
 msgstr ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
 
+#: templates/index.html:220
+msgid "하루 10분 단위 기록"
+msgstr "하루 10분 단위 기록"
+
 #: templates/index.html:221
 msgid "하루를 단순하게 기록하세요"
 msgstr "하루를 단순하게 기록하세요"
@@ -1645,92 +1667,100 @@ msgstr "하루를 단순하게 기록하세요"
 msgid "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다."
 msgstr "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다."
 
-#: templates/index.html:230 templates/index.html:360
+#: templates/index.html:224
+msgid "비어 있는 구간을 끌어서 태그를 고르면 끝입니다."
+msgstr "비어 있는 구간을 끌어서 태그를 고르면 끝입니다."
+
+#: templates/index.html:231 templates/index.html:464
 msgid "오늘 기록하기"
 msgstr "오늘 기록하기"
 
-#: templates/index.html:235
+#: templates/index.html:236
 msgid "관리자 패널"
 msgstr "관리자 패널"
 
-#: templates/index.html:241
+#: templates/index.html:242
 msgid "로그인하고 기록 시작"
 msgstr "로그인하고 기록 시작"
 
-#: templates/index.html:250
+#: templates/index.html:251
 msgid "복잡한 정리 없이 이어지는 기록"
 msgstr "복잡한 정리 없이 이어지는 기록"
 
-#: templates/index.html:257
+#: templates/index.html:258
 msgid "기록하기"
 msgstr "기록하기"
 
-#: templates/index.html:258
+#: templates/index.html:259
 msgid "오늘 한 일을 가볍게 남깁니다."
 msgstr "오늘 한 일을 가볍게 남깁니다."
 
-#: templates/index.html:266
+#: templates/index.html:267
 msgid "정리하기"
 msgstr "정리하기"
 
-#: templates/index.html:267
+#: templates/index.html:268
 msgid "태그로 하루의 흐름을 구분합니다."
 msgstr "태그로 하루의 흐름을 구분합니다."
 
-#: templates/index.html:275
+#: templates/index.html:276
 msgid "돌아보기"
 msgstr "돌아보기"
 
-#: templates/index.html:276
+#: templates/index.html:277
 msgid "쌓인 기록에서 패턴을 확인합니다."
 msgstr "쌓인 기록에서 패턴을 확인합니다."
 
-#: templates/index.html:288
+#: templates/index.html:289
 msgid "오늘의 기록"
 msgstr "오늘의 기록"
 
-#: templates/index.html:289
+#: templates/index.html:290
 msgid "가볍게 남긴 하루"
 msgstr "가볍게 남긴 하루"
 
-#: templates/index.html:295 templates/index.html:341
+#: templates/index.html:296 templates/index.html:445
 msgid "소비시간의 분류"
 msgstr "소비시간의 분류"
 
-#: templates/index.html:301
+#: templates/index.html:302
 msgid "소비시간의 분류 이미지 크게 보기"
 msgstr "소비시간의 분류 이미지 크게 보기"
 
-#: templates/index.html:303
+#: templates/index.html:304
 msgid "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
 msgstr "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
 
-#: templates/index.html:305
+#: templates/index.html:306
 msgid "클릭해서 크게 볼 수 있습니다."
 msgstr "클릭해서 크게 볼 수 있습니다."
 
-#: templates/index.html:308
-msgid "하루 기록 예시"
-msgstr "하루 기록 예시"
+#: templates/index.html:309
+msgid "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
+msgstr "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
 
-#: templates/index.html:328
+#: templates/index.html:430
+msgid "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
+msgstr "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
+
+#: templates/index.html:432
 msgid "오늘의 한 줄"
 msgstr "오늘의 한 줄"
 
-#: templates/index.html:329
+#: templates/index.html:433
 msgid "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
 msgstr "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
 
-#: templates/index.html:345
+#: templates/index.html:449
 msgid "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
 msgstr "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
 
-#: templates/index.html:356
+#: templates/index.html:460
 #, python-format
 msgid "%(username)s님, 오늘 기록을 이어가세요"
 msgstr "%(username)s님, 오늘 기록을 이어가세요"
 
-#: templates/index.html:357
+#: templates/index.html:461
 msgid "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
 msgstr "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
 

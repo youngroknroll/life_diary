@@ -4,22 +4,25 @@
 {% block title %}{% trans "태그 관리" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
+<nav class="breadcrumb-trail" aria-label="{% trans '현재 위치' %}">
+    <a href="{% url 'users:mypage' %}">{% trans "설정" %}</a>
+    <span aria-hidden="true">›</span>
+    <span class="is-current">{% trans "태그 관리" %}</span>
+</nav>
+
+<div class="page-head mb-3">
+    <div>
+        <h1 class="page-title">{% trans "태그 관리" %}{% if user.is_superuser %} <span class="badge bg-warning text-dark">{% trans "관리자" %}</span>{% endif %}</h1>
+        <p class="page-subtitle">{% trans "색은 카테고리가 정합니다. 같은 카테고리면 이름이 달라도 같은 색입니다." %}</p>
+    </div>
+    <button type="button" class="btn-sian btn-sian--primary" onclick="openTagFormModal()">
+        {% trans "새 태그" %}
+    </button>
+</div>
+
 <div class="row">
     <div class="col-12">
         <div class="card">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-tags me-2"></i>
-                    {% trans "태그 관리" %}
-                    {% if user.is_superuser %}
-                        <small class="badge bg-warning text-dark ms-2">{% trans "관리자" %}</small>
-                    {% endif %}
-                </h5>
-                <button type="button" class="btn btn-primary btn-sm" onclick="openTagFormModal()">
-                    <i class="fas fa-plus me-1"></i>
-                    {% trans "새 태그 생성" %}
-                </button>
-            </div>
             <div class="card-body">
                 <div id="tagListContainer">
                     <div class="text-center py-4">
@@ -31,9 +34,7 @@
                 </div>
 
                 <div id="tagEmptyState" class="text-center py-4" style="display: none;">
-                    <i class="fas fa-tags text-muted mb-3" style="font-size: 3rem;"></i>
-                    <h5 class="text-muted">{% trans "등록된 태그가 없습니다." %}</h5>
-                    <p class="text-muted">{% trans "새 태그를 생성하여 시간 기록을 시작해보세요." %}</p>
+                    <p class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</p>
                 </div>
             </div>
         </div>

@@ -345,7 +345,104 @@ body {
     padding: 6px 0;
 }
 
-.settings-row + .page-head {
+.settings-row + /* 홈 미리보기 — 장식이 아니라 실제 기록 화면의 축소판이다 */
+.home-daygrid {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.home-daygrid__row {
+    display: grid;
+    grid-template-columns: 38px 1fr;
+    gap: 8px;
+    align-items: center;
+}
+
+.home-daygrid__label {
+    font: 500 9.5px/1 var(--font-mono);
+    color: var(--color-text-muted);
+    text-align: right;
+}
+
+.home-daygrid__cells {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 2px;
+}
+
+.home-daygrid__block {
+    height: 13px;
+    border-radius: 2px;
+    background: var(--color-track);
+}
+
+.home-daygrid__block.is-work { background: var(--color-accent-work); }
+.home-daygrid__block.is-move { background: var(--color-accent-move); }
+.home-daygrid__block.is-care { background: var(--color-accent-care); }
+.home-daygrid__block.is-rest { background: var(--color-accent-rest); }
+.home-daygrid__block.is-sleep { background: var(--color-accent-sleep); }
+
+.auth-panel {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.auth-panel__brand {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--color-primary);
+    margin-bottom: 22px;
+}
+
+.auth-panel__title {
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--color-text);
+    margin: 0 0 6px;
+}
+
+.auth-panel__lead {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0 0 22px;
+}
+
+.auth-panel__foot {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border-muted);
+    text-align: center;
+}
+
+.auth-card .card-body {
+    padding: 30px 32px 26px;
+}
+
+.breadcrumb-trail {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin-bottom: 10px;
+}
+
+.breadcrumb-trail a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.breadcrumb-trail .is-current {
+    color: var(--color-text);
+    font-weight: 500;
+}
+
+.settings-danger {
+    color: var(--color-danger-text);
+}
+
+.page-head {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;

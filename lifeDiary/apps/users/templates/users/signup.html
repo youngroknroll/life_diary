@@ -4,22 +4,12 @@
 {% block title %}{% trans "회원가입" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
-<div class="auth-split shadow">
-    <aside class="auth-split__brand" aria-labelledby="auth-brand-title">
-        <div class="auth-split__brand-inner">
-            <i class="fas fa-book-open auth-split__logo" aria-hidden="true"></i>
-            <h2 id="auth-brand-title" class="auth-split__title">{% trans "라이프 다이어리" %}</h2>
-            <p class="auth-split__tagline">{% trans "오늘의 하루를 기록하고, 내일의 나를 만들어가세요." %}</p>
-        </div>
-    </aside>
-    <div class="card auth-card auth-split__panel">
-        <div class="card-header text-center">
-            <h3 class="mb-0 h4">
-                <i class="fas fa-user-plus me-2" aria-hidden="true"></i>
-                {% trans "회원가입" %}
-            </h3>
-        </div>
+<div class="auth-panel">
+    <div class="card auth-card">
         <div class="card-body">
+                <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
+                <h1 class="auth-panel__title">{% trans "30초면 됩니다" %}</h1>
+                <p class="auth-panel__lead">{% trans "아이디와 비밀번호만 있으면 바로 기록을 시작할 수 있습니다." %}</p>
                 <form id="signupForm" method="post"
                       data-check-username-url="{% url 'users:check_username' %}"
                       data-check-email-url="{% url 'users:check_email' %}"

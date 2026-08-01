@@ -23,7 +23,9 @@ class TestHomePage:
         assert "소비시간의 분류" in body
         assert 'data-bs-target="#homePreviewImageModal"' in body
         assert 'id="homePreviewImageModal"' in body
-        assert "10분 단위" not in body
+        # 시안 5a 는 "하루 10분 단위 기록"을 히어로 kicker 로 쓴다.
+        # 홈에서 10분 단위를 감추던 2026-04-11 결정을 뒤집은 것이다.
+        assert "10분 단위" in body
 
     def test_home_page_renders_korean_footer_copyright(self, ko_client):
         response = ko_client.get(reverse("home"))

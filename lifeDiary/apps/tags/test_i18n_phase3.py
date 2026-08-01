@@ -13,7 +13,7 @@ class TestTagsEnglish:
         body = response.content.decode()
         assert "Create new tag" in body
         assert "Loading tags..." in body
-        assert "No tags yet." in body
+        assert "no tags yet" in body.lower()
         assert "새 태그 생성" not in body
 
     def test_tags_modal_labels_english(self, auth_en_client):
