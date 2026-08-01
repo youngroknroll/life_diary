@@ -3,9 +3,9 @@
    ========================================================= */
 :root {
     /* Brand palette (녹색 테마) */
-    --color-primary: #2f7d4f;
-    --color-primary-hover: #25663f;
-    --color-primary-soft: #e8f4ec;
+    --color-primary: #2C6E4A;
+    --color-primary-hover: #235B3C;
+    --color-primary-soft: #EDF3EE;
     --color-primary-border: #98c7aa;
 
     /* Text */
@@ -14,17 +14,22 @@
 
     /* Surface */
     --color-surface: #ffffff;
-    --color-surface-soft: #f3f8f5;
-    --color-border: #d8e3d8;
+    --color-surface-soft: #F5F6F4;
+    --color-border: #E3E6E1;
     --color-border-soft: #dfe7df;
     --color-border-muted: #e1e8e1;
 
-    /* Accent (하루 기록 블록) */
-    --color-accent-work: #4f9f68;
-    --color-accent-rest: #f0c24b;
-    --color-accent-move: #6cb6c9;
-    --color-accent-care: #e48f73;
+    /* Accent — 소비시간 5분류. 색은 카테고리가 정하며 태그별로 고르지 않는다. */
+    --color-accent-work: #4E8F63;   /* 투자시간 */
+    --color-accent-move: #4F8B9E;   /* 주도적 사용시간 */
+    --color-accent-care: #C1715A;   /* 수동적 소비시간 */
+    --color-accent-rest: #C99A2E;   /* 기초 생활시간 */
+    --color-accent-sleep: #8A9A91;  /* 수면시간 */
     --color-accent-muted: #dbe8df;
+
+    /* 태그·활동 색 위의 텍스트는 항상 이 잉크를 쓴다.
+       흰 글자는 밝은 accent 위에서 4.5:1을 넘기지 못한다. */
+    --ink-on-accent: #14211A;
 
     /* Note (노란 강조 박스) */
     --color-note-bg: #fff7df;
@@ -41,13 +46,13 @@
     --dark-color: var(--color-text);
 
     /* Bootstrap 5 CSS 변수 오버라이드 — btn-outline-primary, text-primary 등 자동 적용 */
-    --bs-primary: #2f7d4f;
-    --bs-primary-rgb: 47, 125, 79;
+    --bs-primary: #2C6E4A;
+    --bs-primary-rgb: 44, 110, 74;
 
     /* Radius */
     --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 15px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
 
     /* Responsive heights — clamp(min, viewport, max).
        모든 차트·스크롤 패널 공용. 한 곳에서만 조정. */
@@ -58,8 +63,13 @@
     --chart-cap-md: clamp(220px, 35vh, 320px);
     --chart-cap-lg: clamp(260px, 45vh, 420px);
 
-    /* Typography */
-    --font-body: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Typography.
+       웹폰트는 아직 싣지 않는다 — 설치돼 있으면 쓰고 없으면 system-ui로 떨어진다.
+       CDN 탑재는 CSP(font-src)에 jsdelivr만 열려 있어 별도 결정 대상. */
+    --font-body: 'Pretendard Variable', Pretendard, 'Noto Sans KR',
+        system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo,
+        Consolas, monospace;
 }
 
 /* =========================================================
@@ -81,10 +91,14 @@
     --color-border-muted: #2a3630;
 
     --color-accent-work: #5cb87e;
-    --color-accent-rest: #d4a93a;
     --color-accent-move: #5a9fb0;
     --color-accent-care: #c97a5f;
+    --color-accent-rest: #d4a93a;
+    --color-accent-sleep: #9AAAA1;
     --color-accent-muted: #2a3a2e;
+
+    /* 다크에서도 accent는 밝게 유지되므로 잉크는 그대로 어두운 값을 쓴다. */
+    --ink-on-accent: #14211A;
 
     --color-note-bg: #2a2615;
     --color-note-border: #5d4a15;
@@ -111,6 +125,14 @@ body {
     background-color: var(--light-color);
     font-family: var(--font-body);
     color: var(--color-text);
+    /* 공통 수용 기준: 모든 수치는 자릿수가 흔들리지 않아야 한다. */
+    font-variant-numeric: tabular-nums;
+}
+
+/* 시간·비율 등 표에서 세로로 줄맞춤이 필요한 수치. */
+.num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .navbar {
@@ -150,43 +172,86 @@ footer {
 }
 
 /* =========================================================
-   Time Grid (대시보드 시간대 입력)
+   Day Grid — 24행 × 6열. 한 행이 한 시간, 한 칸이 10분.
+   열 수는 화면 폭과 무관하게 6으로 고정한다.
    ========================================================= */
-.time-grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 2px;
-    max-width: 100%;
-    margin: 0 auto;
+.day-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
     -webkit-user-select: none;
     user-select: none;
+    touch-action: pan-y;
 }
 
-.time-slot {
-    aspect-ratio: 1;
-    border: 1px solid var(--color-border);
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s ease;
+.day-row {
+    display: grid;
+    grid-template-columns: 46px 1fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.day-row__label {
+    font: 500 10.5px/1 var(--font-mono);
+    color: var(--color-text-muted);
+    text-align: right;
+}
+
+.day-row__cells {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
     position: relative;
-    min-height: 30px;
-    -webkit-user-select: none;
-    user-select: none;
+}
+
+.slot-block {
+    height: 19px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    padding: 0 7px;
+    cursor: pointer;
+    color: var(--ink-on-accent);
+    font: 600 10.5px/1 var(--font-body);
     -webkit-touch-callout: none;
 }
 
-.time-slot:hover {
-    transform: scale(1.05);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.slot-block.is-empty {
+    background: #F1F3F0;
+    padding: 0;
 }
 
-.time-slot.selected {
-    border-width: 2px;
-    border-color: var(--color-primary);
+.slot-block__label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.time-slot.filled {
-    opacity: 0.9;
+/* 선택 표시는 별도 레이어에 그린다. 표시용 블록(run)을 건드리지 않는다. */
+.day-row__selection {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    pointer-events: none;
+}
+
+.day-row__selection .is-selected {
+    border-radius: 3px;
+    background: var(--color-primary-soft);
+    box-shadow: 0 0 0 1.5px var(--color-primary) inset;
+}
+
+.day-header__cell {
+    font: 500 10px/1 var(--font-mono);
+    color: var(--color-text-muted);
+    text-align: center;
+}
+
+[data-theme="dark"] .slot-block.is-empty {
+    background: var(--color-surface-soft);
 }
 
 .dashboard-date-header {
@@ -195,37 +260,17 @@ footer {
     align-items: center;
 }
 
-.time-header-cell {
-    font-weight: 500;
-}
-
-.slot-time {
-    font-size: 0.7rem;
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    color: var(--color-text-muted);
-    line-height: 1;
-    -webkit-user-select: none;
-    user-select: none;
+@media (max-width: 767.98px) {
+    .day-row {
+        grid-template-columns: 40px 1fr;
+        gap: 8px;
+    }
+    .slot-block {
+        height: 22px;
+    }
 }
 
 @media (max-width: 768px) {
-    .time-grid {
-        grid-template-columns: repeat(6, 1fr);
-        margin: 0 1rem;
-        touch-action: pan-y;
-    }
-    .time-slot {
-        aspect-ratio: auto;
-        min-height: 20px;
-    }
-    .slot-time {
-        font-size: 0.6rem;
-    }
-    .time-header-cell:nth-child(n+7) {
-        display: none;
-    }
     .dashboard-date-header {
         flex-direction: column;
         gap: 0.5rem;
@@ -238,12 +283,6 @@ footer {
     }
     .dashboard-stats small {
         font-size: 0.7rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .time-slot {
-        min-height: 16px;
     }
 }
 
@@ -355,12 +394,13 @@ footer {
    Card & Button (전역 공통)
    ========================================================= */
 .card-header {
-    background: var(--color-primary);
-    color: white;
+    background: var(--color-surface);
+    color: var(--color-text);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .card-header .nav-link {
-    color: white !important;
+    color: var(--color-text) !important;
 }
 
 .card-header .nav-link.active {
@@ -378,25 +418,8 @@ footer {
     transform: translateY(-1px);
 }
 
-/* Bootstrap btn-outline-primary 강제 오버라이드 — 직접 color 속성 사용 */
-.btn.btn-outline-primary,
-.btn-outline-primary {
-    color: rgba(0, 0, 0, 0.55) !important;
-    border: 1px solid rgba(0, 0, 0, 0.3) !important;
-    border-radius: 6px !important;
-    background-color: transparent !important;
-}
-
-.btn.btn-outline-primary:hover,
-.btn.btn-outline-primary:focus,
-.btn.btn-outline-primary:active,
-.btn-outline-primary:hover,
-.btn-outline-primary:focus,
-.btn-outline-primary:active {
-    color: #ffffff !important;
-    background-color: #2f7d4f !important;
-    border-color: #2f7d4f !important;
-}
+/* btn-outline-primary 는 --bs-primary 토큰을 그대로 따른다.
+   회색으로 덮어쓰던 !important 블록은 제거했다. */
 
 /* =========================================================
    Welcome Screen — 회원가입 직후 환영 화면
@@ -540,7 +563,7 @@ footer {
 }
 
 .auth-split__brand {
-    background: linear-gradient(135deg, #2f7d4f 0%, #1f5d3a 100%);
+    background: linear-gradient(135deg, #2C6E4A 0%, #1B4A31 100%);
     color: #fff;
     display: flex;
     align-items: center;
@@ -707,23 +730,27 @@ footer {
     flex: 1 1 0;
     min-width: 0;
 }
+/* 시안 3a–3d·4a–4d: 상자 탭이 아니라 밑줄 탭. 활성 탭만 2px 밑줄. */
 #statsTabs .nav-link {
     width: 100%;
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    border: 1px solid transparent;
-    border-bottom: none;
-    transition: background-color 0.15s, border-color 0.15s;
+    border: none;
+    border-bottom: 1px solid var(--color-border);
+    border-radius: 0;
+    color: var(--color-text-muted);
+    background-color: transparent;
+    transition: color 0.15s, border-color 0.15s;
 }
 #statsTabs .nav-link:hover:not(.active) {
-    background-color: var(--color-surface-soft);
-    border-color: var(--color-border-soft);
+    color: var(--color-text);
 }
 #statsTabs .nav-link.active {
-    border-color: var(--color-border);
-    border-bottom-color: var(--color-surface);
+    color: var(--color-primary);
+    background-color: transparent;
+    border-bottom: 2px solid var(--color-primary);
     font-weight: 600;
 }
 #statsTabs .nav-link:focus-visible {
@@ -999,12 +1026,6 @@ footer {
 [data-theme="dark"] .auth-card .password-strength.is-good .password-strength__label { color: #60a5fa; }
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
-
-[data-theme="dark"] .btn.btn-outline-primary,
-[data-theme="dark"] .btn-outline-primary {
-    color: var(--color-text-muted) !important;
-    border-color: var(--color-border) !important;
-}
 
 [data-theme="dark"] .date-selector .btn-outline-primary {
     color: white !important;
