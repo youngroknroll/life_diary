@@ -5,6 +5,11 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext, gettext_lazy as _
 
 
+# CSS 의 --ink-on-accent 와 같은 값. 서버가 인라인 style 로도 내보내야 해서
+# 여기에 한 번 더 둔다.
+INK_ON_ACCENT = "#0F1A14"
+
+
 # DB-stored Category 이름/설명을 makemessages가 수집하도록 등록.
 # Why: 카테고리는 DB에 한국어로 저장되며 표시 시점에 gettext로 번역된다.
 # How to apply: 새 카테고리를 추가하면 이 튜플에도 포함시켜야 en 번역 가능.
@@ -136,11 +141,12 @@ class Tag(models.Model):
 
     @property
     def text_color(self):
-        """배경색 대비 텍스트 색상 (YIQ 공식 기반)"""
-        hex_color = self.color.lstrip('#')
-        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
-        yiq = (r * 299 + g * 587 + b * 114) / 1000
-        return '#212529' if yiq >= 128 else '#ffffff'
+        """태그 색 위 텍스트는 항상 같은 잉크를 쓴다.
+
+        밝기로 흰 글자와 검은 글자를 뒤집으면 중간 밝기 색에서 4.5:1을
+        넘기지 못한다. 다섯 카테고리 색은 모두 이 잉크로 기준을 통과한다.
+        """
+        return INK_ON_ACCENT
 
     def __str__(self):
         if self.is_default:

@@ -3,6 +3,7 @@
     <input type="date"
            class="form-control form-control-sm date-input-sm"
            id="dateSelector"
+           aria-label="{% trans '날짜 선택' %}"
            value="{{ selected_date|date:'Y-m-d' }}"
            {% if ds_onchange %}onchange="{{ ds_onchange }}"{% endif %}>
     <button class="btn btn-sm btn-outline-primary" onclick="goToToday()">

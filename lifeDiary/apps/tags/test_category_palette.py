@@ -2,7 +2,7 @@
 
 import pytest
 
-from apps.tags.models import Category, Tag
+from apps.tags.models import INK_ON_ACCENT, Category, Tag
 
 
 SIAN_PALETTE = {
@@ -81,12 +81,25 @@ class TestTagFollowsItsCategory:
 
         assert first.color == second.color
 
+    def test_tag_text_color_is_always_the_shared_ink(self, make_user):
+        """밝기에 따라 흰 글자로 뒤집으면 4.5:1을 넘기지 못한다."""
+        user = make_user(username="inkuser")
+
+        for category in Category.objects.all():
+            tag = Tag.objects.create(
+                user=user,
+                name=f"태그{category.pk}",
+                is_default=False,
+                category=category,
+            )
+            assert tag.text_color == INK_ON_ACCENT
+
     def test_text_ink_is_readable_on_every_category_color(self):
         """태그 색 위 텍스트는 항상 같은 잉크를 쓴다."""
         user_tag_colors = Category.objects.values_list("color", flat=True)
 
         for color in user_tag_colors:
-            assert _contrast_ratio(color, "#0F1A14") >= 4.5
+            assert _contrast_ratio(color, INK_ON_ACCENT) >= 4.5
 
 
 def _relative_luminance(hex_color):

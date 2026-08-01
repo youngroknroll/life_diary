@@ -158,11 +158,13 @@
                                 <button type="button" class="btn btn-sm btn-outline-success me-1" id="createNewTagBtn">
                                     <i class="fas fa-plus"></i> {% trans "새 태그" %}
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-primary me-1" id="manageTagsBtn">
-                                    <i class="fas fa-cog"></i>
+                                <button type="button" class="btn btn-sm btn-outline-primary me-1" id="manageTagsBtn"
+                                        aria-label="{% trans '태그 관리' %}">
+                                    <i class="fas fa-cog" aria-hidden="true"></i>
                                 </button>
-                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#usageHelp" aria-expanded="false" aria-controls="usageHelp">
-                                    <i class="fas fa-question-circle"></i>
+                                <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="collapse" data-bs-target="#usageHelp" aria-expanded="false" aria-controls="usageHelp"
+                                        aria-label="{% trans '사용법 도움말' %}">
+                                    <i class="fas fa-question-circle" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </div>

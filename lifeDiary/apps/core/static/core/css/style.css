@@ -40,13 +40,16 @@
     --success-color: #198754;
     --warning-color: #ffc107;
     --danger-color: #dc3545;
-    --info-color: #0dcaf0;
+    /* 부트스트랩 기본 #0dcaf0 은 흰 배경에서 1.96:1 이라 본문에 못 쓴다 */
+    --info-color: #0a7c92;
     --light-color: var(--color-surface-soft);
     --dark-color: var(--color-text);
 
     /* Bootstrap 5 CSS 변수 오버라이드 — btn-outline-primary, text-primary 등 자동 적용 */
     --bs-primary: #2C6E4A;
     --bs-primary-rgb: 44, 110, 74;
+    --bs-info: #0a7c92;
+    --bs-info-rgb: 10, 124, 146;
 
     /* Radius */
     --radius-sm: 6px;
@@ -104,12 +107,15 @@
     --success-color: #22a45c;
     --warning-color: #e6ac00;
     --danger-color: #e05555;
-    --info-color: #17a2b8;
+    /* 다크 표면에서는 밝은 쪽이 대비를 얻는다 */
+    --info-color: #4FC3D9;
     --light-color: var(--color-surface-soft);
     --dark-color: var(--color-text);
 
     --bs-primary: #4aa66d;
     --bs-primary-rgb: 74, 166, 109;
+    --bs-info: #4FC3D9;
+    --bs-info-rgb: 79, 195, 217;
 
     color-scheme: dark;
 }
@@ -257,6 +263,14 @@ footer {
     }
     .slot-block {
         height: 22px;
+    }
+}
+
+/* 시안은 19/22px 이지만 WCAG 2.5.8 최소 타깃은 24px 이다. 손가락으로
+   고르는 기기에서는 화면 폭과 무관하게 기준을 따른다. */
+@media (pointer: coarse) {
+    .slot-block {
+        height: 24px;
     }
 }
 
