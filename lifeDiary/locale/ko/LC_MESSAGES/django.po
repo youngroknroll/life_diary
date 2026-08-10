@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 17:16+0900\n"
+"POT-Creation-Date: 2026-08-10 17:48+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,9 +82,8 @@ msgstr "슬롯 인덱스"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 
-#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:219
-#: apps/stats/templates/stats/index.html:278
-#: apps/stats/templates/stats/index.html:335 apps/tags/models.py:114
+#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:220
+#: apps/stats/templates/stats/index.html:289 apps/tags/models.py:114
 #: apps/users/forms.py:69 apps/users/templates/users/_goal_table_section.html:7
 msgid "태그"
 msgstr "태그"
@@ -510,9 +509,10 @@ msgstr "통계"
 #: apps/users/templates/users/password/password_change_done.html:4
 #: apps/users/templates/users/password/password_change_form.html:5
 #: apps/users/templates/users/password/password_reset_complete.html:4
-#: apps/users/templates/users/password/password_reset_confirm.html:4
+#: apps/users/templates/users/password/password_reset_confirm.html:5
 #: apps/users/templates/users/password/password_reset_done.html:4
-#: apps/users/templates/users/password/password_reset_form.html:4
+#: apps/users/templates/users/password/password_reset_form.html:5
+#: apps/users/templates/users/password/password_reset_form.html:11
 #: apps/users/templates/users/recovery/username_recovery_done.html:4
 #: apps/users/templates/users/recovery/username_recovery_form.html:4
 #: apps/users/templates/users/signup.html:5
@@ -543,6 +543,7 @@ msgid "요약"
 msgstr "요약"
 
 #: apps/stats/templates/stats/index.html:29
+#: apps/stats/templates/stats/index.html:359
 msgid "일"
 msgstr "일"
 
@@ -610,7 +611,7 @@ msgid "카테고리"
 msgstr "카테고리"
 
 #: apps/stats/templates/stats/index.html:111
-#: apps/stats/templates/stats/index.html:220
+#: apps/stats/templates/stats/index.html:221
 #: apps/users/templates/users/mypage.html:102
 #: apps/users/templates/users/usergoal_form.html:43
 msgid "시간"
@@ -659,7 +660,7 @@ msgid "전날 대비"
 msgstr "전날 대비"
 
 #: apps/stats/templates/stats/index.html:199
-#: apps/stats/templates/stats/index.html:313
+#: apps/stats/templates/stats/index.html:324
 msgid "지난 기간 없음"
 msgstr "지난 기간 없음"
 
@@ -679,93 +680,128 @@ msgstr "하루 구성"
 msgid "24시간 기준 · 미기록 포함"
 msgstr "24시간 기준 · 미기록 포함"
 
-#: apps/stats/templates/stats/index.html:221
+#: apps/stats/templates/stats/index.html:216
+#| msgid "하루 구성"
+msgid "하루 구성 표"
+msgstr "하루 구성 표"
+
+#: apps/stats/templates/stats/index.html:222
 msgid "24h 비율"
 msgstr "24h 비율"
 
-#: apps/stats/templates/stats/index.html:240
+#: apps/stats/templates/stats/index.html:223
+#| msgid "슬롯 클릭"
+msgid "슬롯"
+msgstr "슬롯"
+
+#: apps/stats/templates/stats/index.html:224
+#| msgid "일 평균"
+msgid "7일 평균 대비"
+msgstr "7일 평균 대비"
+
+#: apps/stats/templates/stats/index.html:251
 msgid "주 합계"
 msgstr "주 합계"
 
-#: apps/stats/templates/stats/index.html:244
-#: apps/stats/templates/stats/index.html:305
+#: apps/stats/templates/stats/index.html:255
+#: apps/stats/templates/stats/index.html:316
 msgid "기록한 날"
 msgstr "기록한 날"
 
-#: apps/stats/templates/stats/index.html:248
+#: apps/stats/templates/stats/index.html:259
 msgid "가장 많은 요일"
 msgstr "가장 많은 요일"
 
-#: apps/stats/templates/stats/index.html:252 apps/users/forms.py:70
+#: apps/stats/templates/stats/index.html:263 apps/users/forms.py:70
 #: apps/users/templates/users/welcome.html:80
 msgid "기간"
 msgstr "기간"
 
-#: apps/stats/templates/stats/index.html:258
-#: apps/stats/templates/stats/index.html:320
+#: apps/stats/templates/stats/index.html:269
+#: apps/stats/templates/stats/index.html:331
 #, python-format
 msgid "추세선은 %(d)s일 더 필요합니다"
 msgstr "추세선은 %(d)s일 더 필요합니다"
 
-#: apps/stats/templates/stats/index.html:259
-#: apps/stats/templates/stats/index.html:321
+#: apps/stats/templates/stats/index.html:270
+#: apps/stats/templates/stats/index.html:332
 #, python-format
 msgid ""
 "지금까지 %(n)s일 기록했습니다. 선으로 읽히려면 점이 더 있어야 해서, 그때까지"
 "는 아래 누적으로 보여드립니다."
 msgstr ""
 
-#: apps/stats/templates/stats/index.html:260
-#: apps/stats/templates/stats/index.html:322
+#: apps/stats/templates/stats/index.html:271
+#: apps/stats/templates/stats/index.html:333
 msgid "오늘 기록 이어가기"
 msgstr "오늘 기록 이어가기"
 
-#: apps/stats/templates/stats/index.html:264
+#: apps/stats/templates/stats/index.html:275
 msgid "태그별 추세"
 msgstr "태그별 추세"
 
-#: apps/stats/templates/stats/index.html:264
+#: apps/stats/templates/stats/index.html:275
 msgid "요일별 시간"
 msgstr "요일별 시간"
 
-#: apps/stats/templates/stats/index.html:269
+#: apps/stats/templates/stats/index.html:280
 msgid "요일별 기록량"
 msgstr "요일별 기록량"
 
-#: apps/stats/templates/stats/index.html:274
-#: apps/stats/templates/stats/index.html:331
+#: apps/stats/templates/stats/index.html:285
 msgid "태그 순위"
 msgstr "태그 순위"
 
-#: apps/stats/templates/stats/index.html:274
-#: apps/stats/templates/stats/index.html:331
+#: apps/stats/templates/stats/index.html:285
 msgid "기록한 날 기준 하루 평균"
 msgstr "기록한 날 기준 하루 평균"
 
-#: apps/stats/templates/stats/index.html:279
-#: apps/stats/templates/stats/index.html:337
+#: apps/stats/templates/stats/index.html:290
 msgid "하루 평균"
 msgstr "하루 평균"
 
-#: apps/stats/templates/stats/index.html:297
+#: apps/stats/templates/stats/index.html:308
 msgid "월 합계"
 msgstr "월 합계"
 
-#: apps/stats/templates/stats/index.html:301
+#: apps/stats/templates/stats/index.html:312
+#: apps/stats/templates/stats/index.html:349
 msgid "일 평균"
 msgstr "일 평균"
 
-#: apps/stats/templates/stats/index.html:310
+#: apps/stats/templates/stats/index.html:321
 msgid "지난달 대비"
 msgstr "지난달 대비"
 
-#: apps/stats/templates/stats/index.html:326
+#: apps/stats/templates/stats/index.html:337
 msgid "태그별 일별 추세"
 msgstr "태그별 일별 추세"
 
-#: apps/stats/templates/stats/index.html:336
-msgid "합계"
-msgstr "합계"
+#: apps/stats/templates/stats/index.html:342
+msgid "주차별 요약"
+msgstr "주차별 요약"
+
+#: apps/stats/templates/stats/index.html:343
+msgid "주차별 요약 표"
+msgstr "주차별 요약 표"
+
+#: apps/stats/templates/stats/index.html:347
+#| msgid "주"
+msgid "주차"
+msgstr "주차"
+
+#: apps/stats/templates/stats/index.html:348 templates/base.html:79
+#: templates/base.html:140
+msgid "기록"
+msgstr "기록"
+
+#: apps/stats/templates/stats/index.html:352
+msgid "직전 대비"
+msgstr "직전 대비"
+
+#: apps/stats/templates/stats/index.html:365
+msgid "진행 중"
+msgstr "진행 중"
 
 #: apps/stats/templates/stats/life_feedback.html:9
 msgid "Goal progress"
@@ -975,7 +1011,7 @@ msgid ""
 "계 방식이 함께 정해집니다."
 msgstr ""
 
-#: apps/tags/templates/tags/category_guide.html:39
+#: apps/tags/templates/tags/category_guide.html:46
 msgid ""
 "같은 활동이라도 계획했는지 아닌지에 따라 카테고리가 갈립니다 — 정해 둔 OTT는 "
 "주도적 사용시간, 어쩌다 켠 OTT는 수동적 소비시간. 태그를 두 개로 나눠 두면 "
@@ -1042,53 +1078,100 @@ msgstr "같은 태그로는 옮길 수 없습니다."
 msgid "옮길 태그를 찾을 수 없습니다."
 msgstr "옮길 태그를 찾을 수 없습니다."
 
-#: apps/tags/views.py:63
+#: apps/tags/views.py:48
+msgid "집중 작업"
+msgstr "집중 작업"
+
+#: apps/tags/views.py:48
+msgid "회의"
+msgstr "회의"
+
+#: apps/tags/views.py:48
+msgid "학습"
+msgstr "학습"
+
+#: apps/tags/views.py:49
+msgid "운동"
+msgstr "운동"
+
+#: apps/tags/views.py:49
+msgid "약속"
+msgstr "약속"
+
+#: apps/tags/views.py:50
+#| msgid "열기"
+msgid "여가"
+msgstr "여가"
+
+#: apps/tags/views.py:50
+msgid "멍때림"
+msgstr "멍때림"
+
+#: apps/tags/views.py:51
+msgid "식사"
+msgstr "식사"
+
+#: apps/tags/views.py:51
+msgid "이동"
+msgstr "이동"
+
+#: apps/tags/views.py:52
+#| msgid "수면시간"
+msgid "수면"
+msgstr "수면"
+
+#: apps/tags/views.py:52
+#| msgid "잠, 낮잠"
+msgid "낮잠"
+msgstr "낮잠"
+
+#: apps/tags/views.py:76
 msgid "카테고리 목록"
 msgstr "카테고리 목록"
 
-#: apps/tags/views.py:80
+#: apps/tags/views.py:93
 msgid "카테고리 조회 중 오류가 발생했습니다."
 msgstr "카테고리 조회 중 오류가 발생했습니다."
 
-#: apps/tags/views.py:90
+#: apps/tags/views.py:103
 msgid "태그 목록"
 msgstr "태그 목록"
 
-#: apps/tags/views.py:110
+#: apps/tags/views.py:123
 msgid "태그 조회 중 오류가 발생했습니다."
 msgstr "태그 조회 중 오류가 발생했습니다."
 
-#: apps/tags/views.py:115 apps/tags/views.py:144
+#: apps/tags/views.py:128 apps/tags/views.py:157
 msgid "잘못된 형식의 요청입니다."
 msgstr "잘못된 형식의 요청입니다."
 
-#: apps/tags/views.py:125
+#: apps/tags/views.py:138
 msgid "태그가 생성되었습니다."
 msgstr "태그가 생성되었습니다."
 
-#: apps/tags/views.py:134
+#: apps/tags/views.py:147
 msgid "태그 생성 중 오류가 발생했습니다."
 msgstr "태그 생성 중 오류가 발생했습니다."
 
-#: apps/tags/views.py:155
+#: apps/tags/views.py:168
 msgid "태그가 수정되었습니다."
 msgstr "태그가 수정되었습니다."
 
-#: apps/tags/views.py:164
+#: apps/tags/views.py:177
 msgid "태그 수정 중 오류가 발생했습니다."
 msgstr "태그 수정 중 오류가 발생했습니다."
 
-#: apps/tags/views.py:176
+#: apps/tags/views.py:189
 #, python-format
 msgid "\"%(name)s\" 태그가 삭제되었습니다."
 msgstr "\"%(name)s\" 태그가 삭제되었습니다."
 
-#: apps/tags/views.py:184
+#: apps/tags/views.py:197
 msgid "태그 삭제 중 오류가 발생했습니다."
 msgstr "태그 삭제 중 오류가 발생했습니다."
 
 #: apps/users/forms.py:14 apps/users/forms.py:59
-#: apps/users/templates/users/password/password_reset_form.html:23
+#: apps/users/templates/users/password/password_reset_form.html:18
 #: apps/users/templates/users/recovery/username_recovery_form.html:20
 #: apps/users/templates/users/signup.html:33
 msgid "이메일"
@@ -1236,7 +1319,6 @@ msgstr "어제 기록이 그대로 기다리고 있습니다."
 #: apps/users/templates/users/login.html:19
 #: apps/users/templates/users/mypage.html:134
 #: apps/users/templates/users/signup.html:21
-#| msgid "아이디 찾기"
 msgid "아이디"
 msgstr "아이디"
 
@@ -1246,7 +1328,6 @@ msgid "비밀번호"
 msgstr "비밀번호"
 
 #: apps/users/templates/users/login.html:29
-#| msgid "비밀번호가 변경되었습니다"
 msgid "비밀번호가 맞지 않습니다"
 msgstr "비밀번호가 맞지 않습니다"
 
@@ -1272,8 +1353,8 @@ msgid "아이디 찾기"
 msgstr "아이디 찾기"
 
 #: apps/users/templates/users/login.html:69
-#: apps/users/templates/users/password/password_reset_form.html:4
-#: apps/users/templates/users/password/password_reset_form.html:13
+#: apps/users/templates/users/password/password_reset_form.html:5
+#: apps/users/templates/users/password/password_reset_form.html:12
 msgid "비밀번호 찾기"
 msgstr "비밀번호 찾기"
 
@@ -1358,7 +1439,6 @@ msgid "분석 화면의 달성 일수 기준"
 msgstr "분석 화면의 달성 일수 기준"
 
 #: apps/users/templates/users/mypage.html:132
-#| msgid "설정"
 msgid "계정"
 msgstr "계정"
 
@@ -1366,7 +1446,6 @@ msgstr "계정"
 #: apps/users/templates/users/password/password_change_form.html:5
 #: apps/users/templates/users/password/password_change_form.html:14
 #: apps/users/templates/users/password/password_change_form.html:17
-#: apps/users/templates/users/password/password_reset_confirm.html:32
 msgid "비밀번호 변경"
 msgstr "비밀번호 변경"
 
@@ -1386,7 +1465,6 @@ msgid "비밀번호 변경 완료"
 msgstr "비밀번호 변경 완료"
 
 #: apps/users/templates/users/password/password_change_done.html:10
-#| msgid "비밀번호가 변경되었습니다"
 msgid "비밀번호를 바꿨습니다"
 msgstr "비밀번호를 바꿨습니다"
 
@@ -1395,7 +1473,6 @@ msgid "다음 로그인부터 새 비밀번호를 쓰세요. 지금 세션은 �
 msgstr "다음 로그인부터 새 비밀번호를 쓰세요. 지금 세션은 그대로 유지됩니다."
 
 #: apps/users/templates/users/password/password_change_done.html:14
-#| msgid "로그인으로 돌아가기"
 msgid "설정으로 돌아가기"
 msgstr "설정으로 돌아가기"
 
@@ -1404,7 +1481,6 @@ msgid "현재 비밀번호를 확인한 뒤 새 비밀번호로 바꿉니다."
 msgstr "현재 비밀번호를 확인한 뒤 새 비밀번호로 바꿉니다."
 
 #: apps/users/templates/users/password/password_change_form.html:24
-#| msgid "새 비밀번호"
 msgid "현재 비밀번호"
 msgstr "현재 비밀번호"
 
@@ -1414,33 +1490,38 @@ msgid "새 비밀번호"
 msgstr "새 비밀번호"
 
 #: apps/users/templates/users/password/password_change_form.html:36
-#: apps/users/templates/users/password/password_reset_confirm.html:25
+#: apps/users/templates/users/password/password_reset_confirm.html:23
 msgid "새 비밀번호 확인"
 msgstr "새 비밀번호 확인"
 
 #: apps/users/templates/users/password/password_change_form.html:42
-#| msgid "비밀번호 찾기"
+#: apps/users/templates/users/password/password_reset_confirm.html:28
 msgid "비밀번호 바꾸기"
 msgstr "비밀번호 바꾸기"
 
-#: apps/users/templates/users/password/password_reset_complete.html:12
+#: apps/users/templates/users/password/password_reset_complete.html:10
 msgid "비밀번호가 변경되었습니다"
 msgstr "비밀번호가 변경되었습니다"
 
-#: apps/users/templates/users/password/password_reset_complete.html:13
+#: apps/users/templates/users/password/password_reset_complete.html:11
 msgid "새 비밀번호로 로그인하실 수 있습니다."
 msgstr "새 비밀번호로 로그인하실 수 있습니다."
 
-#: apps/users/templates/users/password/password_reset_confirm.html:4
+#: apps/users/templates/users/password/password_reset_confirm.html:5
 #: apps/users/templates/users/password/password_reset_confirm.html:11
 msgid "새 비밀번호 설정"
 msgstr "새 비밀번호 설정"
 
-#: apps/users/templates/users/password/password_reset_confirm.html:37
+#: apps/users/templates/users/password/password_reset_confirm.html:14
+#| msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
+msgid "새로 쓸 비밀번호를 입력하세요."
+msgstr "새로 쓸 비밀번호를 입력하세요."
+
+#: apps/users/templates/users/password/password_reset_confirm.html:32
 msgid "재설정 링크가 유효하지 않거나 이미 사용되었습니다. 다시 요청해주세요."
 msgstr "재설정 링크가 유효하지 않거나 이미 사용되었습니다. 다시 요청해주세요."
 
-#: apps/users/templates/users/password/password_reset_confirm.html:40
+#: apps/users/templates/users/password/password_reset_confirm.html:34
 msgid "다시 요청하기"
 msgstr "다시 요청하기"
 
@@ -1448,12 +1529,12 @@ msgstr "다시 요청하기"
 msgid "비밀번호 재설정 메일 발송"
 msgstr "비밀번호 재설정 메일 발송"
 
-#: apps/users/templates/users/password/password_reset_done.html:12
+#: apps/users/templates/users/password/password_reset_done.html:10
 #: apps/users/templates/users/recovery/username_recovery_done.html:12
 msgid "메일을 확인해주세요"
 msgstr "메일을 확인해주세요"
 
-#: apps/users/templates/users/password/password_reset_done.html:14
+#: apps/users/templates/users/password/password_reset_done.html:12
 msgid ""
 "입력하신 이메일이 등록되어 있다면, 비밀번호 재설정 링크가 발송되었습니다. 메"
 "일이 보이지 않으면 스팸함을 확인해주세요."
@@ -1462,7 +1543,7 @@ msgstr ""
 "일이 보이지 않으면 스팸함을 확인해주세요."
 
 #: apps/users/templates/users/password/password_reset_done.html:16
-#: apps/users/templates/users/password/password_reset_form.html:37
+#: apps/users/templates/users/password/password_reset_form.html:28
 #: apps/users/templates/users/recovery/username_recovery_done.html:16
 #: apps/users/templates/users/recovery/username_recovery_form.html:32
 msgid "로그인으로 돌아가기"
@@ -1495,13 +1576,13 @@ msgstr "본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩
 msgid "— 라이프 다이어리"
 msgstr "— 라이프 다이어리"
 
-#: apps/users/templates/users/password/password_reset_form.html:18
+#: apps/users/templates/users/password/password_reset_form.html:13
 msgid ""
 "가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
 msgstr ""
 "가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
 
-#: apps/users/templates/users/password/password_reset_form.html:31
+#: apps/users/templates/users/password/password_reset_form.html:23
 msgid "재설정 링크 받기"
 msgstr "재설정 링크 받기"
 
@@ -1579,11 +1660,12 @@ msgid ""
 "<a href=\"%(terms_url)s\" target=\"_blank\" rel=\"noopener\">이용약관</a>과 "
 "<a href=\"%(privacy_url)s\" target=\"_blank\" rel=\"noopener\">개인정보처리방"
 "침</a>에 동의합니다"
-msgstr "<a href=\"%(terms_url)s\" target=\"_blank\" rel=\"noopener\">이용약관</a>과 "
-"<a href=\"%(privacy_url)s\" target=\"_blank\" rel=\"noopener\">개인정보처리방침</a>에 동의합니다"
+msgstr ""
+"<a href=\"%(terms_url)s\" target=\"_blank\" rel=\"noopener\">이용약관</a>과 "
+"<a href=\"%(privacy_url)s\" target=\"_blank\" rel=\"noopener\">개인정보처리방"
+"침</a>에 동의합니다"
 
 #: apps/users/templates/users/signup.html:88
-#| msgid "기록 시작하기"
 msgid "가입하고 시작하기"
 msgstr "가입하고 시작하기"
 
@@ -1825,10 +1907,6 @@ msgstr "페이지를 불러오는 중입니다..."
 #: templates/base.html:77 templates/base.html:136
 msgid "홈"
 msgstr "홈"
-
-#: templates/base.html:79 templates/base.html:140
-msgid "기록"
-msgstr "기록"
 
 #: templates/base.html:89
 msgid "계정 메뉴"

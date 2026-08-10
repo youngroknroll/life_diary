@@ -3,7 +3,7 @@ import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import gettext
+from django.utils.translation import gettext, gettext_lazy as _
 from django.views.decorators.http import require_http_methods, require_GET
 
 from apps.core.utils import success_response, error_response
@@ -43,14 +43,27 @@ def index(request):
     return render(request, "tags/index.html")
 
 
+# 안내 화면의 예시일 뿐 사용자 태그가 아니다. 시안 7a 의 세 번째 열.
+CATEGORY_EXAMPLE_TAGS = {
+    "investment": [_("집중 작업"), _("회의"), _("학습")],
+    "proactive": [_("운동"), _("약속")],
+    "passive": [_("여가"), _("멍때림")],
+    "basic_life": [_("식사"), _("이동")],
+    "sleep": [_("수면"), _("낮잠")],
+}
+
+
 @login_required
 @require_GET
 def category_guide(request):
     """소비시간 다섯 분류 설명. 색이 무엇을 뜻하는지 읽는 화면이다."""
+    categories = list(_category_repo.find_all())
+    for category in categories:
+        category.example_tags = CATEGORY_EXAMPLE_TAGS.get(category.slug, [])
     return render(
         request,
         "tags/category_guide.html",
-        {"categories": _category_repo.find_all()},
+        {"categories": categories},
     )
 
 

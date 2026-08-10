@@ -665,7 +665,7 @@ body {
 
 .category-guide__row {
     display: grid;
-    grid-template-columns: 172px 1fr;
+    grid-template-columns: minmax(160px, 172px) 1fr minmax(180px, 210px);
     gap: 16px;
     align-items: start;
     border: 1px solid var(--color-border);
@@ -2363,4 +2363,32 @@ footer {
         transform-origin: 0 0;
         height: 70px;
     }
+}
+
+/* 증감은 색만으로 말하지 않는다 — 부호를 항상 함께 둔다 */
+.data-table .is-delta-up { color: var(--color-primary); }
+.data-table .is-delta-down { color: var(--color-danger-text); }
+.data-table .is-primary { font-weight: 600; }
+.data-table .text-meta { color: var(--color-text-meta); }
+
+/* 시안 4b 의 하루 구성은 3열을 유지한다. 슬롯·7일 평균 대비는 좁은 화면에서 뺀다 */
+@media (max-width: 575.98px) {
+    .data-table .is-wide-only {
+        display: none;
+    }
+}
+
+/* 읽기 전용 예시다 — 클릭 핸들러도 tabindex 도 붙이지 않는다 */
+.category-guide__examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.category-guide__examples .chip {
+    min-height: 26px;
+    font-size: 11.5px;
 }

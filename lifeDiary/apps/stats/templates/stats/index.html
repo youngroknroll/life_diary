@@ -213,24 +213,35 @@
                                       title="{{ tag.name }}"></span>
                             {% endfor %}
                         </div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">{% trans "태그" %}</th>
-                                    <th scope="col" class="is-num">{% trans "시간" %}</th>
-                                    <th scope="col" class="is-num">{% trans "24h 비율" %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for tag in daily_stats.tag_stats %}
-                                    <tr{% if tag.is_unclassified %} class="is-rest"{% endif %}>
-                                        <td><span class="chip__swatch" style="background-color: {% if tag.is_unclassified %}var(--color-track){% else %}{{ tag.color }}{% endif %}"></span>{{ tag.name }}</td>
-                                        <td class="is-num num">{{ tag.hours }}h</td>
-                                        <td class="is-num num">{% widthratio tag.hours 24 100 %}%</td>
+                        <div class="table-scroll" tabindex="0" role="region" aria-label="{% trans '하루 구성 표' %}">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% trans "태그" %}</th>
+                                        <th scope="col" class="is-num">{% trans "시간" %}</th>
+                                        <th scope="col" class="is-num">{% trans "24h 비율" %}</th>
+                                        <th scope="col" class="is-num is-wide-only">{% trans "슬롯" %}</th>
+                                        <th scope="col" class="is-num is-wide-only">{% trans "7일 평균 대비" %}</th>
                                     </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {% for tag in daily_stats.tag_stats %}
+                                        <tr{% if tag.is_unclassified %} class="is-rest"{% endif %}>
+                                            <td><span class="chip__swatch" style="background-color: {% if tag.is_unclassified %}var(--color-track){% else %}{{ tag.color }}{% endif %}"></span>{{ tag.name }}</td>
+                                            <td class="is-num num">{{ tag.hours }}h</td>
+                                            <td class="is-num num">{% widthratio tag.hours 24 100 %}%</td>
+                                            <td class="is-num num is-wide-only">{{ tag.blocks }}</td>
+                                            <td class="is-num num is-wide-only">
+                                                {% if tag.delta_vs_week is None %}—
+                                                {% elif tag.delta_vs_week > 0 %}<span class="is-delta-up">+{{ tag.delta_vs_week }}h</span>
+                                                {% elif tag.delta_vs_week < 0 %}<span class="is-delta-down">{{ tag.delta_vs_week }}h</span>
+                                                {% else %}+0.0h{% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     <div class="tab-pane fade" id="weekly" role="tabpanel">
@@ -328,27 +339,41 @@
                             <canvas id="monthlyLineChart"></canvas>
                         </div>
 
-                        <div class="section-title">{% trans "태그 순위" %}<span class="section-title__note">{% trans "기록한 날 기준 하루 평균" %}</span></div>
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th scope="col">{% trans "태그" %}</th>
-                                    <th scope="col" class="is-num">{% trans "합계" %}</th>
-                                    <th scope="col" class="is-num">{% trans "하루 평균" %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for tag in monthly_stats.tag_stats %}
-                                    {% if not tag.is_unclassified %}
+                        <div class="section-title">{% trans "주차별 요약" %}</div>
+                        <div class="table-scroll" tabindex="0" role="region" aria-label="{% trans '주차별 요약 표' %}">
+                            <table class="data-table weekly-summary">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">{% trans "주차" %}</th>
+                                        <th scope="col" class="is-num">{% trans "기록" %}</th>
+                                        <th scope="col" class="is-num">{% trans "일 평균" %}</th>
+                                        {% if weekly_summary.0.top_tag_name %}
+                                            <th scope="col" class="is-num">{{ weekly_summary.0.top_tag_name }}</th>
+                                            <th scope="col" class="is-num">{% trans "직전 대비" %}</th>
+                                        {% endif %}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for week in weekly_summary %}
                                         <tr>
-                                            <td><span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}</td>
-                                            <td class="is-num num">{{ tag.total_hours }}h</td>
-                                            <td class="is-num num">{{ tag.avg_hours }}h</td>
+                                            <td>{{ week.start|date:"m-d" }} – {{ week.end|date:"m-d" }}{% if week.is_partial %} <span class="text-meta">({{ week.days }}{% trans "일" %})</span>{% endif %}</td>
+                                            <td class="is-num num is-primary">{{ week.hours }}h</td>
+                                            <td class="is-num num">{{ week.avg_hours }}h</td>
+                                            {% if week.top_tag_name %}
+                                                <td class="is-num num">{{ week.top_tag_hours }}h</td>
+                                                <td class="is-num{% if not week.in_progress %} num{% endif %}">
+                                                    {% if week.in_progress %}<span class="text-meta">{% trans "진행 중" %}</span>
+                                                    {% elif week.delta is None %}—
+                                                    {% elif week.delta > 0 %}<span class="is-delta-up">+{{ week.delta }}h</span>
+                                                    {% elif week.delta < 0 %}<span class="is-delta-down">{{ week.delta }}h</span>
+                                                    {% else %}+0.0h{% endif %}
+                                                </td>
+                                            {% endif %}
                                         </tr>
-                                    {% endif %}
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                     
