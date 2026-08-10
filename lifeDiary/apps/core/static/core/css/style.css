@@ -315,7 +315,7 @@ body {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    min-height: 40px;
+    min-height: 44px;
     padding: 9px 14px;
     border: 1px solid var(--color-border);
     border-radius: 9px;
@@ -880,7 +880,12 @@ body {
 }
 
 /* Tables grow columns over time; keep the overflow inside the table, never on
-   the page body. Focusable so keyboard users can reach clipped columns. */
+   the page body.
+
+   Consumers MUST render this as
+   `<div class="table-scroll" tabindex="0" role="region" aria-label="...">`.
+   CSS alone cannot grant focus, so without tabindex a keyboard user cannot
+   reach the clipped columns. */
 .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
@@ -1849,11 +1854,16 @@ footer {
 .auth-card .password-toggle {
     position: absolute;
     top: 50%;
-    right: 8px;
+    right: 4px;
     transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     background: transparent;
     border: 0;
-    padding: 6px 10px;
+    padding: 0;
     color: var(--color-text-muted);
     cursor: pointer;
     border-radius: var(--radius-sm, 6px);
@@ -2343,4 +2353,14 @@ footer {
 .goal-table td:nth-last-child(-n+2),
 .goal-table th:nth-last-child(-n+2) {
     text-align: center;
+}
+
+/* Google's reCAPTCHA iframe is a fixed ~304px and overflows the auth card at
+   360px. Scale it down rather than letting the page scroll sideways. */
+@media (max-width: 400px) {
+    .auth-card .g-recaptcha {
+        transform: scale(0.9);
+        transform-origin: 0 0;
+        height: 70px;
+    }
 }
