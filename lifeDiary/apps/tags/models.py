@@ -4,6 +4,8 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext, gettext_lazy as _
 
+from .name_limit import MAX_TAG_NAME_LENGTH
+
 
 # CSS 의 --ink-on-accent 와 같은 값. 서버가 인라인 style 로도 내보내야 해서
 # 여기에 한 번 더 둔다.
@@ -88,7 +90,9 @@ class Tag(models.Model):
         help_text=_("null이면 기본 태그 (모든 사용자 공용)"),
     )
     name = models.CharField(
-        max_length=50, verbose_name=_("태그명"), help_text=_("최대 50자까지 입력 가능")
+        max_length=MAX_TAG_NAME_LENGTH,
+        verbose_name=_("태그명"),
+        help_text=_("최대 10자까지 입력 가능"),
     )
     color = models.CharField(
         max_length=7,

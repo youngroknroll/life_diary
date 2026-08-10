@@ -78,8 +78,8 @@ class TestHomePageEnglish:
         response = en_client.get(reverse("javascript-catalog"))
         assert response.status_code == 200
         body = response.content.decode("utf-8")
-        assert "Select a category" in body
-        assert "Create new tag" in body
+        assert "New tag" in body
+        assert "Create tag" in body
         assert "Processing..." in body
 
 

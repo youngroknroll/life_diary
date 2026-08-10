@@ -41,7 +41,7 @@ class TestMypageEnglish:
         assert "Period" in body
         assert "Target hours" in body
         assert "Delete account" in body
-        assert "Account deletion" in body
+        assert "Tags and categories" in body
         assert "설정된" not in body
         assert "목표 추가" not in body
         assert "계정 탈퇴" not in body

@@ -14,6 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!tagFormModalEl) return; // 모달이 없는 페이지에서는 실행하지 않음
 
     const tagFormModal = new bootstrap.Modal(tagFormModalEl);
+
+    // 모달을 data-bs-toggle 이 아니라 JS 로 열기 때문에 Bootstrap 이 트리거를
+    // 모른다. 닫을 때 포커스를 직접 돌려주지 않으면 body 로 떨어진다.
+    let modalOpener = null;
+    tagFormModalEl.addEventListener('hidden.bs.modal', function () {
+        if (modalOpener && document.contains(modalOpener)) {
+            modalOpener.focus();
+        }
+        modalOpener = null;
+    });
     
     const colorPicker = document.getElementById('tagFormColor');
     const colorText = document.getElementById('tagFormColorText');
@@ -28,34 +38,87 @@ document.addEventListener('DOMContentLoaded', function() {
         if (colorSwatch) colorSwatch.style.backgroundColor = color;
     }
 
-    function syncColorFromCategory() {
-        const select = document.getElementById('tagFormCategory');
-        if (!select || !window._categories) return;
-        const chosen = window._categories.find(cat => String(cat.id) === select.value);
-        syncTagColorInputs(chosen && chosen.color);
+    // 시안 7b 의 카테고리별 한 줄 설명. 7a 의 전체 설명과 달리 고르는 자리에서
+    // 읽는 짧은 꼬리표다.
+    const CATEGORY_HINTS = {
+        investment: gettext('목표 영역'),
+        proactive: gettext('계획 안'),
+        passive: gettext('계획 밖'),
+        basic_life: gettext('준비 · 이동'),
+        sleep: gettext('잠 · 낮잠')
+    };
+
+    function chosenCategory() {
+        const picked = document.querySelector('input[name="tagFormCategory"]:checked');
+        if (!picked || !window._categories) return null;
+        return window._categories.find(cat => String(cat.id) === picked.value) || null;
     }
 
-    const categorySelect = document.getElementById('tagFormCategory');
-    if (categorySelect) {
-        categorySelect.addEventListener('change', syncColorFromCategory);
+    function updatePreview() {
+        const category = chosenCategory();
+        const nameInput = document.getElementById('tagFormName');
+        const previewName = document.getElementById('tagFormPreviewName');
+        const note = document.getElementById('tagFormColorNote');
+
+        if (previewName) {
+            previewName.textContent = (nameInput && nameInput.value.trim()) || gettext('새 태그');
+        }
+        if (category) {
+            syncTagColorInputs(category.color);
+        }
+        if (note) {
+            note.textContent = category
+                ? interpolate(gettext('%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다.'), [category.name])
+                : gettext('카테고리를 고르면 색이 정해집니다.');
+        }
     }
 
-    // 카테고리 드롭다운 초기화
+    // 카테고리 선택지 — 네이티브 라디오라 방향키 이동과 탭 정지 하나를
+    // 브라우저가 처리한다. div 로 흉내 내면 둘 다 직접 만들어야 한다.
     function populateCategorySelect(selectedCategoryId) {
-        const select = document.getElementById('tagFormCategory');
-        if (!select || !window._categories) return;
-        select.innerHTML = `<option value="">${gettext('카테고리를 선택하세요')}</option>`;
+        const host = document.getElementById('tagFormCategoryOptions');
+        if (!host || !window._categories) return;
+        host.innerHTML = '';
+
         window._categories.forEach(cat => {
-            const option = document.createElement('option');
-            option.value = cat.id;
-            option.textContent = cat.name;
+            const id = `tagFormCategory_${cat.id}`;
+            const label = document.createElement('label');
+            label.className = 'category-picker__option';
+            label.setAttribute('for', id);
+
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'tagFormCategory';
+            input.id = id;
+            input.value = cat.id;
+            input.required = true;
+            input.className = 'category-picker__radio';
             if (selectedCategoryId && cat.id === selectedCategoryId) {
-                option.selected = true;
+                input.checked = true;
             }
-            select.appendChild(option);
+            input.addEventListener('change', updatePreview);
+
+            const swatch = document.createElement('span');
+            swatch.className = 'category-picker__swatch';
+            swatch.style.backgroundColor = cat.color;
+
+            const name = document.createElement('span');
+            name.className = 'category-picker__name';
+            name.textContent = cat.name;
+
+            const hint = document.createElement('span');
+            hint.className = 'category-picker__hint';
+            hint.textContent = CATEGORY_HINTS[cat.slug] || '';
+
+            label.append(input, swatch, name, hint);
+            host.appendChild(label);
         });
-        syncColorFromCategory();
+
+        updatePreview();
     }
+
+    const nameInputEl = document.getElementById('tagFormName');
+    if (nameInputEl) nameInputEl.addEventListener('input', updatePreview);
 
     // 전역 함수로 모달 열기 함수 등록
     window.openTagFormModal = function(tag = null) {
@@ -68,10 +131,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const colorInput = document.getElementById('tagFormColor');
         const colorTextInput = document.getElementById('tagFormColorText');
         const isDefaultCheckbox = document.getElementById('tagFormIsDefault');
+        const saveLabel = document.getElementById('saveTagFormBtn');
 
         if (tag) {
             // 태그 수정
             titleEl.textContent = gettext('태그 수정');
+            if (saveLabel) saveLabel.textContent = gettext('저장');
             tagIdInput.value = tag.id;
             nameInput.value = tag.name;
             colorInput.value = tag.color;
@@ -82,17 +147,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             // 새 태그 생성
-            titleEl.textContent = gettext('새 태그 생성');
+            titleEl.textContent = gettext('새 태그');
+            if (saveLabel) saveLabel.textContent = gettext('태그 만들기');
             tagIdInput.value = '';
-            const defaultColor = '#007bff';
-            colorInput.value = defaultColor;
-            colorTextInput.value = defaultColor; // 텍스트 필드 값도 설정
+            colorInput.value = '';
+            colorTextInput.value = '';
             populateCategorySelect(null);
             if (isDefaultCheckbox) {
                 isDefaultCheckbox.checked = false;
             }
         }
         
+        modalOpener = document.activeElement;
         tagFormModal.show();
     };
 
@@ -103,8 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const color = document.getElementById('tagFormColor').value; // 색상 선택기의 최종 값을 사용
         const isDefaultEl = document.getElementById('tagFormIsDefault');
         const is_default = isDefaultEl ? isDefaultEl.checked : false;
-        const categorySelect = document.getElementById('tagFormCategory');
-        const category_id = categorySelect ? parseInt(categorySelect.value) : null;
+        const pickedCategory = document.querySelector('input[name="tagFormCategory"]:checked');
+        const category_id = pickedCategory ? parseInt(pickedCategory.value) : null;
 
         if (!name) {
             showNotification(gettext('태그명을 입력해주세요.'), 'warning');

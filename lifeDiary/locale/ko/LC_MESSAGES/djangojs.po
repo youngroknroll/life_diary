@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-02 05:29+0900\n"
+"POT-Creation-Date: 2026-08-10 18:41+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,43 +18,78 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/core/static/core/js/tag.js:47
-msgid "카테고리를 선택하세요"
-msgstr "카테고리를 선택하세요"
+#: apps/core/static/core/js/tag.js:44
+msgid "목표 영역"
+msgstr "목표 영역"
 
-#: apps/core/static/core/js/tag.js:74
+#: apps/core/static/core/js/tag.js:45
+msgid "계획 안"
+msgstr "계획 안"
+
+#: apps/core/static/core/js/tag.js:46
+msgid "계획 밖"
+msgstr "계획 밖"
+
+#: apps/core/static/core/js/tag.js:47
+msgid "준비 · 이동"
+msgstr "준비 · 이동"
+
+#: apps/core/static/core/js/tag.js:48
+msgid "잠 · 낮잠"
+msgstr "잠 · 낮잠"
+
+#: apps/core/static/core/js/tag.js:64 apps/core/static/core/js/tag.js:150
+#| msgid "새 태그 생성"
+msgid "새 태그"
+msgstr "새 태그"
+
+#: apps/core/static/core/js/tag.js:71
+#, javascript-format
+msgid "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
+msgstr "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
+
+#: apps/core/static/core/js/tag.js:72
+msgid "카테고리를 고르면 색이 정해집니다."
+msgstr "카테고리를 고르면 색이 정해집니다."
+
+#: apps/core/static/core/js/tag.js:138
 msgid "태그 수정"
 msgstr "태그 수정"
 
-#: apps/core/static/core/js/tag.js:85
-msgid "새 태그 생성"
-msgstr "새 태그 생성"
+#: apps/core/static/core/js/tag.js:139
+#| msgid "저장중..."
+msgid "저장"
+msgstr "저장"
 
-#: apps/core/static/core/js/tag.js:110
+#: apps/core/static/core/js/tag.js:151
+msgid "태그 만들기"
+msgstr "태그 만들기"
+
+#: apps/core/static/core/js/tag.js:176
 msgid "태그명을 입력해주세요."
 msgstr "태그명을 입력해주세요."
 
-#: apps/core/static/core/js/tag.js:115
+#: apps/core/static/core/js/tag.js:181
 msgid "카테고리를 선택해주세요."
 msgstr "카테고리를 선택해주세요."
 
-#: apps/core/static/core/js/tag.js:137
+#: apps/core/static/core/js/tag.js:203
 #, javascript-format
 msgid "태그 저장 실패: %s"
 msgstr "태그 저장 실패: %s"
 
-#: apps/core/static/core/js/tag.js:155
+#: apps/core/static/core/js/tag.js:221
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "태그 삭제 실패: %s"
 
-#: apps/core/static/core/js/tag.js:176
+#: apps/core/static/core/js/tag.js:242
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:200
+#: apps/core/static/core/js/tag.js:266
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr "'%s' 태그를 정말 삭제하시겠습니까?"
@@ -263,3 +298,7 @@ msgstr "비밀번호가 일치합니다."
 #: apps/users/static/users/js/signup-validate.js:108
 msgid "비밀번호가 일치하지 않습니다."
 msgstr "비밀번호가 일치하지 않습니다."
+
+#: apps/users/static/users/js/signup-validate.js:143
+msgid "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
+msgstr "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."

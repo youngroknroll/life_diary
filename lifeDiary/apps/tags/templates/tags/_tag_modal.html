@@ -1,55 +1,63 @@
 {% load i18n %}
 <!--
-    태그 생성 및 수정을 위한 공통 모달
+    태그 생성 및 수정을 위한 공통 모달 (시안 7b)
     - ID: tagFormModal
-    - 이 템플릿을 include하는 곳에서는 tag_form_js.html도 함께 include 해야 합니다.
+    - 카테고리는 드롭다운이 아니라 다섯 개의 네이티브 라디오다. 방향키 이동과
+      roving tabindex 를 브라우저가 처리한다.
+    - 색 선택기는 없다. 색이 카테고리를 뜻하므로 사용자가 고르면 의미가 깨진다.
 -->
-<div class="modal fade" id="tagFormModal" tabindex="-1" style="z-index: 1060;">
-    <div class="modal-dialog">
+<div class="modal fade" id="tagFormModal" tabindex="-1" aria-labelledby="tagFormModalTitle" style="z-index: 1060;">
+    <div class="modal-dialog modal-dialog-centered tag-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="tagFormModalTitle">{% trans "새 태그 생성" %}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
             <div class="modal-body">
+                <h2 class="tag-modal__title" id="tagFormModalTitle">{% trans "새 태그" %}</h2>
+                <p class="tag-modal__lead">{% trans "이름과 카테고리만 정하면 됩니다. 색은 카테고리를 따라갑니다." %}</p>
+
                 <form id="tagForm">
                     <input type="hidden" id="tagFormTagId">
+
                     <div class="mb-3">
-                        <label for="tagFormCategory" class="form-label">{% trans "카테고리" %}</label>
-                        <select class="form-select tag-category-select" id="tagFormCategory" required>
-                            <option value="">{% trans "카테고리를 선택하세요" %}</option>
-                        </select>
+                        <label for="tagFormName" class="form-label">{% trans "이름" %}</label>
+                        <input type="text" class="form-control" id="tagFormName" maxlength="10" required>
+                        <div class="form-text">{% trans "최대 10자" %}</div>
                     </div>
+
+                    <fieldset class="mb-3 category-picker">
+                        <legend class="form-label">
+                            {% trans "카테고리 대분류" %}
+                            <span class="category-picker__required">{% trans "필수" %}</span>
+                        </legend>
+                        <div id="tagFormCategoryOptions" class="category-picker__list"></div>
+                    </fieldset>
+
                     <div class="mb-3">
-                        <label for="tagFormName" class="form-label">{% trans "태그명" %}</label>
-                        <input type="text" class="form-control" id="tagFormName" maxlength="50" required>
-                    </div>
-                    <div class="mb-3">
-                        <div class="form-label">{% trans "색상" %}</div>
                         <div class="tag-color-preview" id="tagFormColorPreview">
-                            <span class="chip__swatch" id="tagFormColorSwatch"></span>
-                            <span class="tag-color-preview__text">{% trans "색은 카테고리를 따릅니다. 같은 카테고리 태그와 같은 색으로 저장됩니다." %}</span>
+                            <span class="chip" id="tagFormPreviewChip">
+                                <span class="chip__swatch" id="tagFormColorSwatch"></span>
+                                <span id="tagFormPreviewName">{% trans "새 태그" %}</span>
+                            </span>
+                            <span class="tag-color-preview__text" id="tagFormColorNote"></span>
                         </div>
                         <input type="hidden" id="tagFormColor" value="">
                         <input type="hidden" id="tagFormColorText" value="">
                     </div>
+
                     {% if user.is_superuser %}
                     <div class="mb-3" id="tagFormDefaultOption">
                         <div class="form-check">
                             <input class="form-check-input" type="checkbox" id="tagFormIsDefault">
                             <label class="form-check-label" for="tagFormIsDefault">
-                                <i class="fas fa-star text-warning me-1"></i>
                                 {% trans "기본 태그로 설정 (모든 사용자가 사용 가능)" %}
                             </label>
                         </div>
-                        <small class="text-muted">{% trans "기본 태그는 관리자가 아니면 수정/삭제할 수 없습니다." %}</small>
                     </div>
                     {% endif %}
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn-sian" data-bs-dismiss="modal">{% trans "취소" %}</button>
-                <button type="button" class="btn-sian btn-sian--primary" id="saveTagFormBtn">{% trans "저장" %}</button>
+
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn-sian btn-sian--primary" id="saveTagFormBtn">{% trans "태그 만들기" %}</button>
+                    <button type="button" class="btn-sian" data-bs-dismiss="modal">{% trans "취소" %}</button>
+                </div>
             </div>
         </div>
     </div>

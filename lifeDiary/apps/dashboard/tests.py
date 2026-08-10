@@ -108,9 +108,10 @@ class TestDashboardIndexRendering:
         idx_invest_header = section.index("투자시간")
         idx_invest_tag = section.index("투자태그")
 
-        assert idx_passive_header < idx_passive_tag
-        assert idx_passive_tag < idx_invest_header
+        # 시안 순서: 투자 → 주도적 → 수동적 (0012_sian_category_order)
         assert idx_invest_header < idx_invest_tag
+        assert idx_invest_tag < idx_passive_header
+        assert idx_passive_header < idx_passive_tag
 
     def test_sidebar_tag_list_uses_compact_wrapping_row_layout(self, dash_user_with_tags):
         client, _ = dash_user_with_tags

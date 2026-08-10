@@ -25,6 +25,7 @@ from django.conf import settings
 from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
 from .account_deletion import cancel_account_deletion, request_account_deletion
 from .repositories import GoalRepository, NoteRepository, UserAccountRepository
+from apps.tags.models import Category
 from apps.tags.repositories import TagRepository
 from .use_cases import (
     DeleteGoalUseCase,
@@ -561,7 +562,17 @@ def mypage(request):
         form.fields["period"].initial = "monthly"
 
     data = _mypage_use_case.execute(user)
-    return render(request, "users/mypage.html", {"goals": data["goals"], "form": form})
+    return render(
+        request,
+        "users/mypage.html",
+        {
+            "goals": data["goals"],
+            "form": form,
+            # 시안 5c 는 설정 안에서 태그와 카테고리 색을 바로 보여 준다.
+            "settings_tags": _get_user_tag_queryset(user).select_related("category"),
+            "categories": Category.objects.all(),
+        },
+    )
 
 
 @login_required

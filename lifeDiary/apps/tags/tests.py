@@ -105,7 +105,7 @@ class TestCategoryRepository:
         repo = CategoryRepository()
         cats = repo.find_all()
         assert cats.count() == 5
-        assert cats[0].slug == "passive"
+        assert cats[0].slug == "investment"
 
     def test_find_by_slug(self):
         repo = CategoryRepository()
@@ -167,7 +167,7 @@ class TestTagRepositoryCategory:
 
         tags = list(repo.find_accessible_ordered(user))
         user_tag_order = [t.name for t in tags if t.user_id == user.id]
-        assert user_tag_order == ["zzz-passive", "mmm-invest", "aaa-basic"]
+        assert user_tag_order == ["mmm-invest", "zzz-passive", "aaa-basic"]
 
 
 # === Template Tag Tests ===
@@ -209,19 +209,6 @@ class TestTagBadgeTemplateTag:
 
 
 class TestTagModalTemplate:
-    def test_category_select_has_readable_font_size_class(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/_tag_modal.html"
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-
-        template_source = template_path.read_text()
-        css_source = css_path.read_text()
-
-        assert 'id="tagFormCategory"' in template_source
-        assert "tag-category-select" in template_source
-        assert ".tag-category-select" in css_source
-        assert "font-size: 1rem;" in css_source
-        assert ".tag-category-select option" in css_source
-
     def test_tag_management_category_header_uses_shared_template(self):
         template_path = settings.BASE_DIR / "apps/tags/templates/tags/index.html"
         template_source = template_path.read_text()
@@ -244,7 +231,7 @@ class TestSeedCategory:
 
     def test_display_order(self):
         cats = list(Category.objects.values_list("slug", flat=True))
-        assert cats == ["passive", "proactive", "investment", "basic_life", "sleep"]
+        assert cats == ["investment", "proactive", "passive", "basic_life", "sleep"]
 
 
 # === API Tests ===

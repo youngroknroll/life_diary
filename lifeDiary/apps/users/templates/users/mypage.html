@@ -5,22 +5,52 @@
 <div class="page-head mb-3">
     <div>
         <h1 class="page-title">{% trans "설정" %}</h1>
-        <p class="page-subtitle">{{ user.username }}</p>
     </div>
 </div>
 
+{# 시안 5c 는 목표를 맨 위에 둔다. 분석 화면의 달성 일수가 여기서 정해지기 때문이다. #}
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-body">
-                <div class="section-title">{% trans "태그와 카테고리" %}<span class="section-title__note">{% trans "색은 카테고리를 따릅니다" %}</span></div>
-                <div class="settings-row">
-                    <span class="settings-row__label">{% trans "태그 관리" %}</span>
-                    <a class="settings-row__control btn-sian" href="{% url 'tags:index' %}">{% trans "열기" %}</a>
+            <div class="card-body" id="goalListBlock">
+                <div class="settings-head">
+                    <div>
+                        <div class="section-title mb-0">{% trans "목표 시간" %}</div>
+                        <p class="page-subtitle">{% trans "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다" %}</p>
+                    </div>
+                    <button type="button" class="settings-head__action" id="goalAddToggle"
+                            aria-expanded="false" aria-controls="goalAddPanel">
+                        {% trans "+ 목표 추가" %}
+                    </button>
                 </div>
-                <div class="settings-row">
-                    <span class="settings-row__label">{% trans "카테고리 설명" %}</span>
-                    <a class="settings-row__control btn-sian" href="{% url 'tags:category_guide' %}">{% trans "열기" %}</a>
+
+                {% include 'users/usergoal_list.html' with goals=goals %}
+
+                <div class="goal-add" id="goalAddPanel" hidden>
+                    <form method="post" id="goalAddForm" data-partial-url="{% url 'users:mypage_goals_partial' %}">
+                        {% csrf_token %}
+                        <div class="goal-add__fields">
+                            <label class="goal-add__field">
+                                <span class="form-label">{{ form.tag.label }}</span>
+                                {{ form.tag }}
+                                {% include 'shared/_field_errors.html' with field=form.tag %}
+                            </label>
+                            <label class="goal-add__field">
+                                <span class="form-label">{{ form.period.label }}</span>
+                                {{ form.period }}
+                                {% include 'shared/_field_errors.html' with field=form.period %}
+                            </label>
+                            <label class="goal-add__field">
+                                <span class="form-label">{{ form.target_hours.label }}</span>
+                                {{ form.target_hours }}
+                                {% include 'shared/_field_errors.html' with field=form.target_hours %}
+                            </label>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <button type="submit" class="btn-sian btn-sian--primary" id="goalAddBtn">{% trans "목표 저장" %}</button>
+                            <span id="goalSaveStatus" class="small text-success" role="status" aria-live="polite">{% if request.GET.saved %}{% trans "저장완료!" %}{% endif %}</span>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -30,6 +60,50 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
+            <div class="card-body">
+                <div class="settings-head">
+                    <div>
+                        <div class="section-title mb-0">{% trans "태그와 카테고리" %}</div>
+                        <p class="page-subtitle">{% trans "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다" %}</p>
+                    </div>
+                    <button type="button" class="settings-head__action" onclick="openTagFormModal()">{% trans "+ 새 태그" %}</button>
+                </div>
+
+                <ul class="category-legend">
+                    {% for category in categories %}
+                        <li class="category-legend__item">
+                            <span class="chip__swatch" style="background-color: {{ category.color }}"></span>{{ category.display_name }}
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <ul class="settings-tags">
+                    {% for tag in settings_tags %}
+                        <li class="chip">
+                            <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
+                        </li>
+                    {% empty %}
+                        <li class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</li>
+                    {% endfor %}
+                </ul>
+
+                {# 칩을 눌러 편집하려면 태그 관리 재작성(A1)이 필요하다. 그때까지 보조 링크를 남긴다. #}
+                <div class="settings-row">
+                    <span class="settings-row__label">{% trans "태그 관리" %}</span>
+                    <a class="settings-row__control btn-sian" href="{% url 'tags:index' %}">{% trans "열기" %}</a>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row__label">{% trans "태그 카테고리 설명 보기" %}</span>
+                    <a class="settings-row__control btn-sian" href="{% url 'tags:category_guide' %}">{% trans "열기" %}</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
             <div class="card-body">
                 <div class="section-title">{% trans "표시" %}</div>
                 <div class="settings-row">
@@ -61,73 +135,9 @@
             </div>
         </div>
     </div>
-</div>
-
-
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-body">
-                <div class="section-title">{% trans "목표 추가" %}</div>
-                <div class="mb-3 goal-guide-panel">
-                    <button class="btn w-100 text-start py-2 px-3" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#goalGuide"
-                            aria-expanded="false" aria-controls="goalGuide"
-                            class="goal-guide-toggle">
-                        <i class="fas fa-info-circle me-1"></i>{% trans "목표 시간 입력 안내" %}
-                        <i class="fas fa-chevron-down float-end mt-1"></i>
-                    </button>
-                    <div class="collapse px-3 pb-3" id="goalGuide">
-                        {% blocktrans %}• 일간: 하루 목표 시간 (최대 24시간)<br>
-                        • 주간: 일주일 총 목표 시간 (최대 100시간)<br>
-                        • 월간: 한 달 총 목표 시간 (최대 300시간){% endblocktrans %}
-                    </div>
-                </div>
-                <form method="post" id="goalAddForm" data-partial-url="{% url 'users:mypage_goals_partial' %}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="{{ form.tag.id_for_label }}" class="form-label">{{ form.tag.label }}</label>
-                        {{ form.tag }}
-                        {% include 'shared/_field_errors.html' with field=form.tag %}
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.period.id_for_label }}" class="form-label">{{ form.period.label }}</label>
-                        {{ form.period }}
-                        {% include 'shared/_field_errors.html' with field=form.period %}
-                    </div>
-                    <div class="mb-3">
-                        <label for="{{ form.target_hours.id_for_label }}" class="form-label">{{ form.target_hours.label }}</label>
-                        <div class="d-flex align-items-center gap-2">
-                            {{ form.target_hours }}
-                            <span class="text-muted">{% trans "시간" %}</span>
-                        </div>
-                        {% if form.target_hours.help_text %}
-                            <div class="form-text">{{ form.target_hours.help_text|safe }}</div>
-                        {% endif %}
-                        {% include 'shared/_field_errors.html' with field=form.target_hours %}
-                    </div>
-                    <div class="d-flex align-items-center gap-2">
-                        <button type="submit" class="btn-sian btn-sian--primary" id="goalAddBtn">{% trans "목표 추가" %}</button>
-                        <span id="goalSaveStatus" class="small text-success" role="status" aria-live="polite">{% if request.GET.saved %}{% trans "저장완료!" %}{% endif %}</span>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
     <div class="col-md-6 mb-4">
         <div class="card h-100">
-            <div class="card-body" id="goalListBlock">
-                <div class="section-title">{% trans "목표 시간" %}<span class="section-title__note">{% trans "분석 화면의 달성 일수 기준" %}</span></div>
-                {% include 'users/usergoal_list.html' with goals=goals %}
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-12">
-        <div class="card">
             <div class="card-body">
                 <div class="section-title">{% trans "계정" %}</div>
                 <div class="settings-row">
@@ -138,19 +148,39 @@
                     <span class="settings-row__label">{% trans "비밀번호 변경" %}</span>
                     <a class="settings-row__control btn-sian" href="{% url 'users:password_change' %}">{% trans "열기" %}</a>
                 </div>
-
-                <div class="section-title settings-danger mt-4">{% trans "계정 탈퇴" %}</div>
-                <p class="text-muted mb-3">
-                    {% trans "탈퇴 요청 후 15일 안에 다시 로그인하면 요청이 취소됩니다. 15일이 지나면 계정과 개인 기록이 완전히 삭제됩니다." %}
-                </p>
-                <a href="{% url 'users:account_delete' %}" class="btn-sian btn-sian--danger">
-                    {% trans "계정 탈퇴 진행" %}
-                </a>
+                {# 데스크톱은 상단바 메뉴에 로그아웃이 있지만 360px 에서는 접히므로 여기에도 둔다. #}
+                <div class="settings-row is-narrow-only-row">
+                    <span class="settings-row__label">{% trans "로그아웃" %}</span>
+                    <form action="{% url 'users:logout' %}" method="post" class="settings-row__control">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-sian">{% trans "로그아웃" %}</button>
+                    </form>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-row__label settings-danger">{% trans "회원 탈퇴" %}</span>
+                    <a class="settings-row__control btn-sian btn-sian--danger" href="{% url 'users:account_delete' %}">{% trans "탈퇴 진행" %}</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+{% include 'tags/_tag_modal.html' %}
+
 {% load static %}
+<script src="{% static 'core/js/tag.js' %}" defer></script>
 <script src="{% static 'users/js/goals.js' %}" defer></script>
+<script>
+// 태그 모달은 window._categories 를 전제로 한다. 태그 관리 화면 밖에서 열려면
+// 여기서도 채워 줘야 한다.
+document.addEventListener('DOMContentLoaded', async function () {
+    try {
+        const data = await apiCall('/api/categories/');
+        window._categories = data.categories;
+    } catch (error) {
+        console.error('카테고리 로드 오류:', error);
+    }
+    document.addEventListener('tags-updated', () => window.location.reload());
+});
+</script>
 {% endblock %}

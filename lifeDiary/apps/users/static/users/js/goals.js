@@ -110,4 +110,28 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }, 2500);
     }
+
+    // 목표 추가는 별도 화면이 아니라 목록 아래에서 펼친다 (시안 5c).
+    const addToggle = document.getElementById('goalAddToggle');
+    const addPanel = document.getElementById('goalAddPanel');
+    if (addToggle && addPanel) {
+        addToggle.addEventListener('click', function () {
+            const opening = addPanel.hasAttribute('hidden');
+            addPanel.toggleAttribute('hidden', !opening);
+            addToggle.setAttribute('aria-expanded', String(opening));
+            if (opening) {
+                // CSRF 히든 입력이 먼저 잡히면 포커스가 조용히 실패한다.
+                const first = addPanel.querySelector('select, input:not([type=hidden])');
+                if (first) first.focus();
+            } else {
+                addToggle.focus();
+            }
+        });
+
+        // 서버가 폼을 오류와 함께 되돌려줬다면 접어 두면 안 된다.
+        if (addPanel.querySelector('.field-error')) {
+            addPanel.removeAttribute('hidden');
+            addToggle.setAttribute('aria-expanded', 'true');
+        }
+    }
 });
