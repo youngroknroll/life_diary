@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 17:48+0900\n"
+"POT-Creation-Date: 2026-08-10 18:07+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -657,7 +657,6 @@ msgid "24시간 기준 · 미기록 포함"
 msgstr "Out of 24 hours · unlogged included"
 
 #: apps/stats/templates/stats/index.html:216
-#| msgid "하루 구성"
 msgid "하루 구성 표"
 msgstr "Day composition table"
 
@@ -666,12 +665,10 @@ msgid "24h 비율"
 msgstr "Share of 24h"
 
 #: apps/stats/templates/stats/index.html:223
-#| msgid "슬롯 클릭"
 msgid "슬롯"
 msgstr "Slots"
 
 #: apps/stats/templates/stats/index.html:224
-#| msgid "일 평균"
 msgid "7일 평균 대비"
 msgstr "vs 7-day average"
 
@@ -762,7 +759,6 @@ msgid "주차별 요약 표"
 msgstr "Weekly summary table"
 
 #: apps/stats/templates/stats/index.html:347
-#| msgid "주"
 msgid "주차"
 msgstr "Week"
 
@@ -778,6 +774,15 @@ msgstr "vs previous"
 #: apps/stats/templates/stats/index.html:365
 msgid "진행 중"
 msgstr "In progress"
+
+#: apps/stats/templates/stats/index.html:380
+msgid "태그 합계"
+msgstr "Tag totals"
+
+#: apps/stats/templates/stats/index.html:391
+#| msgid "주 합계"
+msgid "합계"
+msgstr "Total"
 
 #: apps/stats/templates/stats/life_feedback.html:9
 msgid "Goal progress"
@@ -1080,7 +1085,6 @@ msgid "약속"
 msgstr "Plans with others"
 
 #: apps/tags/views.py:50
-#| msgid "열기"
 msgid "여가"
 msgstr "Leisure"
 
@@ -1097,12 +1101,10 @@ msgid "이동"
 msgstr "Commuting"
 
 #: apps/tags/views.py:52
-#| msgid "수면시간"
 msgid "수면"
 msgstr "Sleep"
 
 #: apps/tags/views.py:52
-#| msgid "잠, 낮잠"
 msgid "낮잠"
 msgstr "Nap"
 
@@ -1168,8 +1170,7 @@ msgstr "I agree to the Terms of Service and the Privacy Policy"
 
 #: apps/users/forms.py:21
 msgid "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
-msgstr ""
-"You must agree to the Terms of Service and the Privacy Policy to sign up."
+msgstr "You must agree to the Terms of Service and the Privacy Policy to sign up."
 
 #: apps/users/forms.py:33 apps/users/templates/users/signup.html:27
 msgid "30자 이하. 영문자, 숫자, @/./+/-/_ 만 가능합니다."
@@ -1464,8 +1465,7 @@ msgstr "Your password has been changed"
 
 #: apps/users/templates/users/password/password_change_done.html:11
 msgid "다음 로그인부터 새 비밀번호를 쓰세요. 지금 세션은 그대로 유지됩니다."
-msgstr ""
-"Use the new password from your next sign-in. This session stays active."
+msgstr "Use the new password from your next sign-in. This session stays active."
 
 #: apps/users/templates/users/password/password_change_done.html:14
 msgid "설정으로 돌아가기"
@@ -1508,7 +1508,6 @@ msgid "새 비밀번호 설정"
 msgstr "Set new password"
 
 #: apps/users/templates/users/password/password_reset_confirm.html:14
-#| msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
 msgid "새로 쓸 비밀번호를 입력하세요."
 msgstr "Enter the password you want to use."
 

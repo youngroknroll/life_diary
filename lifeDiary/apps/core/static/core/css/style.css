@@ -2392,3 +2392,95 @@ footer {
     min-height: 26px;
     font-size: 11.5px;
 }
+
+/* 월 탭 태그 합계 — 시안 3d 는 데스크톱에서 이 패널을 유지한다 */
+.tag-totals {
+    margin-top: 22px;
+}
+
+.tag-totals__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tag-totals__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--color-border-soft);
+    font-size: 11.5px;
+    color: var(--color-text-body);
+}
+
+.tag-totals__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.tag-totals__row--sum {
+    border-bottom: 0;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.is-narrow-only {
+    display: none;
+}
+
+@media (max-width: 575.98px) {
+    .is-wide-only-block {
+        display: none;
+    }
+
+    .is-narrow-only {
+        display: inline;
+        color: var(--color-text-meta);
+    }
+
+    /* 시안 4d 의 주차별 요약은 표가 아니라 두 줄짜리 스택 행이다 */
+    .weekly-summary,
+    .weekly-summary tbody,
+    .weekly-summary tr,
+    .weekly-summary td {
+        display: block;
+        width: 100%;
+    }
+
+    .weekly-summary thead {
+        display: none;
+    }
+
+    .weekly-summary tr {
+        padding: 9px 0;
+        border-bottom: 1px solid var(--color-border-soft);
+    }
+
+    .weekly-summary td {
+        padding: 0;
+        text-align: left;
+    }
+
+    .weekly-summary td:first-child {
+        font-size: 11.5px;
+        color: var(--color-text-muted);
+        margin-bottom: 3px;
+    }
+
+    .weekly-summary td.is-primary {
+        display: inline-block;
+        width: auto;
+        font-size: 13px;
+        margin-right: 10px;
+    }
+
+    .weekly-summary td.is-focus-cell {
+        display: inline-block;
+        width: auto;
+        font-size: 12px;
+        color: var(--color-text-body);
+    }
+}

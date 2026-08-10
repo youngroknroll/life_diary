@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 17:48+0900\n"
+"POT-Creation-Date: 2026-08-10 18:07+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -681,7 +681,6 @@ msgid "24시간 기준 · 미기록 포함"
 msgstr "24시간 기준 · 미기록 포함"
 
 #: apps/stats/templates/stats/index.html:216
-#| msgid "하루 구성"
 msgid "하루 구성 표"
 msgstr "하루 구성 표"
 
@@ -690,12 +689,10 @@ msgid "24h 비율"
 msgstr "24h 비율"
 
 #: apps/stats/templates/stats/index.html:223
-#| msgid "슬롯 클릭"
 msgid "슬롯"
 msgstr "슬롯"
 
 #: apps/stats/templates/stats/index.html:224
-#| msgid "일 평균"
 msgid "7일 평균 대비"
 msgstr "7일 평균 대비"
 
@@ -786,7 +783,6 @@ msgid "주차별 요약 표"
 msgstr "주차별 요약 표"
 
 #: apps/stats/templates/stats/index.html:347
-#| msgid "주"
 msgid "주차"
 msgstr "주차"
 
@@ -802,6 +798,15 @@ msgstr "직전 대비"
 #: apps/stats/templates/stats/index.html:365
 msgid "진행 중"
 msgstr "진행 중"
+
+#: apps/stats/templates/stats/index.html:380
+msgid "태그 합계"
+msgstr "태그 합계"
+
+#: apps/stats/templates/stats/index.html:391
+#| msgid "주 합계"
+msgid "합계"
+msgstr "합계"
 
 #: apps/stats/templates/stats/life_feedback.html:9
 msgid "Goal progress"
@@ -1099,7 +1104,6 @@ msgid "약속"
 msgstr "약속"
 
 #: apps/tags/views.py:50
-#| msgid "열기"
 msgid "여가"
 msgstr "여가"
 
@@ -1116,12 +1120,10 @@ msgid "이동"
 msgstr "이동"
 
 #: apps/tags/views.py:52
-#| msgid "수면시간"
 msgid "수면"
 msgstr "수면"
 
 #: apps/tags/views.py:52
-#| msgid "잠, 낮잠"
 msgid "낮잠"
 msgstr "낮잠"
 
@@ -1513,7 +1515,6 @@ msgid "새 비밀번호 설정"
 msgstr "새 비밀번호 설정"
 
 #: apps/users/templates/users/password/password_reset_confirm.html:14
-#| msgid "확인을 위해 동일한 비밀번호를 입력해주세요."
 msgid "새로 쓸 비밀번호를 입력하세요."
 msgstr "새로 쓸 비밀번호를 입력하세요."
 
