@@ -57,8 +57,20 @@
         input.addEventListener('blur', () => { caps.hidden = true; });
     }
 
+    // A failed submit re-renders the whole page, so focus would otherwise sit at
+    // the document top and the user would never hear why the attempt failed.
+    function focusFirstInvalid() {
+        const field = document.querySelector('.auth-card [aria-invalid="true"]');
+        if (!field) return;
+        field.focus({ preventScroll: false });
+        if (typeof field.select === 'function' && field.type !== 'checkbox') {
+            field.select();
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
         const inputs = document.querySelectorAll('.auth-card input[type="password"]');
         inputs.forEach(enhance);
+        focusFirstInvalid();
     });
 })();

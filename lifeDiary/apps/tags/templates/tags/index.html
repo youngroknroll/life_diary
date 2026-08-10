@@ -105,12 +105,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     <div class="card-footer bg-transparent py-1 px-3">
                         <div class="d-flex gap-1">
                             ${canEdit ? `
-                                <button class="btn btn-outline-primary btn-sm flex-fill py-0"
+                                <button class="btn-sian flex-fill"
                                         onclick="openTagFormModal({id: ${tag.id}, name: '${escapeHTML(tag.name)}', color: '${tag.color}', is_default: ${tag.is_default}, category_id: ${tag.category_id}})">
                                     <i class="fas fa-edit me-1 d-none d-md-inline"></i>${gettext('수정')}
                                 </button>` : ''}
                             ${canDelete ? `
-                                <button class="btn btn-outline-danger btn-sm flex-fill py-0"
+                                <button class="btn-sian btn-sian--danger flex-fill"
                                         onclick="deleteTag(${tag.id})">
                                     <i class="fas fa-trash me-1 d-none d-md-inline"></i>${gettext('삭제')}
                                 </button>` : ''}

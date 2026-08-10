@@ -15,6 +15,7 @@
     --color-text-meta: #8B968D;
     --color-text-disabled: #C4CCC6;
     --color-danger-text: #B4471F;
+    --color-danger-soft: #FDF6F3;
 
     /* Surface */
     --color-surface: #ffffff;
@@ -92,6 +93,7 @@
     --color-text-meta: #7F8F85;
     --color-text-disabled: #5A6860;
     --color-danger-text: #E8927A;
+    --color-danger-soft: #2E1D18;
 
     --color-surface: #1a1f1c;
     --color-surface-soft: #232a26;
@@ -758,6 +760,37 @@ body {
     margin: 0 0 22px;
 }
 
+/* Errors sit under their own field, not in a page-top banner. */
+.field-error {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: baseline;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--color-danger-text);
+}
+
+.field-error__count {
+    font-family: var(--font-mono);
+    font-size: 11px;
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid {
+    border-color: var(--color-danger-text);
+    background-color: var(--color-danger-soft);
+}
+
+.consent-check .form-check-label {
+    font-size: 12.5px;
+    color: var(--color-text-body);
+}
+
+.consent-check .field-error {
+    margin-left: -1.5em;
+}
+
 .auth-panel__foot {
     margin-top: 18px;
     padding-top: 16px;
@@ -844,6 +877,18 @@ body {
 .composition-bar > span {
     display: block;
     min-width: 0;
+}
+
+/* Tables grow columns over time; keep the overflow inside the table, never on
+   the page body. Focusable so keyboard users can reach clipped columns. */
+.table-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.table-scroll:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 .data-table {
@@ -2284,4 +2329,18 @@ footer {
 .goal-guide-toggle {
     color: var(--color-text-muted);
     font-weight: bold;
+}
+
+/* Goal table — 설정 화면의 목표 목록 */
+.goal-table th,
+.goal-table td {
+    white-space: nowrap;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.9rem;
+    vertical-align: middle;
+}
+
+.goal-table td:nth-last-child(-n+2),
+.goal-table th:nth-last-child(-n+2) {
+    text-align: center;
 }

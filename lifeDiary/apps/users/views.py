@@ -115,6 +115,17 @@ def _reset_login_failures(request, username):
     cache.delete(_login_failure_key(request, username))
 
 
+def _login_attempts_remaining(failure_count):
+    """How many tries are left before reCAPTCHA gates the form.
+
+    Returns None when nothing has failed yet, so the template can stay silent
+    instead of announcing a full budget to a first-time visitor.
+    """
+    if not failure_count:
+        return None
+    return max(_login_failure_limit() - failure_count, 0)
+
+
 def _login_requires_recaptcha(request, username):
     return (
         _login_recaptcha_enabled()
@@ -198,6 +209,7 @@ def login_view(request):
     사용자 로그인
     """
     recaptcha_required = False
+    failure_count = 0
     if request.method == "POST":
         username = (request.POST.get("username") or "").strip()
         recaptcha_required = _login_requires_recaptcha(request, username)
@@ -216,6 +228,9 @@ def login_view(request):
                         "page_title": gettext("로그인"),
                         "show_recaptcha": True,
                         "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+                        "remaining_attempts": _login_attempts_remaining(
+                            _get_login_failure_count(request, username)
+                        ),
                     },
                 )
         form = AuthenticationForm(request, data=request.POST)
@@ -261,6 +276,7 @@ def login_view(request):
             "page_title": gettext("로그인"),
             "show_recaptcha": recaptcha_required,
             "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+            "remaining_attempts": _login_attempts_remaining(failure_count),
         },
     )
 

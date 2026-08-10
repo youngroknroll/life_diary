@@ -18,6 +18,7 @@ class TestSignupRedirectsToWelcome:
                 "email": "newcomer@example.com",
                 "password1": "Strong-Pass-9!",
                 "password2": "Strong-Pass-9!",
+            "consent": "on",
             },
             follow=False,
         )
