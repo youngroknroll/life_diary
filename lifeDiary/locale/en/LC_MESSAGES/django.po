@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 18:41+0900\n"
+"POT-Creation-Date: 2026-08-10 19:01+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -82,7 +82,7 @@ msgstr "0–143 (0: 00:00–00:10, 143: 23:50–24:00)"
 
 #: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:220
 #: apps/stats/templates/stats/index.html:289 apps/tags/models.py:118
-#: apps/users/forms.py:69 apps/users/templates/users/_goal_table_section.html:7
+#: apps/users/forms.py:69 apps/users/templates/users/usergoal_list.html:9
 msgid "태그"
 msgstr "Tag"
 
@@ -242,7 +242,7 @@ msgstr "New tag"
 #: apps/tags/templates/tags/category_guide.html:10
 #: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:10
 #: apps/tags/templates/tags/index.html:15
-#: apps/users/templates/users/mypage.html:92
+#: apps/users/templates/users/mypage.html:94
 msgid "태그 관리"
 msgstr "Manage tags"
 
@@ -316,6 +316,7 @@ msgstr "Memo (optional)"
 
 #: apps/dashboard/templates/dashboard/index.html:217
 #: apps/users/templates/users/usergoal_form.html:51
+#: apps/users/templates/users/usergoal_list.html:33
 #: apps/users/templates/users/usernote_form.html:13
 msgid "저장"
 msgstr "Save"
@@ -684,6 +685,7 @@ msgid "가장 많은 요일"
 msgstr "Busiest weekday"
 
 #: apps/stats/templates/stats/index.html:263 apps/users/forms.py:70
+#: apps/users/templates/users/usergoal_list.html:10
 #: apps/users/templates/users/welcome.html:80
 msgid "기간"
 msgstr "Period"
@@ -903,7 +905,6 @@ msgid "태그명"
 msgstr "Tag name"
 
 #: apps/tags/models.py:95
-#| msgid "최대 50자까지 입력 가능"
 msgid "최대 10자까지 입력 가능"
 msgstr "Up to 10 characters"
 
@@ -932,13 +933,10 @@ msgid "태그명은 공백일 수 없습니다."
 msgstr "Tag name cannot be blank."
 
 #: apps/tags/templates/tags/_tag_modal.html:14
-#| msgid ""
-#| "색은 카테고리가 정합니다. 같은 카테고리면 이름이 달라도 같은 색입니다."
 msgid "이름과 카테고리만 정하면 됩니다. 색은 카테고리를 따라갑니다."
 msgstr "Just a name and a category. The color follows the category."
 
 #: apps/tags/templates/tags/_tag_modal.html:20
-#| msgid "이동"
 msgid "이름"
 msgstr "Name"
 
@@ -947,12 +945,10 @@ msgid "최대 10자"
 msgstr "Up to 10 characters"
 
 #: apps/tags/templates/tags/_tag_modal.html:27
-#| msgid "카테고리 비중"
 msgid "카테고리 대분류"
 msgstr "Category"
 
 #: apps/tags/templates/tags/_tag_modal.html:28
-#| msgid "터치:"
 msgid "필수"
 msgstr "Required"
 
@@ -1027,7 +1023,7 @@ msgid "태그 목록 불러오는 중..."
 msgstr "Loading tags..."
 
 #: apps/tags/templates/tags/index.html:37
-#: apps/users/templates/users/mypage.html:86
+#: apps/users/templates/users/mypage.html:88
 msgid "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 msgstr ""
 "No tags yet. Create one and it shows up in the record screen right away."
@@ -1193,8 +1189,7 @@ msgstr "Username must be 30 characters or fewer."
 msgid "이미 사용 중인 이메일입니다."
 msgstr "This email is already in use."
 
-#: apps/users/forms.py:71 apps/users/templates/users/_goal_table_section.html:8
-#: apps/users/templates/users/mypage.html:18
+#: apps/users/forms.py:71 apps/users/templates/users/mypage.html:18
 #: apps/users/templates/users/welcome.html:88
 msgid "목표 시간"
 msgstr "Target hours"
@@ -1234,34 +1229,6 @@ msgstr "Weekly goal cannot exceed 100 hours."
 #: apps/users/models.py:43
 msgid "월간 목표는 300시간을 초과할 수 없습니다."
 msgstr "Monthly goal cannot exceed 300 hours."
-
-#: apps/users/templates/users/_goal_table_section.html:9
-msgid "달성률"
-msgstr "Progress"
-
-#: apps/users/templates/users/_goal_table_section.html:10
-msgid "실제 기록"
-msgstr "Actual"
-
-#: apps/users/templates/users/_goal_table_section.html:11
-#: apps/users/templates/users/usernote_list.html:12
-#: templates/shared/_table_row_actions.html:2
-msgid "수정"
-msgstr "Edit"
-
-#: apps/users/templates/users/_goal_table_section.html:12
-#: apps/users/templates/users/usernote_list.html:13
-#: templates/shared/_table_row_actions.html:6
-#: templates/shared/confirm_delete.html:5
-#: templates/shared/confirm_delete.html:11
-msgid "삭제"
-msgstr "Delete"
-
-#: apps/users/templates/users/_goal_table_section.html:20
-#: apps/users/templates/users/_goal_table_section.html:28
-#, python-format
-msgid "%(h)s시간"
-msgstr "%(h)sh"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
@@ -1318,7 +1285,7 @@ msgid "어제 기록이 그대로 기다리고 있습니다."
 msgstr "No records to delete."
 
 #: apps/users/templates/users/login.html:19
-#: apps/users/templates/users/mypage.html:144
+#: apps/users/templates/users/mypage.html:146
 #: apps/users/templates/users/signup.html:21
 msgid "아이디"
 msgstr "Username"
@@ -1371,101 +1338,101 @@ msgstr "Sign up"
 
 #: apps/users/templates/users/mypage.html:19
 msgid "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다"
-msgstr "This is what the analysis screen counts achieved days against — edit it right here."
+msgstr ""
+"This is what the analysis screen counts achieved days against — edit it "
+"right here."
 
 #: apps/users/templates/users/mypage.html:23
-#| msgid "목표 추가"
 msgid "+ 목표 추가"
 msgstr "+ Add goal"
 
-#: apps/users/templates/users/mypage.html:50
+#: apps/users/templates/users/mypage.html:52
 msgid "목표 저장"
 msgstr "Save goal"
 
-#: apps/users/templates/users/mypage.html:51
+#: apps/users/templates/users/mypage.html:53
 msgid "저장완료!"
 msgstr "Saved!"
 
-#: apps/users/templates/users/mypage.html:66
+#: apps/users/templates/users/mypage.html:68
 msgid "태그와 카테고리"
 msgstr "Tags and categories"
 
-#: apps/users/templates/users/mypage.html:67
-msgid "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
-msgstr "Every tag belongs to one of five categories, and the color follows the category."
-
 #: apps/users/templates/users/mypage.html:69
-#| msgid "새 태그"
+msgid "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
+msgstr ""
+"Every tag belongs to one of five categories, and the color follows the "
+"category."
+
+#: apps/users/templates/users/mypage.html:71
 msgid "+ 새 태그"
 msgstr "+ New tag"
 
-#: apps/users/templates/users/mypage.html:93
-#: apps/users/templates/users/mypage.html:97
-#: apps/users/templates/users/mypage.html:149
+#: apps/users/templates/users/mypage.html:95
+#: apps/users/templates/users/mypage.html:99
+#: apps/users/templates/users/mypage.html:151
 msgid "열기"
 msgstr "Open"
 
-#: apps/users/templates/users/mypage.html:96
-#| msgid "태그 카테고리 설명"
+#: apps/users/templates/users/mypage.html:98
 msgid "태그 카테고리 설명 보기"
 msgstr "View tag category guide"
 
-#: apps/users/templates/users/mypage.html:108
+#: apps/users/templates/users/mypage.html:110
 msgid "표시"
 msgstr "Display"
 
-#: apps/users/templates/users/mypage.html:110
+#: apps/users/templates/users/mypage.html:112
 msgid "언어"
 msgstr "Language"
 
-#: apps/users/templates/users/mypage.html:117
+#: apps/users/templates/users/mypage.html:119
 msgid "언어 선택"
 msgstr "Language"
 
-#: apps/users/templates/users/mypage.html:126
+#: apps/users/templates/users/mypage.html:128
 msgid "테마"
 msgstr "Theme"
 
-#: apps/users/templates/users/mypage.html:128
 #: apps/users/templates/users/mypage.html:130
+#: apps/users/templates/users/mypage.html:132
 msgid "다크 모드로 전환"
 msgstr "Switch to dark mode"
 
-#: apps/users/templates/users/mypage.html:129
-#: apps/users/templates/users/mypage.html:132
+#: apps/users/templates/users/mypage.html:131
+#: apps/users/templates/users/mypage.html:134
 msgid "다크"
 msgstr "Dark"
 
-#: apps/users/templates/users/mypage.html:129
+#: apps/users/templates/users/mypage.html:131
 msgid "라이트"
 msgstr "Light"
 
-#: apps/users/templates/users/mypage.html:131
+#: apps/users/templates/users/mypage.html:133
 msgid "라이트 모드로 전환"
 msgstr "Switch to light mode"
 
-#: apps/users/templates/users/mypage.html:142
+#: apps/users/templates/users/mypage.html:144
 msgid "계정"
 msgstr "Account"
 
-#: apps/users/templates/users/mypage.html:148
+#: apps/users/templates/users/mypage.html:150
 #: apps/users/templates/users/password/password_change_form.html:5
 #: apps/users/templates/users/password/password_change_form.html:14
 #: apps/users/templates/users/password/password_change_form.html:17
 msgid "비밀번호 변경"
 msgstr "Change password"
 
-#: apps/users/templates/users/mypage.html:153
-#: apps/users/templates/users/mypage.html:156 templates/base.html:101
+#: apps/users/templates/users/mypage.html:155
+#: apps/users/templates/users/mypage.html:158 templates/base.html:101
 msgid "로그아웃"
 msgstr "Log out"
 
-#: apps/users/templates/users/mypage.html:160
+#: apps/users/templates/users/mypage.html:162
 msgid "회원 탈퇴"
 msgstr "Delete account"
 
-#: apps/users/templates/users/mypage.html:161
-#| msgid "계정 탈퇴 진행"
+#: apps/users/templates/users/mypage.html:163
 msgid "탈퇴 진행"
 msgstr "Continue to delete"
 
@@ -1718,29 +1685,34 @@ msgstr ""
 msgid "목록으로"
 msgstr "Back to list"
 
-#: apps/users/templates/users/usergoal_list.html:2
-msgid "일간 목표"
-msgstr "Daily goals"
-
-#: apps/users/templates/users/usergoal_list.html:3
-msgid "주간 목표"
-msgstr "Weekly goals"
-
-#: apps/users/templates/users/usergoal_list.html:4
-msgid "월간 목표"
-msgstr "Monthly goals"
-
 #: apps/users/templates/users/usergoal_list.html:5
-msgid "하루 목표 시간"
-msgstr "hours per day"
+#| msgid "목표 시간"
+msgid "목표 시간 표"
+msgstr "Target hours table"
 
-#: apps/users/templates/users/usergoal_list.html:6
-msgid "일주일 총 목표 시간"
-msgstr "total hours per week"
+#: apps/users/templates/users/usergoal_list.html:11
+#| msgid "목표:"
+msgid "목표"
+msgstr "Goal"
 
-#: apps/users/templates/users/usergoal_list.html:7
-msgid "한 달 총 목표 시간"
-msgstr "total hours per month"
+#: apps/users/templates/users/usergoal_list.html:12
+#: apps/users/templates/users/usergoal_list.html:37
+#: apps/users/templates/users/usernote_list.html:13
+#: templates/shared/_table_row_actions.html:6
+#: templates/shared/confirm_delete.html:5
+#: templates/shared/confirm_delete.html:11
+msgid "삭제"
+msgstr "Delete"
+
+#: apps/users/templates/users/usergoal_list.html:28
+#, python-format
+#| msgid "목표 시간"
+msgid "%(t)s 목표 시간"
+msgstr "%(t)s target hours"
+
+#: apps/users/templates/users/usergoal_list.html:42
+msgid "아직 목표가 없습니다. 하나만 정해두면 분석 화면이 달성한 날을 셉니다."
+msgstr "No goals yet. Set just one and the analysis screen starts counting achieved days."
 
 #: apps/users/templates/users/usernote_confirm_delete.html:4
 msgid "특이사항 삭제"
@@ -1766,6 +1738,11 @@ msgstr "My notes"
 #: apps/users/templates/users/usernote_list.html:10
 msgid "작성일"
 msgstr "Created at"
+
+#: apps/users/templates/users/usernote_list.html:12
+#: templates/shared/_table_row_actions.html:2
+msgid "수정"
+msgstr "Edit"
 
 #: apps/users/templates/users/usernote_list.html:26
 msgid "등록된 특이사항이 없습니다."

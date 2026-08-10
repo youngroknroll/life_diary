@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     showLoading: false,
                 });
                 listBlock.innerHTML = partialHtml;
+                document.dispatchEvent(new CustomEvent('goals-refreshed'));
 
                 goalForm.reset();
                 updateTargetHoursMax();
@@ -134,4 +135,23 @@ document.addEventListener('DOMContentLoaded', function() {
             addToggle.setAttribute('aria-expanded', 'true');
         }
     }
+
+    // 목표 시간은 인라인으로 고친다. "저장"은 값이 실제로 바뀐 행에만 나타난다.
+    function wireGoalRows(scope) {
+        scope.querySelectorAll('.goal-row-form').forEach(function (form) {
+            const hours = form.querySelector('.goal-row-form__hours');
+            const save = form.querySelector('.goal-row-form__save');
+            if (!hours || !save || hours.dataset.wired === '1') return;
+            hours.dataset.wired = '1';
+            const original = hours.value;
+            hours.addEventListener('input', function () {
+                save.hidden = hours.value === original;
+            });
+        });
+    }
+
+    wireGoalRows(document);
+    document.addEventListener('goals-refreshed', function () {
+        wireGoalRows(document);
+    });
 });

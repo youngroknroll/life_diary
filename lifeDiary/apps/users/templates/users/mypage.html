@@ -12,7 +12,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <div class="card">
-            <div class="card-body" id="goalListBlock">
+            <div class="card-body">
                 <div class="settings-head">
                     <div>
                         <div class="section-title mb-0">{% trans "목표 시간" %}</div>
@@ -24,7 +24,9 @@
                     </button>
                 </div>
 
-                {% include 'users/usergoal_list.html' with goals=goals %}
+                <div id="goalListBlock">
+                    {% include 'users/usergoal_list.html' with goals=goals %}
+                </div>
 
                 <div class="goal-add" id="goalAddPanel" hidden>
                     <form method="post" id="goalAddForm" data-partial-url="{% url 'users:mypage_goals_partial' %}">

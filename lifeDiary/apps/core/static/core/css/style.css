@@ -2337,19 +2337,6 @@ footer {
     font-weight: bold;
 }
 
-/* Goal table — 설정 화면의 목표 목록 */
-.goal-table th,
-.goal-table td {
-    white-space: nowrap;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.9rem;
-    vertical-align: middle;
-}
-
-.goal-table td:nth-last-child(-n+2),
-.goal-table th:nth-last-child(-n+2) {
-    text-align: center;
-}
 
 /* Google's reCAPTCHA iframe is a fixed ~304px and overflows the auth card at
    360px. Scale it down rather than letting the page scroll sideways. */
@@ -2663,4 +2650,31 @@ footer {
     .is-narrow-only-row {
         display: flex;
     }
+}
+
+/* 목표 표 — 시안 5c 의 인라인 편집 */
+.goal-row-form {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.goal-row-form__hours {
+    width: 84px;
+    min-height: 44px;
+    text-align: right;
+}
+
+.goal-row-delete {
+    color: var(--color-danger-text);
+    font-size: 11.5px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+}
+
+.goal-row-delete:hover {
+    text-decoration: underline;
 }

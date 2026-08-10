@@ -122,6 +122,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 전역 함수로 모달 열기 함수 등록
     window.openTagFormModal = function(tag = null) {
+        // 카테고리가 아직 안 왔으면 라디오가 빈 채로 열린다. 고를 것이 없는
+        // 모달을 여느니 기다리라고 말한다.
+        if (!window._categories || !window._categories.length) {
+            showNotification(gettext('카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요.'), 'warning');
+            return;
+        }
         const form = document.getElementById('tagForm');
         form.reset();
         
