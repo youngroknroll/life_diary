@@ -24,7 +24,7 @@ def user(make_user):
 @pytest.fixture
 def focus(user):
     return Tag.objects.create(
-        user=user, name="집중", is_default=False,
+        user=user, name="집중",
         category=Category.objects.get(slug="investment"),
     )
 
@@ -70,7 +70,7 @@ class TestTagUsage:
 
     def test_usage_is_reported_per_tag(self, user, focus):
         other = Tag.objects.create(
-            user=user, name="여가", is_default=False,
+            user=user, name="여가",
             category=Category.objects.get(slug="passive"),
         )
         record(user, focus, count=6)

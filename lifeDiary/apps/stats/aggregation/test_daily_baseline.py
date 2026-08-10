@@ -23,7 +23,6 @@ def focus(user):
         user=user,
         name="집중",
         color="#4E8F63",
-        is_default=False,
         category=Category.objects.get(slug="investment"),
     )
 

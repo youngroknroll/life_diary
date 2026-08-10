@@ -25,7 +25,6 @@ def focus(user):
         user=user,
         name="집중",
         color="#4E8F63",
-        is_default=False,
         category=Category.objects.get(slug="investment"),
     )
 
@@ -36,7 +35,6 @@ def leisure(user):
         user=user,
         name="여가",
         color="#C1715A",
-        is_default=False,
         category=Category.objects.get(slug="passive"),
     )
 
@@ -151,7 +149,6 @@ class TestTotalsAndDelta:
             user=stranger,
             name="남의태그",
             color="#4E8F63",
-            is_default=False,
             category=Category.objects.get(slug="investment"),
         )
         record(stranger, stranger_tag, SATURDAY, slots=6)

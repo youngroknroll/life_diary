@@ -23,7 +23,6 @@ def focus(user):
     return Tag.objects.create(
         user=user,
         name="집중",
-        is_default=False,
         category=Category.objects.get(slug="investment"),
     )
 
@@ -119,7 +118,7 @@ class TestCategoryShare:
 
     def test_tags_in_one_category_are_summed_together(self, user, focus):
         sibling = Tag.objects.create(
-            user=user, name="회의", is_default=False,
+            user=user, name="회의",
             category=Category.objects.get(slug="investment"),
         )
         record(user, focus, SATURDAY, slots=3)
@@ -132,7 +131,7 @@ class TestCategoryShare:
 
     def test_shares_are_sorted_by_size(self, user, focus):
         leisure = Tag.objects.create(
-            user=user, name="여가", is_default=False,
+            user=user, name="여가",
             category=Category.objects.get(slug="passive"),
         )
         record(user, focus, SATURDAY, slots=3)
@@ -151,7 +150,7 @@ class TestCategoryShare:
 
     def test_percentages_add_up_to_a_hundred(self, user, focus):
         leisure = Tag.objects.create(
-            user=user, name="여가", is_default=False,
+            user=user, name="여가",
             category=Category.objects.get(slug="passive"),
         )
         record(user, focus, SATURDAY, slots=6)

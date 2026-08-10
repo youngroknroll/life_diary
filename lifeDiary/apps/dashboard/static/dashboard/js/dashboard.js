@@ -883,7 +883,6 @@ function renderTagButton(tag) {
                 data-tag-name="${safeName}">
             <span class="badge me-2" style="background-color: ${safeColor};">&nbsp;</span>
             ${safeName}
-            ${tag.is_default ? `<i class="fas fa-star text-warning ms-1" title="${gettext('기본 태그')}"></i>` : ''}
         </button>`;
 }
 

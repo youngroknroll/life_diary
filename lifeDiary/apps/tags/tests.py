@@ -15,21 +15,19 @@ from apps.tags.repositories import CategoryRepository, TagRepository
 
 
 class TestTagPolicyService:
-    def test_can_manage_default_tag_only_for_superuser(self):
+    def test_can_manage_only_own_tag(self):
         service = TagPolicyService()
-        admin = SimpleNamespace(is_superuser=True)
-        user = SimpleNamespace(is_superuser=False)
-        default_tag = SimpleNamespace(is_default=True, user=None)
-        assert service.can_manage(admin, default_tag)
-        assert not service.can_manage(user, default_tag)
-
-    def test_can_manage_user_owned_tag(self):
-        service = TagPolicyService()
-        owner = SimpleNamespace(is_superuser=False, username="owner")
-        other = SimpleNamespace(is_superuser=False, username="other")
-        tag = SimpleNamespace(is_default=False, user=owner)
+        owner = SimpleNamespace(id=1, is_superuser=False)
+        other = SimpleNamespace(id=2, is_superuser=False)
+        tag = SimpleNamespace(user_id=owner.id)
         assert service.can_manage(owner, tag)
         assert not service.can_manage(other, tag)
+
+    def test_superuser_gets_no_extra_reach(self):
+        service = TagPolicyService()
+        admin = SimpleNamespace(id=9, is_superuser=True)
+        tag = SimpleNamespace(user_id=1)
+        assert not service.can_manage(admin, tag)
 
 
 # === Category Model Tests ===
@@ -129,7 +127,7 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         tag = repo.create(
             user=user, name="독서", color="#FF5733",
-            is_default=False, category=cat_invest,
+            category=cat_invest,
         )
         assert tag.category == cat_invest
 
@@ -139,7 +137,7 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         repo.create(
             user=user, name="독서", color="#FF5733",
-            is_default=False, category=cat_invest,
+            category=cat_invest,
         )
         tags = repo.find_accessible(user)
         assert tags.first().category.slug == "investment"
@@ -149,8 +147,8 @@ class TestTagRepositoryCategory:
         user = make_user(username="testuser")
         cat_invest = Category.objects.get(slug="investment")
         cat_passive = Category.objects.get(slug="passive")
-        repo.create(user=user, name="독서", color="#FF5733", is_default=False, category=cat_invest)
-        repo.create(user=user, name="SNS", color="#33FF57", is_default=False, category=cat_passive)
+        repo.create(user=user, name="독서", color="#FF5733", category=cat_invest)
+        repo.create(user=user, name="SNS", color="#33FF57", category=cat_passive)
         tags = repo.find_by_category(user, cat_invest)
         assert tags.count() == 1
         assert tags.first().name == "독서"
@@ -161,9 +159,9 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         cat_passive = Category.objects.get(slug="passive")
         cat_basic = Category.objects.get(slug="basic_life")
-        repo.create(user=user, name="aaa-basic", color="#111111", is_default=False, category=cat_basic)
-        repo.create(user=user, name="zzz-passive", color="#222222", is_default=False, category=cat_passive)
-        repo.create(user=user, name="mmm-invest", color="#333333", is_default=False, category=cat_invest)
+        repo.create(user=user, name="aaa-basic", color="#111111", category=cat_basic)
+        repo.create(user=user, name="zzz-passive", color="#222222", category=cat_passive)
+        repo.create(user=user, name="mmm-invest", color="#333333", category=cat_invest)
 
         tags = list(repo.find_accessible_ordered(user))
         user_tag_order = [t.name for t in tags if t.user_id == user.id]

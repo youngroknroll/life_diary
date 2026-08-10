@@ -70,11 +70,11 @@ def dash_user_with_tags(ko_client, make_user):
     cat_invest = Category.objects.get(slug="investment")
     Tag.objects.create(
         user=user, name="투자태그", color="#111111",
-        is_default=False, category=cat_invest,
+        category=cat_invest,
     )
     Tag.objects.create(
         user=user, name="수동태그", color="#222222",
-        is_default=False, category=cat_passive,
+        category=cat_passive,
     )
     return ko_client, user
 
@@ -154,7 +154,6 @@ class TestDashboardIndexRendering:
             user=user,
             name="x');alert(1);//",
             color="#AABBCC",
-            is_default=False,
             category=cat,
         )
         resp = client.get("/dashboard/")

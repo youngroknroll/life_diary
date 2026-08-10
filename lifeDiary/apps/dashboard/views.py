@@ -86,7 +86,6 @@ def dashboard_view(request):
 
     slot_rows = build_slot_rows(slot_data)
 
-    # 사용자의 모든 태그 + 공용 기본 태그 조회 (기본 태그 우선)
     user_tags = _tag_repo.find_accessible_ordered(request.user)
 
     # 통계 계산 (core 유틸리티 사용)

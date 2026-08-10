@@ -85,9 +85,6 @@ class Tag(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name=_("사용자"),
-        null=True,
-        blank=True,
-        help_text=_("null이면 기본 태그 (모든 사용자 공용)"),
     )
     name = models.CharField(
         max_length=MAX_TAG_NAME_LENGTH,
@@ -106,11 +103,6 @@ class Tag(models.Model):
         verbose_name=_("색상"),
         help_text=_("카테고리에서 자동으로 정해집니다."),
     )
-    is_default = models.BooleanField(
-        default=False,
-        verbose_name=_("기본 태그"),
-        help_text=_("관리자가 등록한 모든 사용자 공용 태그"),
-    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("생성일"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("수정일"))
 
@@ -122,13 +114,6 @@ class Tag(models.Model):
                 fields=["user", "name"],
                 name="unique_user_tag_name",
                 violation_error_message=_("이미 같은 이름의 태그가 존재합니다."),
-                condition=models.Q(user__isnull=False),
-            ),
-            models.UniqueConstraint(
-                fields=["name"],
-                name="unique_default_tag_name",
-                violation_error_message=_("이미 같은 이름의 기본 태그가 존재합니다."),
-                condition=models.Q(is_default=True),
             ),
         ]
         ordering = ["name"]
@@ -153,9 +138,7 @@ class Tag(models.Model):
         return INK_ON_ACCENT
 
     def __str__(self):
-        if self.is_default:
-            return f"[기본] {self.name}"
-        return f"{self.user.username if self.user else '시스템'} - {self.name}"
+        return f"{self.user.username} - {self.name}"
 
     def clean(self):
         """추가 유효성 검사"""

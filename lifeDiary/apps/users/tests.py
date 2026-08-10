@@ -50,7 +50,6 @@ def alice_bob_with_bob_tag(make_user):
         user=bob,
         name="bob_only",
         color="#123456",
-        is_default=False,
         category=category,
     )
     return alice, bob, bob_tag

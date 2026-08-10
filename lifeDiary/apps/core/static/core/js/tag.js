@@ -136,7 +136,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const nameInput = document.getElementById('tagFormName');
         const colorInput = document.getElementById('tagFormColor');
         const colorTextInput = document.getElementById('tagFormColorText');
-        const isDefaultCheckbox = document.getElementById('tagFormIsDefault');
         const saveLabel = document.getElementById('saveTagFormBtn');
 
         if (tag) {
@@ -148,9 +147,6 @@ document.addEventListener('DOMContentLoaded', function() {
             colorInput.value = tag.color;
             colorTextInput.value = tag.color; // 텍스트 필드 값도 설정
             populateCategorySelect(tag.category_id);
-            if (isDefaultCheckbox) {
-                isDefaultCheckbox.checked = tag.is_default || false;
-            }
         } else {
             // 새 태그 생성
             titleEl.textContent = gettext('새 태그');
@@ -159,9 +155,6 @@ document.addEventListener('DOMContentLoaded', function() {
             colorInput.value = '';
             colorTextInput.value = '';
             populateCategorySelect(null);
-            if (isDefaultCheckbox) {
-                isDefaultCheckbox.checked = false;
-            }
         }
         
         modalOpener = document.activeElement;
@@ -173,8 +166,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const tagId = document.getElementById('tagFormTagId').value;
         const name = document.getElementById('tagFormName').value.trim();
         const color = document.getElementById('tagFormColor').value; // 색상 선택기의 최종 값을 사용
-        const isDefaultEl = document.getElementById('tagFormIsDefault');
-        const is_default = isDefaultEl ? isDefaultEl.checked : false;
         const pickedCategory = document.querySelector('input[name="tagFormCategory"]:checked');
         const category_id = pickedCategory ? parseInt(pickedCategory.value) : null;
 
@@ -195,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             const result = await apiCall(url, {
                 method: method,
-                data: { name, color, is_default, category_id },
+                data: { name, color, category_id },
                 loadingElement: saveBtn
             });
 
@@ -213,6 +204,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // 전역 함수로 태그 삭제 함수 등록 (core utils 사용)
     const deleteModalEl = document.getElementById('tagDeleteModal');
     const deleteModal = deleteModalEl ? new bootstrap.Modal(deleteModalEl) : null;
+
+    // 폼 모달과 같은 이유로 포커스를 직접 돌려준다. 기본 태그가 없어지면서
+    // 기록이 붙은 태그도 전부 삭제 가능해져, 이 모달을 지나는 횟수가 늘었다.
+    let deleteModalOpener = null;
+    if (deleteModalEl) {
+        deleteModalEl.addEventListener('hidden.bs.modal', function () {
+            // 삭제가 성공하면 목록이 다시 그려져 여는 버튼 자체가 사라진다.
+            // 그때는 화면의 주 동작으로 보낸다. 그냥 두면 body 로 떨어진다.
+            const fallback = document.querySelector('.page-head .btn-sian--primary');
+            const target = deleteModalOpener && document.contains(deleteModalOpener)
+                ? deleteModalOpener
+                : fallback;
+            if (target) target.focus();
+            deleteModalOpener = null;
+        });
+    }
 
     async function requestDelete(tagId, moveToId) {
         try {
@@ -233,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * 조용히 바뀐다. 옮길 곳을 기본값으로 두고 확인을 받는다.
      */
     function openDeleteModal(tag) {
+        deleteModalOpener = document.activeElement;
         const select = document.getElementById('tagDeleteMoveTo');
         const others = (window._tagsCache || []).filter(other => other.id !== tag.id);
 

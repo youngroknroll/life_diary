@@ -24,7 +24,7 @@ def user(make_user):
 @pytest.fixture
 def source(user):
     return Tag.objects.create(
-        user=user, name="회의", is_default=False,
+        user=user, name="회의",
         category=Category.objects.get(slug="investment"),
     )
 
@@ -32,7 +32,7 @@ def source(user):
 @pytest.fixture
 def destination(user):
     return Tag.objects.create(
-        user=user, name="집중 작업", is_default=False,
+        user=user, name="집중 작업",
         category=Category.objects.get(slug="investment"),
     )
 
@@ -70,7 +70,7 @@ class TestDeleteWithMigration:
     def test_other_tags_are_untouched(self, user, source, destination):
         record(user, source, count=2)
         other = Tag.objects.create(
-            user=user, name="식사", is_default=False,
+            user=user, name="식사",
             category=Category.objects.get(slug="basic_life"),
         )
         TimeBlock.objects.create(user=user, date=TARGET, slot_index=50, tag=other)
@@ -82,7 +82,7 @@ class TestDeleteWithMigration:
     def test_moving_to_a_stranger_tag_is_refused(self, user, source, make_user):
         stranger = make_user(username="stranger")
         stranger_tag = Tag.objects.create(
-            user=stranger, name="남의태그", is_default=False,
+            user=stranger, name="남의태그",
             category=Category.objects.get(slug="investment"),
         )
         record(user, source)

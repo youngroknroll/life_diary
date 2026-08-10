@@ -191,9 +191,6 @@
                                                         data-tag-name="{{ tag.name }}">
                                                     {% tag_dot tag.color %}
                                                     {{ tag.name }}
-                                                    {% if tag.is_default %}
-                                                        <i class="fas fa-star text-warning ms-1" title="{% trans '기본 태그' %}"></i>
-                                                    {% endif %}
                                                 </button>
                                             {% endfor %}
                                         </div>

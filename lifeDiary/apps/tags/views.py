@@ -3,11 +3,12 @@ import logging
 
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
 from django.views.decorators.http import require_http_methods, require_GET
 
 from apps.core.utils import success_response, error_response
 from .repositories import CategoryRepository
+from .seed_tags import seed_names_by_category
 from .use_cases import (
     CreateTagUseCase,
     DeleteTagUseCase,
@@ -44,22 +45,18 @@ def index(request):
 
 
 # 안내 화면의 예시일 뿐 사용자 태그가 아니다. 시안 7a 의 세 번째 열.
-CATEGORY_EXAMPLE_TAGS = {
-    "investment": [_("집중 작업"), _("회의"), _("학습")],
-    "proactive": [_("운동"), _("약속")],
-    "passive": [_("여가"), _("멍때림")],
-    "basic_life": [_("식사"), _("이동")],
-    "sleep": [_("수면"), _("낮잠")],
-}
 
 
 @login_required
 @require_GET
 def category_guide(request):
     """소비시간 다섯 분류 설명. 색이 무엇을 뜻하는지 읽는 화면이다."""
+    # 예시는 가입 시 실제로 만들어 주는 시드 태그와 같은 집합이다.
+    # 두 곳에 적으면 한쪽만 바뀌어 설명 화면이 거짓말을 하게 된다.
+    examples = seed_names_by_category()
     categories = list(_category_repo.find_all())
     for category in categories:
-        category.example_tags = CATEGORY_EXAMPLE_TAGS.get(category.slug, [])
+        category.example_tags = examples.get(category.slug, [])
     return render(
         request,
         "tags/category_guide.html",
@@ -107,7 +104,6 @@ def tag_list_create(request):
                             "id": t.id,
                             "name": t.name,
                             "color": t.color,
-                            "is_default": t.is_default,
                             "category_id": t.category_id,
                             "can_edit": t.can_edit,
                             "can_delete": t.can_delete,
@@ -132,7 +128,6 @@ def tag_list_create(request):
             user=request.user,
             name=data.get("name", "").strip(),
             color=data.get("color", "").strip(),
-            is_default=data.get("is_default", False),
             category_id=data.get("category_id"),
         )
         return success_response(gettext("태그가 생성되었습니다."), {"tag": tag}, 201)
@@ -162,7 +157,6 @@ def tag_detail_update_delete(request, tag_id):
                 tag_id=tag_id,
                 name=data.get("name", "").strip(),
                 color=data.get("color", "").strip(),
-                is_default=data.get("is_default", False),
                 category_id=data.get("category_id"),
             )
             return success_response(gettext("태그가 수정되었습니다."), {"tag": tag})

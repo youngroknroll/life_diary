@@ -20,14 +20,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ["name", "category", "user", "is_default", "color_display", "created_at"]
-    list_filter = ["category", "is_default", "user", "created_at"]
+    list_display = ["name", "category", "user", "color_display", "created_at"]
+    list_filter = ["category", "user", "created_at"]
     search_fields = ["name", "user__username"]
-    ordering = ["category__display_order", "is_default", "user", "name"]
+    ordering = ["category__display_order", "user", "name"]
     list_per_page = 25
 
     fieldsets = (
-        (None, {"fields": ("name", "color", "category", "is_default")}),
+        (None, {"fields": ("name", "color", "category")}),
         (
             "사용자 정보",
             {

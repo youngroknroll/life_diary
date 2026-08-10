@@ -27,6 +27,7 @@ from .account_deletion import cancel_account_deletion, request_account_deletion
 from .repositories import GoalRepository, NoteRepository, UserAccountRepository
 from apps.tags.models import Category
 from apps.tags.repositories import TagRepository
+from apps.tags.seed_tags import create_seed_tags
 from .use_cases import (
     DeleteGoalUseCase,
     DeleteNoteUseCase,
@@ -58,7 +59,7 @@ LOGIN_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
 
 
 def _get_user_tag_queryset(user):
-    """사용자 태그 + 기본 태그 쿼리셋"""
+    """사용자 태그 쿼리셋"""
     return _tag_repo.find_accessible(user)
 
 
@@ -188,6 +189,7 @@ def signup_view(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
+            create_seed_tags(user)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("users:welcome")
     else:

@@ -22,14 +22,12 @@ def logged_in(client, make_user):
         user=user,
         name="집중",
         color="#4E8F63",
-        is_default=False,
         category=Category.objects.get(slug="investment"),
     )
     leisure = Tag.objects.create(
         user=user,
         name="여가",
         color="#C1715A",
-        is_default=False,
         category=Category.objects.get(slug="passive"),
     )
     return client, user, focus, leisure

@@ -326,6 +326,32 @@ body {
     text-decoration: none;
 }
 
+/* 좁은 카드 안에 두 개가 나란히 들어가는 버튼.
+   기본 좌우 여백 14px 은 카드 폭에서 글자 자리를 다 먹어 라벨이 두 줄로
+   접힌다. 여백과 글자만 줄이고 44px 높이는 그대로 지킨다. */
+.btn-sian--compact {
+    padding-inline: 6px;
+    gap: 4px;
+    min-width: 0;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+@media (min-width: 576px) {
+    .btn-sian--compact {
+        padding-inline: 10px;
+        font-size: 13px;
+    }
+}
+
+@media (min-width: 768px) {
+    .btn-sian--compact {
+        padding-inline: 14px;
+        gap: 6px;
+        font-size: 13.5px;
+    }
+}
+
 .btn-sian--primary {
     border-color: transparent;
     background: var(--color-primary);

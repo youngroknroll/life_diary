@@ -34,7 +34,6 @@ class TestTagFollowsItsCategory:
         tag = Tag.objects.create(
             user=user,
             name="자격증 공부",
-            is_default=False,
             category=Category.objects.get(slug="investment"),
         )
 
@@ -48,7 +47,6 @@ class TestTagFollowsItsCategory:
             user=user,
             name="자격증 공부",
             color="#FF00FF",
-            is_default=False,
             category=Category.objects.get(slug="investment"),
         )
 
@@ -59,7 +57,6 @@ class TestTagFollowsItsCategory:
         tag = Tag.objects.create(
             user=user,
             name="OTT",
-            is_default=False,
             category=Category.objects.get(slug="proactive"),
         )
 
@@ -73,10 +70,10 @@ class TestTagFollowsItsCategory:
         investment = Category.objects.get(slug="investment")
 
         first = Tag.objects.create(
-            user=user, name="집중 작업", is_default=False, category=investment
+            user=user, name="집중 작업", category=investment
         )
         second = Tag.objects.create(
-            user=user, name="회의", is_default=False, category=investment
+            user=user, name="회의", category=investment
         )
 
         assert first.color == second.color
@@ -89,7 +86,7 @@ class TestTagFollowsItsCategory:
             tag = Tag.objects.create(
                 user=user,
                 name=f"태그{category.pk}",
-                is_default=False,
+               
                 category=category,
             )
             assert tag.text_color == INK_ON_ACCENT

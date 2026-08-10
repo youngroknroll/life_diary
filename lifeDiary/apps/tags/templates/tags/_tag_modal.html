@@ -41,17 +41,6 @@
                         <input type="hidden" id="tagFormColor" value="">
                         <input type="hidden" id="tagFormColorText" value="">
                     </div>
-
-                    {% if user.is_superuser %}
-                    <div class="mb-3" id="tagFormDefaultOption">
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="tagFormIsDefault">
-                            <label class="form-check-label" for="tagFormIsDefault">
-                                {% trans "기본 태그로 설정 (모든 사용자가 사용 가능)" %}
-                            </label>
-                        </div>
-                    </div>
-                    {% endif %}
                 </form>
 
                 <div class="d-grid gap-2">

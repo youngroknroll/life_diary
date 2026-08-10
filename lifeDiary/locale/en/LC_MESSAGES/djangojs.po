@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 18:41+0900\n"
+"POT-Creation-Date: 2026-08-10 20:42+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -36,58 +36,61 @@ msgstr "Prep · transit"
 msgid "잠 · 낮잠"
 msgstr "Sleep · naps"
 
-#: apps/core/static/core/js/tag.js:64 apps/core/static/core/js/tag.js:150
-#| msgid "새 태그 생성"
+#: apps/core/static/core/js/tag.js:64 apps/core/static/core/js/tag.js:152
 msgid "새 태그"
 msgstr "New tag"
 
 #: apps/core/static/core/js/tag.js:71
 #, javascript-format
 msgid "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
-msgstr "Saved in the %s color. It reads as one block with tags in the same category."
+msgstr ""
+"Saved in the %s color. It reads as one block with tags in the same category."
 
 #: apps/core/static/core/js/tag.js:72
 msgid "카테고리를 고르면 색이 정해집니다."
 msgstr "Pick a category and the color is set."
 
-#: apps/core/static/core/js/tag.js:138
+#: apps/core/static/core/js/tag.js:128
+msgid "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
+msgstr ""
+
+#: apps/core/static/core/js/tag.js:143
 msgid "태그 수정"
 msgstr "Edit tag"
 
-#: apps/core/static/core/js/tag.js:139
-#| msgid "저장중..."
+#: apps/core/static/core/js/tag.js:144
 msgid "저장"
 msgstr "Save"
 
-#: apps/core/static/core/js/tag.js:151
+#: apps/core/static/core/js/tag.js:153
 msgid "태그 만들기"
 msgstr "Create tag"
 
-#: apps/core/static/core/js/tag.js:176
+#: apps/core/static/core/js/tag.js:173
 msgid "태그명을 입력해주세요."
 msgstr "Please enter a tag name."
 
-#: apps/core/static/core/js/tag.js:181
+#: apps/core/static/core/js/tag.js:178
 msgid "카테고리를 선택해주세요."
 msgstr "Please select a category."
 
-#: apps/core/static/core/js/tag.js:203
+#: apps/core/static/core/js/tag.js:200
 #, javascript-format
 msgid "태그 저장 실패: %s"
 msgstr "Failed to save tag: %s"
 
-#: apps/core/static/core/js/tag.js:221
+#: apps/core/static/core/js/tag.js:234
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "Failed to delete tag: %s"
 
-#: apps/core/static/core/js/tag.js:242
+#: apps/core/static/core/js/tag.js:256
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
 msgstr ""
 
-#: apps/core/static/core/js/tag.js:266
+#: apps/core/static/core/js/tag.js:280
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete the '%s' tag?"
@@ -183,15 +186,11 @@ msgstr "Delete failed: %s"
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr "An error occurred while loading tags."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:886
-msgid "기본 태그"
-msgstr "Default tag"
-
-#: apps/dashboard/static/dashboard/js/dashboard.js:918
+#: apps/dashboard/static/dashboard/js/dashboard.js:917
 msgid "태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요."
 msgstr "No tags.<br>Add one with the 'New tag' button."
 
-#: apps/dashboard/static/dashboard/js/dashboard.js:958
+#: apps/dashboard/static/dashboard/js/dashboard.js:957
 msgid "생성된 태그가 없습니다."
 msgstr "No tags yet."
 
@@ -256,16 +255,16 @@ msgstr "Up to %sh"
 msgid "저장중..."
 msgstr "Saving..."
 
-#: apps/users/static/users/js/goals.js:83
-#: apps/users/static/users/js/goals.js:103
+#: apps/users/static/users/js/goals.js:84
+#: apps/users/static/users/js/goals.js:104
 msgid "저장완료!"
 msgstr "Saved!"
 
-#: apps/users/static/users/js/goals.js:91
+#: apps/users/static/users/js/goals.js:92
 msgid "저장 실패"
 msgstr "Save failed"
 
-#: apps/users/static/users/js/goals.js:93
+#: apps/users/static/users/js/goals.js:94
 msgid "저장 실패 - 네트워크 오류"
 msgstr "Save failed - network error"
 
@@ -299,4 +298,5 @@ msgstr "Passwords don't match."
 
 #: apps/users/static/users/js/signup-validate.js:143
 msgid "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
-msgstr "You must agree to the Terms of Service and the Privacy Policy to sign up."
+msgstr ""
+"You must agree to the Terms of Service and the Privacy Policy to sign up."

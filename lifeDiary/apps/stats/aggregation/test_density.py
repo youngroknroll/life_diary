@@ -91,7 +91,6 @@ def tag(user):
         user=user,
         name="집중",
         color="#4E8F63",
-        is_default=False,
         category=Category.objects.get(slug="investment"),
     )
 
@@ -138,7 +137,6 @@ class TestDensityGrid:
             user=stranger,
             name="남의태그",
             color="#4E8F63",
-            is_default=False,
             category=Category.objects.get(slug="investment"),
         )
         record(stranger, stranger_tag, 54)
