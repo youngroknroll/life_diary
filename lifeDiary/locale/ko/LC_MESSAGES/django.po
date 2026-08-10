@@ -1096,12 +1096,12 @@ msgstr "삭제"
 
 #: apps/tags/templates/tags/index.html:85
 msgid "아직 기록 없음"
-msgstr ""
+msgstr "아직 기록 없음"
 
 #: apps/tags/templates/tags/index.html:86
 #, python-format
 msgid "누적 %%s시간"
-msgstr ""
+msgstr "누적 %%s시간"
 
 #: apps/tags/templates/tags/index.html:87
 msgid "태그를 불러오는 중 오류가 발생했습니다."
