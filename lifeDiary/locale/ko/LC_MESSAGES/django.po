@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 18:29+0900\n"
+"POT-Creation-Date: 2026-08-11 21:49+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -633,7 +633,7 @@ msgstr "가장 많은 요일"
 
 #: apps/stats/templates/stats/index.html:267 apps/users/forms.py:70
 #: apps/users/templates/users/usergoal_list.html:12
-#: apps/users/templates/users/welcome.html:80
+#: apps/users/templates/users/welcome.html:93
 msgid "기간"
 msgstr "기간"
 
@@ -952,7 +952,7 @@ msgstr "태그 목록 불러오는 중..."
 
 #: apps/tags/templates/tags/index.html:37
 #: apps/users/templates/users/mypage.html:88
-#: apps/users/templates/users/welcome.html:32
+#: apps/users/templates/users/welcome.html:40
 msgid "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 msgstr "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다."
 
@@ -1098,7 +1098,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "이미 사용 중인 이메일입니다."
 
 #: apps/users/forms.py:71 apps/users/templates/users/mypage.html:18
-#: apps/users/templates/users/welcome.html:88
+#: apps/users/templates/users/welcome.html:101
 msgid "목표 시간"
 msgstr "목표 시간"
 
@@ -1654,44 +1654,52 @@ msgstr "쓸 태그부터 골라볼까요"
 
 #: apps/users/templates/users/welcome.html:24
 msgid ""
-"지금 고른 것만 기록 화면에 나옵니다. 나중에 설정에서 얼마든지 바꿀 수 있습니"
-"다."
+"체크한 태그부터 확인해 두세요. 나머지도 기록 화면에 그대로 남아 있습니다."
 msgstr ""
 
-#: apps/users/templates/users/welcome.html:36
-#: apps/users/templates/users/welcome.html:63
+#: apps/users/templates/users/welcome.html:44
+msgid "+ 직접 추가"
+msgstr ""
+
+#: apps/users/templates/users/welcome.html:46
+#, python-format
+msgid "%(n)s개 선택"
+msgstr ""
+
+#: apps/users/templates/users/welcome.html:49
+#: apps/users/templates/users/welcome.html:76
 msgid "다음"
 msgstr "다음"
 
-#: apps/users/templates/users/welcome.html:39
+#: apps/users/templates/users/welcome.html:52
 msgid "한 구간을 직접 채워보세요"
 msgstr "한 구간을 직접 채워보세요"
 
-#: apps/users/templates/users/welcome.html:40
+#: apps/users/templates/users/welcome.html:53
 msgid ""
 "기록 화면에서 비어 있는 구간을 끌면 그만큼 선택됩니다. 손을 떼면 태그를 고르"
 "는 자리가 열립니다."
 msgstr ""
 
-#: apps/users/templates/users/welcome.html:66
+#: apps/users/templates/users/welcome.html:79
 msgid "목표를 하나만 정해둘까요"
 msgstr "목표를 하나만 정해둘까요"
 
-#: apps/users/templates/users/welcome.html:67
+#: apps/users/templates/users/welcome.html:80
 msgid ""
 "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 "
 "지장이 없습니다."
 msgstr ""
 
-#: apps/users/templates/users/welcome.html:72
+#: apps/users/templates/users/welcome.html:85
 msgid "대상 태그"
 msgstr "대상 태그"
 
-#: apps/users/templates/users/welcome.html:91
+#: apps/users/templates/users/welcome.html:104
 msgid "기록 시작하기"
 msgstr "기록 시작하기"
 
-#: apps/users/templates/users/welcome.html:93
+#: apps/users/templates/users/welcome.html:106
 msgid "설정 › 목표에서 언제든 바꿀 수 있습니다"
 msgstr "설정 › 목표에서 언제든 바꿀 수 있습니다"
 

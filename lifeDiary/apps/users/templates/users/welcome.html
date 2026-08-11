@@ -21,16 +21,29 @@
 
     {% if step == 1 %}
         <h1 class="onboarding__title">{% trans "쓸 태그부터 골라볼까요" %}</h1>
-        <p class="onboarding__lead">{% trans "지금 고른 것만 기록 화면에 나옵니다. 나중에 설정에서 얼마든지 바꿀 수 있습니다." %}</p>
+        <p class="onboarding__lead">{% trans "체크한 태그부터 확인해 두세요. 나머지도 기록 화면에 그대로 남아 있습니다." %}</p>
 
-        <div class="onboarding__chips">
-            {% for tag in tags %}
-                <span class="chip">
-                    <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
-                </span>
-            {% empty %}
-                <p class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</p>
-            {% endfor %}
+        {% regroup tags by category as tags_by_category %}
+        {% for group in tags_by_category %}
+            <fieldset class="onboarding__group">
+                <legend class="onboarding__group-title">{{ group.grouper.display_name }}</legend>
+                <div class="onboarding__chips">
+                    {% for tag in group.list %}
+                        <label class="chip chip--pick">
+                            <input type="checkbox" class="chip__check" name="pick" value="{{ tag.id }}" checked>
+                            <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        {% empty %}
+            <p class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</p>
+        {% endfor %}
+
+        <div class="onboarding__picks-foot">
+            <button type="button" class="btn-sian" id="onboardingAddTag">{% trans "+ 직접 추가" %}</button>
+            <span class="onboarding__count" id="onboardingCount" role="status" aria-live="polite"
+                  data-label="{% blocktrans with n='__N__' %}{{ n }}개 선택{% endblocktrans %}"></span>
         </div>
 
         <a class="btn-sian btn-sian--primary onboarding__next" href="?step=2">{% trans "다음" %}</a>
@@ -93,4 +106,25 @@
         <p class="onboarding__foot">{% trans "설정 › 목표에서 언제든 바꿀 수 있습니다" %}</p>
     {% endif %}
 </div>
+
+{% if step == 1 %}
+    {% include 'tags/_tag_modal.html' %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+{% if step == 1 %}
+    <script src="{% static 'core/js/tag.js' %}" defer></script>
+    <script>
+        // 태그 모달이 카테고리 라디오를 그리려면 이 값이 있어야 한다.
+        // apiCall 은 defer 된 utils.js 가 정의하므로 DOM 준비 후에 부른다.
+        document.addEventListener('DOMContentLoaded', function () {
+            apiCall('/api/categories/')
+                .then(function (data) { window._categories = data.categories; })
+                .catch(function (error) { console.error(error); });
+        });
+    </script>
+{% endif %}
+<script src="{% static 'users/js/onboarding.js' %}" defer></script>
 {% endblock %}
