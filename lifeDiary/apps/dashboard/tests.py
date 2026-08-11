@@ -10,8 +10,10 @@ from apps.tags.models import Category, Tag
 
 class TestDashboardServices:
     def test_build_time_headers(self):
-        # 24행 × 6열 그리드의 한 줄짜리 헤더. 시작 분 6개.
-        assert build_time_headers() == [":00", ":10", ":20", ":30", ":40", ":50"]
+        # 눈금은 칸이 아니라 경계선을 가리킨다. 6칸이면 경계는 7개다.
+        assert build_time_headers() == [
+            ":00", ":10", ":20", ":30", ":40", ":50", ":60",
+        ]
 
     def test_validate_slot_indexes_accepts_valid_list(self):
         assert validate_slot_indexes([0, 1, 143])

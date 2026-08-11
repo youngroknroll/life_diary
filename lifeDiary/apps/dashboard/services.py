@@ -9,8 +9,13 @@ MIN_LABEL_SPAN = 3
 
 
 def build_time_headers(slot_start_minutes=None):
+    """분 눈금. 칸이 아니라 경계선을 가리키므로 6칸에 눈금은 7개다.
+
+    마지막 `:60` 은 다음 시각의 `:00` 과 같은 선이다. 없으면 마지막 칸이
+    어디서 끝나는지 축이 말해 주지 않는다.
+    """
     minutes = slot_start_minutes or SLOT_START_MINUTES
-    return [f":{minute:02d}" for minute in minutes]
+    return [f":{minute:02d}" for minute in minutes] + [f":{minutes[-1] + 10:02d}"]
 
 
 def build_slot_rows(slot_data):

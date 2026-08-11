@@ -69,9 +69,9 @@
             <div class="card-body">
                 <div class="day-row day-header mb-2" aria-hidden="true">
                     <div class="day-row__label"></div>
-                    <div class="day-row__cells">
+                    <div class="day-row__cells day-header__cells">
                         {% for time_header in time_headers %}
-                            <div class="day-header__cell">{{ time_header }}</div>
+                            <div class="day-header__cell{% if forloop.last %} day-header__cell--end{% endif %}">{{ time_header }}</div>
                         {% endfor %}
                     </div>
                 </div>
