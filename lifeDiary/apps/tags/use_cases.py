@@ -50,6 +50,35 @@ class ListTagsUseCase:
         ]
 
 
+# 시안 6c 의 빈 화면이 집어 주는 칩 개수.
+FREQUENT_TAG_LIMIT = 4
+
+
+class ListFrequentTagsUseCase:
+    """빈 화면에서 바로 집을 태그 몇 개.
+
+    시안은 제목을 "자주 쓰는 태그"라 하고 설명은 "최근 순으로 재정렬"이라 해
+    서로 어긋난다. 빈도로 간다 — 자주 쓰는 것이 다시 쓸 것이고, 저장소가
+    이미 세고 있는 값이라 새 집계를 더하지 않는다.
+    """
+
+    def execute(self, user, limit: int = FREQUENT_TAG_LIMIT) -> list:
+        tags = list(_tag_repo.find_accessible_ordered(user))
+        if not tags:
+            return []
+
+        counts = _time_block_repo.count_blocks_by_tag(user)
+        # 쓴 적 없는 태그도 남은 자리를 채운다. 정렬만 뒤로 민다.
+        ordered = sorted(
+            enumerate(tags),
+            key=lambda pair: (-counts.get(pair[1].id, 0), pair[0]),
+        )
+        return [tag for _position, tag in ordered[:limit]]
+
+    def has_usage(self, user) -> bool:
+        return bool(_time_block_repo.count_blocks_by_tag(user))
+
+
 class CreateTagUseCase:
     def execute(self, user, name: str, color: str, category_id) -> dict:
         if not name or not color:

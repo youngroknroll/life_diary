@@ -1102,6 +1102,109 @@ footer {
     text-overflow: ellipsis;
 }
 
+/* 아직 오지 않은 시간. 안 채운 것이 아니라 아직 올 수 없는 것이라
+   지난 빈 칸과 같은 회색으로 두면 0%가 실패로 읽힌다. 시안대로 "더 연하게" —
+   바탕색을 덮어 뒤로 물러나게 한다. 라이트에서는 밝아지고 다크에서는
+   어두워지므로 두 테마 모두 같은 뜻이 된다. */
+.day-row__future {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    pointer-events: none;
+}
+
+.day-row__future > span {
+    background: var(--color-surface);
+    opacity: 0.72;
+    border-radius: 3px;
+}
+
+/* 지금 이 순간이 놓인 자리. 음영만으로는 경계가 안 읽혀 선을 하나 긋는다. */
+.day-row__now {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px;
+    pointer-events: none;
+}
+
+.day-row__now > span {
+    border-left: 2px solid var(--color-primary);
+    margin-left: -1px;
+}
+
+.day-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 10px;
+    font: 500 11.5px/1 var(--font-body);
+    color: var(--color-text-muted);
+}
+
+.day-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.day-legend__swatch {
+    width: 14px;
+    height: 12px;
+    border-radius: 3px;
+    background: var(--color-track);
+    box-shadow: 0 0 0 1px var(--color-border-soft) inset;
+}
+
+/* 격자에서와 같은 겹침을 그대로 보여 준다. */
+.day-legend__swatch.is-future {
+    position: relative;
+    overflow: hidden;
+}
+
+.day-legend__swatch.is-future::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--color-surface);
+    opacity: 0.62;
+}
+
+/* 빈 화면에서 바로 집을 태그 몇 개. 넛지 다음의 조용한 지름길이다. */
+.frequent-tags__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.frequent-tags__title {
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.frequent-tags__note {
+    color: var(--color-text-muted);
+    font-size: 12px;
+}
+
+.frequent-tags__row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.frequent-tags__chip {
+    min-height: 44px;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    cursor: pointer;
+}
+
 .day-row__selection {
     position: absolute;
     inset: 0;

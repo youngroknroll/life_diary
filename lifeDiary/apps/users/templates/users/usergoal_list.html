@@ -1,7 +1,9 @@
 {% load i18n %}
-{# 시안 5c: 태그 | 기간 | 목표 | 삭제 네 열.
-   달성률과 실제 기록은 분석 탭 소관이라 설정에서 뺐다. 설정은 목표를 정하는
-   자리이지 결과를 보는 자리가 아니다. 기간별 세 표도 기간 열 하나로 합쳤다. #}
+{% comment %}
+시안 5c: 태그 | 기간 | 목표 | 삭제 네 열. 달성률과 실제 기록은 분석 탭
+소관이라 설정에서 뺐다. 설정은 목표를 정하는 자리이지 결과를 보는 자리가
+아니다. 기간별 세 표도 기간 열 하나로 합쳤다.
+{% endcomment %}
 <div class="table-scroll" tabindex="0" role="region" aria-label="{% trans '목표 시간 표' %}">
     <table class="data-table goal-table">
         <thead>

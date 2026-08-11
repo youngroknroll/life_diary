@@ -17,7 +17,12 @@
 <div class="page-head mb-3">
     <div>
         <h1 class="page-title">{{ selected_date|date:"DATE_FORMAT" }} ({{ selected_date|date:"l" }})</h1>
-        <p class="page-subtitle">{% blocktrans with h=total_hours m=remaining_minutes p=fill_percentage %}{{ h }}시간 {{ m }}분 기록 · 기록률 {{ p }}%{% endblocktrans %}</p>
+        {% if filled_slots == 0 %}
+            {# 0시간 0분 기록 · 기록률 0% 는 아무것도 말해 주지 않는다. #}
+            <p class="page-subtitle">{% trans "아직 기록이 없습니다" %}{% if is_today %} · {% blocktrans with t=now_time|time:"H:i" %}지금 시각 {{ t }}{% endblocktrans %}{% endif %}</p>
+        {% else %}
+            <p class="page-subtitle">{% blocktrans with h=total_hours m=remaining_minutes p=fill_percentage %}{{ h }}시간 {{ m }}분 기록 · 기록률 {{ p }}%{% endblocktrans %}</p>
+        {% endif %}
     </div>
     {% trans "목표 추가" as add_goal_label %}
     {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
@@ -31,6 +36,31 @@
     </div>
     <button type="button" class="btn-sian btn-sian--primary" id="fillNowBtn">{% trans "지금 시각 채우기" %}</button>
 </div>
+
+{% if frequent_tags %}
+<div class="frequent-tags mb-4">
+    <div class="frequent-tags__head">
+        <span class="frequent-tags__title">{% trans "자주 쓰는 태그" %}</span>
+        <span class="frequent-tags__note">
+            {% if has_tag_usage %}
+                {% trans "자주 쓰는 순서로 보여드립니다." %}
+            {% else %}
+                {% trans "아직 사용 이력이 없어 만든 순서대로 보여드립니다. 쓰기 시작하면 자주 쓰는 순으로 바뀝니다." %}
+            {% endif %}
+        </span>
+    </div>
+    <div class="frequent-tags__row">
+        {% for tag in frequent_tags %}
+            <button type="button" class="chip frequent-tags__chip tag-btn"
+                    data-tag-id="{{ tag.id }}"
+                    data-tag-color="{{ tag.color }}"
+                    data-tag-name="{{ tag.name }}">
+                <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
+            </button>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
 {% endif %}
 
 <div class="summary-tiles mb-4">
@@ -78,26 +108,16 @@
 
                 <div class="day-grid" id="timeGrid" data-date="{{ selected_date|date:'Y-m-d' }}">
                     {% for row in slot_rows %}
-                        <div class="day-row" data-hour="{{ row.hour }}">
-                            <div class="day-row__label">{{ row.hour|stringformat:"02d" }}:00</div>
-                            <div class="day-row__cells">
-                                {% for run in row.runs %}
-                                    <div class="slot-block{% if not run.tag %} is-empty{% endif %}"
-                                         role="button"
-                                         tabindex="0"
-                                         style="grid-column: span {{ run.span }};--slot-span: {{ run.span }}{% if run.tag %};background-color:{{ run.tag.color }}{% endif %}"
-                                         data-start="{{ run.start_index }}"
-                                         data-span="{{ run.span }}"
-                                         {% if run.tag %}data-tag-id="{{ run.tag.id }}"{% endif %}
-                                         title="{% if run.tag %}{{ run.tag.name }}{% if run.memo %} · {{ run.memo }}{% endif %}{% else %}{% trans "빈 구간" %}{% endif %}">
-                                        {% if run.label %}<span class="slot-block__label">{{ run.label }}</span>{% endif %}
-                                    </div>
-                                {% endfor %}
-                                <div class="day-row__selection" aria-hidden="true"></div>
-                            </div>
-                        </div>
+                        {% include 'dashboard/_day_row.html' %}
                     {% endfor %}
                 </div>
+
+                {% if is_today %}
+                    <div class="day-legend" aria-hidden="true">
+                        <span class="day-legend__item"><span class="day-legend__swatch"></span>{% trans "지금까지 지난 시간" %}</span>
+                        <span class="day-legend__item"><span class="day-legend__swatch is-future"></span>{% trans "아직 오지 않은 시간" %}</span>
+                    </div>
+                {% endif %}
                 
                 <!-- 범례 -->
                 <div class="mt-3">

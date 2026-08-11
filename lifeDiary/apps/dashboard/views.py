@@ -11,12 +11,14 @@ from pydantic import ValidationError
 from django.utils import timezone
 
 from apps.tags.repositories import TagRepository
+from apps.tags.use_cases import ListFrequentTagsUseCase
 from .commands import (
     DeleteTimeBlocksCommand,
     RestoreTimeBlocksCommand,
     UpsertTimeBlocksCommand,
 )
 from .repositories import TimeBlockRepository
+from .day_window import annotate_future, current_slot_index
 from .services import build_slot_rows, build_time_headers, hours_touched, serialize_rows
 from .undo import pop_snapshot, save_snapshot
 from .use_cases import (
@@ -35,6 +37,7 @@ from apps.core.utils import (
 
 _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
+_list_frequent_tags = ListFrequentTagsUseCase()
 _upsert_use_case = UpsertTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_repo)
 _delete_use_case = DeleteTimeBlocksUseCase(writer=_time_block_repo)
 _restore_use_case = RestoreTimeBlocksUseCase(writer=_time_block_repo, tags=_tag_repo)
@@ -84,7 +87,9 @@ def dashboard_view(request):
         for block in time_blocks
     }
 
-    slot_rows = build_slot_rows(slot_data)
+    now = timezone.localtime()
+    current_slot = current_slot_index(selected_date, now)
+    slot_rows = annotate_future(build_slot_rows(slot_data), current_slot)
 
     user_tags = _tag_repo.find_accessible_ordered(request.user)
 
@@ -95,6 +100,10 @@ def dashboard_view(request):
         "page_title": gettext("대시보드"),
         "selected_date": selected_date,
         "slot_rows": slot_rows,
+        "is_today": current_slot is not None,
+        "now_time": now,
+        "frequent_tags": _list_frequent_tags.execute(request.user),
+        "has_tag_usage": _list_frequent_tags.has_usage(request.user),
         "user_tags": user_tags,
         "total_slots": TOTAL_SLOTS_PER_DAY,
         "filled_slots": len(slot_data),
