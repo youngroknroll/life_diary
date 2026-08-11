@@ -22,6 +22,10 @@ class FakeBlock:
         self.tag = tag
         self.memo = memo
 
+    @property
+    def tag_id(self):
+        return getattr(self.tag, "id", None)
+
 
 class FakeTagReader:
     def __init__(self, tag=None):
@@ -52,6 +56,20 @@ class FakeWriter:
 
     def bulk_update(self, blocks, fields):
         self.updated.extend(blocks)
+
+    def snapshot_slots(self, user, target_date, slot_indexes):
+        return [
+            {
+                "slot_index": slot_index,
+                "tag_id": self._existing[slot_index].tag_id
+                if slot_index in self._existing
+                else None,
+                "memo": self._existing[slot_index].memo
+                if slot_index in self._existing
+                else "",
+            }
+            for slot_index in slot_indexes
+        ]
 
     def delete_by_slots(self, user, target_date, slot_indexes):
         count = sum(1 for s in slot_indexes if s in self._existing)

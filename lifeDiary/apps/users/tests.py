@@ -1,6 +1,5 @@
 import time
 from datetime import timedelta
-from types import SimpleNamespace
 from unittest.mock import patch
 
 import pytest
@@ -9,36 +8,7 @@ from django.test import override_settings
 from django.urls import reverse
 
 from apps.tags.models import Category, Tag
-from apps.users.domain_services import GoalProgressService
 from apps.users.models import UserGoal
-
-
-class TestGoalProgressService:
-    def test_get_actual_hours_from_daily_stats(self):
-        service = GoalProgressService()
-        goal = SimpleNamespace(
-            period="daily",
-            tag=SimpleNamespace(name="운동"),
-            target_hours=2,
-        )
-        actual = service.get_actual_hours(
-            goal,
-            daily_stats={"tag_stats": [{"name": "운동", "hours": 1.5}]},
-        )
-        assert actual == 1.5
-
-    def test_get_actual_hours_from_weekly_stats(self):
-        service = GoalProgressService()
-        goal = SimpleNamespace(
-            period="weekly",
-            tag=SimpleNamespace(name="공부"),
-            target_hours=8,
-        )
-        actual = service.get_actual_hours(
-            goal,
-            weekly_stats={"tag_weekly_stats": [{"name": "공부", "total_hours": 6.5}]},
-        )
-        assert actual == 6.5
 
 
 @pytest.fixture
@@ -50,7 +20,6 @@ def alice_bob_with_bob_tag(make_user):
         user=bob,
         name="bob_only",
         color="#123456",
-        is_default=False,
         category=category,
     )
     return alice, bob, bob_tag

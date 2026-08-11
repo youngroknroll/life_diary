@@ -3,13 +3,15 @@ stats/logic.py — 얇은 오케스트레이터.
 집계 로직은 aggregation/ 패키지에 위치한다.
 """
 from apps.users.repositories import GoalRepository, NoteRepository
-from apps.users.domain_services import _goal_progress_service
 
 from .aggregation.calculator import StatsCalculator
 from .aggregation.daily import get_daily_stats_data
 from .aggregation.weekly import get_weekly_stats_data
 from .aggregation.monthly import get_monthly_stats_data
 from .aggregation.analysis import get_tag_analysis_data
+from .aggregation.daily_baseline import get_tag_deltas_vs_week
+from .aggregation.weekly_summary import build_weekly_summary
+from .aggregation.summary import build_summary
 
 __all__ = [
     "StatsCalculator",
@@ -17,6 +19,9 @@ __all__ = [
     "get_weekly_stats_data",
     "get_monthly_stats_data",
     "get_tag_analysis_data",
+    "get_tag_deltas_vs_week",
+    "build_weekly_summary",
+    "build_summary",
     "get_stats_context",
 ]
 
@@ -30,6 +35,11 @@ def get_stats_context(user, selected_date):
     weekly_stats = get_weekly_stats_data(user, selected_date, calculator)
     monthly_stats = get_monthly_stats_data(user, selected_date, calculator)
     tag_analysis = get_tag_analysis_data(user, selected_date, calculator)
+    summary = build_summary(user, selected_date)
+    tag_deltas = get_tag_deltas_vs_week(user, selected_date)
+    weekly_summary = build_weekly_summary(monthly_stats, today=selected_date)
+    for tag in daily_stats["tag_stats"]:
+        tag["delta_vs_week"] = tag_deltas.get(tag["name"])
 
     context = {
         "page_title": "통계",
@@ -37,9 +47,11 @@ def get_stats_context(user, selected_date):
         "total_blocks": len(daily_stats["tag_stats"]),
         "total_days": monthly_stats["total_days"],
         "total_hours": monthly_stats["total_hours"],
+        "summary": summary,
         "daily_stats": daily_stats,
         "weekly_stats": weekly_stats,
         "monthly_stats": monthly_stats,
+        "weekly_summary": weekly_summary,
         "tag_analysis": tag_analysis,
         "daily_stats_json": {
             "tag_stats": daily_stats["tag_stats"],
@@ -59,22 +71,6 @@ def get_stats_context(user, selected_date):
             "daily_totals": monthly_stats["daily_totals"],
         },
     }
-
-    grouped_goals = _goal_repo.find_grouped_by_period(user)
-    user_goals_daily = grouped_goals["daily"]
-    user_goals_weekly = grouped_goals["weekly"]
-    user_goals_monthly = grouped_goals["monthly"]
-    context["user_goals_daily"] = user_goals_daily
-    context["user_goals_weekly"] = user_goals_weekly
-    context["user_goals_monthly"] = user_goals_monthly
-
-    for goals in [user_goals_daily, user_goals_weekly, user_goals_monthly]:
-        _goal_progress_service.attach_progress(
-            goals,
-            daily_stats=daily_stats,
-            weekly_stats=weekly_stats,
-            monthly_stats=monthly_stats,
-        )
 
     context["user_note"] = _note_repo.find_latest(user)
     return context

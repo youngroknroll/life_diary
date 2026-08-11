@@ -78,11 +78,6 @@ class TimeBlock(models.Model):
     def clean(self):
         """추가 유효성 검사"""
         super().clean()
-        # 태그와 사용자가 일치하는지 확인 (기본 태그는 제외)
-        if (
-            self.tag
-            and self.user
-            and not self.tag.is_default
-            and self.tag.user != self.user
-        ):
+        # 태그와 사용자가 일치하는지 확인
+        if self.tag and self.user and self.tag.user_id != self.user_id:
             raise ValidationError({"tag": _("다른 사용자의 태그는 사용할 수 없습니다.")})

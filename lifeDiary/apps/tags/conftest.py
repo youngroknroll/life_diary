@@ -24,14 +24,13 @@ def category_factory(db):
 def tag_factory(db, category_factory):
     counter = {"n": 0}
 
-    def _make(user, name=None, category=None, color="#0000FF", is_default=False, **kwargs):
+    def _make(user, name=None, category=None, color="#0000FF", **kwargs):
         counter["n"] += 1
         return Tag.objects.create(
             user=user,
             category=category or category_factory(),
             name=name or f"태그{counter['n']}",
             color=color,
-            is_default=is_default,
             **kwargs,
         )
 

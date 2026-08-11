@@ -1,0 +1,34 @@
+{% load i18n %}
+{% comment %}
+한 시간 = 10분 칸 여섯. 접힌 구간에서도 같은 마크업을 쓴다 — 접기는 감추는
+것이지 버리는 것이 아니라서, 행이 사라지면 좌표로 칸을 찾는 드래그와
+인덱스로 찾는 키보드 이동이 어긋난다.
+{% endcomment %}
+<div class="day-row" data-hour="{{ row.hour }}">
+    <div class="day-row__label">{{ row.hour|stringformat:"02d" }}:00</div>
+    <div class="day-row__cells">
+        {% for run in row.runs %}
+            <div class="slot-block{% if not run.tag %} is-empty{% endif %}"
+                 role="button"
+                 tabindex="0"
+                 style="grid-column: span {{ run.span }};--slot-span: {{ run.span }}{% if run.tag %};background-color:{{ run.tag.color }}{% endif %}"
+                 data-start="{{ run.start_index }}"
+                 data-span="{{ run.span }}"
+                 {% if run.tag %}data-tag-id="{{ run.tag.id }}"{% endif %}
+                 title="{% if run.tag %}{{ run.tag.name }}{% if run.memo %} · {{ run.memo }}{% endif %}{% else %}{% trans "빈 구간" %}{% endif %}">
+                {% if run.label %}<span class="slot-block__label">{{ run.label }}</span>{% endif %}
+            </div>
+        {% endfor %}
+        {% if row.future_from_col is not None %}
+            <div class="day-row__future" aria-hidden="true">
+                <span style="grid-column: {{ row.future_from_col|add:1 }} / -1"></span>
+            </div>
+        {% endif %}
+        {% if row.now_col is not None %}
+            <div class="day-row__now" aria-hidden="true">
+                <span style="grid-column: {{ row.now_col|add:1 }} / -1"></span>
+            </div>
+        {% endif %}
+        <div class="day-row__selection" aria-hidden="true"></div>
+    </div>
+</div>

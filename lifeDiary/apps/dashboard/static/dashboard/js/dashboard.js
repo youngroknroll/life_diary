@@ -24,26 +24,72 @@ let isDragging = false;
 let startSlot = null;
 let isAdditiveDrag = false;
 let dragBaseSelection = new Set();
-let touchStartX = 0, touchStartY = 0, touchDecided = false;
-let lastSelectedSlotElement = null;
 
-// ── 그리드 칼럼 수 (반응형) ──
-
-function getGridColumns() {
-    return window.innerWidth <= 768 ? 6 : 12;
-}
+const SLOTS_PER_HOUR = 6;
+const TOTAL_SLOTS = 144;
 
 function isMobileDashboardLayout() {
     return window.matchMedia('(max-width: 767.98px)').matches;
 }
 
+function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function slotToRowCol(slotIndex) {
-    const cols = getGridColumns();
-    return { row: Math.floor(slotIndex / cols), col: slotIndex % cols };
+    return {
+        row: Math.floor(slotIndex / SLOTS_PER_HOUR),
+        col: slotIndex % SLOTS_PER_HOUR,
+    };
 }
 
 function rowColToSlot(row, col) {
-    return row * getGridColumns() + col;
+    return row * SLOTS_PER_HOUR + col;
+}
+
+function blockForSlot(slotIndex) {
+    const hour = Math.floor(slotIndex / SLOTS_PER_HOUR);
+    const row = document.querySelector(`.day-row[data-hour="${hour}"]`);
+    if (!row) return null;
+
+    return Array.from(row.querySelectorAll('.slot-block')).find(block => {
+        const start = parseInt(block.dataset.start, 10);
+        const span = parseInt(block.dataset.span, 10);
+        return slotIndex >= start && slotIndex < start + span;
+    }) || null;
+}
+
+function isSlotFilled(slotIndex) {
+    const block = blockForSlot(slotIndex);
+    return !!(block && block.dataset.tagId);
+}
+
+function slotTagInfo(slotIndex) {
+    const block = blockForSlot(slotIndex);
+    if (!block || !block.dataset.tagId) return null;
+
+    const [tagName, memo = ''] = (block.getAttribute('title') || '').split(' · ');
+    return { tagName, memo };
+}
+
+/** 블록 하나가 여러 칸을 덮으므로 요소가 아니라 x 위치로 칸을 정한다. */
+function slotFromPoint(clientX, clientY) {
+    const element = document.elementFromPoint(clientX, clientY);
+    const row = element && element.closest('.day-row[data-hour]');
+    if (!row) return null;
+
+    const cells = row.querySelector('.day-row__cells');
+    if (!cells) return null;
+
+    const rect = cells.getBoundingClientRect();
+    if (rect.width <= 0) return null;
+
+    const ratio = (clientX - rect.left) / rect.width;
+    const col = Math.min(SLOTS_PER_HOUR - 1, Math.max(0, Math.floor(ratio * SLOTS_PER_HOUR)));
+    const hour = parseInt(row.dataset.hour, 10);
+    if (Number.isNaN(hour)) return null;
+
+    return rowColToSlot(hour, col);
 }
 
 // ── 초기화 ──
@@ -55,6 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }).catch(err => console.error('카테고리 로드 오류:', err));
 
     initializeDashboard();
+    initializeGridDrag();
+    initializeGridKeyboard();
+    initializeFillNow();
     initializeTagSelectDelegation('tagLegend');
     initializeTagSelectDelegation('tagContainer');
 
@@ -212,8 +261,10 @@ function closeQuickInputSheet() {
 
     document.removeEventListener('keydown', handleQuickInputSheetKeydown);
 
-    if (lastSelectedSlotElement) {
-        lastSelectedSlotElement.focus({ preventScroll: true });
+    const firstSelected = Math.min(...selectedSlots);
+    const focusTarget = Number.isFinite(firstSelected) ? blockForSlot(firstSelected) : null;
+    if (focusTarget) {
+        focusTarget.focus({ preventScroll: true });
     }
 
     sheet.classList.remove('is-open');
@@ -225,29 +276,19 @@ function closeQuickInputSheet() {
 
 // ── 슬롯 선택 ──
 
-const selectSlot = (slotIndex) => {
-    if (isDragging) return;
-
-    const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
-    if (!slotElement) return;
-
-    const isMultiSelect = event.ctrlKey || event.metaKey;
+const selectSlot = (slotIndex, event) => {
+    const isMultiSelect = !!(event && (event.ctrlKey || event.metaKey));
 
     if (!isMultiSelect) {
-        clearSelection();
+        selectedSlots.clear();
         selectedSlots.add(slotIndex);
-        slotElement.classList.add('selected');
+    } else if (selectedSlots.has(slotIndex)) {
+        selectedSlots.delete(slotIndex);
     } else {
-        if (selectedSlots.has(slotIndex)) {
-            selectedSlots.delete(slotIndex);
-            slotElement.classList.remove('selected');
-        } else {
-            selectedSlots.add(slotIndex);
-            slotElement.classList.add('selected');
-        }
+        selectedSlots.add(slotIndex);
     }
 
-    lastSelectedSlotElement = slotElement;
+    renderSelection();
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
     openQuickInputSheet();
@@ -255,47 +296,47 @@ const selectSlot = (slotIndex) => {
 
 const clearSelection = () => {
     selectedSlots.clear();
-    document.querySelectorAll('.time-slot').forEach(slot => {
-        slot.classList.remove('selected');
+    renderSelection();
+};
+
+const renderSelection = () => {
+    document.querySelectorAll('.day-row[data-hour]').forEach(row => {
+        const layer = row.querySelector('.day-row__selection');
+        if (!layer) return;
+
+        const hour = parseInt(row.dataset.hour, 10);
+        layer.textContent = '';
+
+        let column = 0;
+        while (column < SLOTS_PER_HOUR) {
+            if (!selectedSlots.has(rowColToSlot(hour, column))) {
+                column += 1;
+                continue;
+            }
+
+            let span = 0;
+            while (
+                column + span < SLOTS_PER_HOUR &&
+                selectedSlots.has(rowColToSlot(hour, column + span))
+            ) {
+                span += 1;
+            }
+
+            const chunk = document.createElement('div');
+            chunk.className = 'is-selected';
+            chunk.style.gridColumn = `${column + 1} / span ${span}`;
+            layer.appendChild(chunk);
+
+            column += span;
+        }
     });
+
 };
 
 // ── 드래그 ──
 
-const startDrag = (slotIndex, event) => {
-    isDragging = true;
-    startSlot = slotIndex;
-    isAdditiveDrag = !!(event && (event.ctrlKey || event.metaKey));
-
-    if (isAdditiveDrag) {
-        // 기존 선택 유지, 실제 드래그 이동 시 dragOver에서 범위 추가
-        dragBaseSelection = new Set(selectedSlots);
-    } else {
-        dragBaseSelection = new Set();
-        clearSelection();
-        selectedSlots.add(slotIndex);
-        const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
-        if (slotElement) {
-            slotElement.classList.add('selected');
-            lastSelectedSlotElement = slotElement;
-        }
-    }
-};
-
-const handleTouchStart = (slotIndex, event) => {
-    const touch = event.touches[0];
-    touchStartX = touch.clientX;
-    touchStartY = touch.clientY;
-    touchDecided = false;
-    startDrag(slotIndex, event);
-};
-
 const restoreBaseSelection = () => {
-    dragBaseSelection.forEach(idx => {
-        selectedSlots.add(idx);
-        const el = document.querySelector(`[data-slot-index="${idx}"]`);
-        if (el) el.classList.add('selected');
-    });
+    dragBaseSelection.forEach(index => selectedSlots.add(index));
 };
 
 const dragOver = (slotIndex) => {
@@ -304,70 +345,212 @@ const dragOver = (slotIndex) => {
     const startPos = slotToRowCol(startSlot);
     const endPos = slotToRowCol(slotIndex);
 
-    clearSelection();
+    selectedSlots.clear();
     if (isAdditiveDrag) restoreBaseSelection();
 
     if (startPos.col === endPos.col && startPos.row !== endPos.row) {
-        // 순수 세로 드래그: 같은 열의 각 블록만 선택 (중간 시간 비우기)
-        const minRow = Math.min(startPos.row, endPos.row);
+                const minRow = Math.min(startPos.row, endPos.row);
         const maxRow = Math.max(startPos.row, endPos.row);
-        for (let r = minRow; r <= maxRow; r++) {
-            const idx = rowColToSlot(r, startPos.col);
-            selectedSlots.add(idx);
-            const el = document.querySelector(`[data-slot-index="${idx}"]`);
-            if (el) el.classList.add('selected');
+        for (let row = minRow; row <= maxRow; row++) {
+            selectedSlots.add(rowColToSlot(row, startPos.col));
         }
     } else {
-        // 대각선/가로 드래그: 시작~끝 슬롯 사이 모든 블록 연속 선택
-        const minIdx = Math.min(startSlot, slotIndex);
-        const maxIdx = Math.max(startSlot, slotIndex);
-        for (let i = minIdx; i <= maxIdx; i++) {
-            selectedSlots.add(i);
-            const el = document.querySelector(`[data-slot-index="${i}"]`);
-            if (el) el.classList.add('selected');
+                const minIndex = Math.min(startSlot, slotIndex);
+        const maxIndex = Math.max(startSlot, slotIndex);
+        for (let index = minIndex; index <= maxIndex; index++) {
+            selectedSlots.add(index);
         }
     }
+
+    renderSelection();
     showSlotInfo(Array.from(selectedSlots));
     updateButtons();
 };
 
 const endDrag = () => {
-    if (isDragging) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    startSlot = null;
+    isAdditiveDrag = false;
+    dragBaseSelection = new Set();
+    showSlotInfo(Array.from(selectedSlots));
+    updateButtons();
+    openQuickInputSheet();
+};
+
+/**
+ * 포인터 없이도 기록할 수 있어야 한다. 기록은 이 제품의 핵심 루프다.
+ * 방향키로 칸을 옮기고, Shift를 누른 채 옮기면 범위가 늘어난다.
+ */
+function initializeGridKeyboard() {
+    const grid = document.getElementById('timeGrid');
+    if (!grid) return;
+
+    const STEP = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -SLOTS_PER_HOUR, ArrowDown: SLOTS_PER_HOUR };
+    let anchorSlot = null;
+    let cursorSlot = null;
+
+    grid.addEventListener('keydown', (event) => {
+        const block = event.target.closest('.slot-block');
+        if (!block) return;
+
+        // 블록 하나가 여러 칸을 덮으므로 커서를 따로 든다. 블록의 시작점을
+        // 쓰면 넓은 블록 안에서 방향키가 제자리를 맴돈다.
+        const blockStart = parseInt(block.dataset.start, 10);
+        const blockSpan = parseInt(block.dataset.span, 10);
+        if (cursorSlot === null || cursorSlot < blockStart || cursorSlot >= blockStart + blockSpan) {
+            cursorSlot = blockStart;
+        }
+
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            // Shift+방향키로 넓혀 둔 범위가 있으면 그것을 확정한다.
+            // selectSlot 은 범위를 지우고 한 칸으로 되돌리므로 여기서 부르면
+            // 키보드 사용자는 여러 칸을 기록할 방법이 없어진다.
+            if (selectedSlots.size > 1 && selectedSlots.has(cursorSlot)) {
+                openQuickInputSheet();
+                return;
+            }
+            anchorSlot = cursorSlot;
+            selectSlot(cursorSlot, event);
+            return;
+        }
+
+        if (!(event.key in STEP)) return;
+        event.preventDefault();
+
+        const origin = cursorSlot;
+        const target = origin + STEP[event.key];
+        if (target < 0 || target >= TOTAL_SLOTS) return;
+        cursorSlot = target;
+
+        if (event.shiftKey) {
+            // Enter 없이 Shift+방향키로 시작하면 기준점이 없다. 움직이기 전
+            // 자리를 기준으로 삼는다.
+            if (anchorSlot === null) anchorSlot = origin;
+            selectRange(anchorSlot, target);
+        } else {
+            anchorSlot = target;
+            selectedSlots.clear();
+            selectedSlots.add(target);
+            renderSelection();
+            showSlotInfo(Array.from(selectedSlots));
+            updateButtons();
+        }
+
+        blockForSlot(target)?.focus({ preventScroll: false });
+    });
+}
+
+const selectRange = (from, to) => {
+    selectedSlots.clear();
+    for (let index = Math.min(from, to); index <= Math.max(from, to); index++) {
+        selectedSlots.add(index);
+    }
+    renderSelection();
+    showSlotInfo(Array.from(selectedSlots));
+    updateButtons();
+};
+
+/** 빈 화면에서 다음 동작 하나만 제시한다 — 지금 시각 한 칸을 고른다. */
+function initializeFillNow() {
+    const button = document.getElementById('fillNowBtn');
+    if (!button) return;
+
+    button.addEventListener('click', () => {
+        const now = new Date();
+        const slotIndex = now.getHours() * SLOTS_PER_HOUR
+            + Math.floor(now.getMinutes() / 10);
+
+        selectSlot(slotIndex, null);
+
+        // CSS 미디어쿼리는 브라우저 스크롤 애니메이션을 막지 못한다.
+        // 모션을 줄여 달라는 설정은 여기서 직접 봐야 지켜진다.
+        const target = blockForSlot(slotIndex);
+        if (!target) return;
+        target.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+
+        // 버튼에 포커스가 남으면 어느 칸이 잡혔는지 알 수 없다. 모바일은
+        // openQuickInputSheet 가 시트로 포커스를 옮기므로 건드리지 않는다.
+        if (!isMobileDashboardLayout()) {
+            target.focus({ preventScroll: true });
+        }
+    });
+}
+
+/** 모바일 세로 스와이프는 touch-action:pan-y 가 스크롤로 가져간다. */
+function initializeGridDrag() {
+    const grid = document.getElementById('timeGrid');
+    if (!grid) return;
+
+    let movedDuringDrag = false;
+
+    grid.addEventListener('pointerdown', (event) => {
+        if (event.button !== 0 && event.pointerType === 'mouse') return;
+
+        const slotIndex = slotFromPoint(event.clientX, event.clientY);
+        if (slotIndex === null) return;
+
+        isDragging = true;
+        movedDuringDrag = false;
+        startSlot = slotIndex;
+        isAdditiveDrag = !!(event.ctrlKey || event.metaKey);
+        dragBaseSelection = isAdditiveDrag ? new Set(selectedSlots) : new Set();
+
+        if (!isAdditiveDrag) {
+            selectedSlots.clear();
+        }
+        selectedSlots.add(slotIndex);
+        renderSelection();
+
+        grid.setPointerCapture(event.pointerId);
+    });
+
+    grid.addEventListener('pointermove', (event) => {
+        if (!isDragging) return;
+
+        const slotIndex = slotFromPoint(event.clientX, event.clientY);
+        if (slotIndex === null || slotIndex === startSlot) return;
+
+        movedDuringDrag = true;
+        dragOver(slotIndex);
+    });
+
+    grid.addEventListener('pointerup', (event) => {
+        if (!isDragging) return;
+
+        if (grid.hasPointerCapture(event.pointerId)) {
+            grid.releasePointerCapture(event.pointerId);
+        }
+
+        if (!movedDuringDrag && startSlot !== null) {
+            const clicked = startSlot;
+            isDragging = false;
+            startSlot = null;
+            selectSlot(clicked, event);
+            return;
+        }
+
+        endDrag();
+    });
+
+    grid.addEventListener('pointercancel', () => {
+        if (!isDragging) return;
+
         isDragging = false;
         startSlot = null;
         isAdditiveDrag = false;
+
+        // pointerdown 이 이미 한 칸을 칠해 뒀다. 스크롤로 넘어간 제스처가
+        // 선택만 남기고 사라지면 화면과 저장 버튼 상태가 어긋난다.
+        selectedSlots = new Set(dragBaseSelection);
         dragBaseSelection = new Set();
+        renderSelection();
         showSlotInfo(Array.from(selectedSlots));
         updateButtons();
-        openQuickInputSheet();
-    }
-};
-
-const handleTouchMove = (event) => {
-    if (!isDragging) return;
-    const touch = event.touches[0];
-
-    if (!touchDecided) {
-        const dx = Math.abs(touch.clientX - touchStartX);
-        const dy = Math.abs(touch.clientY - touchStartY);
-        if (dx < 5 && dy < 5) return;
-        touchDecided = true;
-    }
-
-    if (event.cancelable) {
-        event.preventDefault();
-    }
-    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (elementBelow && elementBelow.classList.contains('time-slot')) {
-        const slotIndex = parseInt(elementBelow.dataset.slotIndex, 10);
-        if (!isNaN(slotIndex)) {
-            dragOver(slotIndex);
-        }
-    }
-};
-
-document.addEventListener('mouseup', endDrag);
-document.addEventListener('mouseleave', endDrag);
+    });
+}
 
 // ── 슬롯 정보 표시 ──
 
@@ -382,35 +565,17 @@ const showSlotInfo = (slotIndexes) => {
     }
 
     const hasFilledSlot = slotIndexes.some(idx =>
-        document.querySelector(`[data-slot-index="${idx}"]`)?.classList.contains('filled')
+        isSlotFilled(idx)
     );
 
     const nextActionPrompt = gettext('시간을 선택했어요. 원하는 태그를 선택하세요.');
     let infoHTML = '';
     if (slotIndexes.length === 1) {
         const slotIndex = slotIndexes[0];
-        const slotElement = document.querySelector(`[data-slot-index="${slotIndex}"]`);
-        if (!slotElement) return;
-
-        const timeRange = slotElement.getAttribute('title').split(' - ')[0];
-        let tagName = gettext('빈 슬롯');
-        let memo = '';
-
-        if (slotElement.classList.contains('filled')) {
-            const titleParts = slotElement.title.split(' - ');
-            if (titleParts.length > 1) {
-                const tagAndMemo = titleParts[1];
-                const colonIndex = tagAndMemo.indexOf(':');
-                if (colonIndex !== -1) {
-                    tagName = tagAndMemo.substring(0, colonIndex);
-                    memo = tagAndMemo.substring(colonIndex + 1).trim();
-                } else {
-                    tagName = tagAndMemo;
-                }
-            } else {
-                tagName = gettext('알 수 없음');
-            }
-        }
+        const timeRange = `${slotIndexToTime(slotIndex)}–${slotIndexToTime(slotIndex + 1)}`;
+        const tagInfo = slotTagInfo(slotIndex);
+        const tagName = tagInfo ? tagInfo.tagName : gettext('빈 슬롯');
+        const memo = tagInfo ? tagInfo.memo : '';
 
         const labelTime = gettext('시간:');
         const labelStatus = gettext('상태:');
@@ -468,6 +633,111 @@ const selectTag = (tagId, tagColor, tagName) => {
     updateButtons();
 };
 
+function renderRows(rows) {
+    (rows || []).forEach(row => {
+        const rowElement = document.querySelector(`.day-row[data-hour="${row.hour}"]`);
+        if (!rowElement) return;
+
+        const cells = rowElement.querySelector('.day-row__cells');
+        const selectionLayer = cells.querySelector('.day-row__selection');
+
+        cells.textContent = '';
+        row.runs.forEach(run => cells.appendChild(buildBlock(run)));
+        if (selectionLayer) cells.appendChild(selectionLayer);
+    });
+
+    renderSelection();
+}
+
+function buildBlock(run) {
+    const block = document.createElement('div');
+    block.className = run.tag_id ? 'slot-block' : 'slot-block is-empty';
+    block.style.gridColumn = `span ${run.span}`;
+    block.style.setProperty('--slot-span', run.span);
+    block.dataset.start = run.start_index;
+    block.dataset.span = run.span;
+
+    block.setAttribute('role', 'button');
+    block.setAttribute('tabindex', '0');
+
+    if (run.tag_id) {
+        block.style.backgroundColor = run.color;
+        block.dataset.tagId = run.tag_id;
+        block.title = run.memo ? `${run.tag_name} · ${run.memo}` : run.tag_name;
+    } else {
+        block.title = gettext('빈 구간');
+    }
+
+    if (run.label) {
+        const label = document.createElement('span');
+        label.className = 'slot-block__label';
+        label.textContent = run.label;
+        block.appendChild(label);
+    }
+
+    return block;
+}
+
+function renderDayStats(stats) {
+    if (!stats) return;
+
+    const filled = document.getElementById('filledSlots');
+    const percentage = document.getElementById('fillPercentage');
+    const loggedTime = document.getElementById('loggedTime');
+
+    const empty = document.getElementById('emptySlots');
+    const filledCount = Math.round(stats.logged_minutes / 10);
+    if (filled) filled.textContent = filledCount;
+    if (empty) empty.textContent = TOTAL_SLOTS - filledCount;
+    if (percentage) percentage.textContent = `${stats.fill_percentage}%`;
+    if (loggedTime) {
+        loggedTime.textContent = interpolate(
+            gettext('%(h)s시간 %(m)s분'),
+            { h: Math.floor(stats.logged_minutes / 60), m: stats.logged_minutes % 60 },
+            true
+        );
+    }
+}
+
+let undoTimer = null;
+
+function showUndoSnackbar(message, token) {
+    const snackbar = document.getElementById('undoSnackbar');
+    if (!snackbar || !token) return;
+
+    snackbar.querySelector('[data-undo-message]').textContent = message;
+    snackbar.querySelector('[data-undo-action]').onclick = () => runUndo(token);
+    snackbar.classList.add('is-open');
+
+    clearTimeout(undoTimer);
+    undoTimer = setTimeout(hideUndoSnackbar, 5000);
+}
+
+function hideUndoSnackbar() {
+    const snackbar = document.getElementById('undoSnackbar');
+    if (snackbar) snackbar.classList.remove('is-open');
+    clearTimeout(undoTimer);
+}
+
+async function runUndo(token) {
+    hideUndoSnackbar();
+
+    try {
+        const result = await apiCall('/api/time-blocks/undo/', {
+            method: 'POST',
+            data: { undo_token: token }
+        });
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        showNotification(result.message, 'success');
+    } catch (error) {
+        showNotification(
+            interpolate(gettext('되돌리기 실패: %s'), [error.message]),
+            'warning'
+        );
+    }
+}
+
 // ── 저장/삭제 ──
 
 const saveSlot = async () => {
@@ -482,7 +752,10 @@ const saveSlot = async () => {
     }
 
     const saveBtn = document.getElementById('saveBtn');
-    showOverlay(gettext('저장 중입니다...'), 'fa-save');
+    const slotIndexes = Array.from(selectedSlots);
+    const affectedRows = snapshotRows(slotIndexes);
+
+    paintSelectedSlots(selectedTag.color);
 
     try {
         const memo = document.getElementById('memoInput').value.trim();
@@ -491,7 +764,7 @@ const saveSlot = async () => {
         const result = await apiCall('/api/time-blocks/', {
             method: 'POST',
             data: {
-                slot_indexes: Array.from(selectedSlots),
+                slot_indexes: slotIndexes,
                 tag_id: selectedTag.id,
                 memo: memo,
                 date: date
@@ -499,17 +772,65 @@ const saveSlot = async () => {
             loadingElement: saveBtn
         });
 
-        showNotification(result.message, 'success');
-        // 리로드까지 1초 공백 동안 키보드 Enter로 인한 중복 제출 방지
-        if (saveBtn) saveBtn.disabled = true;
-        setTimeout(() => location.reload(), 1000);
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        clearSelection();
+        updateButtons();
+        closeQuickInputSheet();
+        showUndoSnackbar(result.message, result.undo_token);
 
     } catch (error) {
-        hideOverlay();
+        restoreRows(affectedRows);
         showNotification(interpolate(gettext('저장 실패: %s'), [error.message]), 'error');
         console.error('Save error:', error);
     }
 };
+
+function snapshotRows(slotIndexes) {
+    const hours = new Set(slotIndexes.map(index => Math.floor(index / SLOTS_PER_HOUR)));
+
+    return Array.from(hours).map(hour => {
+        const cells = document
+            .querySelector(`.day-row[data-hour="${hour}"]`)
+            ?.querySelector('.day-row__cells');
+        return { hour, html: cells ? cells.innerHTML : null };
+    });
+}
+
+function restoreRows(snapshots) {
+    snapshots.forEach(({ hour, html }) => {
+        if (html === null) return;
+        const cells = document
+            .querySelector(`.day-row[data-hour="${hour}"]`)
+            ?.querySelector('.day-row__cells');
+        if (cells) cells.innerHTML = html;
+    });
+    renderSelection();
+}
+
+function paintSelectedSlots(color) {
+    document.querySelectorAll('.day-row[data-hour]').forEach(row => {
+        const hour = parseInt(row.dataset.hour, 10);
+        const selected = [];
+        for (let column = 0; column < SLOTS_PER_HOUR; column++) {
+            if (selectedSlots.has(rowColToSlot(hour, column))) selected.push(column);
+        }
+        if (selected.length === 0) return;
+
+        row.querySelectorAll('.slot-block').forEach(block => {
+            const start = parseInt(block.dataset.start, 10);
+            const span = parseInt(block.dataset.span, 10);
+            const covered = [];
+            for (let index = start; index < start + span; index++) {
+                if (selectedSlots.has(index)) covered.push(index);
+            }
+            if (covered.length !== span) return;
+
+            block.classList.remove('is-empty');
+            block.style.backgroundColor = color;
+        });
+    });
+}
 
 const deleteSlot = async () => {
     if (selectedSlots.size === 0) {
@@ -518,7 +839,7 @@ const deleteSlot = async () => {
     }
 
     const filledSlots = Array.from(selectedSlots).filter(idx =>
-        document.querySelector(`[data-slot-index="${idx}"]`)?.classList.contains('filled')
+        isSlotFilled(idx)
     );
 
     if (filledSlots.length === 0) {
@@ -538,7 +859,7 @@ const deleteSlot = async () => {
         return;
     }
 
-    showOverlay(gettext('삭제 중입니다...'), 'fa-trash');
+    const affectedRows = snapshotRows(filledSlots);
 
     try {
         const date = document.getElementById('dateSelector').value;
@@ -551,14 +872,15 @@ const deleteSlot = async () => {
             }
         });
 
-        showNotification(result.message, 'success');
-        // 리로드까지 1초 공백 동안 선택 상태를 비워 삭제 버튼·저장 버튼 비활성 유지
-        selectedSlots.clear();
+        renderRows(result.runs);
+        renderDayStats(result.stats);
+        clearSelection();
         updateButtons();
-        setTimeout(() => location.reload(), 1000);
+        closeQuickInputSheet();
+        showUndoSnackbar(result.message, result.undo_token);
 
     } catch (error) {
-        hideOverlay();
+        restoreRows(affectedRows);
         showNotification(interpolate(gettext('삭제 실패: %s'), [error.message]), 'error');
         console.error('Delete error:', error);
     }
@@ -586,7 +908,6 @@ function renderTagButton(tag) {
                 data-tag-name="${safeName}">
             <span class="badge me-2" style="background-color: ${safeColor};">&nbsp;</span>
             ${safeName}
-            ${tag.is_default ? `<i class="fas fa-star text-warning ms-1" title="${gettext('기본 태그')}"></i>` : ''}
         </button>`;
 }
 

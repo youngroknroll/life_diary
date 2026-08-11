@@ -1,54 +1,39 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load socialaccount %}
+{% load form_fields %}
 
 {% block title %}{% trans "로그인" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
 {% block content %}
-<div class="auth-split shadow">
-    <aside class="auth-split__brand" aria-labelledby="auth-brand-title">
-        <div class="auth-split__brand-inner">
-            <i class="fas fa-book-open auth-split__logo" aria-hidden="true"></i>
-            <h2 id="auth-brand-title" class="auth-split__title">{% trans "라이프 다이어리" %}</h2>
-            <p class="auth-split__tagline">{% trans "오늘의 하루를 기록하고, 내일의 나를 만들어가세요." %}</p>
-        </div>
-    </aside>
-    <div class="card auth-card auth-split__panel">
-        <div class="card-header text-center">
-            <h3 class="mb-0 h4">
-                <i class="fas fa-sign-in-alt me-2" aria-hidden="true"></i>
-                {% trans "로그인" %}
-            </h3>
-        </div>
+<div class="auth-panel">
+    <div class="card auth-card">
         <div class="card-body">
+                <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
+                <h1 class="auth-panel__title">{% trans "다시 오셨네요" %}</h1>
+                <p class="auth-panel__lead">{% trans "어제 기록이 그대로 기다리고 있습니다." %}</p>
                 <form method="post">
                     {% csrf_token %}
 
                     <div class="mb-3">
-                        <label for="{{ form.username.id_for_label }}" class="form-label">{% trans "사용자명" %}</label>
-                        {{ form.username }}
-                        {% if form.username.errors %}
-                            <div class="text-danger small">
-                                {{ form.username.errors }}
-                            </div>
-                        {% endif %}
+                        <label for="{{ form.username.id_for_label }}" class="form-label">{% trans "아이디" %}</label>
+                        {% form_field form.username %}
+                        {% include 'shared/_field_errors.html' with field=form.username %}
                     </div>
 
                     <div class="mb-3">
                         <label for="{{ form.password.id_for_label }}" class="form-label">{% trans "비밀번호" %}</label>
-                        {{ form.password }}
-                        {% if form.password.errors %}
-                            <div class="text-danger small">
-                                {{ form.password.errors }}
+                        {% if form.non_field_errors %}
+                            {% form_field form.password invalid=True %}
+                            <div class="field-error" id="{{ form.password|field_error_id }}">
+                                <span>{% trans "비밀번호가 맞지 않습니다" %}</span>
+                                {% if remaining_attempts %}<span class="field-error__count">{% blocktrans %}{{ remaining_attempts }}회 남음{% endblocktrans %}</span>{% endif %}
                             </div>
+                        {% else %}
+                            {% form_field form.password %}
+                            {% include 'shared/_field_errors.html' with field=form.password %}
                         {% endif %}
                     </div>
-
-                    {% if form.non_field_errors %}
-                        <div class="alert alert-danger">
-                            {{ form.non_field_errors }}
-                        </div>
-                    {% endif %}
 
                     {% if show_recaptcha %}
                         <div class="mb-3">
@@ -64,21 +49,17 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-sign-in-alt me-1"></i>
-                            {% trans "로그인" %}
-                        </button>
+                        <button type="submit" class="btn-sian btn-sian--primary">{% trans "로그인" %}</button>
                     </div>
                     <div class="d-grid gap-2 mt-2">
-                        <a href="{% provider_login_url 'google' %}" class="btn btn-outline-secondary auth-google-login">
+                        <a href="{% provider_login_url 'google' %}" class="btn-sian auth-google-login">
                             <i class="fab fa-google me-1" aria-hidden="true"></i>
                             {% trans "Google로 계속하기" %}
                         </a>
                     </div>
                 </form>
 
-                <hr>
-                <div class="text-center">
+                <div class="auth-panel__foot">
                     <p class="mb-2 small">
                         <a href="{% url 'users:username_recovery' %}" class="text-decoration-none">
                             {% trans "아이디 찾기" %}

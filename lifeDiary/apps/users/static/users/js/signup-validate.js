@@ -109,6 +109,47 @@
         }
     }
 
+    // The form carries `novalidate`, so the checkbox's own `required` attribute
+    // never fires. Without this guard the only thing stopping an unchecked
+    // consent is a full server round trip.
+    const consentInput = form.querySelector('input[name="consent"]');
+
+    function consentError() {
+        let node = document.getElementById(consentInput.id + '_error');
+        if (!node) {
+            node = document.createElement('div');
+            node.id = consentInput.id + '_error';
+            node.className = 'field-error';
+            consentInput.closest('.form-check').appendChild(node);
+        }
+        return node;
+    }
+
+    function clearConsentError() {
+        consentInput.removeAttribute('aria-invalid');
+        consentInput.removeAttribute('aria-describedby');
+        const node = document.getElementById(consentInput.id + '_error');
+        if (node) node.textContent = '';
+    }
+
+    if (consentInput) {
+        form.addEventListener('submit', function (event) {
+            if (consentInput.checked) {
+                clearConsentError();
+                return;
+            }
+            event.preventDefault();
+            const node = consentError();
+            node.textContent = gettext('이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다.');
+            consentInput.setAttribute('aria-invalid', 'true');
+            consentInput.setAttribute('aria-describedby', node.id);
+            consentInput.focus();
+        });
+        consentInput.addEventListener('change', function () {
+            if (consentInput.checked) clearConsentError();
+        });
+    }
+
     if (usernameInput && CHECK_USERNAME_URL) {
         usernameInput.addEventListener('blur', checkUsername);
     }

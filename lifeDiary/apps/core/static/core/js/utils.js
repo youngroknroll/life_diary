@@ -42,6 +42,11 @@ function showNotification(message, type = 'info', duration = 3000) {
     const notification = document.createElement('div');
     notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show core-notification`;
     notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+
+    // 이게 없으면 저장·삭제 실패가 스크린리더에 아무것도 남기지 않는다.
+    const isError = type === 'error' || type === 'danger';
+    notification.setAttribute('role', isError ? 'alert' : 'status');
+    notification.setAttribute('aria-live', isError ? 'assertive' : 'polite');
     
     notification.innerHTML = `
         ${message}

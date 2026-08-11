@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-07-18
+Last updated: 2026-08-02
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,38 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## Latest Execution (2026-08-01 ~ 08-02)
+
+P0 시안 리디자인을 마쳤다. 구현 명세 7단계와 시안 화면 19개 전부.
+브랜치 `feat/p0-redesign-grid`, PR #40, 커밋 30개. 머지는 사용자 몫.
+
+- 실행 로그: `docs/refactoring/2026-08-01_p0-sian-redesign.md`
+- 명세 단계 계획: `docs/plans/2026-08-01_p0-redesign-plan.md`
+- 화면 인벤토리와 컴포넌트 스펙: `docs/plans/2026-08-01_sian-screen-inventory.md`
+
+핵심 변경:
+
+- 최상위 내비게이션이 홈·기록·분석·설정 넷으로 바뀌었다. 태그 관리는 설정
+  하위로 내려갔고 언어·테마도 설정 안으로 들어갔다. 모바일은 하단 탭바.
+- 기록 그리드가 24행 × 6열이 되고 같은 태그 연속 칸이 하나의 블록으로
+  병합된다. 드래그는 그리드 하나에 위임하고 키보드 경로가 생겼다.
+- 저장·삭제 후 페이지를 다시 읽지 않는다. 서버가 돌려준 행만 부분 갱신하고
+  60초짜리 되돌리기를 준다.
+- 분석 화면이 요약·일·주·월 4탭이 되고 "태그 분석" 탭은 흡수됐다.
+- 색은 카테고리가 정한다. 태그별 색 선택기를 없앴다.
+- 집계 4종 신설: `comparison` · `density` · `goal_progress` · `summary`.
+
+주의할 결정:
+
+- **주 기간은 달력 주(월~일)다.** 시안은 롤링 7일이었고 사용자가 뒤집었다.
+  진행 중인 주는 `is_partial`과 경과일 분모로 표기한다.
+- **홈에서 "10분 단위"를 노출한다.** 2026-04-11에 감추기로 한 결정을
+  시안 5a가 뒤집었고 테스트를 반대로 고정했다.
+- **프론트엔드는 테스트하지 않는다.** 마크업·CSS·JS 소스 문자열 검사
+  테스트 12건을 제거했다. `AGENTS.md` Frontend Work Policy 참조.
+- **Git은 에이전트가 직접 실행한다.** 커밋은 작은 기능 단위, 트랙마다
+  브랜치 push + PR. 머지는 사용자.
 
 ## Known Current Regressions (Read Before Trusting "Passed" Evidence Below)
 
@@ -151,9 +183,16 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, email verification, and email backfill policy. |
 | Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`, `ALLOWED_HOSTS` refinement, deployed `Set-Cookie` header inspection, and live Resend sender-domain verification remain deferred. |
 | Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
+| P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 시안 6a의 행 끌어 순서 바꾸기(순서 저장 필드 없음), 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. |
 
 ## Next Recommended Work
 
+0. PR #40 리뷰와 머지 결정. 커밋 30개, 마이그레이션 3건
+   (`0008` 시안 팔레트, `0009` `Tag.color` blank 허용, `0010` 파스텔 팔레트),
+   백엔드 계약 신설 4건(되돌리기 API, 집계 3종). 그 위에 다음 트랙을 쌓기
+   전에 정리하는 편이 낫다.
+0-1. 결정 대기 두 건 — 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부,
+   `Tag.color` 컬럼 드롭 여부.
 1. Choose one active plan as the next approved scope.
 2. Before code work, create an integrated plan document that combines analyst requirements, design, risks, TDD checkpoints, and verification commands.
 3. For a small implementation start, consider either:
@@ -162,6 +201,34 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 4. After each completed implementation, update this `docs/project-status.md` file and write the required refactoring document.
 
 ## Fresh Verification From This Status Update
+
+Commands run on 2026-08-02:
+
+```bash
+conda run -n knou-life-diary pytest
+# 405 passed
+
+conda run -n knou-life-diary python manage.py check
+# System check identified no issues (0 silenced).
+
+conda run -n knou-life-diary python manage.py makemigrations --check --dry-run
+# No changes detected
+
+node --check apps/core/static/core/js/tag.js
+node --check apps/dashboard/static/dashboard/js/dashboard.js
+node --check apps/stats/static/stats/js/stats.js
+# ok
+```
+
+브라우저 실측(크롬 MCP): 대시보드 접근성 96 · 분석 100 ·
+Best Practices 100 · SEO 100 · agentic-browsing 100.
+대시보드 LCP 165ms · 분석 401ms · CLS 둘 다 0.00. 콘솔 에러 0건.
+
+`TestLoginAxesBehavior::test_cooloff_allows_login_again`은 간헐적으로
+실패한다(타이밍 의존). 2026-07-18 기록과 같은 증상이며 이번 변경과 무관함을
+stash 실행으로 확인했다.
+
+---
 
 Commands run on 2026-05-14:
 

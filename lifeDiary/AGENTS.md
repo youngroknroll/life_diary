@@ -12,7 +12,7 @@ LifeDiary is a Django-based life logging service.
 Product priority:
 
 1. Daily 10-minute slot recording and tagging quality
-2. Statistics and rule-based life feedback insight
+2. Statistics insight from the user's own record
 3. Desktop distribution as a single local-user app
 4. Public content pages and conservative ad revenue, gated by approval
 
@@ -45,7 +45,7 @@ contracts, not claims that the current application already implements them.
 1. Record a day in 10-minute time slots on the dashboard.
 2. Classify slots with user-defined tags grouped by category.
 3. Maintain goals and notes alongside the daily record.
-4. Review life patterns through statistics and rule-based life feedback.
+4. Review life patterns through statistics.
 5. Return to keep records complete and adjust tags, goals, and habits.
 
 Optimize for record quality and low-friction repeated daily entry, not for
@@ -64,8 +64,8 @@ views -> use_cases -> repositories/domain_services -> models
 - `dashboard` owns slot records and day-view behavior.
 - `tags` owns tag and category rules, including tag policy.
 - `users` owns auth, account lifecycle, goals, notes, and recovery.
-- `stats` owns aggregation and rule-based life feedback; it reads other apps'
-  data through their query paths and does not own their writes.
+- `stats` owns aggregation and the factual observations built from it; it reads
+  other apps' data through their query paths and does not own their writes.
 - `core` owns shared utilities, email backends, i18n messages, and template
   tags. The public home and legal pages are served from `lifeDiary/views.py`
   with shared templates.
@@ -375,8 +375,8 @@ above), per the Test Authoring Policy:
 
 ### AI Automation Architect
 
-- Activates only when AI/LLM work is explicitly in scope. The current life
-  feedback feature is rule-based and does not activate this role.
+- Activates only when AI/LLM work is explicitly in scope. Statistics and
+  observations are deterministic and do not activate this role.
 - Determines whether deterministic logic already suffices before proposing a
   model.
 - Designs model tier, prompt, structured output, validation, confidence
@@ -575,7 +575,7 @@ ordinary behavior tests:
 ### Behavior-Centered Naming
 
 - Test names describe user-observable behavior in domain language (user, time
-  slot, tag, category, goal, note, statistics, life feedback, account
+  slot, tag, category, goal, note, statistics, account
   deletion).
 - Base shape: situation, behavior, then observable result — for example
   `test_login_within_grace_period_cancels_deletion_request`.
@@ -663,6 +663,10 @@ exempt from the backend TDD cycle.
 
 - Do not create automated tests for purely presentational layout, spacing,
   sizing, visual state, transition, animation, or markup rearrangement.
+- Do not assert on rendered markup strings, CSS rule text, or JavaScript source
+  text. Such tests track the implementation, not the contract, and break on
+  every rewrite while proving nothing. Delete them when the code they mirror is
+  replaced.
 - Verify frontend work with HTTP render checks, browser screenshots at agreed
   viewports, interaction click-through, console inspection, `node --check` on
   changed JS, and accessibility checks appropriate to scope.
@@ -775,6 +779,20 @@ Every backend design and task review must answer:
 If either answer is no or unclear, stop until the plan is revised or the user
 explicitly accepts the tradeoff.
 
+### Comments
+
+Do not comment by default. Code that needs a comment to be understood usually
+needs a better name or a smaller function; fix that first.
+
+- Never restate what the code does. `# 지우기 전에 남긴다` above a line that
+  saves a snapshot adds nothing and goes stale the moment the code moves.
+- Write only what the reader cannot recover from the code: a rule imposed by
+  the spec, a framework behavior being worked around, or the incident that a
+  non-obvious choice prevents.
+- Docstrings follow the same bar. One line stating the contract. Do not
+  enumerate rules the tests already pin down.
+- No section-divider comment banners.
+
 ### Pythonic Code Design
 
 - Prefer explicit, readable Python and framework-native Django extension
@@ -878,7 +896,13 @@ Rules:
 - Wrap body lines at 72 characters and explain what changed and why.
 - The footer is optional and may use `Closes`, `Fixes`, `Resolves`, `Ref`, or
   `Related to`.
-- The user executes all Git commands; prepare the message and a copy-ready
-  command block.
+
+Execution:
+
+- The agent runs Git itself. Commit in small feature units — one commit is one
+  behavior that already passed its verification, not a day's worth of edits.
+- Never commit on `main`. Open a branch per large track (`feat/<track>`), push
+  it, and open a PR for that track.
+- Merging and release tagging stay with the user.
 
 Convention source: https://nohack.tistory.com/17

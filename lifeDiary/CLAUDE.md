@@ -9,12 +9,12 @@ summary conflicts with `AGENTS.md`, `AGENTS.md` wins.
 LifeDiary is a Django-based life logging service.
 
 Core loop: record a day in 10-minute slots, classify time with tags, manage
-goals and notes, then review life patterns through statistics and rule-based
-life feedback. Record quality and repeated daily use drive return.
+goals and notes, then review life patterns through statistics. Record quality
+and repeated daily use drive return.
 
 Priority:
 1. Daily 10-minute slot recording and tagging quality
-2. Statistics and rule-based life feedback insight
+2. Statistics insight from the user's own record
 3. Desktop distribution as a single local-user app
 4. Public content pages and conservative ad revenue, gated by approval
 
@@ -49,11 +49,11 @@ Priority:
 ## Project Map
 - `lifeDiary/`: Django configuration, root routing, public home/legal pages,
   `settings/` (`dev`, `prod`, `desktop`)
-- `apps/core/`: shared utilities, email backends, i18n messages, template tags
+- `apps/core/`: shared utilities, email backends, middleware, template tags
 - `apps/dashboard/`: 10-minute slot recording, day view, slot APIs
 - `apps/tags/`: tag and category management and tag policy
 - `apps/users/`: auth, account lifecycle, goals, notes, recovery flows
-- `apps/stats/`: statistics aggregation and rule-based life feedback
+- `apps/stats/`: statistics aggregation and factual observations
 - `desktop/`: pywebview launcher for the desktop build
 - `templates/`, `locale/`, `scripts/`: shared web UI, translations, local
   tooling
@@ -71,7 +71,7 @@ Priority:
   `apps/users/forms.py`, `apps/users/views.py`,
   `apps/users/account_deletion.py`, `apps/users/repositories.py`
 - Stats: `apps/stats/logic.py`, `apps/stats/use_cases.py`,
-  `apps/stats/aggregation/`, `apps/stats/life_feedback.py`
+  `apps/stats/aggregation/`
 - Frontend: `templates/base.html`, `templates/shared/`, `apps/*/templates/`,
   `apps/*/static/`
 - Desktop: `desktop/launcher.py`, `lifeDiary/settings/desktop.py`,
@@ -115,8 +115,11 @@ targeted test before broad regression.
 - Never create permanent objects in the dev database from verification
   scripts; verify through pytest or roll changes back.
 - Never overwrite `prompt_plan.md`; it is a superseded historical i18n record.
-- Do not commit, push, merge, or open a PR. The user executes Git actions;
-  present copy-ready commands and messages instead.
+- Commit in small feature units and push a branch per large track, opening a
+  PR for it. Never work directly on `main`. Merging stays with the user.
+- Frontend work carries no automated tests. Templates, CSS, and browser
+  JavaScript are verified in the browser, not by asserting markup strings,
+  CSS rules, or JS source text. See `AGENTS.md` Frontend Work Policy.
 - Report failed and unverified checks directly; confidence is not evidence.
 
 ## Instruction Placement

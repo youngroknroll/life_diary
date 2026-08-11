@@ -1,3 +1,6 @@
+{% load form_fields %}
 {% if field.errors %}
-    <div class="text-danger">{{ field.errors }}</div>
+    <div class="field-error" id="{{ field|field_error_id }}">
+        {% for error in field.errors %}<span>{{ error }}</span>{% endfor %}
+    </div>
 {% endif %}

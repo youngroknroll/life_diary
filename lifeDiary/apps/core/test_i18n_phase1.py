@@ -28,12 +28,9 @@ class TestHomePageEnglish:
     def test_home_page_renders_english_navbar(self, en_client):
         response = en_client.get(reverse("home"))
         body = response.content.decode()
-        assert "Home" in body
-        assert "Dashboard" in body
-        assert "Stats" in body
-        assert "Tags" in body
-        assert "대시보드" not in body
-        assert "태그 관리" not in body
+        assert "Log in" in body
+        assert "Start free" in body
+        assert "로그인" not in body
 
     def test_javascript_catalog_url_is_loaded(self, en_client):
         response = en_client.get(reverse("home"))
@@ -77,28 +74,12 @@ class TestHomePageEnglish:
         assert "user-entered data" in body
         assert "이용약관" not in body
 
-    def test_home_page_renders_english_header_theme_text(self, en_client):
-        response = en_client.get(reverse("home"))
-        body = response.content.decode()
-
-        assert 'class="navbar-utility-controls"' in body
-        utility_start = body.index('class="navbar-utility-controls"')
-        utility_end = body.index('<button class="navbar-toggler"', utility_start)
-        utility_section = body[utility_start:utility_end]
-
-        assert 'id="themeToggle"' in utility_section
-        assert 'class="theme-toggle__label"' in utility_section
-        assert "Dark" in utility_section
-        assert "Switch to dark mode" in utility_section
-        assert "fas fa-moon" not in utility_section
-        assert "fas fa-sun" not in utility_section
-
     def test_javascript_catalog_endpoint_returns_translations(self, en_client):
         response = en_client.get(reverse("javascript-catalog"))
         assert response.status_code == 200
         body = response.content.decode("utf-8")
-        assert "Select a category" in body
-        assert "Create new tag" in body
+        assert "New tag" in body
+        assert "Create tag" in body
         assert "Processing..." in body
 
 

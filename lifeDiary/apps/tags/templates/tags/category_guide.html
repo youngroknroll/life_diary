@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "소비시간의 다섯 분류" %} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<nav class="breadcrumb-trail" aria-label="{% trans '현재 위치' %}">
+    <a href="{% url 'users:mypage' %}">{% trans "설정" %}</a>
+    <span aria-hidden="true">›</span>
+    <a href="{% url 'tags:index' %}">{% trans "태그 관리" %}</a>
+    <span aria-hidden="true">›</span>
+    <span class="is-current">{% trans "카테고리 설명" %}</span>
+</nav>
+
+<div class="page-head mb-3">
+    <div>
+        <h1 class="page-title">{% trans "소비시간의 다섯 분류" %}</h1>
+        <p class="page-subtitle">{% trans "자기통제력 관점의 분류입니다. 태그를 만들 때 이 중 하나를 고르면 색과 통계 집계 방식이 함께 정해집니다." %}</p>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="category-guide">
+            {% for category in categories %}
+                <div class="category-guide__row">
+                    <div class="category-guide__head">
+                        <span class="category-guide__swatch" style="background-color: {{ category.color }}"></span>
+                        <div>
+                            <div class="category-guide__name">{{ category.display_name }}</div>
+                            <div class="category-guide__hex num">{{ category.color }}</div>
+                        </div>
+                    </div>
+                    <p class="category-guide__desc">{{ category.display_description }}</p>
+                    <ul class="category-guide__examples">
+                        {% for example in category.example_tags %}
+                            <li class="chip">
+                                <span class="chip__swatch" style="background-color: {{ category.color }}"></span>{{ example }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+        <p class="category-guide__foot">
+            {% trans "같은 활동이라도 계획했는지 아닌지에 따라 카테고리가 갈립니다 — 정해 둔 OTT는 주도적 사용시간, 어쩌다 켠 OTT는 수동적 소비시간. 태그를 두 개로 나눠 두면 이 구분이 기록 중에 자연스럽게 남습니다." %}
+        </p>
+    </div>
+</div>
+{% endblock %}

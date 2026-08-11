@@ -21,42 +21,35 @@ class TagRepository:
     """Tag ORM 쿼리 전담."""
 
     def find_accessible(self, user):
-        """사용자 태그 + 기본 태그"""
-        return Tag.objects.filter(Q(user=user) | Q(is_default=True))
+        """태그는 전부 개인 소유다. 접근 가능 = 본인 것."""
+        return Tag.objects.filter(user=user)
 
     def find_accessible_ordered(self, user):
-        return self.find_accessible(user).order_by(
-            "category__display_order", "-is_default", "name"
-        )
+        return self.find_accessible(user).order_by("category__display_order", "name")
 
     def find_by_id_accessible(self, tag_id, user):
         """사용자가 접근 가능한 특정 태그 조회. 없으면 None."""
-        return Tag.objects.filter(
-            Q(id=tag_id, user=user) | Q(id=tag_id, is_default=True)
-        ).first()
+        return Tag.objects.filter(id=tag_id, user=user).first()
 
     def find_by_id(self, tag_id):
         return Tag.objects.filter(id=tag_id).first()
 
     def get_for_owner_or_404(self, tag_id, user):
-        """일반 사용자: 본인 비기본 태그만. superuser: 전체."""
-        if user.is_superuser:
-            return get_object_or_404(Tag, id=tag_id)
-        return get_object_or_404(Tag, id=tag_id, user=user, is_default=False)
+        """본인 태그만. superuser 도 남의 태그를 다루지 않는다."""
+        return get_object_or_404(Tag, id=tag_id, user=user)
 
     def exists_duplicate(self, user, name, exclude_id=None):
-        """사용자 또는 기본 태그 중 같은 이름 존재 여부"""
-        qs = Tag.objects.filter(Q(user=user, name=name) | Q(is_default=True, name=name))
+        """같은 사용자 안에서 같은 이름 존재 여부"""
+        qs = Tag.objects.filter(user=user, name=name)
         if exclude_id:
             qs = qs.exclude(id=exclude_id)
         return qs.exists()
 
-    def create(self, user, name, color, is_default, category=None):
+    def create(self, user, name, color, category=None):
         return Tag.objects.create(
-            user=None if is_default else user,
+            user=user,
             name=name,
             color=color,
-            is_default=is_default,
             category=category,
         )
 

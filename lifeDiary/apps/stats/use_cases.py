@@ -13,7 +13,7 @@ _TODAY_TTL = 60 * 5         # 오늘: 5분
 
 def _cache_key(user_id: int, target_date: date, language: str | None = None) -> str:
     lang = language or get_language() or "default"
-    return f"stats:{user_id}:{target_date.isoformat()}:{lang}"
+    return f"stats:{user_id}:{target_date.isoformat()}:{lang}:v2"
 
 
 class GetStatsContextUseCase:

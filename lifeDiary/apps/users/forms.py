@@ -15,6 +15,12 @@ class SignupForm(UserCreationForm):
         help_text=_("아이디/비밀번호 찾기에 사용됩니다."),
     )
 
+    consent = forms.BooleanField(
+        required=True,
+        label=_("이용약관과 개인정보처리방침에 동의합니다"),
+        error_messages={"required": _("이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다.")},
+    )
+
     class Meta(UserCreationForm.Meta):
         model = User
         fields = ("username", "email")
