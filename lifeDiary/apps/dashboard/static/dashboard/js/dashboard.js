@@ -409,12 +409,15 @@ function initializeGridKeyboard() {
         if (!(event.key in STEP)) return;
         event.preventDefault();
 
-        const target = cursorSlot + STEP[event.key];
+        const origin = cursorSlot;
+        const target = origin + STEP[event.key];
         if (target < 0 || target >= TOTAL_SLOTS) return;
         cursorSlot = target;
 
         if (event.shiftKey) {
-            if (anchorSlot === null) anchorSlot = slotIndex;
+            // Enter 없이 Shift+방향키로 시작하면 기준점이 없다. 움직이기 전
+            // 자리를 기준으로 삼는다.
+            if (anchorSlot === null) anchorSlot = origin;
             selectRange(anchorSlot, target);
         } else {
             anchorSlot = target;
