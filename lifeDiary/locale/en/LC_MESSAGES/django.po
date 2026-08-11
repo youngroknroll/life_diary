@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-11 22:06+0900\n"
+"POT-Creation-Date: 2026-08-11 22:28+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -497,10 +497,12 @@ msgid "%(e)s/%(t)s일 경과"
 msgstr "%(e)s/%(t)s days elapsed"
 
 #: apps/stats/templates/stats/index.html:71
+#: apps/users/templates/users/welcome.html:135
 msgid "목표 달성"
 msgstr "Goal met"
 
 #: apps/stats/templates/stats/index.html:73
+#: apps/users/templates/users/welcome.html:136
 #, python-format
 msgid "/%(t)s일"
 msgstr "/%(t)s days"
@@ -635,7 +637,7 @@ msgstr "Busiest weekday"
 
 #: apps/stats/templates/stats/index.html:267 apps/users/forms.py:70
 #: apps/users/templates/users/usergoal_list.html:12
-#: apps/users/templates/users/welcome.html:105
+#: apps/users/templates/users/welcome.html:111
 msgid "기간"
 msgstr "Period"
 
@@ -1110,7 +1112,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "This email is already in use."
 
 #: apps/users/forms.py:71 apps/users/templates/users/mypage.html:18
-#: apps/users/templates/users/welcome.html:113
+#: apps/users/templates/users/welcome.html:121
 msgid "목표 시간"
 msgstr "Target hours"
 
@@ -1676,8 +1678,8 @@ msgid "STEP %(s)s / %(t)s"
 msgstr "STEP %(s)s / %(t)s"
 
 #: apps/users/templates/users/welcome.html:24
-msgid "쓸 태그부터 골라볼까요"
-msgstr "Pick the tags you will use"
+msgid "쓸 태그를 확인해 볼까요"
+msgstr "Let's look at the tags you have"
 
 #: apps/users/templates/users/welcome.html:25
 msgid ""
@@ -1708,7 +1710,10 @@ msgid ""
 "비어 있는 구간을 위아래로 쓸면 그만큼 선택됩니다. 방향키로 옮기고 Shift+방향"
 "키로 넓힌 뒤 Enter 로 고를 수도 있습니다. 여기서 채운 기록은 그대로 저장됩니"
 "다."
-msgstr "Swipe up or down over an empty stretch to select it. You can also move with the arrow keys, widen with Shift+arrow, and confirm with Enter. What you fill in here is saved for real."
+msgstr ""
+"Swipe up or down over an empty stretch to select it. You can also move with "
+"the arrow keys, widen with Shift+arrow, and confirm with Enter. What you "
+"fill in here is saved for real."
 
 #: apps/users/templates/users/welcome.html:86
 msgid "저장하고 다음"
@@ -1727,16 +1732,42 @@ msgid ""
 "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 "
 "지장이 없습니다."
 msgstr ""
+"The analysis screen counts the days you hit this. One is enough, and "
+"skipping it does not affect your records."
 
-#: apps/users/templates/users/welcome.html:97
+#: apps/users/templates/users/welcome.html:95
+msgid "방금 채운 구간을 저장했습니다."
+msgstr "Saved what you just filled in."
+
+#: apps/users/templates/users/welcome.html:96
+msgid "방금 기록 취소"
+msgstr "Undo what I just recorded"
+
+#: apps/users/templates/users/welcome.html:102
 msgid "대상 태그"
 msgstr "Target tag"
 
-#: apps/users/templates/users/welcome.html:116
+#: apps/users/templates/users/welcome.html:124
+msgid "목표 시간 30분 줄이기"
+msgstr "Decrease target by 30 minutes"
+
+#: apps/users/templates/users/welcome.html:128
+msgid "목표 시간 30분 늘리기"
+msgstr "Increase target by 30 minutes"
+
+#: apps/users/templates/users/welcome.html:133
+msgid "이렇게 보입니다"
+msgstr "Here is how it will look"
+
+#: apps/users/templates/users/welcome.html:139
+msgid "예시입니다. 실제 수치는 기록이 쌓이면서 채워집니다."
+msgstr "An example. Real numbers fill in as you record."
+
+#: apps/users/templates/users/welcome.html:142
 msgid "기록 시작하기"
 msgstr "Start your first entry"
 
-#: apps/users/templates/users/welcome.html:118
+#: apps/users/templates/users/welcome.html:144
 msgid "설정 › 목표에서 언제든 바꿀 수 있습니다"
 msgstr "You can change this any time in Settings › Goals"
 
@@ -1793,11 +1824,11 @@ msgstr "Invalid email format."
 
 #: apps/users/views.py:483
 msgid "하루"
-msgstr "Day composition"
+msgstr "A day"
 
 #: apps/users/views.py:483
 msgid "한 주"
-msgstr "Weekly"
+msgstr "A week"
 
 #: apps/users/views.py:612
 msgid "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."

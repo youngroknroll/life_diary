@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializePickCount();
     initializeAddTag();
     initializeStepTwo();
+    initializeStepThree();
 });
 
 function initializePickCount() {
@@ -79,4 +80,98 @@ function rememberSavedSlots(detail) {
         // 시크릿 모드 등에서 막히면 취소 링크만 못 보여 줄 뿐 기록은 남는다.
         console.warn(error);
     }
+}
+
+
+/**
+ * STEP3 는 목표 하나를 정하는 자리다. 스테퍼와 미리보기, 그리고 STEP2 에서
+ * 실수로 채운 구간을 무를 링크를 둔다.
+ */
+function initializeStepThree() {
+    const form = document.getElementById('onboardingGoalForm');
+    if (!form) return;
+
+    initializeStepper();
+    initializeGoalPreview();
+    initializeUndoSaved();
+}
+
+function initializeStepper() {
+    const value = document.getElementById('goalHours');
+    if (!value) return;
+
+    document.querySelectorAll('.stepper__btn').forEach(function (button) {
+        button.addEventListener('click', function () {
+            const step = parseFloat(button.dataset.step);
+            const min = parseFloat(value.min);
+            const max = parseFloat(value.max);
+            // 바닥과 천장을 넘기면 조용히 멈춘다. 0 시간 목표는 달성 여부를
+            // 물을 수 없고, 하루는 24 시간을 넘지 않는다.
+            const next = Math.min(max, Math.max(min, (parseFloat(value.value) || min) + step));
+            if (next === parseFloat(value.value)) return;
+
+            value.value = next;
+            value.dispatchEvent(new Event('input', { bubbles: true }));
+        });
+    });
+}
+
+/**
+ * 미리보기는 예시다. 이 시점에는 목표가 아직 없고 달성일을 셀 기록도 없다.
+ * 실측처럼 보이는 숫자를 지어내지 않도록 분모만 기간에서 끌어오고 분자는
+ * 언제나 0 으로 둔다.
+ */
+function initializeGoalPreview() {
+    const hours = document.getElementById('goalHours');
+    const note = document.getElementById('goalPreviewNote');
+    const tagSelect = document.getElementById('goalTagSelect');
+    if (!hours || !note) return;
+
+    const render = () => {
+        const tag = tagSelect && tagSelect.selectedOptions[0]
+            ? tagSelect.selectedOptions[0].textContent.trim()
+            : '';
+        note.textContent = interpolate(
+            gettext('%(tag)s %(hours)s시간 기준'),
+            { tag: tag, hours: hours.value },
+            true
+        );
+    };
+
+    hours.addEventListener('input', render);
+    if (tagSelect) tagSelect.addEventListener('change', render);
+    render();
+}
+
+function initializeUndoSaved() {
+    const wrapper = document.getElementById('onboardingUndo');
+    const button = document.getElementById('onboardingUndoBtn');
+    if (!wrapper || !button) return;
+
+    let saved = null;
+    try {
+        saved = JSON.parse(window.sessionStorage.getItem(SAVED_KEY) || 'null');
+    } catch (error) {
+        console.warn(error);
+    }
+    if (!saved || !saved.slotIndexes || !saved.slotIndexes.length) return;
+
+    wrapper.hidden = false;
+
+    button.addEventListener('click', async function () {
+        button.disabled = true;
+        try {
+            await apiCall('/api/time-blocks/', {
+                method: 'DELETE',
+                data: { date: saved.date, slot_indexes: saved.slotIndexes },
+                loadingElement: button,
+            });
+            window.sessionStorage.removeItem(SAVED_KEY);
+            wrapper.hidden = true;
+            showNotification(gettext('방금 기록을 지웠습니다.'), 'success');
+        } catch (error) {
+            button.disabled = false;
+            showNotification(interpolate(gettext('취소 실패: %s'), [error.message]), 'error');
+        }
+    });
 }

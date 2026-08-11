@@ -707,7 +707,13 @@ let undoTimer = null;
 
 function showUndoSnackbar(message, token) {
     const snackbar = document.getElementById('undoSnackbar');
-    if (!snackbar || !token) return;
+    if (!token) return;
+    if (!snackbar) {
+        // 이 그리드를 빌려 쓰는 화면에는 스낵바가 없다. 조용히 넘어가면
+        // 저장됐다는 사실이 아무에게도 전달되지 않는다.
+        showNotification(message, 'success');
+        return;
+    }
 
     snackbar.querySelector('[data-undo-message]').textContent = message;
     snackbar.querySelector('[data-undo-action]').onclick = () => runUndo(token);

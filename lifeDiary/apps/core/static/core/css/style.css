@@ -659,9 +659,6 @@ body {
    시각 라벨 폭을 줄여야 여섯 칸이 눌릴 만큼 남는다. */
 .onboarding__grid {
     margin-bottom: 12px;
-    max-height: 46vh;
-    overflow-y: auto;
-    padding-right: 4px;
 }
 
 .onboarding__grid .day-row {
@@ -691,44 +688,110 @@ body {
     color: var(--color-text-muted);
 }
 
+/* 목표 시간 스테퍼. 숫자 입력을 그대로 두고 버튼을 양옆에 붙인다 —
+   방향키 증감과 값 낭독을 브라우저가 이미 해 준다. */
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stepper__btn {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-text);
+}
+
+.stepper__btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.stepper__value {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-align: center;
+    font-size: 15px;
+}
+
+.onboarding__stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.onboarding__period {
+    border: 0;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.onboarding__period-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.onboarding__preview {
+    margin-bottom: 16px;
+}
+
+.onboarding__preview-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.onboarding__preview-caption {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo {
+    margin-bottom: 12px;
+}
+
+.onboarding__undo-note {
+    margin: 0 0 6px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo-btn {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    font-size: 12.5px;
+    color: var(--color-text-body);
+}
+
 .onboarding__next {
     width: 100%;
     min-height: 50px;
     font-size: 15px;
-}
-
-.onboarding__demo {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 12px 13px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    margin-bottom: 20px;
-}
-
-.onboarding__demo-row {
-    display: grid;
-    grid-template-columns: 38px 1fr;
-    gap: 8px;
-    align-items: center;
-}
-
-.onboarding__demo-cells {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 2px;
-}
-
-.onboarding__demo-cell {
-    height: 22px;
-    border-radius: 3px;
-    background: var(--color-track);
-}
-
-.onboarding__demo-cell.is-picked {
-    background: var(--color-primary-soft);
-    box-shadow: 0 0 0 2px var(--color-primary) inset;
 }
 
 .onboarding__goal {

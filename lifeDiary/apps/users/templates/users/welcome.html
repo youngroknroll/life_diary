@@ -21,7 +21,7 @@
     <p class="onboarding__step">{% blocktrans with s=step t=total_steps %}STEP {{ s }} / {{ t }}{% endblocktrans %}</p>
 
     {% if step == 1 %}
-        <h1 class="onboarding__title">{% trans "쓸 태그부터 골라볼까요" %}</h1>
+        <h1 class="onboarding__title">{% trans "쓸 태그를 확인해 볼까요" %}</h1>
         <p class="onboarding__lead">{% trans "체크한 태그부터 확인해 두세요. 나머지도 기록 화면에 그대로 남아 있습니다." %}</p>
 
         {% regroup tags by category as tags_by_category %}
@@ -91,28 +91,54 @@
         <h1 class="onboarding__title">{% trans "목표를 하나만 정해둘까요" %}</h1>
         <p class="onboarding__lead">{% trans "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 지장이 없습니다." %}</p>
 
-        <form method="post" action="{% url 'users:usergoal_create' %}" class="onboarding__goal">
+        <div class="onboarding__undo" id="onboardingUndo" hidden>
+            <p class="onboarding__undo-note" id="onboardingUndoNote" role="status">{% trans "방금 채운 구간을 저장했습니다." %}</p>
+            <button type="button" class="onboarding__undo-btn" id="onboardingUndoBtn">{% trans "방금 기록 취소" %}</button>
+        </div>
+
+        <form method="post" action="{% url 'users:usergoal_create' %}" class="onboarding__goal" id="onboardingGoalForm">
             {% csrf_token %}
             <label class="onboarding__field">
                 <span class="onboarding__field-label">{% trans "대상 태그" %}</span>
-                <select name="tag" class="form-select">
+                <select name="tag" class="form-select" id="goalTagSelect">
                     {% for tag in tags %}
                         <option value="{{ tag.id }}">{{ tag.name }}</option>
                     {% endfor %}
                 </select>
             </label>
-            <label class="onboarding__field">
-                <span class="onboarding__field-label">{% trans "기간" %}</span>
-                <select name="period" class="form-select">
-                    {% for value, label in periods %}
-                        <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label class="onboarding__field">
-                <span class="onboarding__field-label">{% trans "목표 시간" %}</span>
-                <input type="number" name="target_hours" class="form-control" value="4" min="0" step="0.5">
-            </label>
+
+            <fieldset class="onboarding__period">
+                <legend class="onboarding__field-label">{% trans "기간" %}</legend>
+                {% for value, label in periods %}
+                    <label class="onboarding__period-option">
+                        <input type="radio" name="period" value="{{ value }}"{% if forloop.first %} checked{% endif %}>
+                        <span>{{ label }}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+
+            <div class="onboarding__stepper">
+                <span class="onboarding__field-label" id="goalHoursLabel">{% trans "목표 시간" %}</span>
+                <div class="stepper">
+                    <button type="button" class="stepper__btn" data-step="-0.5"
+                            aria-label="{% trans '목표 시간 30분 줄이기' %}">−</button>
+                    <input type="number" name="target_hours" class="stepper__value num" id="goalHours"
+                           value="4" min="0.5" max="24" step="0.5" aria-labelledby="goalHoursLabel">
+                    <button type="button" class="stepper__btn" data-step="0.5"
+                            aria-label="{% trans '목표 시간 30분 늘리기' %}">+</button>
+                </div>
+            </div>
+
+            <div class="onboarding__preview">
+                <span class="onboarding__preview-label">{% trans "이렇게 보입니다" %}</span>
+                <div class="summary-tile">
+                    <div class="summary-tile__label">{% trans "목표 달성" %}</div>
+                    <div class="summary-tile__value num" id="goalPreviewValue">0<span class="summary-tile__unit">{% blocktrans with t=1 %}/{{ t }}일{% endblocktrans %}</span></div>
+                    <div class="summary-tile__note" id="goalPreviewNote"></div>
+                </div>
+                <p class="onboarding__preview-caption">{% trans "예시입니다. 실제 수치는 기록이 쌓이면서 채워집니다." %}</p>
+            </div>
+
             <button type="submit" class="btn-sian btn-sian--primary onboarding__next">{% trans "기록 시작하기" %}</button>
         </form>
         <p class="onboarding__foot">{% trans "설정 › 목표에서 언제든 바꿀 수 있습니다" %}</p>
