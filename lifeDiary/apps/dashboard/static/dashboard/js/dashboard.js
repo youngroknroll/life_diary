@@ -32,6 +32,10 @@ function isMobileDashboardLayout() {
     return window.matchMedia('(max-width: 767.98px)').matches;
 }
 
+function prefersReducedMotion() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
 function slotToRowCol(slotIndex) {
     return {
         row: Math.floor(slotIndex / SLOTS_PER_HOUR),
@@ -401,6 +405,13 @@ function initializeGridKeyboard() {
 
         if (event.key === 'Enter' || event.key === ' ') {
             event.preventDefault();
+            // Shift+방향키로 넓혀 둔 범위가 있으면 그것을 확정한다.
+            // selectSlot 은 범위를 지우고 한 칸으로 되돌리므로 여기서 부르면
+            // 키보드 사용자는 여러 칸을 기록할 방법이 없어진다.
+            if (selectedSlots.size > 1 && selectedSlots.has(cursorSlot)) {
+                openQuickInputSheet();
+                return;
+            }
             anchorSlot = cursorSlot;
             selectSlot(cursorSlot, event);
             return;
@@ -453,7 +464,18 @@ function initializeFillNow() {
             + Math.floor(now.getMinutes() / 10);
 
         selectSlot(slotIndex, null);
-        blockForSlot(slotIndex)?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+
+        // CSS 미디어쿼리는 브라우저 스크롤 애니메이션을 막지 못한다.
+        // 모션을 줄여 달라는 설정은 여기서 직접 봐야 지켜진다.
+        const target = blockForSlot(slotIndex);
+        if (!target) return;
+        target.scrollIntoView({ block: 'center', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+
+        // 버튼에 포커스가 남으면 어느 칸이 잡혔는지 알 수 없다. 모바일은
+        // openQuickInputSheet 가 시트로 포커스를 옮기므로 건드리지 않는다.
+        if (!isMobileDashboardLayout()) {
+            target.focus({ preventScroll: true });
+        }
     });
 }
 
