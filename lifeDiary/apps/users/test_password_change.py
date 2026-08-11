@@ -2,10 +2,12 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 
+from conftest import DEFAULT_TEST_PASSWORD
+
 User = get_user_model()
 
-CURRENT_PASSWORD = "old-pass-2026!"
-NEW_PASSWORD = "new-pass-2026!"
+CURRENT_PASSWORD = DEFAULT_TEST_PASSWORD
+NEW_PASSWORD = f"{DEFAULT_TEST_PASSWORD}-new"
 
 
 @pytest.fixture
@@ -67,7 +69,7 @@ class TestPasswordChange:
         response = client.post(
             reverse("users:password_change"),
             {
-                "old_password": "not-the-current-one",
+                "old_password": f"{CURRENT_PASSWORD}-wrong",
                 "new_password1": NEW_PASSWORD,
                 "new_password2": NEW_PASSWORD,
             },
@@ -85,7 +87,7 @@ class TestPasswordChange:
             {
                 "old_password": CURRENT_PASSWORD,
                 "new_password1": NEW_PASSWORD,
-                "new_password2": "something-else-2026!",
+                "new_password2": f"{NEW_PASSWORD}-typo",
             },
         )
 

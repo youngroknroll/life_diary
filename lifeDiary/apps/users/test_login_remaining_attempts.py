@@ -3,10 +3,12 @@ from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.urls import reverse
 
+from conftest import DEFAULT_TEST_PASSWORD
+
 User = get_user_model()
 
-PASSWORD = "right-pass-2026!"
-WRONG = "wrong-pass-2026!"
+PASSWORD = DEFAULT_TEST_PASSWORD
+WRONG = f"{DEFAULT_TEST_PASSWORD}-wrong"
 LIMIT = 3
 
 

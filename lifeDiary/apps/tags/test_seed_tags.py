@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import gettext
 
+from conftest import DEFAULT_TEST_PASSWORD
+
 from apps.tags.models import Category, Tag
 from apps.tags.name_limit import MAX_TAG_NAME_LENGTH
 from apps.tags.seed_tags import SEED_TAGS, create_seed_tags
@@ -19,7 +21,7 @@ def categories(db):
 
 @pytest.fixture
 def user(db):
-    return User.objects.create_user(username="seeded", password="pw-12345678")
+    return User.objects.create_user(username="seeded", password=DEFAULT_TEST_PASSWORD)
 
 
 class TestCreateSeedTags:
@@ -80,7 +82,7 @@ class TestCreateSeedTags:
         assert Tag.objects.filter(user=user, name=name).count() == 1
 
     def test_two_users_get_independent_rows(self, categories, user):
-        other = User.objects.create_user(username="other", password="pw-12345678")
+        other = User.objects.create_user(username="other", password=DEFAULT_TEST_PASSWORD)
         create_seed_tags(user)
         create_seed_tags(other)
 
@@ -110,8 +112,8 @@ class TestSignupSeedsTags:
             "/accounts/signup/",
             {
                 "username": "newcomer",
-                "password1": "sian-pass-8891",
-                "password2": "sian-pass-8891",
+                "password1": DEFAULT_TEST_PASSWORD,
+                "password2": DEFAULT_TEST_PASSWORD,
                 "email": "newcomer@example.com",
                 "consent": "on",
             },
