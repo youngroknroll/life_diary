@@ -655,6 +655,42 @@ body {
     color: var(--color-text-muted);
 }
 
+/* STEP2 는 기록 화면의 그리드를 그대로 얹는다. 온보딩 열은 420px 이라
+   시각 라벨 폭을 줄여야 여섯 칸이 눌릴 만큼 남는다. */
+.onboarding__grid {
+    margin-bottom: 12px;
+    max-height: 46vh;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.onboarding__grid .day-row {
+    grid-template-columns: 38px 1fr;
+    gap: 6px;
+}
+
+.onboarding__selection {
+    min-height: 20px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.onboarding__foot-link {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
 .onboarding__next {
     width: 100%;
     min-height: 50px;

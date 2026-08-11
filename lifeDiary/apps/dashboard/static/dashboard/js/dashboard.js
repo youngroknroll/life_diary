@@ -137,9 +137,13 @@ function initializeDashboard() {
         });
     }
 
-    document.getElementById('createNewTagBtn').addEventListener('click', function() {
-        window.openTagFormModal();
-    });
+    // 온보딩처럼 이 그리드를 빌려 쓰는 화면에는 태그 만들기 버튼이 없다.
+    const createTagBtn = document.getElementById('createNewTagBtn');
+    if (createTagBtn) {
+        createTagBtn.addEventListener('click', function() {
+            window.openTagFormModal();
+        });
+    }
 
     const manageTagsBtn = document.getElementById('manageTagsBtn');
     if (manageTagsBtn) {
@@ -779,6 +783,12 @@ const saveSlot = async () => {
         closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
 
+        // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
+        // 판단할 수 있다. 실패는 catch 로 가므로 여기까지 오면 저장된 것이다.
+        document.dispatchEvent(new CustomEvent('time-blocks-saved', {
+            detail: { date: date, slotIndexes: slotIndexes },
+        }));
+
     } catch (error) {
         restoreRows(affectedRows);
         showNotification(interpolate(gettext('저장 실패: %s'), [error.message]), 'error');
@@ -878,6 +888,12 @@ const deleteSlot = async () => {
         updateButtons();
         closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
+
+        // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
+        // 판단할 수 있다. 실패는 catch 로 가므로 여기까지 오면 저장된 것이다.
+        document.dispatchEvent(new CustomEvent('time-blocks-saved', {
+            detail: { date: date, slotIndexes: slotIndexes },
+        }));
 
     } catch (error) {
         restoreRows(affectedRows);

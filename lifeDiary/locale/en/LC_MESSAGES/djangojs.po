@@ -109,7 +109,7 @@ msgstr "Pick a time on the grid"
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:546
 msgid "시간을 선택했어요. 원하는 태그를 선택하세요."
-msgstr ""
+msgstr "Selected. Now pick a tag."
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:552
 msgid "빈 슬롯"
