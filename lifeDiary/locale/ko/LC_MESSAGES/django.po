@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-10 20:49+0900\n"
+"POT-Creation-Date: 2026-08-11 15:59+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,35 +17,6 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-
-#: apps/core/templatetags/i18n_messages.py:42
-#, python-format
-msgid "[missing message: %(code)s]"
-msgstr "[missing message: %(code)s]"
-
-#: apps/core/test_messages.py:57 apps/core/test_messages.py:62
-#, python-format
-msgid "안녕 %(name)s"
-msgstr "안녕 %(name)s"
-
-#: apps/core/test_messages.py:67
-#, python-format
-msgid "%(period)s 요약입니다"
-msgstr "%(period)s 요약입니다"
-
-#: apps/core/test_messages.py:68 apps/stats/messages.py:33
-#: templates/shared/_date_selector.html:10
-msgid "오늘"
-msgstr "오늘"
-
-#: apps/core/test_messages.py:68 apps/stats/messages.py:34
-msgid "이번주"
-msgstr "이번주"
-
-#: apps/core/test_messages.py:82 apps/core/test_messages.py:90
-#, python-format
-msgid "Hi %(name)s"
-msgstr "Hi %(name)s"
 
 #: apps/core/utils.py:167
 #, python-format
@@ -62,7 +33,7 @@ msgstr "%(hours)s시간"
 msgid "%(minutes)s분"
 msgstr "%(minutes)s분"
 
-#: apps/core/utils.py:173 apps/stats/templates/stats/index.html:138
+#: apps/core/utils.py:173 apps/stats/templates/stats/index.html:142
 msgid "0분"
 msgstr "0분"
 
@@ -70,7 +41,7 @@ msgstr "0분"
 msgid "사용자"
 msgstr "사용자"
 
-#: apps/dashboard/models.py:20 apps/stats/templates/stats/index.html:150
+#: apps/dashboard/models.py:20 apps/stats/templates/stats/index.html:154
 msgid "날짜"
 msgstr "날짜"
 
@@ -82,8 +53,8 @@ msgstr "슬롯 인덱스"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 
-#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:220
-#: apps/stats/templates/stats/index.html:289 apps/tags/models.py:110
+#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:224
+#: apps/stats/templates/stats/index.html:293 apps/tags/models.py:110
 #: apps/users/forms.py:69 apps/users/templates/users/usergoal_list.html:9
 msgid "태그"
 msgstr "태그"
@@ -176,7 +147,7 @@ msgid "전체 %(t)s칸"
 msgstr "전체 %(t)s칸"
 
 #: apps/dashboard/templates/dashboard/index.html:43
-#: apps/stats/templates/stats/index.html:187
+#: apps/stats/templates/stats/index.html:191
 msgid "기록률"
 msgstr "기록률"
 
@@ -369,128 +340,44 @@ msgstr "되돌리는 중 오류가 발생했습니다."
 msgid "되돌렸습니다."
 msgstr "되돌렸습니다."
 
-#: apps/stats/aggregation/summary.py:168
+#: apps/stats/aggregation/summary.py:185
 #, python-format
 msgid "%(tag)s %(hours)s시간"
 msgstr "%(tag)s %(hours)s시간"
 
-#: apps/stats/aggregation/summary.py:170
+#: apps/stats/aggregation/summary.py:187
 #, python-format
 msgid "지난 7일 기록의 %(share)d%%"
 msgstr "지난 7일 기록의 %(share)d%%"
 
-#: apps/stats/aggregation/summary.py:181
+#: apps/stats/aggregation/summary.py:198
 #, python-format
 msgid "%(start)02d–%(end)02d시가 비어 있습니다"
 msgstr "%(start)02d–%(end)02d시가 비어 있습니다"
 
-#: apps/stats/aggregation/summary.py:183
+#: apps/stats/aggregation/summary.py:200
 #, python-format
 msgid "지난 7일 중 %(days)d일"
 msgstr "지난 7일 중 %(days)d일"
 
-#: apps/stats/aggregation/summary.py:194
+#: apps/stats/aggregation/summary.py:211
 #, python-format
 msgid "%(start)02d–%(end)02d시는 매일 기록했습니다"
 msgstr "%(start)02d–%(end)02d시는 매일 기록했습니다"
 
-#: apps/stats/aggregation/summary.py:205
+#: apps/stats/aggregation/summary.py:222
 #, python-format
 msgid "%(tag)s 목표 %(days)d/%(total)d일"
 msgstr "%(tag)s 목표 %(days)d/%(total)d일"
 
-#: apps/stats/aggregation/summary.py:211
+#: apps/stats/aggregation/summary.py:228
 #, python-format
 msgid "하루 %(hours)s시간 기준"
 msgstr "하루 %(hours)s시간 기준"
 
-#: apps/stats/messages.py:11
-#, python-format
-msgid "%(period)s '%(name)s' 목표(%(hours)s시간)를 이미 달성했습니다!"
-msgstr "%(period)s '%(name)s' 목표(%(hours)s시간)를 이미 달성했습니다!"
-
-#: apps/stats/messages.py:14
-#, python-format
-msgid ""
-"%(period)s '%(name)s' 목표(%(hours)s시간) 중 %(actual).1f시간을 달성했습니"
-"다. %(remain).1f시간만 더 해보세요!"
-msgstr ""
-"%(period)s '%(name)s' 목표(%(hours)s시간) 중 %(actual).1f시간을 달성했습니"
-"다. %(remain).1f시간만 더 해보세요!"
-
-#: apps/stats/messages.py:18
-#, python-format
-msgid ""
-"'%(name)s' 시간이 전체의 %(percent)d%%를 차지합니다. 활동의 균형을 점검해보세"
-"요."
-msgstr ""
-"'%(name)s' 시간이 전체의 %(percent)d%%를 차지합니다. 활동의 균형을 점검해보세"
-"요."
-
-#: apps/stats/messages.py:21
-#, python-format
-msgid "최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
-msgstr ""
-"최근 '%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!최근 "
-"'%(name)s' 활동 시간이 들쭉날쭉해요. 규칙적인 리듬을 만들어보세요!"
-
-#: apps/stats/messages.py:24
-#, python-format
-msgid ""
-"휴식 시간이 전체의 %(percent)d%%를 차지합니다. 활동적인 시간을 늘려보세요."
-msgstr ""
-"휴식 시간이 전체의 %(percent)d%%를 차지합니다. 활동적인 시간을 늘려보세요."
-
-#: apps/stats/messages.py:27
-#, python-format
-msgid ""
-"기록되지 않은 시간이 전체의 %(percent)d%%입니다. 하루를 더 꼼꼼히 기록해보세"
-"요."
-msgstr ""
-"기록되지 않은 시간이 전체의 %(percent)d%%입니다. 하루를 더 꼼꼼히 기록해보세"
-"요."
-
-#: apps/stats/messages.py:35
-msgid "이번 달"
-msgstr "이번 달"
-
-#: apps/stats/services.py:12 apps/tags/templates/tags/index.html:84
+#: apps/stats/services.py:12 apps/tags/templates/tags/index.html:86
 msgid "미분류"
 msgstr "미분류"
-
-#: apps/stats/templates/stats/_goal_accordion_item.html:30
-msgid "목표:"
-msgstr "목표:"
-
-#: apps/stats/templates/stats/_goal_accordion_item.html:31
-msgid "실제:"
-msgstr "실제:"
-
-#: apps/stats/templates/stats/_goal_accordion_item.html:34
-msgid "달성률:"
-msgstr "달성률:"
-
-#: apps/stats/templates/stats/_goal_accordion_item.html:46
-msgid "추가하기"
-msgstr "추가하기"
 
 #: apps/stats/templates/stats/index.html:5
 msgid "통계"
@@ -539,7 +426,7 @@ msgid "요약"
 msgstr "요약"
 
 #: apps/stats/templates/stats/index.html:29
-#: apps/stats/templates/stats/index.html:359
+#: apps/stats/templates/stats/index.html:363
 msgid "일"
 msgstr "일"
 
@@ -580,265 +467,241 @@ msgstr "%(e)s/%(t)s일 경과"
 msgid "목표 달성"
 msgstr "목표 달성"
 
+#: apps/stats/templates/stats/index.html:73
+#, python-format
+msgid "/%(t)s일"
+msgstr "/%(t)s일"
+
 #: apps/stats/templates/stats/index.html:74
 #, python-format
 msgid "%(t)s %(h)s시간 기준"
 msgstr "%(t)s %(h)s시간 기준"
 
 #: apps/stats/templates/stats/index.html:78
+msgid "아직 지난 날이 없습니다"
+msgstr "아직 지난 날이 없습니다"
+
+#: apps/stats/templates/stats/index.html:82
 msgid "설정된 목표가 없습니다"
 msgstr "설정된 목표가 없습니다"
 
-#: apps/stats/templates/stats/index.html:85
+#: apps/stats/templates/stats/index.html:89
 msgid "관찰"
 msgstr "관찰"
 
-#: apps/stats/templates/stats/index.html:100
+#: apps/stats/templates/stats/index.html:104
 msgid "카테고리 비중"
 msgstr "카테고리 비중"
 
-#: apps/stats/templates/stats/index.html:100
+#: apps/stats/templates/stats/index.html:104
 msgid "지난 7일 · 태그가 아니라 카테고리 단위"
 msgstr "지난 7일 · 태그가 아니라 카테고리 단위"
 
-#: apps/stats/templates/stats/index.html:110 apps/tags/models.py:55
+#: apps/stats/templates/stats/index.html:114 apps/tags/models.py:55
 #: apps/tags/models.py:82
 msgid "카테고리"
 msgstr "카테고리"
 
-#: apps/stats/templates/stats/index.html:111
-#: apps/stats/templates/stats/index.html:221
+#: apps/stats/templates/stats/index.html:115
+#: apps/stats/templates/stats/index.html:225
 #: apps/users/templates/users/usergoal_form.html:43
 msgid "시간"
 msgstr "시간"
 
-#: apps/stats/templates/stats/index.html:112
+#: apps/stats/templates/stats/index.html:116
 msgid "비중"
 msgstr "비중"
 
-#: apps/stats/templates/stats/index.html:127
+#: apps/stats/templates/stats/index.html:131
 msgid "기록 밀도"
 msgstr "기록 밀도"
 
-#: apps/stats/templates/stats/index.html:128
+#: apps/stats/templates/stats/index.html:132
 msgid "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다."
 msgstr "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다."
 
-#: apps/stats/templates/stats/index.html:144
+#: apps/stats/templates/stats/index.html:148
 msgid "60분"
 msgstr "60분"
 
-#: apps/stats/templates/stats/index.html:147
+#: apps/stats/templates/stats/index.html:151
 msgid "지난 7일 시간대별 기록 분"
 msgstr "지난 7일 시간대별 기록 분"
 
-#: apps/stats/templates/stats/index.html:169
+#: apps/stats/templates/stats/index.html:173
 #, python-format
 msgid "규칙적 %(s)s–%(e)s시"
 msgstr "규칙적 %(s)s–%(e)s시"
 
-#: apps/stats/templates/stats/index.html:172
+#: apps/stats/templates/stats/index.html:176
 #, python-format
 msgid "공백 %(s)s–%(e)s시"
 msgstr "공백 %(s)s–%(e)s시"
 
-#: apps/stats/templates/stats/index.html:183
+#: apps/stats/templates/stats/index.html:187
 msgid "기록 시간"
 msgstr "기록 시간"
 
-#: apps/stats/templates/stats/index.html:191
+#: apps/stats/templates/stats/index.html:195
 msgid "피크 시간"
 msgstr "피크 시간"
 
-#: apps/stats/templates/stats/index.html:196
+#: apps/stats/templates/stats/index.html:200
 msgid "전날 대비"
 msgstr "전날 대비"
 
-#: apps/stats/templates/stats/index.html:199
-#: apps/stats/templates/stats/index.html:324
+#: apps/stats/templates/stats/index.html:203
+#: apps/stats/templates/stats/index.html:328
 msgid "지난 기간 없음"
 msgstr "지난 기간 없음"
 
-#: apps/stats/templates/stats/index.html:204
+#: apps/stats/templates/stats/index.html:208
 msgid "시간대별 기록"
 msgstr "시간대별 기록"
 
-#: apps/stats/templates/stats/index.html:204
+#: apps/stats/templates/stats/index.html:208
 msgid "태그 스택 · 한 칸 최대 60분"
 msgstr "태그 스택 · 한 칸 최대 60분"
 
-#: apps/stats/templates/stats/index.html:209
+#: apps/stats/templates/stats/index.html:213
 msgid "하루 구성"
 msgstr "하루 구성"
 
-#: apps/stats/templates/stats/index.html:209
+#: apps/stats/templates/stats/index.html:213
 msgid "24시간 기준 · 미기록 포함"
 msgstr "24시간 기준 · 미기록 포함"
 
-#: apps/stats/templates/stats/index.html:216
+#: apps/stats/templates/stats/index.html:220
 msgid "하루 구성 표"
 msgstr "하루 구성 표"
 
-#: apps/stats/templates/stats/index.html:222
+#: apps/stats/templates/stats/index.html:226
 msgid "24h 비율"
 msgstr "24h 비율"
 
-#: apps/stats/templates/stats/index.html:223
+#: apps/stats/templates/stats/index.html:227
 msgid "슬롯"
 msgstr "슬롯"
 
-#: apps/stats/templates/stats/index.html:224
+#: apps/stats/templates/stats/index.html:228
 msgid "7일 평균 대비"
 msgstr "7일 평균 대비"
 
-#: apps/stats/templates/stats/index.html:251
+#: apps/stats/templates/stats/index.html:255
 msgid "주 합계"
 msgstr "주 합계"
 
-#: apps/stats/templates/stats/index.html:255
-#: apps/stats/templates/stats/index.html:316
+#: apps/stats/templates/stats/index.html:259
+#: apps/stats/templates/stats/index.html:320
 msgid "기록한 날"
 msgstr "기록한 날"
 
-#: apps/stats/templates/stats/index.html:259
+#: apps/stats/templates/stats/index.html:263
 msgid "가장 많은 요일"
 msgstr "가장 많은 요일"
 
-#: apps/stats/templates/stats/index.html:263 apps/users/forms.py:70
+#: apps/stats/templates/stats/index.html:267 apps/users/forms.py:70
 #: apps/users/templates/users/usergoal_list.html:10
 #: apps/users/templates/users/welcome.html:80
 msgid "기간"
 msgstr "기간"
 
-#: apps/stats/templates/stats/index.html:269
-#: apps/stats/templates/stats/index.html:331
+#: apps/stats/templates/stats/index.html:273
+#: apps/stats/templates/stats/index.html:335
 #, python-format
 msgid "추세선은 %(d)s일 더 필요합니다"
 msgstr "추세선은 %(d)s일 더 필요합니다"
 
-#: apps/stats/templates/stats/index.html:270
-#: apps/stats/templates/stats/index.html:332
+#: apps/stats/templates/stats/index.html:274
+#: apps/stats/templates/stats/index.html:336
 #, python-format
 msgid ""
 "지금까지 %(n)s일 기록했습니다. 선으로 읽히려면 점이 더 있어야 해서, 그때까지"
 "는 아래 누적으로 보여드립니다."
 msgstr ""
 
-#: apps/stats/templates/stats/index.html:271
-#: apps/stats/templates/stats/index.html:333
+#: apps/stats/templates/stats/index.html:275
+#: apps/stats/templates/stats/index.html:337
 msgid "오늘 기록 이어가기"
 msgstr "오늘 기록 이어가기"
 
-#: apps/stats/templates/stats/index.html:275
+#: apps/stats/templates/stats/index.html:279
 msgid "태그별 추세"
 msgstr "태그별 추세"
 
-#: apps/stats/templates/stats/index.html:275
+#: apps/stats/templates/stats/index.html:279
 msgid "요일별 시간"
 msgstr "요일별 시간"
 
-#: apps/stats/templates/stats/index.html:280
+#: apps/stats/templates/stats/index.html:284
 msgid "요일별 기록량"
 msgstr "요일별 기록량"
 
-#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:289
 msgid "태그 순위"
 msgstr "태그 순위"
 
-#: apps/stats/templates/stats/index.html:285
+#: apps/stats/templates/stats/index.html:289
 msgid "기록한 날 기준 하루 평균"
 msgstr "기록한 날 기준 하루 평균"
 
-#: apps/stats/templates/stats/index.html:290
+#: apps/stats/templates/stats/index.html:294
 msgid "하루 평균"
 msgstr "하루 평균"
 
-#: apps/stats/templates/stats/index.html:308
+#: apps/stats/templates/stats/index.html:312
 msgid "월 합계"
 msgstr "월 합계"
 
-#: apps/stats/templates/stats/index.html:312
-#: apps/stats/templates/stats/index.html:349
+#: apps/stats/templates/stats/index.html:316
+#: apps/stats/templates/stats/index.html:353
 msgid "일 평균"
 msgstr "일 평균"
 
-#: apps/stats/templates/stats/index.html:321
+#: apps/stats/templates/stats/index.html:325
 msgid "지난달 대비"
 msgstr "지난달 대비"
 
-#: apps/stats/templates/stats/index.html:337
+#: apps/stats/templates/stats/index.html:341
 msgid "태그별 일별 추세"
 msgstr "태그별 일별 추세"
 
-#: apps/stats/templates/stats/index.html:342
+#: apps/stats/templates/stats/index.html:346
 msgid "주차별 요약"
 msgstr "주차별 요약"
 
-#: apps/stats/templates/stats/index.html:343
+#: apps/stats/templates/stats/index.html:347
 msgid "주차별 요약 표"
 msgstr "주차별 요약 표"
 
-#: apps/stats/templates/stats/index.html:347
+#: apps/stats/templates/stats/index.html:351
 msgid "주차"
 msgstr "주차"
 
-#: apps/stats/templates/stats/index.html:348 templates/base.html:79
+#: apps/stats/templates/stats/index.html:352 templates/base.html:79
 #: templates/base.html:140
 msgid "기록"
 msgstr "기록"
 
-#: apps/stats/templates/stats/index.html:352
+#: apps/stats/templates/stats/index.html:356
 msgid "직전 대비"
 msgstr "직전 대비"
 
-#: apps/stats/templates/stats/index.html:365
+#: apps/stats/templates/stats/index.html:369
 msgid "진행 중"
 msgstr "진행 중"
 
-#: apps/stats/templates/stats/index.html:380
+#: apps/stats/templates/stats/index.html:384
 msgid "태그 합계"
 msgstr "태그 합계"
 
-#: apps/stats/templates/stats/index.html:391
+#: apps/stats/templates/stats/index.html:395
 msgid "합계"
 msgstr "합계"
 
-#: apps/stats/templates/stats/life_feedback.html:9
-msgid "Goal progress"
-msgstr "목표 진행"
-
-#: apps/stats/templates/stats/life_feedback.html:10
-msgid "Daily goals"
-msgstr "일간 목표"
-
-#: apps/stats/templates/stats/life_feedback.html:11
-msgid "Weekly goals"
-msgstr "주간 목표"
-
-#: apps/stats/templates/stats/life_feedback.html:12
-msgid "Monthly goals"
-msgstr "월간 목표"
-
-#: apps/stats/templates/stats/life_feedback.html:13
-msgid "등록된 일간 목표가 없거나 기록이 없습니다."
-msgstr "등록된 일간 목표가 없거나 기록이 없습니다."
-
-#: apps/stats/templates/stats/life_feedback.html:14
-msgid "등록된 주간 목표가 없거나 기록이 없습니다."
-msgstr "등록된 주간 목표가 없거나 기록이 없습니다."
-
-#: apps/stats/templates/stats/life_feedback.html:15
-msgid "등록된 월간 목표가 없거나 기록이 없습니다."
-msgstr "등록된 월간 목표가 없거나 기록이 없습니다."
-
-#: apps/stats/templates/stats/life_feedback.html:24
+#: apps/stats/templates/stats/index.html:408
 msgid "특이사항:"
 msgstr "특이사항:"
-
-#: apps/stats/templates/stats/life_feedback.html:43
-#: apps/stats/templates/stats/life_feedback.html:55
-msgid "라이프 피드백"
-msgstr "라이프 피드백"
 
 #: apps/tags/models.py:19
 msgid "수동적 소비시간"
@@ -1078,13 +941,13 @@ msgstr "옮기고 태그 삭제"
 msgid "기록까지 함께 삭제"
 msgstr "기록까지 함께 삭제"
 
-#: apps/tags/templates/tags/index.html:82
+#: apps/tags/templates/tags/index.html:84
 #: apps/users/templates/users/usernote_list.html:12
 #: templates/shared/_table_row_actions.html:2
 msgid "수정"
 msgstr "수정"
 
-#: apps/tags/templates/tags/index.html:83
+#: apps/tags/templates/tags/index.html:85
 #: apps/users/templates/users/usergoal_list.html:12
 #: apps/users/templates/users/usergoal_list.html:37
 #: apps/users/templates/users/usernote_list.html:13
@@ -1094,16 +957,16 @@ msgstr "수정"
 msgid "삭제"
 msgstr "삭제"
 
-#: apps/tags/templates/tags/index.html:85
+#: apps/tags/templates/tags/index.html:87
 msgid "아직 기록 없음"
 msgstr "아직 기록 없음"
 
-#: apps/tags/templates/tags/index.html:86
+#: apps/tags/templates/tags/index.html:88
 #, python-format
 msgid "누적 %%s시간"
 msgstr "누적 %%s시간"
 
-#: apps/tags/templates/tags/index.html:87
+#: apps/tags/templates/tags/index.html:89
 msgid "태그를 불러오는 중 오류가 발생했습니다."
 msgstr "태그를 불러오는 중 오류가 발생했습니다."
 
@@ -1801,7 +1664,7 @@ msgstr "기록 시작하기"
 msgid "설정 › 목표에서 언제든 바꿀 수 있습니다"
 msgstr "설정 › 목표에서 언제든 바꿀 수 있습니다"
 
-#: apps/users/use_cases.py:71
+#: apps/users/use_cases.py:51
 msgid "접근할 수 없는 태그입니다."
 msgstr "접근할 수 없는 태그입니다."
 
@@ -2235,6 +2098,10 @@ msgstr "서비스 이용, 계정, 약관 관련 문의:"
 #: templates/shared/_date_selector.html:6
 msgid "날짜 선택"
 msgstr "날짜 선택"
+
+#: templates/shared/_date_selector.html:10
+msgid "오늘"
+msgstr "오늘"
 
 #: templates/shared/confirm_delete.html:7
 msgid "정말로 삭제하시겠습니까?"

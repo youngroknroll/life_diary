@@ -12,7 +12,7 @@ LifeDiary is a Django-based life logging service.
 Product priority:
 
 1. Daily 10-minute slot recording and tagging quality
-2. Statistics and rule-based life feedback insight
+2. Statistics insight from the user's own record
 3. Desktop distribution as a single local-user app
 4. Public content pages and conservative ad revenue, gated by approval
 
@@ -45,7 +45,7 @@ contracts, not claims that the current application already implements them.
 1. Record a day in 10-minute time slots on the dashboard.
 2. Classify slots with user-defined tags grouped by category.
 3. Maintain goals and notes alongside the daily record.
-4. Review life patterns through statistics and rule-based life feedback.
+4. Review life patterns through statistics.
 5. Return to keep records complete and adjust tags, goals, and habits.
 
 Optimize for record quality and low-friction repeated daily entry, not for
@@ -64,8 +64,8 @@ views -> use_cases -> repositories/domain_services -> models
 - `dashboard` owns slot records and day-view behavior.
 - `tags` owns tag and category rules, including tag policy.
 - `users` owns auth, account lifecycle, goals, notes, and recovery.
-- `stats` owns aggregation and rule-based life feedback; it reads other apps'
-  data through their query paths and does not own their writes.
+- `stats` owns aggregation and the factual observations built from it; it reads
+  other apps' data through their query paths and does not own their writes.
 - `core` owns shared utilities, email backends, i18n messages, and template
   tags. The public home and legal pages are served from `lifeDiary/views.py`
   with shared templates.
@@ -375,8 +375,8 @@ above), per the Test Authoring Policy:
 
 ### AI Automation Architect
 
-- Activates only when AI/LLM work is explicitly in scope. The current life
-  feedback feature is rule-based and does not activate this role.
+- Activates only when AI/LLM work is explicitly in scope. Statistics and
+  observations are deterministic and do not activate this role.
 - Determines whether deterministic logic already suffices before proposing a
   model.
 - Designs model tier, prompt, structured output, validation, confidence
@@ -575,7 +575,7 @@ ordinary behavior tests:
 ### Behavior-Centered Naming
 
 - Test names describe user-observable behavior in domain language (user, time
-  slot, tag, category, goal, note, statistics, life feedback, account
+  slot, tag, category, goal, note, statistics, account
   deletion).
 - Base shape: situation, behavior, then observable result — for example
   `test_login_within_grace_period_cancels_deletion_request`.

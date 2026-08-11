@@ -69,9 +69,13 @@
                             </div>
                             <div class="summary-tile">
                                 <div class="summary-tile__label">{% trans "목표 달성" %}</div>
-                                {% if summary.goal %}
-                                    <div class="summary-tile__value num">{{ summary.goal.hit_days }}<span class="summary-tile__unit">/{{ summary.goal.total_days }}일</span></div>
+                                {% if summary.goal.total_days %}
+                                    <div class="summary-tile__value num">{{ summary.goal.hit_days }}<span class="summary-tile__unit">{% blocktrans with t=summary.goal.total_days %}/{{ t }}일{% endblocktrans %}</span></div>
                                     <div class="summary-tile__note">{% blocktrans with t=summary.goal.tag_name h=summary.goal.target_hours %}{{ t }} {{ h }}시간 기준{% endblocktrans %}</div>
+                                {% elif summary.goal %}
+                                    {# 창이 전부 앞날이면 셀 것이 없다. 0/0 은 실패로 읽힌다. #}
+                                    <div class="summary-tile__value summary-tile__value--empty">—</div>
+                                    <div class="summary-tile__note">{% trans "아직 지난 날이 없습니다" %}</div>
                                 {% else %}
                                     <div class="summary-tile__value summary-tile__value--empty">—</div>
                                     <div class="summary-tile__note">
@@ -399,7 +403,11 @@
 
                 </div>
             </div>
-            {% include 'stats/life_feedback.html' %}
+            {% if user_note %}
+                <div class="alert alert-info mt-4 mb-0 p-2">
+                    <strong>{% trans "특이사항:" %}</strong> {{ user_note.note|linebreaksbr }}
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>

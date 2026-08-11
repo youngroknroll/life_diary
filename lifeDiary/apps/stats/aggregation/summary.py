@@ -1,4 +1,4 @@
-from datetime import timedelta
+from datetime import date, timedelta
 
 from django.utils.translation import gettext
 
@@ -9,7 +9,7 @@ from apps.users.repositories import GoalRepository
 
 from .comparison import get_period_delta
 from .density import get_density_grid, get_gap_pattern
-from .goal_progress import goal_hit_days
+from .goal_progress import goal_hit_dates
 
 
 _goal_repo = GoalRepository()
@@ -30,7 +30,7 @@ def build_summary(user, selected_date, today=None):
     grid = get_density_grid(user, selected_date, days=ROLLING_DAYS)
     rolling_week = _rolling_week(user, selected_date, grid)
     pattern = get_gap_pattern(grid)
-    goal = _goal_tile(user, selected_date)
+    goal = _goal_tile(user, selected_date, today or date.today())
 
     return {
         "today": _with_hours(day["current"]),
@@ -130,21 +130,38 @@ def _rolling_week(user, selected_date, grid):
     }
 
 
-def _goal_tile(user, selected_date):
+def _goal_tile(user, selected_date, today):
     goal = _goal_repo.find_by_user(user).first()
     if goal is None:
         return None
 
     start = selected_date - timedelta(days=ROLLING_DAYS - 1)
+    hit_dates = goal_hit_dates(user, start, selected_date, goal)
 
     return {
         "tag_name": goal.tag.name,
         "color": goal.tag.color,
         "target_hours": goal.target_hours,
         "period": goal.period,
-        "hit_days": goal_hit_days(user, start, selected_date, goal),
-        "total_days": ROLLING_DAYS,
+        "hit_days": len(hit_dates),
+        "total_days": _counted_days(start, selected_date, today, hit_dates),
     }
+
+
+def _counted_days(start, end, today, hit_dates):
+    """아직 오지 않은 날은 분모에서 뺀다.
+
+    끝나지 않은 날을 실패로 세면 아침 9시의 0% 가 실패로 읽힌다. 오늘은 이미
+    목표를 채웠을 때만 분모에 넣는다 — 채운 것을 감추지 않으면서 아직 남은
+    시간을 실패로 만들지도 않는다.
+    """
+    counted = 0
+    day = start
+    while day <= end:
+        if day < today or day in hit_dates:
+            counted += 1
+        day += timedelta(days=1)
+    return counted
 
 
 def _observations(rolling_week, pattern, goal):
