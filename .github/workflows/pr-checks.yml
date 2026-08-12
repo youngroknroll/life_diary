@@ -1,0 +1,125 @@
+--- # PR 에 붙는 검사.
+#
+# deploy-pr.yml 은 main 에 들어온 "뒤에" 돈다. 깨진 코드를 막는 게 아니라
+# 깨진 뒤에 알려 주는 구조여서, 병합 전에 도는 검사를 따로 둔다.
+#
+# production 브랜치는 건드리지 않는다. 이 파일은 pull_request 에서만 돈다.
+name: PR checks
+
+on:
+  pull_request:
+    branches: [main, production]
+
+concurrency:
+  group: pr-checks-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # 실제 비밀이 아니다. dev 설정이 DJANGO_SECRET_KEY 를 요구하고 기본값이
+  # 없어서 CI 에서만 쓰는 더미를 넣는다. deploy-pr.yml 과 같은 방식.
+  DJANGO_SECRET_KEY: ci-only-not-a-real-secret-0123456789abcdefghijklmnopqrstuv
+  DB_NAME: test_db
+  DB_USER: test_user
+  DB_PASSWORD: test_password
+  DB_HOST: localhost
+  DB_PORT: '6543'
+  RESEND_API_KEY: re_test_dummy
+  DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
+
+jobs:
+  backend:
+    name: 백엔드
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: lifeDiary
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: lifeDiary/requirements.txt
+
+      - name: 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: gettext 설치
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      # 이 저장소는 DEBUG 에서도 manifest 기반 정적 파일 저장소를 쓴다
+      # (dev.py 의 CompressedManifestStaticFilesStorage). 수집된 파일이
+      # 없으면 템플릿을 그리는 테스트가 static 조회에서 터진다.
+      - name: 정적 파일 수집
+        run: python manage.py collectstatic --no-input --verbosity 0
+
+      - name: Django check
+        run: python manage.py check
+
+      - name: 마이그레이션 드리프트
+        run: python manage.py makemigrations --check --dry-run
+
+      - name: 전체 테스트
+        run: python -m pytest
+
+      - name: 프로덕션 배포 검사
+        run: >
+          python manage.py check --settings=lifeDiary.settings.prod
+          --deploy --fail-level ERROR
+
+  frontend:
+    name: 프런트엔드
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: lifeDiary
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 브라우저 JS 문법
+        run: |
+          set -euo pipefail
+          find apps -path '*/static/*' -name '*.js' -print0 \
+            | xargs -0 -r -n1 node --check
+
+      - name: gettext 설치
+        run: sudo apt-get update && sudo apt-get install -y gettext
+
+      # fuzzy 는 실패로 막는다. makemessages 가 엉뚱한 번역을 물려주고
+      # compilemessages 는 fuzzy 를 건너뛰어, 영어 화면에 한국어가 남거나
+      # 전혀 다른 문장이 나온 적이 여러 번 있다.
+      #
+      # 미번역은 경고만 한다. 지금 main 에 8건 있어서 실패로 걸면 첫날부터
+      # 빨간불이 된다. 그 8건이 0 이 되면 실패로 올린다.
+      - name: 번역 카탈로그
+        run: |
+          set -uo pipefail
+          status=0
+          for po in locale/*/LC_MESSAGES/*.po; do
+            if ! msgfmt --check-format -o /dev/null "$po"; then
+              echo "::error file=lifeDiary/$po::포맷 지시자가 원문과 맞지 않습니다"
+              status=1
+            fi
+
+            fuzzy=$(msgattrib --only-fuzzy --no-obsolete "$po" \
+              | grep '^msgid "' | grep -cv '^msgid ""' || true)
+            if [ "$fuzzy" -ne 0 ]; then
+              echo "::error file=lifeDiary/$po::fuzzy ${fuzzy}건 — 내용을 확인하고 플래그를 걷으세요"
+              status=1
+            fi
+
+            untranslated=$(msgattrib --untranslated --no-obsolete "$po" \
+              | grep '^msgid ' | grep -cv '^msgid ""' || true)
+            if [ "$untranslated" -ne 0 ]; then
+              echo "::warning file=lifeDiary/$po::미번역 ${untranslated}건"
+            fi
+          done
+          exit $status
