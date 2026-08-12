@@ -25,10 +25,7 @@ class TagRepository:
         return Tag.objects.filter(user=user)
 
     def find_accessible_ordered(self, user):
-        """카테고리 순 → 사용자가 정한 순 → 이름 순."""
-        return self.find_accessible(user).order_by(
-            "category__display_order", "display_order", "name"
-        )
+        return self.find_accessible(user).order_by("category__display_order", "name")
 
     def find_by_id_accessible(self, tag_id, user):
         """사용자가 접근 가능한 특정 태그 조회. 없으면 None."""
@@ -63,10 +60,6 @@ class TagRepository:
     def save(self, tag):
         tag.save()
         return tag
-
-    def save_display_order(self, tags):
-        """순서만 쓴다. Tag.save() 를 거치지 않으므로 색은 그대로다."""
-        Tag.objects.bulk_update(tags, ["display_order"])
 
     def delete(self, tag):
         tag.delete()

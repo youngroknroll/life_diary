@@ -103,9 +103,6 @@ class Tag(models.Model):
         verbose_name=_("색상"),
         help_text=_("카테고리에서 자동으로 정해집니다."),
     )
-    display_order = models.PositiveSmallIntegerField(
-        default=0, verbose_name=_("표시 순서")
-    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("생성일"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("수정일"))
 
@@ -119,10 +116,6 @@ class Tag(models.Model):
                 violation_error_message=_("이미 같은 이름의 태그가 존재합니다."),
             ),
         ]
-        # display_order 를 여기 넣지 않는다. 이 기본 정렬은 order_by 를 쓰지
-        # 않는 모든 쿼리에 걸리는데, 통계의 색 조회처럼 사용자 스코프 없이
-        # .first() 를 쓰는 자리까지 함께 움직인다. 사용자가 정한 순서가
-        # 필요한 곳은 find_accessible_ordered 하나뿐이다.
         ordering = ["name"]
 
     def save(self, *args, **kwargs):

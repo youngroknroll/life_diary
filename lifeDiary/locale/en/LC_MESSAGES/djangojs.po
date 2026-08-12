@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 13:38+0900\n"
+"POT-Creation-Date: 2026-08-12 13:56+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -125,7 +125,7 @@ msgstr "Status:"
 
 #: apps/dashboard/static/dashboard/js/dashboard.js:586
 #: apps/dashboard/static/dashboard/js/dashboard.js:610
-#: apps/tags/static/tags/js/tag_list.js:167
+#: apps/tags/static/tags/js/tag_list.js:150
 msgid "삭제"
 msgstr "Delete"
 
@@ -234,49 +234,32 @@ msgstr "%sh"
 msgid "%(label)s: %(h)sh"
 msgstr "%(label)s: %(h)sh"
 
-#: apps/tags/static/tags/js/tag_list.js:65
+#: apps/tags/static/tags/js/tag_list.js:55
 msgid "태그를 불러오는 중 오류가 발생했습니다."
 msgstr "An error occurred while loading tags."
 
-#: apps/tags/static/tags/js/tag_list.js:147
+#: apps/tags/static/tags/js/tag_list.js:132
 #, javascript-format
 msgid "누적 %s시간"
 msgstr "%sh logged"
 
-#: apps/tags/static/tags/js/tag_list.js:148
+#: apps/tags/static/tags/js/tag_list.js:133
 msgid "아직 기록 없음"
 msgstr "No records yet"
 
-#: apps/tags/static/tags/js/tag_list.js:163
+#: apps/tags/static/tags/js/tag_list.js:146
 msgid "수정"
 msgstr "Edit"
 
-#: apps/tags/static/tags/js/tag_list.js:164
+#: apps/tags/static/tags/js/tag_list.js:147
 #, javascript-format
 msgid "%s 태그 수정"
 msgstr "Edit the %s tag"
 
-#: apps/tags/static/tags/js/tag_list.js:168
+#: apps/tags/static/tags/js/tag_list.js:151
 #, javascript-format
 msgid "%s 태그 삭제"
 msgstr "Delete the %s tag"
-
-#: apps/tags/static/tags/js/tag_list.js:185
-msgid "%(tag)s 위로 이동, %(category)s 안에서"
-msgstr "Move %(tag)s up within %(category)s"
-
-#: apps/tags/static/tags/js/tag_list.js:186
-msgid "%(tag)s 아래로 이동, %(category)s 안에서"
-msgstr "Move %(tag)s down within %(category)s"
-
-#: apps/tags/static/tags/js/tag_list.js:297
-msgid "%(tag)s, %(category)s의 %(position)s번째"
-msgstr "%(tag)s, position %(position)s in %(category)s"
-
-#: apps/tags/static/tags/js/tag_list.js:359
-#, javascript-format
-msgid "순서를 저장하지 못해 되돌렸습니다: %s"
-msgstr "Could not save the order, so it was restored: %s"
 
 #: apps/users/static/users/js/auth-enhance.js:10
 #: apps/users/static/users/js/auth-enhance.js:18

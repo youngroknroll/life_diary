@@ -13,7 +13,6 @@ from .use_cases import (
     CreateTagUseCase,
     DeleteTagUseCase,
     ListTagsUseCase,
-    ReorderTagsUseCase,
     UpdateTagUseCase,
 )
 
@@ -22,7 +21,6 @@ _list_tags = ListTagsUseCase()
 _create_tag = CreateTagUseCase()
 _update_tag = UpdateTagUseCase()
 _delete_tag = DeleteTagUseCase()
-_reorder_tags = ReorderTagsUseCase()
 
 
 def _parse_move_to(request):
@@ -142,31 +140,6 @@ def tag_list_create(request):
     except Exception:
         logging.getLogger(__name__).exception("태그 생성 중 오류")
         return error_response(gettext("태그 생성 중 오류가 발생했습니다."), "SERVER_ERROR", 500)
-
-
-@login_required
-@require_http_methods(["PATCH"])
-def tag_order(request):
-    """화면에 보이는 태그 순서를 통째로 받는다."""
-    try:
-        data = json.loads(request.body)
-    except json.JSONDecodeError:
-        return error_response(gettext("잘못된 형식의 요청입니다."), "INVALID_JSON")
-
-    raw = data.get("tag_ids")
-    if not isinstance(raw, list):
-        return error_response(gettext("태그 목록이 필요합니다."), "VALIDATION_ERROR")
-
-    try:
-        _reorder_tags.execute(request.user, raw)
-        return success_response(gettext("태그 순서를 저장했습니다."))
-    except (TypeError, ValueError) as exc:
-        return error_response(str(exc), "VALIDATION_ERROR")
-    except Exception:
-        logging.getLogger(__name__).exception("태그 순서 저장 중 오류")
-        return error_response(
-            gettext("태그 순서 저장 중 오류가 발생했습니다."), "SERVER_ERROR", 500
-        )
 
 
 @login_required

@@ -1,20 +1,11 @@
 /**
  * 태그 관리 목록.
  *
- * 카테고리로 묶은 행 리스트를 그리고 행을 위아래로 옮긴다. 순서는 카테고리
- * 안에서만 움직인다 — 카테고리는 색이자 통계 분류라서, 순서를 바꾸는 동작이
- * 그것까지 건드리면 사용자가 지난달 통계가 달라진 이유를 알 수 없다.
+ * 카테고리로 묶은 행 리스트를 그린다. 카테고리 순서는 시스템이 정하고
+ * 태그는 그 안에서 이름순이다 — 사용자가 손으로 정하는 순서는 두지 않는다.
  */
-const ORDER_ENDPOINT = '/api/tags/order/';
-
 let categories = [];
 let tags = [];
-// 마지막으로 서버가 받아 준 순서. 저장에 실패하면 여기로 되돌린다.
-let confirmedIds = [];
-let sending = false;
-let dirty = false;
-// 되돌릴 때 포커스를 돌려놓을 자리.
-let lastMove = null;
 // 모달을 연 버튼. 저장하면 목록을 다시 그리느라 그 버튼이 사라진다.
 let pendingFocus = null;
 
@@ -46,8 +37,7 @@ async function loadTags() {
         ]);
         categories = categoryData.categories;
         tags = tagsData.tags;
-        confirmedIds = tags.map((tag) => tag.id);
-        // 모달이 카테고리 선택지를 여기서 가져간다.
+        // 모달이 카테고리 선택지와 옮길 태그 목록을 여기서 가져간다.
         window._categories = categories;
         window._tagsCache = tags;
         render();
@@ -73,8 +63,8 @@ function errorNotice() {
  * 조각을 만들어 한 번에 갈아 끼운다.
  *
  * 예전 코드는 innerHTML 에 문자열을 더해 붙였는데, 그러면 붙일 때마다 이미
- * 들어가 있던 노드까지 전부 새로 만들어진다. 방금 누른 버튼이 사라지므로
- * 포커스가 문서 바닥으로 떨어지고, 연달아 두 칸을 옮길 수가 없다.
+ * 들어가 있던 노드까지 전부 새로 만들어진다. 포커스를 들고 있던 노드도
+ * 함께 사라진다.
  */
 function render() {
     const container = document.getElementById('tagListContainer');
@@ -101,12 +91,7 @@ function buildGroup(category, groupTags) {
     const group = document.createElement('section');
     group.className = 'tag-group';
     group.appendChild(buildGroupHeading(category, groupTags.length));
-
-    groupTags.forEach(function (tag, position) {
-        group.appendChild(
-            buildRow(tag, category, position, position === groupTags.length - 1)
-        );
-    });
+    groupTags.forEach((tag) => group.appendChild(buildRow(tag)));
     return group;
 }
 
@@ -128,7 +113,7 @@ function buildGroupHeading(category, count) {
     return heading;
 }
 
-function buildRow(tag, category, position, isLast) {
+function buildRow(tag) {
     const row = document.createElement('div');
     row.className = 'settings-row tag-row';
     row.dataset.tagRow = tag.id;
@@ -149,16 +134,14 @@ function buildRow(tag, category, position, isLast) {
     info.appendChild(meta);
 
     row.appendChild(info);
-    row.appendChild(buildActions(tag, category, position === 0, isLast));
+    row.appendChild(buildActions(tag));
     return row;
 }
 
-function buildActions(tag, category, isFirst, isLast) {
+function buildActions(tag) {
     const actions = document.createElement('div');
     actions.className = 'tag-row__actions';
 
-    actions.appendChild(moveButton(tag, category, 'up', isFirst));
-    actions.appendChild(moveButton(tag, category, 'down', isLast));
     actions.appendChild(
         actionButton(tag, 'edit', gettext('수정'), 'fa-pen',
             interpolate(gettext('%s 태그 수정'), [tag.name]))
@@ -168,32 +151,6 @@ function buildActions(tag, category, isFirst, isLast) {
             interpolate(gettext('%s 태그 삭제'), [tag.name]))
     );
     return actions;
-}
-
-function moveButton(tag, category, direction, atEdge) {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'btn-sian btn-sian--icon';
-    button.dataset.tagId = tag.id;
-    button.dataset.move = direction;
-    // 카테고리 안에서의 처음과 끝이다. 목록 전체의 처음과 끝이 아니다.
-    button.disabled = atEdge;
-    button.setAttribute(
-        'aria-label',
-        interpolate(
-            direction === 'up'
-                ? gettext('%(tag)s 위로 이동, %(category)s 안에서')
-                : gettext('%(tag)s 아래로 이동, %(category)s 안에서'),
-            { tag: tag.name, category: category.name },
-            true
-        )
-    );
-
-    const icon = document.createElement('i');
-    icon.className = `fas ${direction === 'up' ? 'fa-arrow-up' : 'fa-arrow-down'}`;
-    icon.setAttribute('aria-hidden', 'true');
-    button.appendChild(icon);
-    return button;
 }
 
 function actionButton(tag, action, label, iconName, accessibleName) {
@@ -218,17 +175,13 @@ function actionButton(tag, action, label, iconName, accessibleName) {
 }
 
 
-/* 순서 바꾸기 ------------------------------------------------------------ */
+/* 수정과 삭제 ------------------------------------------------------------ */
 
 function handleRowClick(event) {
     const button = event.target.closest('button[data-tag-id]');
     if (!button) return;
 
     const tagId = Number(button.dataset.tagId);
-    if (button.dataset.move) {
-        moveTag(tagId, button.dataset.move);
-        return;
-    }
     pendingFocus = { tagId: tagId, action: button.dataset.action };
 
     if (button.dataset.action === 'edit') {
@@ -258,125 +211,4 @@ function repairFocus() {
 
     pendingFocus = null;
     if (target) target.focus();
-}
-
-function moveTag(tagId, direction) {
-    const from = tags.findIndex((tag) => tag.id === tagId);
-    if (from < 0) return;
-
-    const to = direction === 'up' ? from - 1 : from + 1;
-    const neighbour = tags[to];
-
-    // 카테고리가 다르면 이웃이 아니다. 목록은 카테고리 순으로 오므로 같은
-    // 카테고리의 태그끼리는 서로 붙어 있다.
-    if (!neighbour || neighbour.category_id !== tags[from].category_id) return;
-
-    const next = tags.slice();
-    next[to] = next[from];
-    next[from] = neighbour;
-    tags = next;
-    lastMove = { tagId: tagId, direction: direction };
-
-    render();
-    announceMove(tagId);
-    focusMoveButton(tagId, direction);
-    flushOrder();
-}
-
-function announceMove(tagId) {
-    const status = document.getElementById('tagOrderStatus');
-    if (!status) return;
-
-    const tag = tags.find((item) => item.id === tagId);
-    const peers = tags.filter((item) => item.category_id === tag.category_id);
-    const category = categories.find((item) => item.id === tag.category_id);
-
-    // 덮어쓴다. 빠르게 여러 번 누르면 중간 상태를 다 읽는 대신 마지막 자리만
-    // 읽힌다.
-    status.textContent = interpolate(
-        gettext('%(tag)s, %(category)s의 %(position)s번째'),
-        {
-            tag: tag.name,
-            category: category ? category.name : '',
-            position: peers.indexOf(tag) + 1,
-        },
-        true
-    );
-}
-
-/**
- * 옮긴 태그를 따라간다.
- *
- * 행이 자리를 바꾸면 방금 누른 버튼은 화면의 다른 곳에 있다. 같은 방향
- * 버튼이 이제 끝이라 눌리지 않으면 반대 방향으로, 그것도 없으면 수정으로
- * 옮긴다. 아무 데도 못 가면 포커스가 문서 바닥으로 떨어진다.
- */
-function focusMoveButton(tagId, direction) {
-    const row = document.querySelector(`[data-tag-row="${tagId}"]`);
-    if (!row) return;
-
-    const other = direction === 'up' ? 'down' : 'up';
-    const target =
-        enabled(row.querySelector(`[data-move="${direction}"]`)) ||
-        enabled(row.querySelector(`[data-move="${other}"]`)) ||
-        row.querySelector('[data-action="edit"]');
-    if (target) target.focus();
-}
-
-function enabled(button) {
-    return button && !button.disabled ? button : null;
-}
-
-/**
- * 순서를 서버에 맡긴다.
- *
- * 보내는 것은 목록 전체라 나중 요청이 앞선 요청을 온전히 덮어쓴다. 이미
- * 보내는 중이면 표시만 해 두었다가 끝난 뒤 최신 순서로 한 번 더 보낸다 —
- * 빠르게 여러 번 누를 때 오래된 응답이 새 순서를 되돌리지 않게 한다.
- */
-async function flushOrder() {
-    if (sending) {
-        dirty = true;
-        return;
-    }
-
-    sending = true;
-    const attempt = tags.map((tag) => tag.id);
-    try {
-        await apiCall(ORDER_ENDPOINT, {
-            method: 'PATCH',
-            data: { tag_ids: attempt },
-            showLoading: false,
-        });
-        confirmedIds = attempt;
-    } catch (error) {
-        // 기다리던 다음 이동까지 함께 되돌아간다. 한 번 실패했다고만 말하면
-        // 두 번 눌렀던 사람은 한 칸은 남았으리라 믿게 된다.
-        dirty = false;
-        rollbackOrder();
-        showNotification(
-            interpolate(
-                gettext('순서를 저장하지 못해 되돌렸습니다: %s'),
-                [error.message]
-            ),
-            'error'
-        );
-        return;
-    } finally {
-        sending = false;
-    }
-
-    if (dirty) {
-        dirty = false;
-        flushOrder();
-    }
-}
-
-function rollbackOrder() {
-    const byId = new Map(tags.map((tag) => [tag.id, tag]));
-    tags = confirmedIds.map((id) => byId.get(id)).filter(Boolean);
-    render();
-    // 화면을 다시 그리면 누른 버튼이 사라진다. 되돌아온 자리에서 다시 잡아
-    // 준다 — 실패했다고 포커스까지 잃으면 키보드로는 다시 시도할 수 없다.
-    if (lastMove) focusMoveButton(lastMove.tagId, lastMove.direction);
 }

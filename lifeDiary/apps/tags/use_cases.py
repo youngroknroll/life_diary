@@ -8,7 +8,6 @@ from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
 from django.utils.translation import gettext
 
 from .domain_services import _tag_policy_service
-from .ordering import assign_display_order
 from .repositories import CategoryRepository, TagRepository
 from apps.dashboard.repositories import TimeBlockRepository
 
@@ -78,29 +77,6 @@ class ListFrequentTagsUseCase:
 
     def has_usage(self, user) -> bool:
         return bool(_time_block_repo.count_blocks_by_tag(user))
-
-
-class ReorderTagsUseCase:
-    """사용자가 정한 태그 순서를 저장한다.
-
-    받는 것은 "이 태그를 3 번으로" 같은 부분 지시가 아니라 목록 전체다.
-    화면에 보이는 순서 자체가 곧 최종 상태라 서버가 자리를 계산할 필요가
-    없고, 두 요청이 겹쳐도 뒤엣것이 온전한 순서로 덮어쓴다.
-    """
-
-    @transaction.atomic
-    def execute(self, user, tag_ids) -> None:
-        mine = {tag.id: tag for tag in _tag_repo.find_accessible(user)}
-        requested = [int(tag_id) for tag_id in tag_ids]
-
-        # 목록이 내 태그 집합과 정확히 같아야 한다. 빠진 것이 있으면 남은
-        # 태그의 자리를 알 수 없고, 남의 id 가 섞이면 그 태그를 건드리게 된다.
-        if len(set(requested)) != len(requested) or set(requested) != set(mine):
-            raise ValueError(gettext("태그 목록이 현재 태그와 맞지 않습니다."))
-
-        changed = assign_display_order([mine[tag_id] for tag_id in requested])
-        if changed:
-            _tag_repo.save_display_order(changed)
 
 
 class CreateTagUseCase:
