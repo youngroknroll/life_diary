@@ -127,27 +127,38 @@ msgfmt --check -o /dev/null locale/ko/LC_MESSAGES/djangojs.po
 
 ## Production Domain (2026-08-12)
 
-서비스 도메인이 `lifediary.kr` 로 바뀌었다(사용자 결정). `prod.py` 의
-`ALLOWED_HOSTS` 에 추가했고 기존 `lifediary.onrender.com` 은 그대로 둔다.
+서비스 도메인이 `lifediary.kr` 로 바뀌었다. **`ALLOWED_HOSTS` 등록만으로
+운영에서 정상 동작하는 것이 확인됐다**(사용자 확인).
 
 ```python
-ALLOWED_HOSTS = ["lifediary.onrender.com", "lifediary.kr"]
+ALLOWED_HOSTS = ["lifediary.onrender.com", "www.lifediary.kr", "lifediary.kr"]
 ```
 
-**CSRF 는 이 변경만으로 동작한다.** Django 의 origin 검사는
-`request.get_host()` 로 만든 origin 과 먼저 대조하고, 호스트가
-`ALLOWED_HOSTS` 에 있으면 `CSRF_TRUSTED_ORIGINS` 를 보지 않는다
-(`CsrfViewMiddleware._origin_verified`, Django 5.2 소스로 확인).
+`CSRF_TRUSTED_ORIGINS` 를 손대지 않아도 되는 이유 — Django 의 origin 검사는
+`request.get_host()` 로 만든 origin 과 **먼저** 대조하고, 호스트가
+`ALLOWED_HOSTS` 에 있으면 그 목록을 보지 않는다
+(`CsrfViewMiddleware._origin_verified`, Django 5.2 소스로 확인). 실제로
+`origin/production` 의 `prod.py` 에는 `CSRF_TRUSTED_ORIGINS` 자체가 없고
+문제없이 서비스되고 있다.
 
-배포 전에 확인이 필요한 두 가지 —
+### 브랜치 사이의 어긋남 (2026-08-12 정리)
 
-- **`www.lifediary.kr` 는 어느 목록에도 없다.** DNS 가 `www` 를 앱으로
-  보내면 모든 요청이 `DisallowedHost` 로 400 이 된다. DNS·프록시에서
-  apex 로 리다이렉트하든지 `ALLOWED_HOSTS` 에 넣든지 정해야 한다
-- **`CSRF_TRUSTED_ORIGINS` 는 아직 `https://lifediary.onrender.com` 하나뿐이다.**
-  같은 출처 요청에는 필요 없지만, 브라우저가 보는 주소와 앱이 받는 Host 가
-  갈리는 구성(CDN·프록시 앞단)에서는 이 목록이 최후의 판단 근거가 된다.
-  의도를 명시하려면 `https://lifediary.kr` 을 넣는 편이 낫다
+도메인 수정이 `production` 브랜치에서 **직접** 이루어져 `main` 에 없었다.
+
+| 브랜치 | `ALLOWED_HOSTS` |
+|---|---|
+| `origin/production` | `onrender`, `www.lifediary.kr`, `lifediary.kr` (커밋 `ca221bf`·`ff9157d`) |
+| `origin/main` | `onrender` 뿐 |
+| `feat/p0-onboarding` | production 과 동일하게 맞춤 |
+
+그대로 두면 다음 `main -> production` 배포에서 `www.lifediary.kr` 이 도로
+사라질 수 있었다. 이 브랜치가 production 의 목록을 그대로 가져와 `main` 을
+따라잡게 한다.
+
+**배포 흐름 메모**: `main` 이 `production` 으로 흘러가는 구조인데
+(`Deploy: main -> production` PR), 지금 `production` 은 `main` 보다 앞선
+커밋 2개와 뒤진 커밋 다수를 동시에 갖고 있다. 운영 급한 수정을 production
+에 직접 넣으면 이런 어긋남이 반복된다.
 
 메일 발신은 현재 Gmail SMTP 다(`prod.py`). 도메인이 생겼으므로 발신 도메인
 검증을 미뤄 두었던 항목을 다시 볼 수 있으나, DNS 설정 여부는 확인하지 않았다.
@@ -285,7 +296,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | pytest | `docs/refactoring/2026-04-28_pytest-migration.md` | More locale parametrization, possible `factory_boy`, and optional locale leak guard fixture. |
 | Desktop distribution | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | Code signing, notarization, auto-update, operational metrics, and monetization phases. |
 | Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, email verification, and email backfill policy. |
-| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, deployed `Set-Cookie` header inspection, and live sender-domain verification remain deferred. `ALLOWED_HOSTS`는 2026-08-12에 도메인 변경으로 갱신됐다(아래 참조). `CSRF_TRUSTED_ORIGINS`와 `www` 서브도메인 처리는 미결. |
+| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, deployed `Set-Cookie` header inspection, and live sender-domain verification remain deferred. `ALLOWED_HOSTS`는 2026-08-12에 도메인 변경으로 갱신됐고 운영에서 동작이 확인됐다(위 "Production Domain" 참조). `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요하다. |
 | Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
 | P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. 시안 6a의 행 끌어 순서 바꾸기는 **채택하지 않기로 결정**(2026-08-12). |
 | 시안 정합 잔여 | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `style.css`의 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류, 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달 이중 제출 창, `_table_row_actions.html`의 44px 미달 버튼(메모 화면), sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼 부재를 알리지 않음. |
@@ -298,8 +309,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 0-1. P0 데이터 무결성·캐시·i18n·계정 삭제 스케줄링 결함은 디자인 완료 후
    별도 승인된 백엔드/운영 계획으로 처리한다.
 1. `feat/p0-onboarding` (6·7단계) 리뷰와 머지 결정. PR #40 은 머지 완료.
-1-0. 도메인 전환 마무리 — `www.lifediary.kr` 처리 방침과
-   `CSRF_TRUSTED_ORIGINS` 갱신 여부. 위 "Production Domain" 절 참조.
+1-0. `production` 에만 있던 도메인 수정 2건이 `main` 에 반영되도록
+   이 PR 을 먼저 넣는다. 위 "Production Domain" 절 참조.
 1-1. 결정 대기 세 건 — 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부,
    `Tag.color` 컬럼 드롭 여부, 태그 관리 화면에 카테고리 색을 어떤 형태로
    되살릴지(7단계에서 색 표시가 사라졌다).
