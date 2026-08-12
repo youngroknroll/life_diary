@@ -240,3 +240,25 @@ class TestObservations:
         summary = build_summary(user, SATURDAY, today=SATURDAY)
 
         assert len(summary["observations"]) <= 4
+
+    def test_the_color_comes_from_my_tag_not_a_stranger_with_the_same_name(
+        self, user, make_user
+    ):
+        """태그는 전부 개인 소유라 같은 이름이 사용자 수만큼 존재한다."""
+        stranger = make_user(username="colorstranger")
+        Tag.objects.create(
+            user=stranger,
+            name="집중",
+            category=Category.objects.get(slug="passive"),
+        )
+        mine = Tag.objects.create(
+            user=user,
+            name="집중",
+            category=Category.objects.get(slug="investment"),
+        )
+        record(user, mine, SATURDAY, slots=12)
+
+        summary = build_summary(user, SATURDAY, today=SATURDAY)
+        top = next(o for o in summary["observations"] if o["kind"] == "top_tag")
+
+        assert top["color"] == Category.objects.get(slug="investment").color

@@ -2,7 +2,6 @@ import json
 from types import SimpleNamespace
 
 import pytest
-from django.conf import settings
 from django.db.models import ProtectedError
 from django.template import Context, Template
 
@@ -204,17 +203,6 @@ class TestTagBadgeTemplateTag:
         )
         assert "<script>alert(1)</script>" not in html
         assert "&lt;script&gt;" in html
-
-
-class TestTagModalTemplate:
-    def test_tag_management_category_header_uses_shared_template(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/index.html"
-        template_source = template_path.read_text()
-
-        assert "{% include 'shared/_tag_category_header.html'" in template_source
-        assert 'id="tagCategoryHeaderTemplate"' in template_source
-        assert "renderCategoryHeader(" in template_source
-        assert 'background-color: ${cat.color}' not in template_source
 
 
 @pytest.mark.django_db

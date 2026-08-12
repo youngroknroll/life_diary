@@ -15,6 +15,7 @@ from django.contrib.auth.views import PasswordResetView
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import gettext
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.core.validators import validate_email
@@ -28,6 +29,9 @@ from .repositories import GoalRepository, NoteRepository, UserAccountRepository
 from apps.tags.models import Category
 from apps.tags.repositories import TagRepository
 from apps.tags.seed_tags import create_seed_tags
+from apps.dashboard.day_window import annotate_future, current_slot_index
+from apps.dashboard.repositories import TimeBlockRepository
+from apps.dashboard.services import build_slot_rows, build_time_headers
 from .use_cases import (
     DeleteGoalUseCase,
     DeleteNoteUseCase,
@@ -43,6 +47,7 @@ logger = logging.getLogger(__name__)
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 _tag_repo = TagRepository()
+_time_block_repo = TimeBlockRepository()
 _user_repo = UserAccountRepository()
 _mypage_use_case = GetMyPageUseCase()
 _save_goal = SaveGoalUseCase(tags=_tag_repo)
@@ -459,6 +464,19 @@ def welcome_view(request):
         "step_range": range(1, ONBOARDING_STEPS + 1),
     }
     if step == 1:
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+    if step == 2:
+        today = timezone.localdate()
+        blocks = _time_block_repo.find_by_date(request.user, today)
+        slot_data = {
+            block.slot_index: {"tag": block.tag, "memo": block.memo, "id": block.id}
+            for block in blocks
+        }
+        context["today"] = today
+        context["time_headers"] = build_time_headers()
+        context["slot_rows"] = annotate_future(
+            build_slot_rows(slot_data), current_slot_index(today, timezone.localtime())
+        )
         context["tags"] = _tag_repo.find_accessible_ordered(request.user)
     if step == 3:
         context["tags"] = _tag_repo.find_accessible_ordered(request.user)

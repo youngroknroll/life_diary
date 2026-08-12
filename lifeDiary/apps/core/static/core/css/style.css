@@ -373,6 +373,61 @@ body {
     padding: 6px 0;
 }
 
+/* 태그 관리의 행 리스트 — 카테고리로 묶고 행마다 이름·누적 기록·버튼 넷. */
+.tag-group__heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 20px 0 2px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.tag-group:first-child .tag-group__heading {
+    margin-top: 4px;
+}
+
+.tag-group__count {
+    font-weight: 400;
+}
+
+/* 360px 에서는 버튼 넷이 이름 옆에 들어가지 않는다. 버튼을 숨기거나 줄이는
+   대신 아랫줄로 내린다 — 관리 화면이라 넷 다 손에 닿아야 한다. */
+.tag-row {
+    flex-wrap: wrap;
+}
+
+.tag-row__info {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    min-width: 0;
+}
+
+.tag-row__name {
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.tag-row__meta {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.tag-row__actions {
+    display: flex;
+    gap: 6px;
+    margin-left: auto;
+}
+
+/* 좁은 화면에서 글자만 남아도 손가락이 닿을 44px 폭을 지킨다.
+   .btn-sian--compact 는 min-width 를 0 으로 풀어 둔다. */
+.tag-row__actions .btn-sian {
+    min-width: 44px;
+}
+
 .settings-row + /* 홈 미리보기 — 장식이 아니라 실제 기록 화면의 축소판이다 */
 .home-daygrid {
     display: flex;
@@ -595,44 +650,203 @@ body {
     margin-bottom: 20px;
 }
 
+/* STEP1 의 태그 고르기. 네이티브 체크박스를 칩 모양으로 입힌다 —
+   카테고리 라디오와 같은 이유로, 체크 상태를 브라우저가 들게 한다. */
+.onboarding__group {
+    border: 0;
+    padding: 0;
+    margin: 0 0 14px;
+}
+
+.onboarding__group-title {
+    float: none;
+    width: auto;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.chip--pick {
+    cursor: pointer;
+    min-height: 44px;
+    padding: 0 14px;
+    user-select: none;
+}
+
+.chip__check {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chip--pick:has(.chip__check:checked) {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.chip--pick:has(.chip__check:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.chip--pick:not(:has(.chip__check:checked)) .chip__swatch {
+    opacity: 0.35;
+}
+
+.onboarding__picks-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 16px;
+}
+
+.onboarding__count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+/* STEP2 는 기록 화면의 그리드를 그대로 얹는다. 온보딩 열은 420px 이라
+   시각 라벨 폭을 줄여야 여섯 칸이 눌릴 만큼 남는다. */
+.onboarding__grid {
+    margin-bottom: 12px;
+}
+
+.onboarding__grid .day-row {
+    grid-template-columns: 38px 1fr;
+    gap: 6px;
+}
+
+.onboarding__selection {
+    min-height: 20px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.onboarding__foot-link {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+/* 목표 시간 스테퍼. 숫자 입력을 그대로 두고 버튼을 양옆에 붙인다 —
+   방향키 증감과 값 낭독을 브라우저가 이미 해 준다. */
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stepper__btn {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-text);
+}
+
+.stepper__btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.stepper__value {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-align: center;
+    font-size: 15px;
+}
+
+.onboarding__stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.onboarding__period {
+    border: 0;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.onboarding__period-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.onboarding__preview {
+    margin-bottom: 16px;
+}
+
+.onboarding__preview-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.onboarding__preview-caption {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo {
+    margin-bottom: 12px;
+}
+
+.onboarding__undo-note {
+    margin: 0 0 6px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo-btn {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    font-size: 12.5px;
+    color: var(--color-text-body);
+}
+
 .onboarding__next {
     width: 100%;
     min-height: 50px;
     font-size: 15px;
-}
-
-.onboarding__demo {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-    padding: 12px 13px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    margin-bottom: 20px;
-}
-
-.onboarding__demo-row {
-    display: grid;
-    grid-template-columns: 38px 1fr;
-    gap: 8px;
-    align-items: center;
-}
-
-.onboarding__demo-cells {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 2px;
-}
-
-.onboarding__demo-cell {
-    height: 22px;
-    border-radius: 3px;
-    background: var(--color-track);
-}
-
-.onboarding__demo-cell.is-picked {
-    background: var(--color-primary-soft);
-    box-shadow: 0 0 0 2px var(--color-primary) inset;
 }
 
 .onboarding__goal {

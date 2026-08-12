@@ -27,7 +27,7 @@ DATABASES = {
         "CONN_HEALTH_CHECKS": True,
     }
 }
-ALLOWED_HOSTS = ["lifediary.onrender.com"]
+ALLOWED_HOSTS = ["lifediary.onrender.com","www.lifediary.kr","lifediary.kr"]
 
 # 프로덕션 보안 설정
 # Render는 TLS를 프록시에서 종료하고 X-Forwarded-Proto를 전달한다.

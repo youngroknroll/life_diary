@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load i18n %}
+{% load tag_ui %}
 
 {% block title %}{% trans "시작하기" %} | {% trans "라이프 다이어리" %}{% endblock %}
 
@@ -20,77 +21,155 @@
     <p class="onboarding__step">{% blocktrans with s=step t=total_steps %}STEP {{ s }} / {{ t }}{% endblocktrans %}</p>
 
     {% if step == 1 %}
-        <h1 class="onboarding__title">{% trans "쓸 태그부터 골라볼까요" %}</h1>
-        <p class="onboarding__lead">{% trans "지금 고른 것만 기록 화면에 나옵니다. 나중에 설정에서 얼마든지 바꿀 수 있습니다." %}</p>
+        <h1 class="onboarding__title">{% trans "쓸 태그를 확인해 볼까요" %}</h1>
+        <p class="onboarding__lead">{% trans "체크한 태그부터 확인해 두세요. 나머지도 기록 화면에 그대로 남아 있습니다." %}</p>
 
-        <div class="onboarding__chips">
-            {% for tag in tags %}
-                <span class="chip">
-                    <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
-                </span>
-            {% empty %}
-                <p class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</p>
-            {% endfor %}
+        {% regroup tags by category as tags_by_category %}
+        {% for group in tags_by_category %}
+            <fieldset class="onboarding__group">
+                <legend class="onboarding__group-title">{{ group.grouper.display_name }}</legend>
+                <div class="onboarding__chips">
+                    {% for tag in group.list %}
+                        <label class="chip chip--pick">
+                            <input type="checkbox" class="chip__check" name="pick" value="{{ tag.id }}" checked>
+                            <span class="chip__swatch" style="background-color: {{ tag.color }}"></span>{{ tag.name }}
+                        </label>
+                    {% endfor %}
+                </div>
+            </fieldset>
+        {% empty %}
+            <p class="page-subtitle">{% trans "아직 태그가 없습니다. 새 태그를 만들면 기록에서 바로 고를 수 있습니다." %}</p>
+        {% endfor %}
+
+        <div class="onboarding__picks-foot">
+            <button type="button" class="btn-sian" id="onboardingAddTag">{% trans "+ 직접 추가" %}</button>
+            <span class="onboarding__count" id="onboardingCount" role="status" aria-live="polite"
+                  data-label="{% blocktrans with n='__N__' %}{{ n }}개 선택{% endblocktrans %}"></span>
         </div>
 
         <a class="btn-sian btn-sian--primary onboarding__next" href="?step=2">{% trans "다음" %}</a>
 
     {% elif step == 2 %}
         <h1 class="onboarding__title">{% trans "한 구간을 직접 채워보세요" %}</h1>
-        <p class="onboarding__lead">{% trans "기록 화면에서 비어 있는 구간을 끌면 그만큼 선택됩니다. 손을 떼면 태그를 고르는 자리가 열립니다." %}</p>
+        <p class="onboarding__lead">{% trans "비어 있는 구간을 위아래로 쓸면 그만큼 선택됩니다. 방향키로 옮기고 Shift+방향키로 넓힌 뒤 Enter 로 고를 수도 있습니다. 여기서 채운 기록은 그대로 저장됩니다." %}</p>
 
-        <div class="onboarding__demo" aria-hidden="true">
-            {% for row in "12345" %}
-                <div class="onboarding__demo-row">
-                    <span class="onboarding__demo-label"></span>
-                    <span class="onboarding__demo-cells">
-                        {% if forloop.counter == 2 %}
-                            <span class="onboarding__demo-cell"></span>
-                            <span class="onboarding__demo-cell"></span>
-                            <span class="onboarding__demo-cell is-picked" style="grid-column: span 4"></span>
-                        {% elif forloop.counter == 3 %}
-                            <span class="onboarding__demo-cell is-picked" style="grid-column: span 4"></span>
-                            <span class="onboarding__demo-cell"></span>
-                            <span class="onboarding__demo-cell"></span>
-                        {% else %}
-                            <span class="onboarding__demo-cell" style="grid-column: span 6"></span>
-                        {% endif %}
-                    </span>
+        {# dashboard.js 가 요구하는 값. 온보딩은 날짜를 고르지 않고 메모도 받지 않는다. #}
+        <input type="hidden" id="dateSelector" value="{{ today|date:'Y-m-d' }}">
+        <input type="hidden" id="memoInput" value="">
+
+        <div class="onboarding__grid">
+            <div class="day-row day-header" aria-hidden="true">
+                <div class="day-row__label"></div>
+                <div class="day-row__cells day-header__cells">
+                    {% for time_header in time_headers %}
+                        <div class="day-header__cell{% if forloop.last %} day-header__cell--end{% endif %}">{{ time_header }}</div>
+                    {% endfor %}
                 </div>
+            </div>
+            <div class="day-grid" id="timeGrid" data-date="{{ today|date:'Y-m-d' }}">
+                {% for row in slot_rows %}
+                    {% include 'dashboard/_day_row.html' %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <p class="onboarding__selection num" id="slotInfoInline"></p>
+
+        <div class="onboarding__tags" id="tagContainer">
+            {% for tag in tags %}
+                {% tag_badge tag.color tag.text_color tag.name clickable=True tag_id=tag.id %}
             {% endfor %}
         </div>
 
-        <a class="btn-sian btn-sian--primary onboarding__next" href="?step=3">{% trans "다음" %}</a>
+        <button type="button" class="btn-sian btn-sian--primary onboarding__next" id="saveBtn"
+                onclick="saveSlot()" disabled>
+            {% trans "저장하고 다음" %}
+        </button>
+        <a class="onboarding__foot-link" href="?step=3">{% trans "채우지 않고 넘어가기" %}</a>
 
     {% else %}
         <h1 class="onboarding__title">{% trans "목표를 하나만 정해둘까요" %}</h1>
         <p class="onboarding__lead">{% trans "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 지장이 없습니다." %}</p>
 
-        <form method="post" action="{% url 'users:usergoal_create' %}" class="onboarding__goal">
+        <div class="onboarding__undo" id="onboardingUndo" hidden>
+            <p class="onboarding__undo-note" id="onboardingUndoNote" role="status">{% trans "방금 채운 구간을 저장했습니다." %}</p>
+            <button type="button" class="onboarding__undo-btn" id="onboardingUndoBtn">{% trans "방금 기록 취소" %}</button>
+        </div>
+
+        <form method="post" action="{% url 'users:usergoal_create' %}" class="onboarding__goal" id="onboardingGoalForm">
             {% csrf_token %}
             <label class="onboarding__field">
                 <span class="onboarding__field-label">{% trans "대상 태그" %}</span>
-                <select name="tag" class="form-select">
+                <select name="tag" class="form-select" id="goalTagSelect">
                     {% for tag in tags %}
                         <option value="{{ tag.id }}">{{ tag.name }}</option>
                     {% endfor %}
                 </select>
             </label>
-            <label class="onboarding__field">
-                <span class="onboarding__field-label">{% trans "기간" %}</span>
-                <select name="period" class="form-select">
-                    {% for value, label in periods %}
-                        <option value="{{ value }}">{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </label>
-            <label class="onboarding__field">
-                <span class="onboarding__field-label">{% trans "목표 시간" %}</span>
-                <input type="number" name="target_hours" class="form-control" value="4" min="0" step="0.5">
-            </label>
+
+            <fieldset class="onboarding__period">
+                <legend class="onboarding__field-label">{% trans "기간" %}</legend>
+                {% for value, label in periods %}
+                    <label class="onboarding__period-option">
+                        <input type="radio" name="period" value="{{ value }}"{% if forloop.first %} checked{% endif %}>
+                        <span>{{ label }}</span>
+                    </label>
+                {% endfor %}
+            </fieldset>
+
+            <div class="onboarding__stepper">
+                <span class="onboarding__field-label" id="goalHoursLabel">{% trans "목표 시간" %}</span>
+                <div class="stepper">
+                    <button type="button" class="stepper__btn" data-step="-0.5"
+                            aria-label="{% trans '목표 시간 30분 줄이기' %}">−</button>
+                    <input type="number" name="target_hours" class="stepper__value num" id="goalHours"
+                           value="4" min="0.5" max="24" step="0.5" aria-labelledby="goalHoursLabel">
+                    <button type="button" class="stepper__btn" data-step="0.5"
+                            aria-label="{% trans '목표 시간 30분 늘리기' %}">+</button>
+                </div>
+            </div>
+
+            <div class="onboarding__preview">
+                <span class="onboarding__preview-label">{% trans "이렇게 보입니다" %}</span>
+                <div class="summary-tile">
+                    <div class="summary-tile__label">{% trans "목표 달성" %}</div>
+                    <div class="summary-tile__value num" id="goalPreviewValue">0<span class="summary-tile__unit">{% blocktrans with t=1 %}/{{ t }}일{% endblocktrans %}</span></div>
+                    <div class="summary-tile__note" id="goalPreviewNote"></div>
+                </div>
+                <p class="onboarding__preview-caption">{% trans "예시입니다. 실제 수치는 기록이 쌓이면서 채워집니다." %}</p>
+            </div>
+
             <button type="submit" class="btn-sian btn-sian--primary onboarding__next">{% trans "기록 시작하기" %}</button>
         </form>
         <p class="onboarding__foot">{% trans "설정 › 목표에서 언제든 바꿀 수 있습니다" %}</p>
     {% endif %}
 </div>
+
+{% if step == 1 %}
+    {% include 'tags/_tag_modal.html' %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+{% if step == 2 %}
+    {% comment %}
+드래그·키보드·저장을 온보딩용으로 다시 만들지 않는다. 한 벌이 갈리면
+       한쪽만 고쳐지고 다른 쪽이 조용히 낡는다.
+{% endcomment %}
+    <script src="{% static 'dashboard/js/dashboard.js' %}" defer></script>
+{% endif %}
+{% if step == 1 %}
+    <script src="{% static 'core/js/tag.js' %}" defer></script>
+    <script>
+        // 태그 모달이 카테고리 라디오를 그리려면 이 값이 있어야 한다.
+        // apiCall 은 defer 된 utils.js 가 정의하므로 DOM 준비 후에 부른다.
+        document.addEventListener('DOMContentLoaded', function () {
+            apiCall('/api/categories/')
+                .then(function (data) { window._categories = data.categories; })
+                .catch(function (error) { console.error(error); });
+        });
+    </script>
+{% endif %}
+<script src="{% static 'users/js/onboarding.js' %}" defer></script>
 {% endblock %}

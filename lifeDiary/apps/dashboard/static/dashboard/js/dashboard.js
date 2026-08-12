@@ -137,9 +137,13 @@ function initializeDashboard() {
         });
     }
 
-    document.getElementById('createNewTagBtn').addEventListener('click', function() {
-        window.openTagFormModal();
-    });
+    // 온보딩처럼 이 그리드를 빌려 쓰는 화면에는 태그 만들기 버튼이 없다.
+    const createTagBtn = document.getElementById('createNewTagBtn');
+    if (createTagBtn) {
+        createTagBtn.addEventListener('click', function() {
+            window.openTagFormModal();
+        });
+    }
 
     const manageTagsBtn = document.getElementById('manageTagsBtn');
     if (manageTagsBtn) {
@@ -703,7 +707,13 @@ let undoTimer = null;
 
 function showUndoSnackbar(message, token) {
     const snackbar = document.getElementById('undoSnackbar');
-    if (!snackbar || !token) return;
+    if (!token) return;
+    if (!snackbar) {
+        // 이 그리드를 빌려 쓰는 화면에는 스낵바가 없다. 조용히 넘어가면
+        // 저장됐다는 사실이 아무에게도 전달되지 않는다.
+        showNotification(message, 'success');
+        return;
+    }
 
     snackbar.querySelector('[data-undo-message]').textContent = message;
     snackbar.querySelector('[data-undo-action]').onclick = () => runUndo(token);
@@ -778,6 +788,12 @@ const saveSlot = async () => {
         updateButtons();
         closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
+
+        // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
+        // 판단할 수 있다. 실패는 catch 로 가므로 여기까지 오면 저장된 것이다.
+        document.dispatchEvent(new CustomEvent('time-blocks-saved', {
+            detail: { date: date, slotIndexes: slotIndexes },
+        }));
 
     } catch (error) {
         restoreRows(affectedRows);
@@ -878,6 +894,12 @@ const deleteSlot = async () => {
         updateButtons();
         closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
+
+        // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
+        // 판단할 수 있다. 실패는 catch 로 가므로 여기까지 오면 저장된 것이다.
+        document.dispatchEvent(new CustomEvent('time-blocks-saved', {
+            detail: { date: date, slotIndexes: slotIndexes },
+        }));
 
     } catch (error) {
         restoreRows(affectedRows);

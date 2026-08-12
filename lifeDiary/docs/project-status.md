@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-02
+Last updated: 2026-08-12
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -17,10 +17,37 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## Latest Execution (2026-08-10 ~ 08-12) — 시안 정합 재작업
+
+시안 22화면을 구현과 전수 대조해 격차를 7단계로 나눠 메웠다.
+계획: `docs/plans/2026-08-10_sian-conformance-remediation-plan.md`
+
+| 단계 | 범위 | 실행 로그 |
+|---|---|---|
+| 1~3 | 스킨 잔재, 인증 화면, 태그 모달·설정 재구성, 이름 10자 | `2026-08-10_sian-conformance-stage1~3.md` |
+| 4 (D1) | 기본 태그 폐지 — 모든 태그를 개인 소유로. 되돌릴 수 없는 마이그레이션 | `2026-08-10_sian-conformance-stage4.md` |
+| 5 (D2) | 달성률 분모를 지난 시간 기준으로, 룰 기반 피드백 제거 | `2026-08-11_sian-conformance-stage5.md` |
+| 6 (B3+A3) | 빈 상태, 온보딩 3단계 (STEP2 는 실제로 저장한다) | `2026-08-11_sian-conformance-stage6.md` |
+| 7 (A1) | 태그 관리를 행 리스트로 재작성 | `2026-08-12_sian-conformance-stage7.md` |
+
+브랜치 `feat/p0-onboarding` (6·7단계). 4·5단계는 PR #40 에 포함됐다.
+머지는 사용자 몫.
+
+주의할 결정:
+
+- **태그는 전부 개인 소유다.** `Tag.user` non-nullable, `is_default` 폐지.
+  가입 시 시드 태그를 개인 태그로 만들어 준다
+- **달성률 분모에서 아직 오지 않은 날을 뺀다.** 다만 오늘 이미 채웠으면 센다
+- **지시형 코칭 문구를 전부 없앴다.** 남긴 `_observations` 는 사실 진술이다
+- **태그 순서는 사용자가 정하지 않는다** (2026-08-12). 카테고리 순서는
+  시스템이, 태그는 그 안에서 이름순. 7단계에서 만들었다가 걷어냈다
+- **시안 이탈 신설**: 시안 6a 의 행 드래그와 인라인 이름 편집은 채택하지
+  않는다. 편집은 행에서 바로 열리는 모달이다
+
 ## Latest Execution (2026-08-01 ~ 08-02)
 
 P0 시안 리디자인을 마쳤다. 구현 명세 7단계와 시안 화면 19개 전부.
-브랜치 `feat/p0-redesign-grid`, PR #40, 커밋 30개. 머지는 사용자 몫.
+브랜치 `feat/p0-redesign-grid`, PR #40, 커밋 30개. **머지 완료(2026-08-11).**
 
 - 실행 로그: `docs/refactoring/2026-08-01_p0-sian-redesign.md`
 - 명세 단계 계획: `docs/plans/2026-08-01_p0-redesign-plan.md`
@@ -48,6 +75,93 @@ P0 시안 리디자인을 마쳤다. 구현 명세 7단계와 시안 화면 19�
   테스트 12건을 제거했다. `AGENTS.md` Frontend Work Policy 참조.
 - **Git은 에이전트가 직접 실행한다.** 커밋은 작은 기능 단위, 트랙마다
   브랜치 push + PR. 머지는 사용자.
+
+## Review Follow-up (2026-08-10)
+
+전수 점검 결과를 문서화했다. 사용자는 **현재 변경 중인 디자인 시안을 먼저
+완료한 뒤** 최종 코드 기준의 프런트엔드·브라우저 재검토와 후속 수정을
+진행하기로 결정했다. 따라서 디자인 관련 지적은 지금 수정하지 않으며, 새
+시안의 최종 브랜치에서 다시 판정한다.
+
+- 후속 계획: `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md`
+- 문서화 로그: `docs/refactoring/2026-08-10_review-follow-up-documentation.md`
+- 디자인과 무관하여 출시 전 별도 승인·수정이 필요한 P0: 기본 태그 이관의
+  교차 사용자 소유권 침해, 통계 캐시 무효화 범위, 한국어 GNU gettext 카탈로그
+  컴파일, 계정 삭제 purge 스케줄링.
+- 재검토 대기 P0: Shift+Arrow 슬롯 키보드 오류, 닫힌 모바일 퀵인풋 시트의
+  포커스 누출, 사용자 문자열의 inline JavaScript/`innerHTML` 경계.
+
+**2026-08-12 갱신 — 위 목록에서 해소된 것들.** 시안 정합 재작업이 지나가며
+같이 닫혔다. 아래 2026-08-10 증거 블록의 수치와 실패는 그 시점의 기록이다.
+
+| 지적 | 해소 |
+|---|---|
+| 기본 태그 이관의 교차 사용자 소유권 침해 | 4단계 — 공유 태그 개념 자체를 폐지 |
+| 한국어 gettext 카탈로그 컴파일 실패 | `msgfmt --check-format` 4개 파일 통과, fuzzy·미번역 0건 |
+| Shift+Arrow 슬롯 키보드 오류 | 6단계 — 정의되지 않은 `slotIndex` 참조 수정 |
+| 사용자 문자열의 inline JS/`innerHTML` 경계 | 7단계 — 태그 관리의 인라인 `onclick` 문자열 보간 제거 |
+
+남은 것: 통계 캐시 무효화 범위, 계정 삭제 purge 스케줄링, 닫힌 모바일
+퀵인풋 시트의 포커스 누출.
+
+2026-08-10 신선한 증거:
+
+```bash
+conda run -n knou-life-diary pytest
+# 405 passed in 221.59s
+
+conda run -n knou-life-diary python manage.py check
+# System check identified no issues (0 silenced).
+
+conda run -n knou-life-diary python manage.py makemigrations --check --dry-run
+# No changes detected
+
+msgfmt --check -o /dev/null locale/ko/LC_MESSAGES/django.po
+msgfmt --check -o /dev/null locale/ko/LC_MESSAGES/djangojs.po
+# 둘 다 Korean plural-form 오류로 실패
+```
+
+프로덕션 deploy check는 오류 레벨로 통과했지만, 로컬 환경의 기본 `SECRET_KEY`
+관련 W009 경고가 남았다. 실제 배포 환경의 키 품질은 이 확인으로 검증되지
+않았다.
+
+## Production Domain (2026-08-12)
+
+서비스 도메인이 `lifediary.kr` 로 바뀌었다. **`ALLOWED_HOSTS` 등록만으로
+운영에서 정상 동작하는 것이 확인됐다**(사용자 확인).
+
+```python
+ALLOWED_HOSTS = ["lifediary.onrender.com", "www.lifediary.kr", "lifediary.kr"]
+```
+
+`CSRF_TRUSTED_ORIGINS` 를 손대지 않아도 되는 이유 — Django 의 origin 검사는
+`request.get_host()` 로 만든 origin 과 **먼저** 대조하고, 호스트가
+`ALLOWED_HOSTS` 에 있으면 그 목록을 보지 않는다
+(`CsrfViewMiddleware._origin_verified`, Django 5.2 소스로 확인). 실제로
+`origin/production` 의 `prod.py` 에는 `CSRF_TRUSTED_ORIGINS` 자체가 없고
+문제없이 서비스되고 있다.
+
+### 브랜치 사이의 어긋남 (2026-08-12 정리)
+
+도메인 수정이 `production` 브랜치에서 **직접** 이루어져 `main` 에 없었다.
+
+| 브랜치 | `ALLOWED_HOSTS` |
+|---|---|
+| `origin/production` | `onrender`, `www.lifediary.kr`, `lifediary.kr` (커밋 `ca221bf`·`ff9157d`) |
+| `origin/main` | `onrender` 뿐 |
+| `feat/p0-onboarding` | production 과 동일하게 맞춤 |
+
+그대로 두면 다음 `main -> production` 배포에서 `www.lifediary.kr` 이 도로
+사라질 수 있었다. 이 브랜치가 production 의 목록을 그대로 가져와 `main` 을
+따라잡게 한다.
+
+**배포 흐름 메모**: `main` 이 `production` 으로 흘러가는 구조인데
+(`Deploy: main -> production` PR), 지금 `production` 은 `main` 보다 앞선
+커밋 2개와 뒤진 커밋 다수를 동시에 갖고 있다. 운영 급한 수정을 production
+에 직접 넣으면 이런 어긋남이 반복된다.
+
+메일 발신은 현재 Gmail SMTP 다(`prod.py`). 도메인이 생겼으므로 발신 도메인
+검증을 미뤄 두었던 항목을 다시 볼 수 있으나, DNS 설정 여부는 확인하지 않았다.
 
 ## Known Current Regressions (Read Before Trusting "Passed" Evidence Below)
 
@@ -130,6 +244,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Priority | Document | Scope | Next decision or action |
 |---|---|---|---|
 | High | `docs/plans/2026-05-07_desktop-auth-single-user-plan.md` | Desktop mode auto-login with one local user; block auth pages only in desktop settings. | Approve or revise scope, then create an integrated implementation plan before code work. |
+| High | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | Finish active design work, re-review the final UI, then remediate confirmed P0 ownership, cache, i18n, and operations defects. | User declares design complete; run the documented dual-review gate before frontend changes. |
 | High | `docs/plans/2026-05-03_desktop-app-packaging-plan.md` | Package the Django app as macOS `.app` and Windows `.exe` with pywebview, waitress, and PyInstaller. | Partial code exists (`desktop/launcher.py`, `lifeDiary/settings/desktop.py`, `requirements-desktop.txt`), but no PyInstaller spec or release workflow was found in this pass. Confirm scope before continuing. |
 | Medium | `docs/plans/2026-05-07_stats-dashboard-mobile-ui-plan.md` | Improve mobile stats/dashboard UX: stacked stats sections, goal accordion, feedback reveal, mobile tag bottom sheet. | Goal cards, dashboard mobile bottom sheet, and default-closed stats feedback reveal are implemented and covered by focused tests. Re-check item #1 expectations before marking complete because current tests preserve tab structure rather than requiring all mobile panes to be stacked. |
 | Medium | `docs/plans/2026-04-26_stats-tab-performance-plan.md` | Measure and optimize stats tab backend queries and chart rendering. | Backend query consolidation and query-count guards are implemented and verified. Frontend chart lazy render was not confirmed in this pass. |
@@ -181,26 +296,53 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | pytest | `docs/refactoring/2026-04-28_pytest-migration.md` | More locale parametrization, possible `factory_boy`, and optional locale leak guard fixture. |
 | Desktop distribution | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | Code signing, notarization, auto-update, operational metrics, and monetization phases. |
 | Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, email verification, and email backfill policy. |
-| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, `CSRF_TRUSTED_ORIGINS`, `ALLOWED_HOSTS` refinement, deployed `Set-Cookie` header inspection, and live Resend sender-domain verification remain deferred. |
+| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, deployed `Set-Cookie` header inspection, and live sender-domain verification remain deferred. `ALLOWED_HOSTS`는 2026-08-12에 도메인 변경으로 갱신됐고 운영에서 동작이 확인됐다(위 "Production Domain" 참조). `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요하다. |
 | Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
-| P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 시안 6a의 행 끌어 순서 바꾸기(순서 저장 필드 없음), 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. |
+| P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. 시안 6a의 행 끌어 순서 바꾸기는 **채택하지 않기로 결정**(2026-08-12). |
+| 시안 정합 잔여 | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `style.css`의 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류, 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달 이중 제출 창, `_table_row_actions.html`의 44px 미달 버튼(메모 화면), sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼 부재를 알리지 않음. |
 
 ## Next Recommended Work
 
-0. PR #40 리뷰와 머지 결정. 커밋 30개, 마이그레이션 3건
-   (`0008` 시안 팔레트, `0009` `Tag.color` blank 허용, `0010` 파스텔 팔레트),
-   백엔드 계약 신설 4건(되돌리기 API, 집계 3종). 그 위에 다음 트랙을 쌓기
-   전에 정리하는 편이 낫다.
-0-1. 결정 대기 두 건 — 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부,
-   `Tag.color` 컬럼 드롭 여부.
-1. Choose one active plan as the next approved scope.
-2. Before code work, create an integrated plan document that combines analyst requirements, design, risks, TDD checkpoints, and verification commands.
-3. For a small implementation start, consider either:
+0. 현재 변경 중인 디자인 시안 작업을 완료한 뒤
+   `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md`의
+   post-design dual review gate를 수행한다.
+0-1. P0 데이터 무결성·캐시·i18n·계정 삭제 스케줄링 결함은 디자인 완료 후
+   별도 승인된 백엔드/운영 계획으로 처리한다.
+1. `feat/p0-onboarding` (6·7단계) 리뷰와 머지 결정. PR #40 은 머지 완료.
+1-0. `production` 에만 있던 도메인 수정 2건이 `main` 에 반영되도록
+   이 PR 을 먼저 넣는다. 위 "Production Domain" 절 참조.
+1-1. 결정 대기 세 건 — 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부,
+   `Tag.color` 컬럼 드롭 여부, 태그 관리 화면에 카테고리 색을 어떤 형태로
+   되살릴지(7단계에서 색 표시가 사라졌다).
+2. Choose one active plan as the next approved scope.
+3. Before code work, create an integrated plan document that combines analyst requirements, design, risks, TDD checkpoints, and verification commands.
+4. For a small implementation start, consider either:
    - `docs/plans/2026-05-07_desktop-auth-single-user-plan.md`; or
    - the remaining unimplemented items from `docs/plans/2026-05-07_stats-dashboard-mobile-ui-plan.md`.
-4. After each completed implementation, update this `docs/project-status.md` file and write the required refactoring document.
+5. After each completed implementation, update this `docs/project-status.md` file and write the required refactoring document.
 
 ## Fresh Verification From This Status Update
+
+Commands run on 2026-08-12 (시안 정합 7단계 종료 시점):
+
+```bash
+conda run -n knou-life-diary pytest
+# 466 passed in 270.46s
+
+conda run -n knou-life-diary python manage.py check
+# System check identified no issues (0 silenced).
+
+conda run -n knou-life-diary python manage.py makemigrations --check --dry-run
+# No changes detected
+
+node --check apps/tags/static/tags/js/tag_list.js
+# exit 0
+
+for f in locale/*/LC_MESSAGES/*.po; do msgfmt --check-format -o /dev/null "$f"; done
+# 4개 파일 모두 통과, fuzzy 0건, 미번역 0건
+```
+
+브라우저 확인은 각 단계 실행 로그에 있다. 이 문서는 명령 증거만 싣는다.
 
 Commands run on 2026-08-02:
 

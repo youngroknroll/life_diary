@@ -4,7 +4,6 @@ from django.utils.translation import gettext
 
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
 from apps.dashboard.repositories import TimeBlockRepository
-from apps.tags.models import Tag
 from apps.users.repositories import GoalRepository
 
 from .comparison import get_period_delta
@@ -100,6 +99,7 @@ def _rolling_week(user, selected_date, grid):
     """
     start = selected_date - timedelta(days=ROLLING_DAYS - 1)
     tag_minutes = {}
+    tag_colors = {}
     category_minutes = {}
 
     for block in _time_block_repo.find_by_date_range(user, start, selected_date):
@@ -108,6 +108,9 @@ def _rolling_week(user, selected_date, grid):
         tag_minutes[block.tag.name] = (
             tag_minutes.get(block.tag.name, 0) + MINUTES_PER_SLOT
         )
+        # 색은 여기서 챙긴다. 나중에 이름으로 되찾으면 같은 이름을 가진 다른
+        # 사용자의 태그를 집을 수 있다 — 태그는 전부 개인 소유다.
+        tag_colors[block.tag.name] = block.tag.color
         category = block.tag.category
         entry = category_minutes.setdefault(
             category.slug,
@@ -126,6 +129,7 @@ def _rolling_week(user, selected_date, grid):
         "days": ROLLING_DAYS,
         "total_minutes": sum(minutes for row in grid for minutes in row),
         "tag_minutes": tag_minutes,
+        "tag_colors": tag_colors,
         "category_minutes": category_minutes,
     }
 
@@ -181,7 +185,7 @@ def _observations(rolling_week, pattern, goal):
         observations.append(
             {
                 "kind": "top_tag",
-                "color": _tag_color(name),
+                "color": rolling_week["tag_colors"].get(name, NEUTRAL_COLOR),
                 "headline": gettext("%(tag)s %(hours)s시간")
                 % {"tag": name, "hours": _hours(minutes)},
                 "detail": gettext("지난 7일 기록의 %(share)d%%")
@@ -237,11 +241,6 @@ def _top_tag(tag_minutes):
     if not tag_minutes:
         return None
     return max(tag_minutes.items(), key=lambda item: item[1])
-
-
-def _tag_color(name):
-    tag = Tag.objects.filter(name=name).first()
-    return tag.color if tag else NEUTRAL_COLOR
 
 
 def _hours(minutes):
