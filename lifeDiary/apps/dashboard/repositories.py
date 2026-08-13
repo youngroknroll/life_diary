@@ -83,6 +83,12 @@ class TimeBlockRepository:
         ).delete()
         return deleted_count
 
+    def find_recorded_months(self, user):
+        return (
+            TimeBlock.objects.filter(user=user)
+            .dates("date", "month", order="DESC")
+        )
+
     def count_blocks_by_tag(self, user) -> dict:
         """{태그 id: 블록 수}. 태그마다 조회하면 N+1 이 된다."""
         return dict(

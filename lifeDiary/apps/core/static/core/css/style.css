@@ -437,6 +437,41 @@ body {
     color: var(--color-text-muted);
 }
 
+/* 분석 화면의 엑셀 내보내기 — 설명과 컨트롤이 한 줄에 선다.
+   설명이 라벨 자리를 대신하므로 한 줄짜리 짧은 라벨보다 길다. 남는 폭을
+   가져가되 컨트롤을 밀어내지 않게 줄바꿈을 허용한다. */
+/* 공용 .settings-row 는 줄바꿈하지 않는다. 짧은 라벨 하나를 전제로 만들어진
+   규칙이라, 설명이 들어온 이 행에서만 풀어 준다. */
+.stats-export .settings-row {
+    flex-wrap: wrap;
+}
+
+.stats-export__note {
+    flex: 1 1 260px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+}
+
+/* 360px 에서는 줄바꿈되게 두되, Bootstrap 기본 select 높이(약 31px)를
+   버튼과 같은 44px 로 올린다. 손가락이 닿아야 한다. */
+.stats-export__control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stats-export__control .form-select {
+    min-height: 44px;
+    width: auto;
+}
+
+/* "내보내는 중…" 이 103.4px. 라벨이 바뀔 때 옆의 select 가 밀리면 안 된다. */
+#statsExportBtn {
+    min-width: 110px;
+}
+
 .tag-row__actions {
     display: flex;
     gap: 6px;
@@ -2475,10 +2510,6 @@ footer {
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
 
-[data-theme="dark"] .date-selector .btn-outline-primary {
-    color: white !important;
-}
-
 [data-theme="dark"] .list-group-item {
     background-color: var(--color-surface);
     border-color: var(--color-border);
@@ -2581,6 +2612,9 @@ footer {
 /* Date input (stats + dashboard 공용) */
 .date-input-sm {
     width: 150px;
+    /* 옆의 .btn-sian 이 44px 이다. 부트스트랩 form-control-sm 은 약 31px 이라
+       한 줄에서 높이가 어긋나고 손가락도 닿지 않는다. */
+    min-height: 44px;
 }
 
 /* =========================================================

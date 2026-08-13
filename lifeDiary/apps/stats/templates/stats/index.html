@@ -402,12 +402,53 @@
 
 
                 </div>
+
+                {% comment %}
+                탭 안이 아니라 밖에 둔다. 파일 하나가 일·주·월 시트를 모두 담으므로
+                특정 탭에 넣으면 "이 탭 것만 나간다"로 읽힌다. 상단 page-head 도
+                아니다 — 거기 날짜 선택은 하루 단위 탐색이라 달 단위 선택과 축이
+                다르다. 다만 card-body 안이어야 좌우 여백이 위 내용과 맞는다.
+                {% endcomment %}
+                {% if export_months %}
+                <form class="stats-export mt-4" method="get" action="{% url 'stats:export' %}">
+                    <div class="section-title">{% trans "엑셀로 내보내기" %}</div>
+                    <div class="settings-row">
+                        <span class="settings-row__label stats-export__note">
+                            {% trans "하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받습니다." %}
+                        </span>
+                        <span class="settings-row__control stats-export__control">
+                            {% comment %}
+                            라벨 글자는 화면에서 지웠지만(사용자 결정) 남겨 둔다.
+                            지우면 select 에 이름이 없어 스크린리더가 무엇을 고르는
+                            자리인지 말하지 못한다.
+                            {% endcomment %}
+                            <label class="visually-hidden" for="statsExportMonth">
+                                {% trans "내보낼 달" %}
+                            </label>
+                            <select class="form-select" id="statsExportMonth" name="month">
+                                {% for month in export_months %}
+                                    <option value="{{ month|date:'Y-m' }}"
+                                            {% if month|date:'Y-m' == export_selected_month %}selected{% endif %}>
+                                        {{ month|date:"YEAR_MONTH_FORMAT" }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <button type="submit" class="btn-sian" id="statsExportBtn"
+                                    data-busy-label="{% trans '내보내는 중…' %}">
+                                {% trans "다운로드" %}
+                            </button>
+                            <span id="statsExportStatus" class="visually-hidden" role="status" aria-live="polite"></span>
+                        </span>
+                    </div>
+                </form>
+                {% endif %}
+
+                {% if user_note %}
+                    <div class="alert alert-info mt-4 mb-0 p-2">
+                        <strong>{% trans "특이사항:" %}</strong> {{ user_note.note|linebreaksbr }}
+                    </div>
+                {% endif %}
             </div>
-            {% if user_note %}
-                <div class="alert alert-info mt-4 mb-0 p-2">
-                    <strong>{% trans "특이사항:" %}</strong> {{ user_note.note|linebreaksbr }}
-                </div>
-            {% endif %}
         </div>
     </div>
 </div>
