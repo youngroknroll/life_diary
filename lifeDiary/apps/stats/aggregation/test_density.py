@@ -16,6 +16,20 @@ def empty_grid(days=7):
     return [[0] * 24 for _ in range(days)]
 
 
+def contradiction_grid():
+    """00–02시가 5일은 완전히 비고 2일은 꽉 찬 주.
+
+    나머지 시간은 30분씩이라 비지도 꽉 차지도 않는다 — 그래서 00–02시가
+    "가장 자주 비는 구간"이자 "가장 자주 꽉 찬 구간"이 된다.
+    """
+    grid = [[30] * 24 for _ in range(7)]
+    for day in (0, 6):
+        grid[day][0] = grid[day][1] = 60
+    for day in range(1, 6):
+        grid[day][0] = grid[day][1] = 0
+    return grid
+
+
 def record(user, tag, slot_index, on_date=END):
     return TimeBlock.objects.create(
         user=user, date=on_date, slot_index=slot_index, tag=tag
@@ -34,7 +48,7 @@ class TestGapPattern:
         assert pattern["worst_range"] == (15, 17)
         assert pattern["missing_days"] == 5
 
-    def test_finds_the_window_that_is_full_on_the_most_days(self):
+    def test_finds_the_window_that_is_full_every_day(self):
         grid = empty_grid()
         for day in range(7):
             grid[day][9] = 60
@@ -43,6 +57,23 @@ class TestGapPattern:
         pattern = get_gap_pattern(grid)
 
         assert pattern["best_range"] == (9, 11)
+
+    def test_a_window_full_on_only_some_days_is_not_steady(self):
+        """화면은 "매일 기록했습니다"라고 말한다. 하루라도 비면 거짓이 된다."""
+        grid = contradiction_grid()
+
+        assert get_gap_pattern(grid)["best_range"] is None
+
+    def test_one_window_is_never_both_the_gap_and_the_steady_one(self):
+        """운영 데이터에서 나온 모순.
+
+        7일 중 5일 비고 2일 꽉 찬 구간이 "비어 있습니다"와 "매일 기록했습니다"
+        양쪽에 동시에 뽑혔다. 두 문구가 같은 시간대를 두고 서로 반대로 말했다.
+        """
+        pattern = get_gap_pattern(contradiction_grid())
+
+        assert pattern["worst_range"] == (0, 2)
+        assert pattern["best_range"] != pattern["worst_range"]
 
     def test_a_fully_recorded_week_has_no_gap(self):
         pattern = get_gap_pattern([[60] * 24 for _ in range(7)])
