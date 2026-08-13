@@ -299,7 +299,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, deployed `Set-Cookie` header inspection, and live sender-domain verification remain deferred. `ALLOWED_HOSTS`는 2026-08-12에 도메인 변경으로 갱신됐고 운영에서 동작이 확인됐다(위 "Production Domain" 참조). `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요하다. |
 | Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
 | P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. 시안 6a의 행 끌어 순서 바꾸기는 **채택하지 않기로 결정**(2026-08-12). |
-| 시안 정합 잔여 | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `style.css`의 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류, 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달 이중 제출 창, `_table_row_actions.html`의 44px 미달 버튼(메모 화면), sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼 부재를 알리지 않음. |
+| 시안 정합 잔여 | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `style.css`의 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류, 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달 이중 제출 창, `_table_row_actions.html`의 44px 미달 버튼(메모 화면), sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼 부재를 알리지 않음, `.chip__swatch`(설정·카테고리 안내·온보딩)와 `.category-picker__swatch`(태그 모달)가 테두리 없이 라이트 표면에 놓여 대비 1.44~2.15 — 태그 관리처럼 공용 규칙 하나로 묶는 편이 낫다. |
 
 ## Next Recommended Work
 
