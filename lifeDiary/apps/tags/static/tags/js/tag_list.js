@@ -123,7 +123,15 @@ function buildRow(tag) {
 
     const name = document.createElement('span');
     name.className = 'tag-row__name';
-    name.textContent = tag.name;
+    // 카테고리는 머리글이 글자로 이미 말한다. 이 색은 그 위에 얹는 단서일
+    // 뿐이라 접근성 트리에서 감춘다 — 63개 행이 카테고리 이름을 63번 더
+    // 읽으면 도움이 아니라 소음이다.
+    const swatch = document.createElement('span');
+    swatch.className = 'chip__swatch';
+    swatch.setAttribute('aria-hidden', 'true');
+    swatch.style.backgroundColor = tag.color;
+    name.appendChild(swatch);
+    name.appendChild(document.createTextNode(tag.name));
     info.appendChild(name);
 
     const meta = document.createElement('span');
