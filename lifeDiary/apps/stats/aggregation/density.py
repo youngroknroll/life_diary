@@ -28,7 +28,7 @@ def get_density_grid(user, end_date, days=7):
 
 
 def get_gap_pattern(grid, window=PATTERN_WINDOW_HOURS):
-    """가장 자주 비는 구간과 가장 꾸준히 채워지는 구간."""
+    """가장 자주 비는 구간과 하루도 빠짐없이 채운 구간."""
     if not grid:
         return {"worst_range": None, "missing_days": 0, "best_range": None}
 
@@ -38,7 +38,11 @@ def get_gap_pattern(grid, window=PATTERN_WINDOW_HOURS):
     return {
         "worst_range": worst_range if missing_days else None,
         "missing_days": missing_days,
-        "best_range": best_range if full_days else None,
+        # 화면은 이 구간을 "매일 기록했습니다"라고 소개한다. 가장 자주 꽉 찬
+        # 구간이 아니라 정말 매일 꽉 찬 구간일 때만 내세운다 — 7일 중 2일만
+        # 채운 구간이 "비어 있습니다"와 "매일 기록했습니다" 양쪽에 동시에
+        # 뽑히던 모순도 이걸로 사라진다.
+        "best_range": best_range if full_days == len(grid) else None,
     }
 
 
