@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 13:56+0900\n"
+"POT-Creation-Date: 2026-08-13 20:21+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -199,7 +199,7 @@ msgstr "10 minutes per slot"
 
 #: apps/dashboard/templates/dashboard/index.html:83
 msgid "미기록"
-msgstr "Logged rate"
+msgstr "Not logged"
 
 #: apps/dashboard/templates/dashboard/index.html:85
 msgid "채우면 기록률이 오릅니다"
@@ -408,6 +408,95 @@ msgstr "%(tag)s goal %(days)d/%(total)d days"
 msgid "하루 %(hours)s시간 기준"
 msgstr "%(hours)sh"
 
+#: apps/stats/export.py:138
+#, python-format
+msgid "%(from)s ~ %(to)s"
+msgstr "%(from)s ~ %(to)s"
+
+#: apps/stats/export.py:149
+msgid "팔레트"
+msgstr "Palette"
+
+#: apps/stats/export.py:155
+msgid "소비시간 별 한 줄 일기"
+msgstr "One-line diary by category"
+
+#: apps/stats/export.py:164
+#, python-format
+msgid "%(month)s월 %(day)s일 (%(weekday)s)"
+msgstr "%(month)s/%(day)s (%(weekday)s)"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "월"
+msgstr "Mon"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "화"
+msgstr "Tue"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "수"
+msgstr "Wed"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "목"
+msgstr "Thu"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "금"
+msgstr "Fri"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "토"
+msgstr "Sat"
+
+#: apps/stats/export.py:174
+msgctxt "요일"
+msgid "일"
+msgstr "Sun"
+
+#: apps/stats/export.py:214
+msgid "기록 합계"
+msgstr "Total logged"
+
+#: apps/stats/export.py:232
+msgid "그래프용 데이터"
+msgstr "Chart data"
+
+#: apps/stats/export.py:235 apps/stats/templates/stats/index.html:395
+msgid "합계"
+msgstr "Total"
+
+#: apps/stats/export.py:240
+#, python-format
+msgid "%(day)s일"
+msgstr "Day %(day)s"
+
+#: apps/stats/export.py:252
+msgid "달 합계"
+msgstr "Month total"
+
+#: apps/stats/export.py:268
+#, python-format
+msgid "%(name)s 추세"
+msgstr "%(name)s trend"
+
+#: apps/stats/export.py:269 apps/stats/templates/stats/index.html:115
+#: apps/stats/templates/stats/index.html:225
+#: apps/users/templates/users/usergoal_form.html:43
+msgid "시간"
+msgstr "h"
+
+#: apps/stats/export.py:285
+msgid "이 달 소비시간 비율"
+msgstr "This month's time split"
+
 #: apps/stats/services.py:12
 msgid "미분류"
 msgstr "Unclassified"
@@ -536,12 +625,6 @@ msgstr "Last 7 days · by category, not by tag"
 #: apps/tags/models.py:82
 msgid "카테고리"
 msgstr "Category"
-
-#: apps/stats/templates/stats/index.html:115
-#: apps/stats/templates/stats/index.html:225
-#: apps/users/templates/users/usergoal_form.html:43
-msgid "시간"
-msgstr "h"
 
 #: apps/stats/templates/stats/index.html:116
 msgid "비중"
@@ -730,13 +813,44 @@ msgstr "In progress"
 msgid "태그 합계"
 msgstr "Tag totals"
 
-#: apps/stats/templates/stats/index.html:395
-msgid "합계"
-msgstr "Total"
+#: apps/stats/templates/stats/index.html:416
+msgid "엑셀로 내보내기"
+msgstr "Export to Excel"
 
-#: apps/stats/templates/stats/index.html:408
+#: apps/stats/templates/stats/index.html:418
+msgid ""
+"하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받"
+"습니다."
+msgstr "Download the selected month as one sheet of 10-minute cells across 24 hours, with a trend chart per category."
+
+#: apps/stats/templates/stats/index.html:422
+msgid "내보낼 달"
+msgstr "Month to export"
+
+#: apps/stats/templates/stats/index.html:434
+msgid "내보내는 중…"
+msgstr "Exporting…"
+
+#: apps/stats/templates/stats/index.html:435
+msgid "다운로드"
+msgstr "Download"
+
+#: apps/stats/templates/stats/index.html:444
 msgid "특이사항:"
 msgstr "Note:"
+
+#: apps/stats/use_cases.py:38 apps/stats/views.py:65 apps/stats/views.py:69
+#: apps/stats/views.py:71
+msgid "올바른 달이 아닙니다."
+msgstr "That is not a valid month."
+
+#: apps/stats/use_cases.py:40
+msgid "그 달에는 기록이 없습니다."
+msgstr "There are no records for that month."
+
+#: apps/stats/views.py:62
+msgid "내보낼 달을 지정해주세요."
+msgstr "Please choose a month to export."
 
 #: apps/tags/models.py:19
 msgid "수동적 소비시간"
@@ -950,7 +1064,9 @@ msgstr ""
 
 #: apps/tags/templates/tags/index.html:16
 msgid "색은 카테고리가 정합니다. 같은 카테고리면 이름이 달라도 같은 색입니다."
-msgstr "The category sets the color. Same category means the same color, whatever the name."
+msgstr ""
+"The category sets the color. Same category means the same color, whatever "
+"the name."
 
 #: apps/tags/templates/tags/index.html:30
 msgid "로딩 중"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 13:56+0900\n"
+"POT-Creation-Date: 2026-08-13 20:21+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -410,6 +410,95 @@ msgstr "%(tag)s 목표 %(days)d/%(total)d일"
 msgid "하루 %(hours)s시간 기준"
 msgstr "하루 %(hours)s시간 기준"
 
+#: apps/stats/export.py:138
+#, python-format
+msgid "%(from)s ~ %(to)s"
+msgstr "%(from)s ~ %(to)s"
+
+#: apps/stats/export.py:149
+msgid "팔레트"
+msgstr "팔레트"
+
+#: apps/stats/export.py:155
+msgid "소비시간 별 한 줄 일기"
+msgstr "소비시간 별 한 줄 일기"
+
+#: apps/stats/export.py:164
+#, python-format
+msgid "%(month)s월 %(day)s일 (%(weekday)s)"
+msgstr "%(month)s월 %(day)s일 (%(weekday)s)"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "월"
+msgstr "월"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "화"
+msgstr "화"
+
+#: apps/stats/export.py:172
+msgctxt "요일"
+msgid "수"
+msgstr "수"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "목"
+msgstr "목"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "금"
+msgstr "금"
+
+#: apps/stats/export.py:173
+msgctxt "요일"
+msgid "토"
+msgstr "토"
+
+#: apps/stats/export.py:174
+msgctxt "요일"
+msgid "일"
+msgstr "일"
+
+#: apps/stats/export.py:214
+msgid "기록 합계"
+msgstr "기록 합계"
+
+#: apps/stats/export.py:232
+msgid "그래프용 데이터"
+msgstr "그래프용 데이터"
+
+#: apps/stats/export.py:235 apps/stats/templates/stats/index.html:395
+msgid "합계"
+msgstr "합계"
+
+#: apps/stats/export.py:240
+#, python-format
+msgid "%(day)s일"
+msgstr "%(day)s일"
+
+#: apps/stats/export.py:252
+msgid "달 합계"
+msgstr "달 합계"
+
+#: apps/stats/export.py:268
+#, python-format
+msgid "%(name)s 추세"
+msgstr "%(name)s 추세"
+
+#: apps/stats/export.py:269 apps/stats/templates/stats/index.html:115
+#: apps/stats/templates/stats/index.html:225
+#: apps/users/templates/users/usergoal_form.html:43
+msgid "시간"
+msgstr "시간"
+
+#: apps/stats/export.py:285
+msgid "이 달 소비시간 비율"
+msgstr "이 달 소비시간 비율"
+
 #: apps/stats/services.py:12
 msgid "미분류"
 msgstr "미분류"
@@ -538,12 +627,6 @@ msgstr "지난 7일 · 태그가 아니라 카테고리 단위"
 #: apps/tags/models.py:82
 msgid "카테고리"
 msgstr "카테고리"
-
-#: apps/stats/templates/stats/index.html:115
-#: apps/stats/templates/stats/index.html:225
-#: apps/users/templates/users/usergoal_form.html:43
-msgid "시간"
-msgstr "시간"
 
 #: apps/stats/templates/stats/index.html:116
 msgid "비중"
@@ -734,13 +817,44 @@ msgstr "진행 중"
 msgid "태그 합계"
 msgstr "태그 합계"
 
-#: apps/stats/templates/stats/index.html:395
-msgid "합계"
-msgstr "합계"
+#: apps/stats/templates/stats/index.html:416
+msgid "엑셀로 내보내기"
+msgstr "엑셀로 내보내기"
 
-#: apps/stats/templates/stats/index.html:408
+#: apps/stats/templates/stats/index.html:418
+msgid ""
+"하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받"
+"습니다."
+msgstr "하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받습니다."
+
+#: apps/stats/templates/stats/index.html:422
+msgid "내보낼 달"
+msgstr "내보낼 달"
+
+#: apps/stats/templates/stats/index.html:434
+msgid "내보내는 중…"
+msgstr "내보내는 중…"
+
+#: apps/stats/templates/stats/index.html:435
+msgid "다운로드"
+msgstr "다운로드"
+
+#: apps/stats/templates/stats/index.html:444
 msgid "특이사항:"
 msgstr "특이사항:"
+
+#: apps/stats/use_cases.py:38 apps/stats/views.py:65 apps/stats/views.py:69
+#: apps/stats/views.py:71
+msgid "올바른 달이 아닙니다."
+msgstr "올바른 달이 아닙니다."
+
+#: apps/stats/use_cases.py:40
+msgid "그 달에는 기록이 없습니다."
+msgstr "그 달에는 기록이 없습니다."
+
+#: apps/stats/views.py:62
+msgid "내보낼 달을 지정해주세요."
+msgstr "내보낼 달을 지정해주세요."
 
 #: apps/tags/models.py:19
 msgid "수동적 소비시간"

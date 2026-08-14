@@ -115,6 +115,8 @@ targeted test before broad regression.
 - Never create permanent objects in the dev database from verification
   scripts; verify through pytest or roll changes back.
 - Never overwrite `prompt_plan.md`; it is a superseded historical i18n record.
+- Do not comment by default. Make the name and the structure carry the meaning
+  first; comment only what the code cannot show. See `AGENTS.md` Comments.
 - Commit in small feature units and push a branch per large track, opening a
   PR for it. Never work directly on `main`. Merging stays with the user.
 - Frontend work carries no automated tests. Templates, CSS, and browser

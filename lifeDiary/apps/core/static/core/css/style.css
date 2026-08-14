@@ -5,8 +5,10 @@
     /* Brand palette (녹색 테마) */
     --color-primary: #2C6E4A;
     --color-primary-hover: #235B3C;
+    --color-primary-press: #1C462F;
     --color-primary-soft: #EDF3EE;
     --color-primary-border: #98c7aa;
+    --ink-on-primary: #ffffff;
 
     /* Text — 시안은 네 단계를 쓴다. 두 단계로 줄이면 위계가 뭉갠다. */
     --color-text: #14211A;
@@ -84,8 +86,11 @@
 [data-theme="dark"] {
     --color-primary: #4aa66d;
     --color-primary-hover: #5cb87e;
+    --color-primary-press: #75C392;
     --color-primary-soft: #1a2e22;
     --color-primary-border: #3a6b4a;
+    /* 다크 초록은 라이트보다 훨씬 밝다. 흰 글자로는 2.44:1 밖에 안 나온다. */
+    --ink-on-primary: var(--ink-on-accent);
 
     --color-text: #E4EBE6;
     --color-text-body: #B9C6BD;
@@ -189,10 +194,17 @@ body {
     padding: 7px 12px;
     border-radius: 7px;
     white-space: nowrap;
+    transition: background-color .15s ease, color .15s ease;
 }
 
 .app-nav__tab:hover {
     color: var(--color-text);
+    background-color: var(--color-surface-soft);
+}
+
+.app-nav__tab:active {
+    color: var(--color-text);
+    background-color: var(--color-primary-soft);
 }
 
 .app-nav__tab.is-active {
@@ -324,6 +336,24 @@ body {
     font-size: 13.5px;
     color: var(--color-text-body);
     text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn-sian:where(:not(:disabled)):hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
+    color: var(--color-text);
+}
+
+.btn-sian:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.btn-sian:where(:not(:disabled)):active {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 /* 좁은 카드 안에 두 개가 나란히 들어가는 버튼.
@@ -355,13 +385,20 @@ body {
 .btn-sian--primary {
     border-color: transparent;
     background: var(--color-primary);
-    color: #fff;
+    color: var(--ink-on-primary);
     font-weight: 600;
 }
 
-.btn-sian--primary:hover {
+.btn-sian--primary:where(:not(:disabled)):hover {
     background: var(--color-primary-hover);
-    color: #fff;
+    border-color: transparent;
+    color: var(--ink-on-primary);
+}
+
+.btn-sian--primary:where(:not(:disabled)):active {
+    background: var(--color-primary-press);
+    border-color: transparent;
+    color: var(--ink-on-primary);
 }
 
 .settings-row {
@@ -435,6 +472,54 @@ body {
 .tag-row__meta {
     font-size: 12.5px;
     color: var(--color-text-muted);
+}
+
+/* 분석 화면의 엑셀 내보내기 — 설명과 컨트롤이 한 줄에 선다.
+   설명이 라벨 자리를 대신하므로 한 줄짜리 짧은 라벨보다 길다. 남는 폭을
+   가져가되 컨트롤을 밀어내지 않게 줄바꿈을 허용한다. */
+/* 공용 .settings-row 는 줄바꿈하지 않는다. 짧은 라벨 하나를 전제로 만들어진
+   규칙이라, 설명이 들어온 이 행에서만 풀어 준다. */
+.stats-export .settings-row {
+    flex-wrap: wrap;
+}
+
+.stats-export__note {
+    flex: 1 1 260px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    line-height: 1.45;
+}
+
+/* 좁은 화면에서는 설명과 컨트롤이 각자 줄을 쓴다. 그때 오른쪽으로 밀면
+   한 줄짜리가 들여쓴 것처럼 보인다. */
+@media (min-width: 576px) {
+    .stats-export .section-title {
+        text-align: right;
+    }
+
+    .stats-export__note {
+        flex-grow: 0;
+        margin-left: auto;
+    }
+}
+
+/* 360px 에서는 줄바꿈되게 두되, Bootstrap 기본 select 높이(약 31px)를
+   버튼과 같은 44px 로 올린다. 손가락이 닿아야 한다. */
+.stats-export__control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.stats-export__control .form-select {
+    min-height: 44px;
+    width: auto;
+}
+
+/* "내보내는 중…" 이 103.4px. 라벨이 바뀔 때 옆의 select 가 밀리면 안 된다. */
+#statsExportBtn {
+    min-width: 110px;
 }
 
 .tag-row__actions {
@@ -693,6 +778,12 @@ body {
     min-height: 44px;
     padding: 0 14px;
     user-select: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.chip--pick:not(:has(.chip__check:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
 }
 
 .chip__check {
@@ -782,11 +873,24 @@ body {
     font-size: 18px;
     line-height: 1;
     color: var(--color-text);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.stepper__btn:where(:not(:disabled)):hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary);
 }
 
 .stepper__btn:focus-visible {
     outline: 2px solid var(--color-primary);
     outline-offset: 2px;
+}
+
+.stepper__btn:where(:not(:disabled)):active {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
 }
 
 .stepper__value {
@@ -1075,6 +1179,12 @@ body {
 .breadcrumb-trail a {
     color: var(--color-text-muted);
     text-decoration: none;
+    transition: color .15s ease;
+}
+
+.breadcrumb-trail a:hover {
+    color: var(--color-text);
+    text-decoration: underline;
 }
 
 .breadcrumb-trail .is-current {
@@ -1224,6 +1334,18 @@ body {
     font-weight: 600;
 }
 
+.btn-sian--danger:where(:not(:disabled)):hover {
+    background: #6d2f13;
+    border-color: transparent;
+    color: #fff;
+}
+
+.btn-sian--danger:where(:not(:disabled)):active {
+    background: #50220E;
+    border-color: transparent;
+    color: #fff;
+}
+
 footer {
     background-color: var(--color-surface);
 }
@@ -1321,6 +1443,12 @@ footer {
         var(--slot-tick) calc(100% / var(--slot-span, 1) - 1px),
         var(--slot-tick) calc(100% / var(--slot-span, 1))
     );
+    transition: box-shadow .15s ease;
+}
+
+.slot-block:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 [data-theme="dark"] .slot-block {
@@ -1331,10 +1459,26 @@ footer {
     box-shadow: 0 0 0 1px var(--color-border-soft) inset;
 }
 
+@media (hover: hover) and (pointer: fine) {
+    .slot-block:hover {
+        box-shadow: 0 0 0 1.5px var(--color-primary) inset;
+    }
+}
+
 .slot-block__label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.btn-tag-legend {
+    transition: box-shadow .15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-tag-legend:hover {
+        box-shadow: 0 0 0 2px var(--color-primary);
+    }
 }
 
 /* 아직 오지 않은 시간. 안 채운 것이 아니라 아직 올 수 없는 것이라
@@ -1438,6 +1582,12 @@ footer {
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.frequent-tags__chip:hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
 }
 
 .day-row__selection {
@@ -1687,6 +1837,7 @@ footer {
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
+    transition: background-color .15s ease;
 }
 
 .undo-snackbar__action:hover,
@@ -1858,11 +2009,25 @@ footer {
 .btn-primary {
     background: var(--color-primary);
     border: none;
+    color: var(--ink-on-primary);
 }
 
 .btn-primary:hover {
     background: var(--color-primary-hover);
     transform: translateY(-1px);
+    color: var(--ink-on-primary);
+}
+
+/* 부트스트랩의 .btn:first-child:active 가 (0,3,0) 이라 .btn 을 함께 적어야 이긴다. */
+.btn.btn-primary:focus-visible {
+    background: var(--color-primary-hover);
+    color: var(--ink-on-primary);
+}
+
+/* 같은 특정도라 순서가 갈린다. 키보드로 누르면 focus 와 active 가 동시에 참이다. */
+.btn.btn-primary:active {
+    background: var(--color-primary-press);
+    color: var(--ink-on-primary);
 }
 
 /* =========================================================
@@ -2129,6 +2294,11 @@ footer {
     cursor: pointer;
     padding: 0.6rem 0.85rem;
     color: inherit;
+    transition: background-color .15s ease;
+}
+
+.goal-card__header:hover {
+    background-color: var(--color-surface-soft);
 }
 
 .goal-card__header:focus-visible {
@@ -2250,6 +2420,7 @@ footer {
     cursor: pointer;
     border-radius: var(--radius-sm, 6px);
     line-height: 1;
+    transition: color .15s ease, background-color .15s ease;
 }
 
 .auth-card .password-toggle:hover,
@@ -2369,6 +2540,7 @@ footer {
 
 [data-theme="dark"] .navbar .nav-link {
     color: var(--color-text-muted) !important;
+    transition: color .15s ease;
 }
 
 [data-theme="dark"] .navbar .nav-link:hover {
@@ -2475,10 +2647,6 @@ footer {
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
 [data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
 
-[data-theme="dark"] .date-selector .btn-outline-primary {
-    color: white !important;
-}
-
 [data-theme="dark"] .list-group-item {
     background-color: var(--color-surface);
     border-color: var(--color-border);
@@ -2498,6 +2666,7 @@ footer {
 
 [data-theme="dark"] .dropdown-item {
     color: var(--color-text);
+    transition: background-color .15s ease;
 }
 
 [data-theme="dark"] .dropdown-item:hover {
@@ -2581,6 +2750,9 @@ footer {
 /* Date input (stats + dashboard 공용) */
 .date-input-sm {
     width: 150px;
+    /* 옆의 .btn-sian 이 44px 이다. 부트스트랩 form-control-sm 은 약 31px 이라
+       한 줄에서 높이가 어긋나고 손가락도 닿지 않는다. */
+    min-height: 44px;
 }
 
 /* =========================================================
@@ -2631,6 +2803,7 @@ footer {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     padding: 0;
+    transition: border-color .15s ease;
 }
 
 .tag-color-swatch:hover,
@@ -2830,6 +3003,12 @@ footer {
     border-radius: 9px;
     background: var(--color-surface);
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.category-picker__option:not(:has(.category-picker__radio:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
 }
 
 /* 라디오는 화면에서 감추되 접근성 트리에는 남긴다. display:none 이면
@@ -2909,6 +3088,7 @@ footer {
     font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
+    transition: color .15s ease;
 }
 
 .settings-head__action:hover {

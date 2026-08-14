@@ -17,6 +17,20 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-13 — 분석 화면 엑셀 내보내기 상호작용 결함 수정
+
+`stats:index` 엑셀 내보내기 버튼의 진행 상태 전환에서 스크린리더 미공지(High)와
+포커스 유실(Medium) 결함을 고쳤다. 엑셀 내보내기 기능 자체는 아직 커밋되지
+않은 작업 중 상태이며, 이 항목은 그 기능의 상호작용 부분만 다룬다.
+
+- 실행 로그: `docs/frontend/2026-08-13-stats-export-interaction-fixes.md`
+- 변경: `apps/stats/templates/stats/index.html`,
+  `apps/stats/static/stats/js/stats.js`,
+  `apps/core/static/core/css/style.css`
+- 검증: `node --check`, `manage.py check`, `collectstatic` 완료. 브라우저 실측
+  (포커스 3가지 경우, 360px 레이아웃, 다크 테마, `min-width` 확정)은 사용자가
+  직접 수행 예정이며 이 세션에서는 수행하지 못했다.
+
 ## Latest Execution (2026-08-10 ~ 08-12) — 시안 정합 재작업
 
 시안 22화면을 구현과 전수 대조해 격차를 7단계로 나눠 메웠다.

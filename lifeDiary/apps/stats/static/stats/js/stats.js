@@ -273,3 +273,40 @@ function renderMonthlyLineChart(monthlyData) {
     });
 }
 
+
+
+/**
+ * 내려받기에는 완료 이벤트가 없다. 그래서 되돌리는 것을 시간으로 한다.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('.stats-export');
+    if (!form) return;
+
+    const button = document.getElementById('statsExportBtn');
+    const statusEl = document.getElementById('statsExportStatus');
+    const idleLabel = button.textContent.trim();
+    const busyLabel = button.dataset.busyLabel;
+    let busy = false;
+
+    form.addEventListener('submit', function (event) {
+        if (busy) {
+            event.preventDefault();
+            return;
+        }
+        busy = true;
+        const restoreFocus = document.activeElement === button;
+        button.disabled = true;
+        button.textContent = busyLabel;
+        if (statusEl) statusEl.textContent = busyLabel;
+
+        setTimeout(function () {
+            busy = false;
+            button.disabled = false;
+            button.textContent = idleLabel;
+            if (statusEl) statusEl.textContent = '';
+            if (restoreFocus && document.activeElement === document.body) {
+                button.focus();
+            }
+        }, 4000);
+    });
+});
