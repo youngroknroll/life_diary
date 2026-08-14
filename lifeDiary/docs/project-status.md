@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-12
+Last updated: 2026-08-14
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,26 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-08-14 — 그리드 태그 라벨 위치와 시간축 24:00 경계
+
+태그 이름이 구간의 첫 블록이 아니라 "폭 3칸 이상인 첫 행"에 붙던 규칙
+(`MIN_LABEL_SPAN`)을 없앴다. 05:40~06:50 "수면"의 이름이 06:00 행에 찍히던 증상이
+사라진다. 함께, 라벨이 옮겨간 인접 시간이 변이 응답에 빠져 옛 라벨이 화면에 남던
+결함을 고쳤다(`hours_touched` → `hours_to_refresh`, ±1 시간 확장). 세로 시간축에는
+가로 분축과 같은 규칙으로 24:00 끝선을 추가했다.
+
+- 계획: `docs/plans/2026-08-14_grid-label-and-hour-axis-plan.md`
+- 실행 로그: `docs/frontend/2026-08-14-grid-label-and-hour-axis.md`
+- 변경: `apps/dashboard/services.py`, `apps/dashboard/views.py`,
+  `apps/dashboard/templates/dashboard/index.html`, 관련 테스트 3파일
+  (CSS·JS 변경 없음)
+- 검증: 전체 pytest 501 passed, `manage.py check` 클린, 마이그레이션 드리프트 없음.
+  브라우저 실측(격리 DB, 1440px·375px, 키보드·포인터 히트테스트, 새로고침 없는
+  라벨 이동) 완료. 스크린리더 실통과와 접근성 트리 이름 확인은 미수행.
+- 상태: Active Plan — 브랜치 `feat/grid-label-and-hour-axis`, 머지는 사용자 몫
+- Deferred: `renderRows` 가 다시 그리는 행의 미래/현재 음영 오버레이를 지우는
+  기존 결함(갱신 행이 늘어 더 자주 드러남)
 
 ## 2026-08-13 — 분석 화면 엑셀 내보내기 상호작용 결함 수정
 
