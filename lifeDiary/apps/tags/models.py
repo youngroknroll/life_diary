@@ -4,6 +4,13 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext, gettext_lazy as _
 
+from .name_limit import MAX_TAG_NAME_LENGTH
+
+
+# CSS 의 --ink-on-accent 와 같은 값. 서버가 인라인 style 로도 내보내야 해서
+# 여기에 한 번 더 둔다.
+INK_ON_ACCENT = "#0F1A14"
+
 
 # DB-stored Category 이름/설명을 makemessages가 수집하도록 등록.
 # Why: 카테고리는 DB에 한국어로 저장되며 표시 시점에 gettext로 번역된다.
@@ -78,15 +85,15 @@ class Tag(models.Model):
         User,
         on_delete=models.CASCADE,
         verbose_name=_("사용자"),
-        null=True,
-        blank=True,
-        help_text=_("null이면 기본 태그 (모든 사용자 공용)"),
     )
     name = models.CharField(
-        max_length=50, verbose_name=_("태그명"), help_text=_("최대 50자까지 입력 가능")
+        max_length=MAX_TAG_NAME_LENGTH,
+        verbose_name=_("태그명"),
+        help_text=_("최대 10자까지 입력 가능"),
     )
     color = models.CharField(
         max_length=7,
+        blank=True,
         validators=[
             RegexValidator(
                 regex=r"^#[0-9A-Fa-f]{6}$",
@@ -94,12 +101,7 @@ class Tag(models.Model):
             )
         ],
         verbose_name=_("색상"),
-        help_text=_("HEX 색상 코드 (예: #FF5733)"),
-    )
-    is_default = models.BooleanField(
-        default=False,
-        verbose_name=_("기본 태그"),
-        help_text=_("관리자가 등록한 모든 사용자 공용 태그"),
+        help_text=_("카테고리에서 자동으로 정해집니다."),
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("생성일"))
     updated_at = models.DateTimeField(auto_now=True, verbose_name=_("수정일"))
@@ -112,29 +114,31 @@ class Tag(models.Model):
                 fields=["user", "name"],
                 name="unique_user_tag_name",
                 violation_error_message=_("이미 같은 이름의 태그가 존재합니다."),
-                condition=models.Q(user__isnull=False),
-            ),
-            models.UniqueConstraint(
-                fields=["name"],
-                name="unique_default_tag_name",
-                violation_error_message=_("이미 같은 이름의 기본 태그가 존재합니다."),
-                condition=models.Q(is_default=True),
             ),
         ]
         ordering = ["name"]
 
+    def save(self, *args, **kwargs):
+        """색은 카테고리가 정한다.
+
+        사용자가 색을 고르면 같은 카테고리끼리 한 덩어리로 읽히는 규칙이
+        깨지므로, 넘어온 값이 있어도 카테고리 색으로 덮어쓴다.
+        """
+        if self.category_id:
+            self.color = self.category.color
+        super().save(*args, **kwargs)
+
     @property
     def text_color(self):
-        """배경색 대비 텍스트 색상 (YIQ 공식 기반)"""
-        hex_color = self.color.lstrip('#')
-        r, g, b = int(hex_color[0:2], 16), int(hex_color[2:4], 16), int(hex_color[4:6], 16)
-        yiq = (r * 299 + g * 587 + b * 114) / 1000
-        return '#212529' if yiq >= 128 else '#ffffff'
+        """태그 색 위 텍스트는 항상 같은 잉크를 쓴다.
+
+        밝기로 흰 글자와 검은 글자를 뒤집으면 중간 밝기 색에서 4.5:1을
+        넘기지 못한다. 다섯 카테고리 색은 모두 이 잉크로 기준을 통과한다.
+        """
+        return INK_ON_ACCENT
 
     def __str__(self):
-        if self.is_default:
-            return f"[기본] {self.name}"
-        return f"{self.user.username if self.user else '시스템'} - {self.name}"
+        return f"{self.user.username} - {self.name}"
 
     def clean(self):
         """추가 유효성 검사"""

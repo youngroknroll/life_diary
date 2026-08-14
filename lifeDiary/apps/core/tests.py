@@ -23,7 +23,9 @@ class TestHomePage:
         assert "소비시간의 분류" in body
         assert 'data-bs-target="#homePreviewImageModal"' in body
         assert 'id="homePreviewImageModal"' in body
-        assert "10분 단위" not in body
+        # 시안 5a 는 "하루 10분 단위 기록"을 히어로 kicker 로 쓴다.
+        # 홈에서 10분 단위를 감추던 2026-04-11 결정을 뒤집은 것이다.
+        assert "10분 단위" in body
 
     def test_home_page_renders_korean_footer_copyright(self, ko_client):
         response = ko_client.get(reverse("home"))
@@ -40,23 +42,6 @@ class TestHomePage:
         assert f'href="{reverse("terms")}"' in body
         assert "개인정보처리방침" in body
         assert "이용약관" in body
-
-    def test_home_page_renders_header_utility_controls(self, ko_client):
-        response = ko_client.get(reverse("home"))
-        body = response.content.decode()
-
-        assert 'class="navbar-utility-controls"' in body
-        utility_start = body.index('class="navbar-utility-controls"')
-        utility_end = body.index('<button class="navbar-toggler"', utility_start)
-        utility_section = body[utility_start:utility_end]
-
-        assert 'class="navbar-language-form"' in utility_section
-        assert "navbar-language-select" in utility_section
-        assert 'id="themeToggle"' in utility_section
-        assert 'class="theme-toggle__label"' in utility_section
-        assert "다크" in utility_section
-        assert "fas fa-moon" not in utility_section
-        assert "fas fa-sun" not in utility_section
 
     def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
         ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"

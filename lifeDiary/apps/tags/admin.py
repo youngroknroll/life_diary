@@ -20,22 +20,15 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ["name", "category", "user", "is_default", "color_display", "created_at"]
-    list_filter = ["category", "is_default", "user", "created_at"]
+    list_display = ["name", "category", "user", "color_display", "created_at"]
+    list_filter = ["category", "user", "created_at"]
     search_fields = ["name", "user__username"]
-    ordering = ["category__display_order", "is_default", "user", "name"]
+    ordering = ["category__display_order", "user", "name"]
     list_per_page = 25
 
+    # 소유자는 필수다. 접힌 섹션에 두면 필수 항목이 보이지 않는 자리에 숨는다.
     fieldsets = (
-        (None, {"fields": ("name", "color", "category", "is_default")}),
-        (
-            "사용자 정보",
-            {
-                "fields": ("user",),
-                "classes": ("collapse",),
-                "description": "기본 태그인 경우 사용자를 비워두세요.",
-            },
-        ),
+        (None, {"fields": ("name", "color", "category", "user")}),
         (
             "시간 정보",
             {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},

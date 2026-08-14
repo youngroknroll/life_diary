@@ -11,11 +11,11 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth import get_user_model
 from django.contrib.auth.views import PasswordResetView
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.translation import gettext
 from django.views.decorators.http import require_POST, require_http_methods, require_GET
 from django.core.validators import validate_email
@@ -25,8 +25,13 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
 from .account_deletion import cancel_account_deletion, request_account_deletion
-from .repositories import GoalRepository, NoteRepository
+from .repositories import GoalRepository, NoteRepository, UserAccountRepository
+from apps.tags.models import Category
 from apps.tags.repositories import TagRepository
+from apps.tags.seed_tags import create_seed_tags
+from apps.dashboard.day_window import annotate_future, current_slot_index
+from apps.dashboard.repositories import TimeBlockRepository
+from apps.dashboard.services import build_slot_rows, build_time_headers
 from .use_cases import (
     DeleteGoalUseCase,
     DeleteNoteUseCase,
@@ -42,6 +47,8 @@ logger = logging.getLogger(__name__)
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 _tag_repo = TagRepository()
+_time_block_repo = TimeBlockRepository()
+_user_repo = UserAccountRepository()
 _mypage_use_case = GetMyPageUseCase()
 _save_goal = SaveGoalUseCase(tags=_tag_repo)
 _delete_goal = DeleteGoalUseCase()
@@ -57,7 +64,7 @@ LOGIN_RECAPTCHA_VERIFY_URL = "https://www.google.com/recaptcha/api/siteverify"
 
 
 def _get_user_tag_queryset(user):
-    """사용자 태그 + 기본 태그 쿼리셋"""
+    """사용자 태그 쿼리셋"""
     return _tag_repo.find_accessible(user)
 
 
@@ -113,6 +120,17 @@ def _record_login_failure(request, username):
 
 def _reset_login_failures(request, username):
     cache.delete(_login_failure_key(request, username))
+
+
+def _login_attempts_remaining(failure_count):
+    """How many tries are left before reCAPTCHA gates the form.
+
+    Returns None when nothing has failed yet, so the template can stay silent
+    instead of announcing a full budget to a first-time visitor.
+    """
+    if not failure_count:
+        return None
+    return max(_login_failure_limit() - failure_count, 0)
 
 
 def _login_requires_recaptcha(request, username):
@@ -176,6 +194,7 @@ def signup_view(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save()
+            create_seed_tags(user)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("users:welcome")
     else:
@@ -198,6 +217,7 @@ def login_view(request):
     사용자 로그인
     """
     recaptcha_required = False
+    failure_count = 0
     if request.method == "POST":
         username = (request.POST.get("username") or "").strip()
         recaptcha_required = _login_requires_recaptcha(request, username)
@@ -216,6 +236,9 @@ def login_view(request):
                         "page_title": gettext("로그인"),
                         "show_recaptcha": True,
                         "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+                        "remaining_attempts": _login_attempts_remaining(
+                            _get_login_failure_count(request, username)
+                        ),
                     },
                 )
         form = AuthenticationForm(request, data=request.POST)
@@ -261,6 +284,7 @@ def login_view(request):
             "page_title": gettext("로그인"),
             "show_recaptcha": recaptcha_required,
             "recaptcha_site_key": getattr(settings, "RECAPTCHA_SITE_KEY", ""),
+            "remaining_attempts": _login_attempts_remaining(failure_count),
         },
     )
 
@@ -268,17 +292,7 @@ def login_view(request):
 def _get_pending_deletion_user_for_login(username, password):
     if not username or not password:
         return None
-    User = get_user_model()
-    user = (
-        User.objects.filter(
-            username__iexact=username,
-            is_active=False,
-            deletion_request__cancelled_at__isnull=True,
-            deletion_request__purged_at__isnull=True,
-        )
-        .select_related("deletion_request")
-        .first()
-    )
+    user = _user_repo.find_inactive_with_pending_deletion(username)
     if user and check_password(password, user.password):
         return user
     return None
@@ -289,8 +303,7 @@ def _send_username_recovery_email(request, email):
 
     Why: 한 이메일에 여러 계정이 있을 수 있으므로 모두 안내.
     """
-    User = get_user_model()
-    users = list(User.objects.filter(email__iexact=email, is_active=True))
+    users = _user_repo.find_active_by_email(email)
     if not users:
         return
     context = {
@@ -371,8 +384,7 @@ def check_username_view(request):
         return JsonResponse(
             {"available": False, "message": gettext("영문자, 숫자, @/./+/-/_ 만 가능합니다.")}
         )
-    User = get_user_model()
-    if User.objects.filter(username__iexact=username).exists():
+    if _user_repo.username_exists(username):
         return JsonResponse(
             {"available": False, "message": gettext("이미 사용 중인 사용자명입니다.")}
         )
@@ -398,8 +410,7 @@ def check_email_view(request):
         return JsonResponse(
             {"available": False, "message": gettext("올바른 이메일 형식이 아닙니다.")}
         )
-    User = get_user_model()
-    if User.objects.filter(email__iexact=email).exists():
+    if _user_repo.email_exists(email):
         return JsonResponse(
             {"available": False, "message": gettext("이미 사용 중인 이메일입니다.")}
         )
@@ -430,18 +441,48 @@ class RateLimitedPasswordResetView(PasswordResetView):
         return super(PasswordResetView, self).form_valid(form)
 
 
+ONBOARDING_STEPS = 3
+
+
 @login_required
 def welcome_view(request):
-    """회원가입 직후 1회 노출되는 환영 화면.
+    """가입 직후 1회 노출되는 온보딩.
 
-    Why: 가입 직후 빈 대시보드로 떨어지면 첫날 이탈률이 높음.
-    가치 제안 + 단일 CTA로 첫 행동(시간 기록)을 유도.
+    읽는 화면이 아니라 고르는 화면이다. 세 스텝 모두 건너뛸 수 있어 가입
+    이탈을 만들지 않는다.
     """
-    return render(
-        request,
-        "users/welcome.html",
-        {"page_title": gettext("환영합니다")},
-    )
+    try:
+        step = int(request.GET.get("step", 1))
+    except (TypeError, ValueError):
+        step = 1
+    step = min(max(step, 1), ONBOARDING_STEPS)
+
+    context = {
+        "page_title": gettext("시작하기"),
+        "step": step,
+        "total_steps": ONBOARDING_STEPS,
+        "step_range": range(1, ONBOARDING_STEPS + 1),
+    }
+    if step == 1:
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+    if step == 2:
+        today = timezone.localdate()
+        blocks = _time_block_repo.find_by_date(request.user, today)
+        slot_data = {
+            block.slot_index: {"tag": block.tag, "memo": block.memo, "id": block.id}
+            for block in blocks
+        }
+        context["today"] = today
+        context["time_headers"] = build_time_headers()
+        context["slot_rows"] = annotate_future(
+            build_slot_rows(slot_data), current_slot_index(today, timezone.localtime())
+        )
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+    if step == 3:
+        context["tags"] = _tag_repo.find_accessible_ordered(request.user)
+        context["periods"] = [("daily", gettext("하루")), ("weekly", gettext("한 주"))]
+
+    return render(request, "users/welcome.html", context)
 
 
 @login_required
@@ -541,7 +582,17 @@ def mypage(request):
         form.fields["period"].initial = "monthly"
 
     data = _mypage_use_case.execute(user)
-    return render(request, "users/mypage.html", {"goals": data["goals"], "form": form})
+    return render(
+        request,
+        "users/mypage.html",
+        {
+            "goals": data["goals"],
+            "form": form,
+            # 시안 5c 는 설정 안에서 태그와 카테고리 색을 바로 보여 준다.
+            "settings_tags": _get_user_tag_queryset(user).select_related("category"),
+            "categories": Category.objects.all(),
+        },
+    )
 
 
 @login_required

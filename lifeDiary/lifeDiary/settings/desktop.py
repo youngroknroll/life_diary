@@ -1,8 +1,8 @@
 """Desktop app settings.
 
 Loaded when running LifeDiary as a packaged desktop app via
-``desktop/launcher.py``. Bases on dev.py and overrides paths/middleware
-to suit a local single-user environment.
+``desktop/launcher.py``. Standalone — it does not import dev.py, so
+cross-cutting settings must be repeated here on purpose.
 """
 
 from __future__ import annotations
@@ -11,6 +11,8 @@ import os
 import secrets
 import sys
 from pathlib import Path
+
+from django.contrib.messages import constants as message_constants
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -114,6 +116,11 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+
+# Django 기본 ERROR 태그는 "error" 인데 Bootstrap 에는 .alert-error 가 없다.
+# 이 파일은 dev.py 를 상속하지 않으므로 같은 설정을 따로 둔다.
+MESSAGE_TAGS = {message_constants.ERROR: "danger"}
 
 
 LANGUAGE_CODE = "ko-kr"

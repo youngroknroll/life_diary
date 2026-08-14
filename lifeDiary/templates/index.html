@@ -217,10 +217,11 @@
     <div class="row g-0 align-items-stretch">
         <div class="col-lg-7">
             <div class="p-4 p-md-5">
-                <p class="home-kicker mb-3">Life Diary</p>
+                <p class="home-kicker mb-3">{% trans "하루 10분 단위 기록" %}</p>
                 <h1 class="home-title fw-bold mb-4">{% trans "하루를 단순하게 기록하세요" %}</h1>
                 <p class="home-subtitle mb-4">
                     {% trans "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다." %}
+                    {% trans "비어 있는 구간을 끌어서 태그를 고르면 끝입니다." %}
                 </p>
 
                 <div class="d-flex flex-wrap gap-3 mb-4">
@@ -305,25 +306,128 @@
                         <p class="home-preview-caption small mt-2 mb-0">{% trans "클릭해서 크게 볼 수 있습니다." %}</p>
                     </div>
 
-                    <div class="home-day-blocks mb-4" aria-label="{% trans '하루 기록 예시' %}">
-                        <span class="home-day-block is-work"></span>
-                        <span class="home-day-block is-work"></span>
-                        <span class="home-day-block is-rest"></span>
-                        <span class="home-day-block is-move"></span>
-                        <span class="home-day-block is-care"></span>
-                        <span class="home-day-block"></span>
-                        <span class="home-day-block is-work"></span>
-                        <span class="home-day-block is-rest"></span>
-                        <span class="home-day-block is-work"></span>
-                        <span class="home-day-block is-move"></span>
-                        <span class="home-day-block is-care"></span>
-                        <span class="home-day-block"></span>
-                        <span class="home-day-block is-rest"></span>
-                        <span class="home-day-block is-work"></span>
-                        <span class="home-day-block is-care"></span>
-                        <span class="home-day-block is-move"></span>
+                    <div class="home-daygrid mb-4" role="img" aria-label="{% trans '하루 기록 예시 — 24행 × 6칸, 한 칸이 10분' %}">
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">06:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-sleep" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-track" style="grid-column: span 1"></span>
+                                <span class="home-daygrid__block is-rest" style="grid-column: span 2"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">07:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-track" style="grid-column: span 3"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">08:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-track" style="grid-column: span 1"></span>
+                                <span class="home-daygrid__block is-work" style="grid-column: span 5"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">09:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">10:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">11:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 4"></span>
+                                <span class="home-daygrid__block is-track" style="grid-column: span 2"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">12:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-rest" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-care" style="grid-column: span 3"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">13:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">14:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">15:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-track" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">16:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-track" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">17:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-track" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">18:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-rest" style="grid-column: span 3"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">19:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-rest" style="grid-column: span 2"></span>
+                                <span class="home-daygrid__block is-care" style="grid-column: span 4"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">20:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-care" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">21:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-work" style="grid-column: span 3"></span>
+                                <span class="home-daygrid__block is-care" style="grid-column: span 3"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">22:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-care" style="grid-column: span 4"></span>
+                                <span class="home-daygrid__block is-track" style="grid-column: span 2"></span>
+                            </span>
+                        </div>
+                        <div class="home-daygrid__row">
+                            <span class="home-daygrid__label">23:00</span>
+                            <span class="home-daygrid__cells">
+                                <span class="home-daygrid__block is-sleep" style="grid-column: span 6"></span>
+                            </span>
+                        </div>
                     </div>
-
+                    <p class="home-preview-caption small mb-4">{% trans "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분" %}</p>
                     <div class="home-note p-3">
                         <p class="fw-bold mb-1">{% trans "오늘의 한 줄" %}</p>
                         <p class="mb-0 small">{% trans "집중한 시간과 쉬어간 시간을 한눈에 남겼어요." %}</p>

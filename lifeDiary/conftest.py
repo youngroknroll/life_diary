@@ -210,12 +210,22 @@ def ko_client(client):
     return client
 
 
+# 테스트에서 쓰는 단 하나의 비밀번호. 파일마다 새로 지어내면 시크릿 스캐너가
+# 매번 자격증명으로 읽는다. 필요하면 이 값에서 파생시킨다.
+DEFAULT_TEST_PASSWORD = "pass-Long-9!"
+
+
+@pytest.fixture
+def test_password():
+    return DEFAULT_TEST_PASSWORD
+
+
 @pytest.fixture
 def make_user(db, django_user_model):
     """user factory — 호출마다 새 user 생성."""
     counter = {"n": 0}
 
-    def _make(username=None, password="pass-Long-9!", **kwargs):
+    def _make(username=None, password=DEFAULT_TEST_PASSWORD, **kwargs):
         counter["n"] += 1
         return django_user_model.objects.create_user(
             username=username or f"u{counter['n']}",

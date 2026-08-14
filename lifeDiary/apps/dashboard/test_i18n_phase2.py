@@ -9,11 +9,10 @@ class TestDashboardEnglish:
     def test_dashboard_renders_english_stats_labels(self, auth_en_client):
         response = auth_en_client.get(reverse("dashboard:index"))
         body = response.content.decode()
-        assert "Total slots" in body
         assert "Logged slots" in body
         assert "Logged rate" in body
         assert "Total time logged" in body
-        assert "총 슬롯" not in body
+        assert "기록률" not in body
 
     def test_dashboard_renders_english_sidebar(self, auth_en_client):
         response = auth_en_client.get(reverse("dashboard:index"))

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from django.contrib.messages import constants as message_constants
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -157,6 +158,10 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+
+# Django 기본 ERROR 태그는 "error" 인데 Bootstrap 에는 .alert-error 가 없다.
+MESSAGE_TAGS = {message_constants.ERROR: "danger"}
 
 
 # Internationalization

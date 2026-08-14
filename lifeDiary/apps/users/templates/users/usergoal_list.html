@@ -1,29 +1,49 @@
 {% load i18n %}
-<style>
-.goal-table th,
-.goal-table td {
-    white-space: nowrap;
-    padding: 0.2rem 0.5rem;
-    font-size: 0.9rem;
-    vertical-align: middle;
-}
-.goal-table .btn-sm {
-    padding: 0.15rem 0.4rem;
-    font-size: 0.75rem;
-}
-.goal-table td:nth-last-child(-n+2),
-.goal-table th:nth-last-child(-n+2) {
-    text-align: center;
-}
-</style>
-
-{% trans "일간 목표" as daily_heading %}
-{% trans "주간 목표" as weekly_heading %}
-{% trans "월간 목표" as monthly_heading %}
-{% trans "하루 목표 시간" as daily_subtext %}
-{% trans "일주일 총 목표 시간" as weekly_subtext %}
-{% trans "한 달 총 목표 시간" as monthly_subtext %}
-
-{% include "users/_goal_table_section.html" with section_period="daily" section_heading=daily_heading section_icon="fa-calendar-day" section_subtext=daily_subtext section_mb="mb-4" %}
-{% include "users/_goal_table_section.html" with section_period="weekly" section_heading=weekly_heading section_icon="fa-calendar-week" section_subtext=weekly_subtext section_mb="mb-4" %}
-{% include "users/_goal_table_section.html" with section_period="monthly" section_heading=monthly_heading section_icon="fa-calendar-alt" section_subtext=monthly_subtext section_mb="" %}
+{% comment %}
+시안 5c: 태그 | 기간 | 목표 | 삭제 네 열. 달성률과 실제 기록은 분석 탭
+소관이라 설정에서 뺐다. 설정은 목표를 정하는 자리이지 결과를 보는 자리가
+아니다. 기간별 세 표도 기간 열 하나로 합쳤다.
+{% endcomment %}
+<div class="table-scroll" tabindex="0" role="region" aria-label="{% trans '목표 시간 표' %}">
+    <table class="data-table goal-table">
+        <thead>
+            <tr>
+                <th scope="col">{% trans "태그" %}</th>
+                <th scope="col">{% trans "기간" %}</th>
+                <th scope="col" class="is-num">{% trans "목표" %}</th>
+                <th scope="col"><span class="visually-hidden">{% trans "삭제" %}</span></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for goal in goals %}
+                <tr>
+                    <td>
+                        <span class="chip__swatch" style="background-color: {{ goal.tag.color }}"></span>{{ goal.tag.name }}
+                    </td>
+                    <td>{{ goal.get_period_display }}</td>
+                    <td class="is-num">
+                        <form method="post" action="{% url 'users:usergoal_update' goal.pk %}" class="goal-row-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="tag" value="{{ goal.tag_id }}">
+                            <input type="hidden" name="period" value="{{ goal.period }}">
+                            <label class="visually-hidden" for="goalHours{{ goal.pk }}">
+                                {% blocktrans with t=goal.tag.name %}{{ t }} 목표 시간{% endblocktrans %}
+                            </label>
+                            <input type="number" class="form-control goal-row-form__hours num"
+                                   id="goalHours{{ goal.pk }}" name="target_hours"
+                                   value="{{ goal.target_hours }}" min="0" step="0.5">
+                            <button type="submit" class="btn-sian goal-row-form__save" hidden>{% trans "저장" %}</button>
+                        </form>
+                    </td>
+                    <td>
+                        <a class="goal-row-delete" href="{% url 'users:usergoal_delete' goal.pk %}">{% trans "삭제" %}</a>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="page-subtitle">{% trans "아직 목표가 없습니다. 하나만 정해두면 분석 화면이 달성한 날을 셉니다." %}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

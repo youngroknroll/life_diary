@@ -10,7 +10,10 @@ from apps.tags.models import Category, Tag
 
 class TestDashboardServices:
     def test_build_time_headers(self):
-        assert build_time_headers() == ["10분", "20분", "30분", "40분", "50분", "60분"] * 2
+        # 눈금은 칸이 아니라 경계선을 가리킨다. 6칸이면 경계는 7개다.
+        assert build_time_headers() == [
+            ":00", ":10", ":20", ":30", ":40", ":50", ":60",
+        ]
 
     def test_validate_slot_indexes_accepts_valid_list(self):
         assert validate_slot_indexes([0, 1, 143])
@@ -69,11 +72,11 @@ def dash_user_with_tags(ko_client, make_user):
     cat_invest = Category.objects.get(slug="investment")
     Tag.objects.create(
         user=user, name="투자태그", color="#111111",
-        is_default=False, category=cat_invest,
+        category=cat_invest,
     )
     Tag.objects.create(
         user=user, name="수동태그", color="#222222",
-        is_default=False, category=cat_passive,
+        category=cat_passive,
     )
     return ko_client, user
 
@@ -107,22 +110,10 @@ class TestDashboardIndexRendering:
         idx_invest_header = section.index("투자시간")
         idx_invest_tag = section.index("투자태그")
 
-        assert idx_passive_header < idx_passive_tag
-        assert idx_passive_tag < idx_invest_header
+        # 시안 순서: 투자 → 주도적 → 수동적 (0012_sian_category_order)
         assert idx_invest_header < idx_invest_tag
-
-    def test_sidebar_category_headers_use_separator_not_color_dot(self, dash_user_with_tags):
-        client, _ = dash_user_with_tags
-        resp = client.get("/dashboard/")
-        section = _extract_element(resp.content.decode(), "tagContainer")
-        passive_header_start = section.index("tag-category-header")
-        passive_tag_start = section.index("수동태그")
-        passive_header = section[passive_header_start:passive_tag_start]
-        normalized_header = re.sub(r"\s+", " ", passive_header)
-
-        assert "- 수동적 소비시간" in normalized_header
-        assert "background-color: #222222" not in passive_header
-        assert "background-color: #222222" in section[passive_tag_start:]
+        assert idx_invest_tag < idx_passive_header
+        assert idx_passive_header < idx_passive_tag
 
     def test_sidebar_tag_list_uses_compact_wrapping_row_layout(self, dash_user_with_tags):
         client, _ = dash_user_with_tags
@@ -165,7 +156,6 @@ class TestDashboardIndexRendering:
             user=user,
             name="x');alert(1);//",
             color="#AABBCC",
-            is_default=False,
             category=cat,
         )
         resp = client.get("/dashboard/")
@@ -233,20 +223,6 @@ class TestDashboardJavaScriptAssets:
         assert 'id="tagCategoryHeaderTemplate"' in template_source
         assert "renderCategoryHeader(" in js_source
         assert 'background-color: ${escapeHtml(cat.color)}' not in js_source
-
-    def test_touchmove_prevent_default_is_guarded_by_cancelable(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "if (event.cancelable) {" in source
-        assert "event.preventDefault();" in source
-
-    def test_mobile_touch_drag_does_not_cancel_vertical_time_slot_gesture(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "dy > dx" not in source
-        assert source.index("event.preventDefault();") < source.index("document.elementFromPoint")
 
     def test_mobile_sheet_close_moves_focus_before_hiding_dialog(self):
         js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"

@@ -1,20 +1,12 @@
 from __future__ import annotations
 
-import datetime
 from dataclasses import dataclass
 
 from django.db import transaction
 from django.utils.translation import gettext
 
-from apps.stats.logic import (
-    StatsCalculator,
-    get_daily_stats_data,
-    get_monthly_stats_data,
-    get_weekly_stats_data,
-)
 from apps.tags.ports import TagReader
 from apps.tags.repositories import TagRepository
-from .domain_services import _goal_progress_service
 from .models import UserGoal, UserNote
 from .repositories import GoalRepository, NoteRepository
 
@@ -33,28 +25,16 @@ class NoteData:
 _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 
-_EMPTY_STATS = {"tag_stats": [], "tag_weekly_stats": [], "weekly_data": []}
-
 
 class GetMyPageUseCase:
     def execute(self, user) -> dict:
-        today = datetime.date.today()
-        goals = list(_goal_repo.find_by_user(user))
-        needed = {g.period for g in goals}
+        """설정은 목표를 정하는 자리다. 달성 결과는 분석 탭 소관이다.
 
-        calculator = StatsCalculator(user, today)
-        daily_stats = get_daily_stats_data(user, today, calculator) if "daily" in needed else _EMPTY_STATS
-        weekly_stats = get_weekly_stats_data(user, today, calculator) if "weekly" in needed else _EMPTY_STATS
-        monthly_stats = get_monthly_stats_data(user, today, calculator) if "monthly" in needed else _EMPTY_STATS
-
-        _goal_progress_service.attach_progress(
-            goals,
-            daily_stats=daily_stats,
-            weekly_stats=weekly_stats,
-            monthly_stats=monthly_stats,
-        )
+        예전에는 여기서 통계 집계를 세 번 돌려 달성률을 붙였는데, 설정 화면이
+        그 값을 더는 그리지 않는다.
+        """
         return {
-            "goals": goals,
+            "goals": list(_goal_repo.find_by_user(user)),
             "note": _note_repo.find_latest(user),
         }
 

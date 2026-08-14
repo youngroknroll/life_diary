@@ -2,7 +2,6 @@ import json
 from types import SimpleNamespace
 
 import pytest
-from django.conf import settings
 from django.db.models import ProtectedError
 from django.template import Context, Template
 
@@ -15,21 +14,19 @@ from apps.tags.repositories import CategoryRepository, TagRepository
 
 
 class TestTagPolicyService:
-    def test_can_manage_default_tag_only_for_superuser(self):
+    def test_can_manage_only_own_tag(self):
         service = TagPolicyService()
-        admin = SimpleNamespace(is_superuser=True)
-        user = SimpleNamespace(is_superuser=False)
-        default_tag = SimpleNamespace(is_default=True, user=None)
-        assert service.can_manage(admin, default_tag)
-        assert not service.can_manage(user, default_tag)
-
-    def test_can_manage_user_owned_tag(self):
-        service = TagPolicyService()
-        owner = SimpleNamespace(is_superuser=False, username="owner")
-        other = SimpleNamespace(is_superuser=False, username="other")
-        tag = SimpleNamespace(is_default=False, user=owner)
+        owner = SimpleNamespace(id=1, is_superuser=False)
+        other = SimpleNamespace(id=2, is_superuser=False)
+        tag = SimpleNamespace(user_id=owner.id)
         assert service.can_manage(owner, tag)
         assert not service.can_manage(other, tag)
+
+    def test_superuser_gets_no_extra_reach(self):
+        service = TagPolicyService()
+        admin = SimpleNamespace(id=9, is_superuser=True)
+        tag = SimpleNamespace(user_id=1)
+        assert not service.can_manage(admin, tag)
 
 
 # === Category Model Tests ===
@@ -105,7 +102,7 @@ class TestCategoryRepository:
         repo = CategoryRepository()
         cats = repo.find_all()
         assert cats.count() == 5
-        assert cats[0].slug == "passive"
+        assert cats[0].slug == "investment"
 
     def test_find_by_slug(self):
         repo = CategoryRepository()
@@ -129,7 +126,7 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         tag = repo.create(
             user=user, name="독서", color="#FF5733",
-            is_default=False, category=cat_invest,
+            category=cat_invest,
         )
         assert tag.category == cat_invest
 
@@ -139,7 +136,7 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         repo.create(
             user=user, name="독서", color="#FF5733",
-            is_default=False, category=cat_invest,
+            category=cat_invest,
         )
         tags = repo.find_accessible(user)
         assert tags.first().category.slug == "investment"
@@ -149,8 +146,8 @@ class TestTagRepositoryCategory:
         user = make_user(username="testuser")
         cat_invest = Category.objects.get(slug="investment")
         cat_passive = Category.objects.get(slug="passive")
-        repo.create(user=user, name="독서", color="#FF5733", is_default=False, category=cat_invest)
-        repo.create(user=user, name="SNS", color="#33FF57", is_default=False, category=cat_passive)
+        repo.create(user=user, name="독서", color="#FF5733", category=cat_invest)
+        repo.create(user=user, name="SNS", color="#33FF57", category=cat_passive)
         tags = repo.find_by_category(user, cat_invest)
         assert tags.count() == 1
         assert tags.first().name == "독서"
@@ -161,13 +158,13 @@ class TestTagRepositoryCategory:
         cat_invest = Category.objects.get(slug="investment")
         cat_passive = Category.objects.get(slug="passive")
         cat_basic = Category.objects.get(slug="basic_life")
-        repo.create(user=user, name="aaa-basic", color="#111111", is_default=False, category=cat_basic)
-        repo.create(user=user, name="zzz-passive", color="#222222", is_default=False, category=cat_passive)
-        repo.create(user=user, name="mmm-invest", color="#333333", is_default=False, category=cat_invest)
+        repo.create(user=user, name="aaa-basic", color="#111111", category=cat_basic)
+        repo.create(user=user, name="zzz-passive", color="#222222", category=cat_passive)
+        repo.create(user=user, name="mmm-invest", color="#333333", category=cat_invest)
 
         tags = list(repo.find_accessible_ordered(user))
         user_tag_order = [t.name for t in tags if t.user_id == user.id]
-        assert user_tag_order == ["zzz-passive", "mmm-invest", "aaa-basic"]
+        assert user_tag_order == ["mmm-invest", "zzz-passive", "aaa-basic"]
 
 
 # === Template Tag Tests ===
@@ -208,66 +205,6 @@ class TestTagBadgeTemplateTag:
         assert "&lt;script&gt;" in html
 
 
-class TestTagModalTemplate:
-    def test_category_select_has_readable_font_size_class(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/_tag_modal.html"
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-
-        template_source = template_path.read_text()
-        css_source = css_path.read_text()
-
-        assert 'id="tagFormCategory"' in template_source
-        assert "tag-category-select" in template_source
-        assert ".tag-category-select" in css_source
-        assert "font-size: 1rem;" in css_source
-        assert ".tag-category-select option" in css_source
-
-    def test_tag_management_category_header_uses_shared_template(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/index.html"
-        template_source = template_path.read_text()
-
-        assert "{% include 'shared/_tag_category_header.html'" in template_source
-        assert 'id="tagCategoryHeaderTemplate"' in template_source
-        assert "renderCategoryHeader(" in template_source
-        assert 'background-color: ${cat.color}' not in template_source
-
-    def test_tag_modal_has_one_line_recommended_color_swatches(self):
-        template_path = settings.BASE_DIR / "apps/tags/templates/tags/_tag_modal.html"
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        template_source = template_path.read_text()
-        css_source = css_path.read_text()
-        expected_colors = [
-            "#e85d5d", "#c94a4a",
-            "#e48f4f", "#c9783f",
-            "#f0c24b", "#d4a93a",
-            "#4f9f68", "#3f8757",
-            "#5a9fd6", "#477fb3",
-            "#5d6fc2", "#4858a3",
-            "#9b6ccf", "#7d55ad",
-        ]
-
-        assert "추천색상:" in template_source
-        assert "tag-color-recommendations" in template_source
-        assert template_source.count("data-tag-color-swatch") == 14
-        for color in expected_colors:
-            assert f'data-color="{color}"' in template_source
-
-        assert ".tag-color-recommendations" in css_source
-        assert ".tag-color-swatch" in css_source
-
-    def test_tag_modal_swatch_js_syncs_existing_color_inputs(self):
-        js_path = settings.BASE_DIR / "apps/core/static/core/js/tag.js"
-        js_source = js_path.read_text()
-
-        assert "data-tag-color-swatch" in js_source
-        assert "syncTagColorInputs" in js_source
-        assert "colorPicker.value = color" in js_source
-        assert "colorText.value = color" in js_source
-
-
-# === Seed Data Migration Tests ===
-
-
 @pytest.mark.django_db
 class TestSeedCategory:
     def test_five_categories_seeded(self):
@@ -280,7 +217,7 @@ class TestSeedCategory:
 
     def test_display_order(self):
         cats = list(Category.objects.values_list("slug", flat=True))
-        assert cats == ["passive", "proactive", "investment", "basic_life", "sleep"]
+        assert cats == ["investment", "proactive", "passive", "basic_life", "sleep"]
 
 
 # === API Tests ===

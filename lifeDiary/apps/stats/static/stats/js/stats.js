@@ -14,6 +14,11 @@ let charts = {};
  * @param {string} key - charts 맵의 키 (예: 'dailyPie')
  * @returns {CanvasRenderingContext2D}
  */
+/** CSS 토큰을 읽어 온다. 차트 색이 그리드 색과 달라 보이면 안 된다. */
+function cssToken(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
 function prepareChart(canvasId, key) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     if (charts[key]) charts[key].destroy();
@@ -78,60 +83,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     try {
-        renderDailyPieChart(daily.tag_stats);
         renderHourlyBarChart(daily.hourly_stats, daily.tag_stats);
         renderWeeklyLineChart(weekly.tag_weekly_stats, weekly.weekly_data);
         renderWeeklyBarChart(weekly.weekly_data);
         renderMonthlyLineChart(monthly);
-        renderTagTotalChart(tagAnalysis);
     } catch (error) {
         console.error('차트 렌더링 오류:', error);
     }
 });
-
-function renderDailyPieChart(tagStats) {
-    const ctx = prepareChart('dailyPieChart', 'dailyPie');
-    if (tagStats.length === 0) {
-        drawEmptyState(ctx);
-        return;
-    }
-
-    charts.dailyPie = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: tagStats.map(tag => tag.name),
-            datasets: [{
-                data: tagStats.map(tag => tag.hours),
-                backgroundColor: tagStats.map(tag => tag.color),
-                borderWidth: 2,
-                borderColor: '#fff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            const hours = context.parsed;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const percentage = ((hours / total) * 100).toFixed(1);
-                            return interpolate(
-                                gettext('%(label)s: %(h)sh (%(p)s%%)'),
-                                {label: context.label, h: hours, p: percentage},
-                                true
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
 
 function renderHourlyBarChart(hourlyStats, tagStats) {
     const ctx = prepareChart('hourlyBarChart', 'hourlyBar');
@@ -236,9 +195,9 @@ function renderWeeklyBarChart(weeklyData) {
             datasets: [{
                 label: gettext('Active hours'),
                 data: weeklyData.map(day => day.total_hours),
-                backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                borderColor: 'rgba(75, 192, 192, 1)',
-                borderWidth: 1
+                backgroundColor: cssToken('--color-accent-work'),
+                borderWidth: 0,
+                borderRadius: 3
             }]
         },
         options: {
@@ -314,31 +273,40 @@ function renderMonthlyLineChart(monthlyData) {
     });
 }
 
-function renderTagTotalChart(tagAnalysis) {
-    const ctx = prepareChart('tagTotalChart', 'tagTotal');
-    const top10 = tagAnalysis.slice(0, 10);
 
-    charts.tagTotal = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: top10.map(tag => tag.name),
-            datasets: [{
-                label: gettext('Total hours'),
-                data: top10.map(tag => tag.total_hours),
-                backgroundColor: top10.map(tag => tag.color),
-                borderWidth: 1
-            }]
-        },
-        options: {
-            indexAxis: 'y',
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: { beginAtZero: true }
-            },
-            plugins: {
-                legend: { display: false }
-            }
+
+/**
+ * 내려받기에는 완료 이벤트가 없다. 그래서 되돌리는 것을 시간으로 한다.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('.stats-export');
+    if (!form) return;
+
+    const button = document.getElementById('statsExportBtn');
+    const statusEl = document.getElementById('statsExportStatus');
+    const idleLabel = button.textContent.trim();
+    const busyLabel = button.dataset.busyLabel;
+    let busy = false;
+
+    form.addEventListener('submit', function (event) {
+        if (busy) {
+            event.preventDefault();
+            return;
         }
+        busy = true;
+        const restoreFocus = document.activeElement === button;
+        button.disabled = true;
+        button.textContent = busyLabel;
+        if (statusEl) statusEl.textContent = busyLabel;
+
+        setTimeout(function () {
+            busy = false;
+            button.disabled = false;
+            button.textContent = idleLabel;
+            if (statusEl) statusEl.textContent = '';
+            if (restoreFocus && document.activeElement === document.body) {
+                button.focus();
+            }
+        }, 4000);
     });
-}
+});

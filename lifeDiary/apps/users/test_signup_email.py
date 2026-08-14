@@ -14,6 +14,7 @@ class TestSignupEmail:
             "email": "newuser@example.com",
             "password1": "pass-Long-9!",
             "password2": "pass-Long-9!",
+            "consent": "on",
         }
         data.update(overrides)
         return client.post(reverse("users:signup"), data)
