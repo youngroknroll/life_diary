@@ -19,7 +19,12 @@ from .commands import (
 )
 from .repositories import TimeBlockRepository
 from .day_window import annotate_future, current_slot_index
-from .services import build_slot_rows, build_time_headers, hours_touched, serialize_rows
+from .services import (
+    build_slot_rows,
+    build_time_headers,
+    hours_to_refresh,
+    serialize_rows,
+)
 from .undo import pop_snapshot, save_snapshot
 from .use_cases import (
     DeleteTimeBlocksUseCase,
@@ -66,7 +71,7 @@ def _mutation_payload(request, target_date, slot_indexes, previous_state, extra=
 
     return {
         **(extra or {}),
-        "runs": serialize_rows(rows, hours_touched(slot_indexes)),
+        "runs": serialize_rows(rows, hours_to_refresh(slot_indexes)),
         "stats": stats,
         "undo_token": token,
     }
@@ -268,7 +273,7 @@ def time_block_undo_api(request):
         gettext("되돌렸습니다."),
         {
             "runs": serialize_rows(
-                rows, hours_touched([slot.slot_index for slot in cmd.slots])
+                rows, hours_to_refresh([slot.slot_index for slot in cmd.slots])
             ),
             "stats": stats,
         },

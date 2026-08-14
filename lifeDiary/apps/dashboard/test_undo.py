@@ -70,22 +70,38 @@ class TestSaveResponse:
 
         assert save(client, focus, [54, 55, 56]).json()["undo_token"]
 
-    def test_save_returns_only_the_rows_it_touched(self, logged_in):
+    def test_save_returns_the_touched_row_with_its_neighbours(self, logged_in):
+        """이웃 시간도 함께 준다. 라벨이 그쪽으로 옮겨갈 수 있어서다."""
         client, _, focus, _ = logged_in
 
         payload = save(client, focus, [54, 55, 56]).json()
 
-        assert [row["hour"] for row in payload["runs"]] == [9]
+        assert [row["hour"] for row in payload["runs"]] == [8, 9, 10]
 
     def test_returned_runs_serialize_the_tag(self, logged_in):
         client, _, focus, _ = logged_in
 
-        runs = save(client, focus, [54]).json()["runs"][0]["runs"]
+        rows = save(client, focus, [54]).json()["runs"]
+        runs = next(row for row in rows if row["hour"] == 9)["runs"]
         filled = next(run for run in runs if run["tag_id"] is not None)
 
         assert filled["tag_id"] == focus.id
         assert filled["tag_name"] == "집중"
         assert filled["color"] == Category.objects.get(slug="investment").color
+
+    def test_save_moves_label_into_a_newly_touched_adjacent_hour(self, logged_in):
+        """06:00–06:50 을 먼저 저장하면 라벨은 6시 행에 있다. 이어서 05:40–05:50 을
+        같은 태그로 저장하면 구간 시작이 5시로 옮겨가므로, 응답은 5시에 이름을
+        싣고 6시의 옛 이름을 지운 상태로 와야 한다.
+        """
+        client, _, focus, _ = logged_in
+        save(client, focus, [36, 37, 38, 39, 40, 41])
+
+        rows = save(client, focus, [34, 35]).json()["runs"]
+
+        by_hour = {row["hour"]: row["runs"] for row in rows}
+        assert by_hour[5][-1]["label"] == "집중"
+        assert by_hour[6][0]["label"] == ""
 
     def test_save_returns_day_stats(self, logged_in):
         client, _, focus, _ = logged_in
@@ -113,7 +129,7 @@ class TestUndoEndpoint:
 
         payload = undo(client, token).json()
 
-        assert [row["hour"] for row in payload["runs"]] == [9]
+        assert [row["hour"] for row in payload["runs"]] == [8, 9, 10]
         assert payload["stats"]["logged_minutes"] == 0
 
     def test_delete_can_also_be_undone(self, logged_in):

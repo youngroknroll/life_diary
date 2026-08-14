@@ -53,8 +53,13 @@ def serialize_rows(rows, hours=None):
     ]
 
 
-def hours_touched(slot_indexes):
-    return sorted({index // SLOTS_PER_HOUR for index in slot_indexes})
+def hours_to_refresh(slot_indexes):
+    """라벨은 구간이 시작하는 블록에 붙으므로, 한 시간을 고치면 옆 시간의
+    라벨이 따라 움직인다. 건드린 시간만 돌려주면 옛 라벨이 화면에 남는다.
+    """
+    touched = {index // SLOTS_PER_HOUR for index in slot_indexes}
+    widened = {hour + offset for hour in touched for offset in (-1, 0, 1)}
+    return sorted(hour for hour in widened if 0 <= hour < HOURS_PER_DAY)
 
 
 def _merge_hour_runs(slot_data, hour):
