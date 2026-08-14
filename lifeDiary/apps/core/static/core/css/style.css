@@ -189,10 +189,12 @@ body {
     padding: 7px 12px;
     border-radius: 7px;
     white-space: nowrap;
+    transition: background-color .15s ease, color .15s ease;
 }
 
 .app-nav__tab:hover {
     color: var(--color-text);
+    background-color: var(--color-surface-soft);
 }
 
 .app-nav__tab.is-active {
@@ -324,6 +326,18 @@ body {
     font-size: 13.5px;
     color: var(--color-text-body);
     text-decoration: none;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.btn-sian:where(:not(:disabled)):hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
+    color: var(--color-text);
+}
+
+.btn-sian:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 /* 좁은 카드 안에 두 개가 나란히 들어가는 버튼.
@@ -359,8 +373,9 @@ body {
     font-weight: 600;
 }
 
-.btn-sian--primary:hover {
+.btn-sian--primary:where(:not(:disabled)):hover {
     background: var(--color-primary-hover);
+    border-color: transparent;
     color: #fff;
 }
 
@@ -451,6 +466,19 @@ body {
     font-size: 12px;
     color: var(--color-text-muted);
     line-height: 1.45;
+}
+
+/* 좁은 화면에서는 설명과 컨트롤이 각자 줄을 쓴다. 그때 오른쪽으로 밀면
+   한 줄짜리가 들여쓴 것처럼 보인다. */
+@media (min-width: 576px) {
+    .stats-export .section-title {
+        text-align: right;
+    }
+
+    .stats-export__note {
+        flex-grow: 0;
+        margin-left: auto;
+    }
 }
 
 /* 360px 에서는 줄바꿈되게 두되, Bootstrap 기본 select 높이(약 31px)를
@@ -728,6 +756,12 @@ body {
     min-height: 44px;
     padding: 0 14px;
     user-select: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.chip--pick:not(:has(.chip__check:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
 }
 
 .chip__check {
@@ -817,6 +851,13 @@ body {
     font-size: 18px;
     line-height: 1;
     color: var(--color-text);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.stepper__btn:where(:not(:disabled)):hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary);
 }
 
 .stepper__btn:focus-visible {
@@ -1110,6 +1151,12 @@ body {
 .breadcrumb-trail a {
     color: var(--color-text-muted);
     text-decoration: none;
+    transition: color .15s ease;
+}
+
+.breadcrumb-trail a:hover {
+    color: var(--color-text);
+    text-decoration: underline;
 }
 
 .breadcrumb-trail .is-current {
@@ -1259,6 +1306,12 @@ body {
     font-weight: 600;
 }
 
+.btn-sian--danger:where(:not(:disabled)):hover {
+    background: #6d2f13;
+    border-color: transparent;
+    color: #fff;
+}
+
 footer {
     background-color: var(--color-surface);
 }
@@ -1356,6 +1409,12 @@ footer {
         var(--slot-tick) calc(100% / var(--slot-span, 1) - 1px),
         var(--slot-tick) calc(100% / var(--slot-span, 1))
     );
+    transition: box-shadow .15s ease;
+}
+
+.slot-block:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
 }
 
 [data-theme="dark"] .slot-block {
@@ -1366,10 +1425,26 @@ footer {
     box-shadow: 0 0 0 1px var(--color-border-soft) inset;
 }
 
+@media (hover: hover) and (pointer: fine) {
+    .slot-block:hover {
+        box-shadow: 0 0 0 1.5px var(--color-primary) inset;
+    }
+}
+
 .slot-block__label {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.btn-tag-legend {
+    transition: box-shadow .15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .btn-tag-legend:hover {
+        box-shadow: 0 0 0 2px var(--color-primary);
+    }
 }
 
 /* 아직 오지 않은 시간. 안 채운 것이 아니라 아직 올 수 없는 것이라
@@ -1473,6 +1548,12 @@ footer {
     border: 1px solid var(--color-border);
     background: var(--color-surface);
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.frequent-tags__chip:hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
 }
 
 .day-row__selection {
@@ -1722,6 +1803,7 @@ footer {
     font-weight: 600;
     font-size: 0.875rem;
     cursor: pointer;
+    transition: background-color .15s ease;
 }
 
 .undo-snackbar__action:hover,
@@ -2164,6 +2246,11 @@ footer {
     cursor: pointer;
     padding: 0.6rem 0.85rem;
     color: inherit;
+    transition: background-color .15s ease;
+}
+
+.goal-card__header:hover {
+    background-color: var(--color-surface-soft);
 }
 
 .goal-card__header:focus-visible {
@@ -2285,6 +2372,7 @@ footer {
     cursor: pointer;
     border-radius: var(--radius-sm, 6px);
     line-height: 1;
+    transition: color .15s ease, background-color .15s ease;
 }
 
 .auth-card .password-toggle:hover,
@@ -2404,6 +2492,7 @@ footer {
 
 [data-theme="dark"] .navbar .nav-link {
     color: var(--color-text-muted) !important;
+    transition: color .15s ease;
 }
 
 [data-theme="dark"] .navbar .nav-link:hover {
@@ -2529,6 +2618,7 @@ footer {
 
 [data-theme="dark"] .dropdown-item {
     color: var(--color-text);
+    transition: background-color .15s ease;
 }
 
 [data-theme="dark"] .dropdown-item:hover {
@@ -2665,6 +2755,7 @@ footer {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     padding: 0;
+    transition: border-color .15s ease;
 }
 
 .tag-color-swatch:hover,
@@ -2864,6 +2955,12 @@ footer {
     border-radius: 9px;
     background: var(--color-surface);
     cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.category-picker__option:not(:has(.category-picker__radio:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
 }
 
 /* 라디오는 화면에서 감추되 접근성 트리에는 남긴다. display:none 이면
@@ -2943,6 +3040,7 @@ footer {
     font-size: 12.5px;
     font-weight: 500;
     cursor: pointer;
+    transition: color .15s ease;
 }
 
 .settings-head__action:hover {
