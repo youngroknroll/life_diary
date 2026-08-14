@@ -66,7 +66,8 @@ def test_prod_settings_trust_render_proxy_ssl_header(monkeypatch):
     assert prod_settings.SECURE_PROXY_SSL_HEADER == ("HTTP_X_FORWARDED_PROTO", "https")
 
 
-def test_prod_settings_trust_only_production_origin_for_csrf(monkeypatch):
+def test_prod_settings_trust_every_serving_host_for_csrf(monkeypatch):
+    """CSRF 목록이 ALLOWED_HOSTS 를 따라가지 못하면 그 도메인의 POST 가 막힌다."""
     monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
     monkeypatch.setenv("DB_NAME", "test_db")
     monkeypatch.setenv("DB_USER", "test_user")
@@ -77,7 +78,11 @@ def test_prod_settings_trust_only_production_origin_for_csrf(monkeypatch):
     prod_settings = importlib.import_module("lifeDiary.settings.prod")
     prod_settings = importlib.reload(prod_settings)
 
-    assert prod_settings.CSRF_TRUSTED_ORIGINS == ["https://lifediary.onrender.com"]
+    origins = prod_settings.CSRF_TRUSTED_ORIGINS
+    assert all(origin.startswith("https://") for origin in origins)
+    assert {origin.removeprefix("https://") for origin in origins} == set(
+        prod_settings.ALLOWED_HOSTS
+    )
 
 
 def test_prod_csp_policy_covers_required_sources(monkeypatch):
