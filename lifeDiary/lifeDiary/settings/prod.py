@@ -34,7 +34,11 @@ ALLOWED_HOSTS = ["lifediary.onrender.com","www.lifediary.kr","lifediary.kr"]
 # 이 헤더를 신뢰하지 않으면 request.is_secure()가 오판해
 # SECURE_SSL_REDIRECT와 결합 시 리다이렉트 루프가 발생할 수 있다.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = ["https://lifediary.onrender.com"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://lifediary.onrender.com",
+    "https://www.lifediary.kr",
+    "https://lifediary.kr",
+]
 SECURE_SSL_REDIRECT = True
 SECURE_HSTS_SECONDS = 31536000  # 1년
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
