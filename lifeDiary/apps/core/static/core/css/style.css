@@ -5,8 +5,10 @@
     /* Brand palette (녹색 테마) */
     --color-primary: #2C6E4A;
     --color-primary-hover: #235B3C;
+    --color-primary-press: #1C462F;
     --color-primary-soft: #EDF3EE;
     --color-primary-border: #98c7aa;
+    --ink-on-primary: #ffffff;
 
     /* Text — 시안은 네 단계를 쓴다. 두 단계로 줄이면 위계가 뭉갠다. */
     --color-text: #14211A;
@@ -84,8 +86,11 @@
 [data-theme="dark"] {
     --color-primary: #4aa66d;
     --color-primary-hover: #5cb87e;
+    --color-primary-press: #75C392;
     --color-primary-soft: #1a2e22;
     --color-primary-border: #3a6b4a;
+    /* 다크 초록은 라이트보다 훨씬 밝다. 흰 글자로는 2.44:1 밖에 안 나온다. */
+    --ink-on-primary: var(--ink-on-accent);
 
     --color-text: #E4EBE6;
     --color-text-body: #B9C6BD;
@@ -195,6 +200,11 @@ body {
 .app-nav__tab:hover {
     color: var(--color-text);
     background-color: var(--color-surface-soft);
+}
+
+.app-nav__tab:active {
+    color: var(--color-text);
+    background-color: var(--color-primary-soft);
 }
 
 .app-nav__tab.is-active {
@@ -340,6 +350,12 @@ body {
     outline-offset: 2px;
 }
 
+.btn-sian:where(:not(:disabled)):active {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
 /* 좁은 카드 안에 두 개가 나란히 들어가는 버튼.
    기본 좌우 여백 14px 은 카드 폭에서 글자 자리를 다 먹어 라벨이 두 줄로
    접힌다. 여백과 글자만 줄이고 44px 높이는 그대로 지킨다. */
@@ -369,14 +385,20 @@ body {
 .btn-sian--primary {
     border-color: transparent;
     background: var(--color-primary);
-    color: #fff;
+    color: var(--ink-on-primary);
     font-weight: 600;
 }
 
 .btn-sian--primary:where(:not(:disabled)):hover {
     background: var(--color-primary-hover);
     border-color: transparent;
-    color: #fff;
+    color: var(--ink-on-primary);
+}
+
+.btn-sian--primary:where(:not(:disabled)):active {
+    background: var(--color-primary-press);
+    border-color: transparent;
+    color: var(--ink-on-primary);
 }
 
 .settings-row {
@@ -865,6 +887,12 @@ body {
     outline-offset: 2px;
 }
 
+.stepper__btn:where(:not(:disabled)):active {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
 .stepper__value {
     flex: 1;
     min-width: 0;
@@ -1308,6 +1336,12 @@ body {
 
 .btn-sian--danger:where(:not(:disabled)):hover {
     background: #6d2f13;
+    border-color: transparent;
+    color: #fff;
+}
+
+.btn-sian--danger:where(:not(:disabled)):active {
+    background: #50220E;
     border-color: transparent;
     color: #fff;
 }
@@ -1975,11 +2009,25 @@ footer {
 .btn-primary {
     background: var(--color-primary);
     border: none;
+    color: var(--ink-on-primary);
 }
 
 .btn-primary:hover {
     background: var(--color-primary-hover);
     transform: translateY(-1px);
+    color: var(--ink-on-primary);
+}
+
+/* 부트스트랩의 .btn:first-child:active 가 (0,3,0) 이라 .btn 을 함께 적어야 이긴다. */
+.btn.btn-primary:focus-visible {
+    background: var(--color-primary-hover);
+    color: var(--ink-on-primary);
+}
+
+/* 같은 특정도라 순서가 갈린다. 키보드로 누르면 focus 와 active 가 동시에 참이다. */
+.btn.btn-primary:active {
+    background: var(--color-primary-press);
+    color: var(--ink-on-primary);
 }
 
 /* =========================================================
