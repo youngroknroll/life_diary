@@ -110,6 +110,11 @@
                     {% for row in slot_rows %}
                         {% include 'dashboard/_day_row.html' %}
                     {% endfor %}
+                    {# 23시 행은 24:00 에 끝난다. 끝선이 없으면 하루가 23시에 멎은 것처럼 읽힌다. #}
+                    <div class="day-row" aria-hidden="true">
+                        <div class="day-row__label">24:00</div>
+                        <div class="day-row__cells"></div>
+                    </div>
                 </div>
 
                 {% if is_today %}
