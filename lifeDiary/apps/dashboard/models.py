@@ -23,9 +23,7 @@ class TimeBlock(models.Model):
         verbose_name=_("슬롯 인덱스"),
         help_text=_("0~143 (0: 00:00-00:10, 143: 23:50-24:00)"),
     )
-    tag = models.ForeignKey(
-        Tag, on_delete=models.SET_NULL, null=True, verbose_name=_("태그")
-    )
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE, verbose_name=_("태그"))
     memo = models.CharField(
         blank=True,
         max_length=500,
