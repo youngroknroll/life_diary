@@ -134,6 +134,8 @@ class DeleteTagUseCase:
 
         if move_to_id is not None:
             _time_block_repo.move_blocks_to_tag(tag, self._destination(user, tag, move_to_id))
+        else:
+            _time_block_repo.delete_blocks_for_tag(tag)
 
         tag_name = tag.name
         _tag_repo.delete(tag)

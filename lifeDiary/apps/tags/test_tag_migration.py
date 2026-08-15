@@ -106,10 +106,23 @@ class TestDeleteWithoutMigration:
 
         assert not Tag.objects.filter(pk=source.pk).exists()
 
-    def test_deleting_a_used_tag_turns_its_blocks_unlogged(self, user, source):
-        """옮길 곳을 주지 않으면 그 구간은 미기록으로 돌아간다."""
-        record(user, source, count=3)
+    def test_deleting_a_used_tag_removes_its_time_blocks_and_memos(self, user, source):
+        """옮길 곳을 주지 않으면 기록과 메모까지 함께 지운다."""
+        record(user, source, count=2)
+        TimeBlock.objects.create(
+            user=user, date=TARGET, slot_index=2, tag=source, memo="비밀 메모"
+        )
+        other = Tag.objects.create(
+            user=user, name="식사",
+            category=Category.objects.get(slug="basic_life"),
+        )
+        TimeBlock.objects.create(
+            user=user, date=TARGET, slot_index=50, tag=other, memo="남는 메모"
+        )
 
         DeleteTagUseCase().execute(user, source.id)
 
-        assert TimeBlock.objects.filter(user=user, tag__isnull=True).count() == 3
+        assert not Tag.objects.filter(pk=source.pk).exists()
+        assert not TimeBlock.objects.filter(user=user, tag__isnull=True).exists()
+        assert not TimeBlock.objects.filter(user=user, memo="비밀 메모").exists()
+        assert TimeBlock.objects.filter(user=user, tag=other, memo="남는 메모").count() == 1
