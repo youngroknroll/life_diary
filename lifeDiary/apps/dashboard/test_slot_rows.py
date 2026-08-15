@@ -89,12 +89,10 @@ def test_empty_gaps_become_empty_runs(focus):
     ]
 
 
-def test_label_appears_only_from_three_slots(focus):
-    short = {0: slot(focus), 1: slot(focus)}
-    long = {6: slot(focus), 7: slot(focus), 8: slot(focus)}
+def test_label_appears_even_on_a_short_stretch(focus):
+    slot_data = {0: slot(focus), 1: slot(focus)}
 
-    assert find_row(build_slot_rows(short), 0)["runs"][0]["label"] == ""
-    assert find_row(build_slot_rows(long), 1)["runs"][0]["label"] == "집중 작업"
+    assert find_row(build_slot_rows(slot_data), 0)["runs"][0]["label"] == "집중 작업"
 
 
 def test_multi_hour_stretch_labels_only_the_first_row(focus):
@@ -106,18 +104,14 @@ def test_multi_hour_stretch_labels_only_the_first_row(focus):
     assert find_row(rows, 10)["runs"][0]["label"] == ""
 
 
-def test_stretch_labels_first_row_that_is_wide_enough(focus):
-    """첫 행 조각이 3칸 미만이면 라벨이 통째로 사라지면 안 된다.
-
-    13:40–15:00 은 13시 행에서 2칸뿐이라 그 행에는 라벨을 넣을 수 없다.
-    이때는 폭이 충분한 첫 행(14시)이 라벨을 받는다.
-    """
+def test_stretch_labels_the_block_containing_its_first_slot(focus):
+    """13:40–15:00 의 이름은 13시 행의 2칸짜리 첫 블록이 받는다."""
     slot_data = {index: slot(focus) for index in range(82, 90)}
 
     rows = build_slot_rows(slot_data)
 
-    assert find_row(rows, 13)["runs"][-1]["label"] == ""
-    assert find_row(rows, 14)["runs"][0]["label"] == "집중 작업"
+    assert find_row(rows, 13)["runs"][-1]["label"] == "집중 작업"
+    assert find_row(rows, 14)["runs"][0]["label"] == ""
     assert find_row(rows, 15)["runs"][0]["label"] == ""
 
 
