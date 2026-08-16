@@ -92,6 +92,15 @@ def _create_deleted_account_record(deletion_request, purged_at):
     )
 
 
+def count_overdue_deletion_requests(now=None):
+    now = now or timezone.now()
+    return AccountDeletionRequest.objects.filter(
+        scheduled_delete_at__lte=now,
+        cancelled_at__isnull=True,
+        purged_at__isnull=True,
+    ).count()
+
+
 @transaction.atomic
 def purge_due_deleted_accounts(now=None):
     now = now or timezone.now()

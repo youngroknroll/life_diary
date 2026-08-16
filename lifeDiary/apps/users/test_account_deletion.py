@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 from django.urls import reverse
 from django.utils import timezone
 
@@ -199,3 +199,37 @@ class TestPurgeDeletedAccountsCommand:
 
         assert get_user_model().objects.filter(id=original_user_id).exists() is False
         assert DeletedAccountRecord.objects.filter(original_user_id=original_user_id).exists()
+
+    def test_check_reports_overdue_requests_excluding_cancelled_without_purging(
+        self, make_user
+    ):
+        overdue_user = make_user(username="overdue", email="overdue@example.com")
+        request_account_deletion(overdue_user, now=timezone.now() - timedelta(days=16))
+        cancelled_user = make_user(username="cancelled", email="cancelled@example.com")
+        request_account_deletion(
+            cancelled_user, now=timezone.now() - timedelta(days=20)
+        )
+        AccountDeletionRequest.objects.filter(user=cancelled_user).update(
+            cancelled_at=timezone.now() - timedelta(days=18)
+        )
+
+        with pytest.raises(CommandError) as excinfo:
+            call_command("purge_deleted_accounts", check=True)
+
+        assert "1" in str(excinfo.value)
+        assert get_user_model().objects.filter(pk=overdue_user.pk).exists()
+        assert AccountDeletionRequest.objects.count() == 2
+        assert not DeletedAccountRecord.objects.exists()
+
+    def test_check_passes_quietly_when_no_overdue_requests(self, make_user, capsys):
+        cancelled_user = make_user(username="cancelled", email="cancelled@example.com")
+        request_account_deletion(
+            cancelled_user, now=timezone.now() - timedelta(days=20)
+        )
+        AccountDeletionRequest.objects.filter(user=cancelled_user).update(
+            cancelled_at=timezone.now() - timedelta(days=18)
+        )
+
+        call_command("purge_deleted_accounts", check=True)
+
+        assert "Overdue deletion requests: 0" in capsys.readouterr().out
