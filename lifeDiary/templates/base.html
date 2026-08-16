@@ -48,6 +48,8 @@
     
     <!-- Custom CSS -->
     {% load static %}
+    <link rel="preload" href="{% static 'core/fonts/PretendardVariable.woff2' %}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{% static 'core/fonts/IBMPlexMono-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
 
     {% block extra_css %}{% endblock %}
@@ -186,12 +188,23 @@
         // 로딩 오버레이 관리 (plain div — body 스크롤 락 없음)
         const loadingOverlay = document.getElementById('loadingOverlay');
         let isNavigating = false;
+        let overlayShowTimer = null;
 
+        // 300ms 안에 끝나는 이동은 스피너를 보여주지 않는다 (hideLoadingOverlay가
+        // 그 전에 호출되면 타이머가 취소되어 클래스가 붙지 않는다).
         function showLoadingOverlay() {
-            if (loadingOverlay) loadingOverlay.classList.add('is-visible');
+            if (!loadingOverlay || overlayShowTimer) return;
+            overlayShowTimer = setTimeout(function() {
+                overlayShowTimer = null;
+                loadingOverlay.classList.add('is-visible');
+            }, 300);
         }
 
         function hideLoadingOverlay() {
+            if (overlayShowTimer) {
+                clearTimeout(overlayShowTimer);
+                overlayShowTimer = null;
+            }
             if (loadingOverlay) loadingOverlay.classList.remove('is-visible');
             isNavigating = false;
         }

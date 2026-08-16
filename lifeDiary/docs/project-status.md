@@ -17,6 +17,24 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-16 — P0 v2 UI 핸드오프 이식 (1단계: 폰트·오버레이·clamp)
+
+Claude Design에서 가져온 「Life Diary P0 구현 명세 v2」+「Life Diary 반영 점검 시안」을
+6단계(§1 차트 재작성·§2 category_stats 집계·§3 입력 패널·§4 segmented+목표 진행 바·
+§5 폰트·크롬·§6 인증/온보딩/설정/홈)로 나눠 이식하는 트랙을 시작했다. 1단계만 완료.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-16_p0-v2-phase1-fonts-chrome.md`
+- 변경: `apps/core/static/core/css/style.css`(`@font-face` 4개), `apps/core/static/core/
+  fonts/`(Pretendard Variable + IBM Plex Mono 400/500/600 woff2, 신규), `templates/
+  base.html`(폰트 preload, 로딩 오버레이 300ms 지연), `templates/index.html`(`.home-title`
+  clamp 반응형화)
+- 검증: `manage.py check` 클린, 브라우저 실측(콘솔 0건, 폰트 네트워크 200, `document.fonts`
+  로딩 확인, 오버레이 타이머 3케이스 스크립트 검증, 뷰포트별 `.home-title` 크기 변화 확인)
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 2~6단계 남음, 머지는 사용자 몫
+- Deferred: Windows 등 타 OS 폰트 렌더 실측, Lighthouse FOUT 측정(코드 검토로 대체),
+  Pretendard 동적 서브셋 빌드(전체 Variable 파일 그대로 배포)
+
 ## 2026-08-16 — JSON API의 django-ninja 이식과 OpenAPI/Swagger 문서화
 
 5개 JSON 엔드포인트(time-blocks 저장/삭제/undo, categories, tags CRUD)를
