@@ -17,6 +17,27 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-16 — P0 v2 UI 핸드오프 이식 (2단계: category_stats 집계)
+
+`weekly.py`·`monthly.py`에 카테고리 롤업(`category_stats`, 5개 카테고리 항상 시드)과
+`week_start`를 추가하고, `daily.py`의 `hourly_stats` 키를 태그명 → 카테고리 key로
+바꿨다. 미분류(빈 슬롯) 시간은 `hourly_stats`에서 빠지고 `tag_stats` 표에만 남는다.
+구현 중 `get_tag_info`가 `block.tag.category`를 읽게 되면서 쿼리 예산 테스트가
+4408쿼리로 터진 회귀를 발견 — `TimeBlockRepository.find_by_date`·`find_by_month`에
+`tag__category` select_related를 추가해 고쳤다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-16_p0-v2-phase2-category-stats.md`
+- 변경: `apps/stats/aggregation/{category_keys.py(신설),calculator.py,weekly.py,
+  monthly.py,daily.py}`, `apps/dashboard/repositories.py`(N+1 회귀 수정), 신규 테스트
+  3파일(`test_weekly.py`,`test_monthly.py`,`test_daily.py`)
+- 검증: 전체 pytest 523개 수집·전부 통과, `manage.py check` 클린, 마이그레이션 드리프트
+  없음(모델 변경 없음)
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 3~6단계 남음, 머지는 사용자 몫
+- 알려진 비일관 상태: `stats.js`(3단계 대상)가 아직 태그명 기준이라 이 커밋만 단독
+  배포하면 일간 스택 차트가 깨진다 — 같은 브랜치 안의 의도된 과도기, 배포 안 함
+- Deferred: 없음(범위 안 항목 전부 완료)
+
 ## 2026-08-16 — P0 v2 UI 핸드오프 이식 (1단계: 폰트·오버레이·clamp)
 
 Claude Design에서 가져온 「Life Diary P0 구현 명세 v2」+「Life Diary 반영 점검 시안」을
