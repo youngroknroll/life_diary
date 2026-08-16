@@ -28,21 +28,36 @@ def mask_email(email):
 @transaction.atomic
 def request_account_deletion(user, now=None):
     now = now or timezone.now()
-    existing = AccountDeletionRequest.objects.filter(
-        user=user,
-        cancelled_at__isnull=True,
-        purged_at__isnull=True,
-    ).first()
-    if existing:
+    existing = (
+        AccountDeletionRequest.objects.select_for_update()
+        .filter(user=user)
+        .first()
+    )
+    if existing and existing.cancelled_at is None and existing.purged_at is None:
         if user.is_active:
             user.is_active = False
             user.save(update_fields=["is_active"])
         return existing
-    deletion_request = AccountDeletionRequest.objects.create(
-        user=user,
-        requested_at=now,
-        scheduled_delete_at=now + timedelta(days=GRACE_PERIOD_DAYS),
-    )
+    if existing:
+        existing.requested_at = now
+        existing.scheduled_delete_at = now + timedelta(days=GRACE_PERIOD_DAYS)
+        existing.cancelled_at = None
+        existing.purged_at = None
+        existing.save(
+            update_fields=[
+                "requested_at",
+                "scheduled_delete_at",
+                "cancelled_at",
+                "purged_at",
+            ]
+        )
+        deletion_request = existing
+    else:
+        deletion_request = AccountDeletionRequest.objects.create(
+            user=user,
+            requested_at=now,
+            scheduled_delete_at=now + timedelta(days=GRACE_PERIOD_DAYS),
+        )
     user.is_active = False
     user.save(update_fields=["is_active"])
     return deletion_request

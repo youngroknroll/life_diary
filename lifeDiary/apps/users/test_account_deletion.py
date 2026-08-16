@@ -61,6 +61,26 @@ class TestAccountDeletionService:
         assert AccountDeletionRequest.objects.count() == 1
         assert second.requested_at == first_now
 
+    def test_new_deletion_request_after_cancellation_reuses_request_with_new_deadline(
+        self, make_user
+    ):
+        user = make_user(email="person@example.com")
+        first_now = timezone.now()
+        first = request_account_deletion(user, now=first_now)
+        cancel_account_deletion(user, now=first_now + timedelta(days=1))
+        second_now = first_now + timedelta(days=10)
+
+        second = request_account_deletion(user, now=second_now)
+
+        user.refresh_from_db()
+        assert AccountDeletionRequest.objects.count() == 1
+        assert second.id == first.id
+        assert second.requested_at == second_now
+        assert second.scheduled_delete_at == second_now + timedelta(days=15)
+        assert second.cancelled_at is None
+        assert second.purged_at is None
+        assert user.is_active is False
+
     def test_cancel_before_deadline_reactivates_user(self, make_user):
         user = make_user(email="person@example.com")
         requested_at = timezone.now()
