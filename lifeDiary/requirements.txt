@@ -18,3 +18,4 @@ wheel==0.45.1
 whitenoise==6.9.0
 django-axes==7.0.1
 django-allauth==65.17.0
+django-ninja==1.6.2

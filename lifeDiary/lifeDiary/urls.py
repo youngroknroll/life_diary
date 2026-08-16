@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.views.i18n import JavaScriptCatalog
 from . import views
+from .api import api
 
 # 관리자만 admin 패널 접근 가능하도록 제한
 admin.site.login = user_passes_test(lambda u: u.is_superuser, login_url="/")(
@@ -61,6 +62,5 @@ urlpatterns = [
     path("accounts/", include("apps.users.urls")),
     path("accounts/", include("allauth.urls")),
     # API URLs
-    path("api/", include("apps.dashboard.api_urls")),
-    path("api/", include("apps.tags.api_urls")),
+    path("api/", api.urls),
 ]

@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-14
+Last updated: 2026-08-16
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,29 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-08-16 — JSON API의 django-ninja 이식과 OpenAPI/Swagger 문서화
+
+5개 JSON 엔드포인트(time-blocks 저장/삭제/undo, categories, tags CRUD)를
+URL·응답 봉투를 보존한 채 django-ninja 라우터로 이식하고 `/api/docs`
+(Swagger UI, 로컬 정적 서빙)와 `/api/openapi.json`(OAS 3.1)을 열었다.
+승인된 계약 변경 4건: 미인증 401 JSON, 깨진 JSON 문구 통일, 미소유 태그
+PUT/DELETE 500→404, 스키마 검증 실패의 봉투 매핑(400 유지). 프론트 JS와
+템플릿은 무변경이다.
+
+- 계획: `docs/plans/2026-08-16_api-openapi-django-ninja-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-16_api-openapi-django-ninja.md`
+- 안내: `docs/architecture/2026-08-16_api-documentation-guide.md`
+- 변경: `lifeDiary/api.py`(신설), `apps/{dashboard,tags}/api.py`·`schemas.py`
+  (신설), `apps/core/schemas.py`(신설), api_urls 2파일 삭제, requirements에
+  `django-ninja==1.6.2`, INSTALLED_APPS(dev·desktop)에 `ninja`
+- 검증: 전체 pytest 506 passed, `manage.py check` 클린, prod deploy check
+  통과(기존 W009 경고만), 마이그레이션 드리프트 없음, 브라우저 실측
+  (슬롯 저장/undo/삭제, 태그 CRUD, Swagger Try-it-out 200)
+- 상태: Active Plan — 브랜치 `feat/api-openapi-ninja`, 머지는 사용자 몫
+- Deferred: rate limiting·토큰 인증·버저닝, PyInstaller ninja 정적 번들,
+  desktop settings의 allauth URLConf 불일치(기존 결함, 이 트랙 이전부터
+  `check --settings=desktop` 실패)
 
 ## 2026-08-14 — 그리드 태그 라벨 위치와 시간축 24:00 경계
 

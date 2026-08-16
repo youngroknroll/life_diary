@@ -2374,3 +2374,15 @@ msgstr "today"
 #: templates/shared/confirm_delete.html:7
 msgid "정말로 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete?"
+
+#: lifeDiary/api.py:24
+msgid "로그인이 필요합니다."
+msgstr "Login is required."
+
+#: lifeDiary/api.py:32
+msgid "요청이 올바르지 않습니다."
+msgstr "Invalid request."
+
+#: apps/tags/api.py:35
+msgid "존재하지 않는 태그이거나 접근 권한이 없습니다."
+msgstr "The tag does not exist or you do not have access to it."

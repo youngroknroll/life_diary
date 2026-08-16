@@ -37,4 +37,4 @@ class TestTagsEnglish:
             "/api/tags/", "not json", content_type="application/json"
         )
         assert response.status_code == 400
-        assert "Malformed request." in response.json()["message"]
+        assert "Invalid JSON format." in response.json()["message"]
