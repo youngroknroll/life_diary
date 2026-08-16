@@ -823,7 +823,11 @@ body {
     transition: background-color .15s ease, border-color .15s ease;
 }
 
-.chip--pick:not(:has(.chip__check:checked)):hover {
+/* `:has(.chip__check)` 로 한정하는 이유: .chip--pick 은 두 상태 모델을 쓴다 —
+   온보딩은 숨은 체크박스, 기록 화면 시트는 .active 클래스다. 이 한정이 없으면
+   체크박스가 없는 시트 칩에서 `:not(:has(:checked))` 가 항상 참이 되어
+   선택된 칩까지 흐려진다. */
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)):hover {
     border-color: var(--color-primary-border);
     background-color: var(--color-surface-soft);
 }
@@ -847,7 +851,7 @@ body {
     outline-offset: 2px;
 }
 
-.chip--pick:not(:has(.chip__check:checked)) .chip__swatch {
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)) .chip__swatch {
     opacity: 0.35;
 }
 
@@ -2092,6 +2096,220 @@ footer {
     white-space: normal;
 }
 
+.quick-input-sheet__empty-tags {
+    margin: 4px 0;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+/* 데스크톱: 사이드바 안의 평범한 패널. 시안에는 카드 헤더가 없다 —
+   .quick-input-sheet 자체가 표면을 갖는다. */
+.quick-input-sheet {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(20, 33, 26, 0.06);
+    overflow: hidden;
+}
+
+.quick-input-sheet__handle {
+    display: none;
+}
+
+.quick-input-sheet__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.quick-input-sheet__range {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.quick-input-sheet__prompt {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__time {
+    font: 600 14px/1.3 var(--font-mono);
+    color: var(--color-text);
+}
+
+.quick-input-sheet__meta {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__memo-preview {
+    display: block;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__delete {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-danger-text);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.quick-input-sheet__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: none;
+    padding-top: 1px;
+}
+
+/* 글자는 11.5px 로 작지만 터치 영역은 44px 를 지킨다(시안 4a). */
+.quick-input-sheet__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0 0 12px;
+    border: none;
+    background: none;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.quick-input-sheet__close {
+    display: none;
+}
+
+.quick-input-sheet__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 16px;
+}
+
+.quick-input-sheet__help {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--color-surface-soft);
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__help ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.quick-input-sheet__help li {
+    margin-bottom: 2px;
+}
+
+/* .quick-input-sheet__body 가 flex column 이라 align-self 없이는 폭이 늘어난다.
+   칩은 내용만큼만 차지해야 한다. */
+.chip--add {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    margin-top: 8px;
+    border: 1px dashed var(--color-text-disabled);
+    border-radius: 16px;
+    background: transparent;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.chip__swatch--add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 10px;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-text-muted);
+}
+
+/* 시트의 칩은 .active 클래스로 선택을 나타낸다. 온보딩은 같은 .chip--pick 에
+   숨은 체크박스를 쓰므로(위쪽 :has(.chip__check) 규칙들), 두 상태 모델이 서로
+   새지 않도록 이쪽은 .quick-input-sheet 안으로 한정한다. */
+.quick-input-sheet .chip--pick {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+.quick-input-sheet .chip--pick.active {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.quick-input-sheet .chip--pick:not(.active):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
+}
+
+.quick-input-sheet .chip--pick:not(.active) .chip__swatch {
+    opacity: 0.35;
+}
+
+.quick-input-sheet__memo {
+    min-height: 64px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 13px;
+    resize: vertical;
+}
+
+.quick-input-sheet__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.quick-input-sheet__save {
+    min-height: 50px;
+}
+
+.quick-input-sheet__footmeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__footmeta a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
 #saveBtn:disabled {
     background-color: var(--color-text-muted);
     border-color: var(--color-text-muted);
@@ -2109,7 +2327,7 @@ footer {
         display: block;
         position: fixed;
         inset: 0;
-        z-index: 1030;
+        z-index: 1035;
         background: rgba(15, 23, 42, 0.45);
         opacity: 0;
         pointer-events: none;
@@ -2130,10 +2348,11 @@ footer {
         box-sizing: border-box;
         height: 80dvh;
         max-height: calc(100dvh - env(safe-area-inset-bottom, 0px));
-        overflow-y: auto;
+        border: none;
+        border-radius: 16px 16px 8px 8px;
+        box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.24);
         transform: translateY(100%);
         transition: transform 0.24s ease;
-        padding: 0 0.75rem 0.75rem;
         will-change: transform;
     }
 
@@ -2141,37 +2360,55 @@ footer {
         transform: translateY(0);
     }
 
-    .quick-input-sheet .card {
-        border-radius: 12px 12px 8px 8px !important;
-        box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.24);
+    .quick-input-sheet__handle {
+        display: block;
+        flex: none;
+        width: 36px;
+        height: 4px;
+        margin: 10px auto 0;
+        border-radius: 2px;
+        background: var(--color-border);
     }
 
-    .quick-input-sheet .card-header {
+    .quick-input-sheet__header {
+        flex: none;
         position: sticky;
         top: 0;
         z-index: 1;
+        background: var(--color-surface);
     }
 
+    .quick-input-sheet__close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: none;
+        font-size: 20px;
+        line-height: 1;
+        color: var(--color-text-muted);
+        cursor: pointer;
+    }
+
+    .quick-input-sheet__body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .quick-input-sheet__footer {
+        flex: none;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* #saveBtn 을 여기서 빼는 이유: id 선택자가 .quick-input-sheet__save 의
+       50px 를 특정도로 눌러 저장 버튼만 44px 로 주저앉는다. 저장은 시트의
+       주 CTA 라 50px 를 지킨다(시안 4a). */
     .quick-input-sheet .btn,
-    .quick-input-sheet .tag-btn,
-    .quick-input-sheet #saveBtn {
+    .quick-input-sheet .tag-btn {
         min-height: 44px;
-    }
-
-    .quick-input-toolbar {
-        align-items: flex-start !important;
-        gap: 0.5rem;
-    }
-
-    .quick-input-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 0.35rem;
-    }
-
-    .quick-input-actions .btn {
-        margin-right: 0 !important;
     }
 }
 

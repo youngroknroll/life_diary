@@ -81,13 +81,6 @@ def dash_user_with_tags(ko_client, make_user):
     return ko_client, user
 
 
-@pytest.fixture
-def dash_en_user_with_tags(en_client, make_user):
-    user = make_user(username="dash-en-user")
-    en_client.force_login(user)
-    return en_client, user
-
-
 @pytest.mark.django_db
 class TestDashboardIndexRendering:
     def test_dashboard_renders_category_headers(self, dash_user_with_tags):
@@ -173,28 +166,6 @@ class TestDashboardIndexRendering:
         assert 'aria-labelledby="quickInputSheetTitle"' in content
         assert 'id="quickInputSheetTitle"' in content
         assert "data-dashboard-sheet-close" in content
-
-    def test_dashboard_uses_korean_tag_usage_guide_for_non_english_language(
-        self, dash_user_with_tags
-    ):
-        client, _ = dash_user_with_tags
-        client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
-        resp = client.get("/dashboard/")
-        body = resp.content.decode()
-
-        assert "/static/core/img/tag_usage_guide.png" in body
-        assert "/static/core/img/tag_usage_guide_en.png" not in body
-
-    def test_dashboard_uses_english_tag_usage_guide_for_english_language(
-        self, dash_en_user_with_tags
-    ):
-        client, _ = dash_en_user_with_tags
-        client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
-        resp = client.get("/dashboard/")
-        body = resp.content.decode()
-
-        assert "/static/core/img/tag_usage_guide_en.png" in body
-        assert "/static/core/img/tag_usage_guide.png" not in body
 
     def test_memo_optional_text_is_placeholder_only(self, dash_user_with_tags):
         client, _ = dash_user_with_tags

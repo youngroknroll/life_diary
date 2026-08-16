@@ -145,20 +145,47 @@ function initializeDashboard() {
         });
     }
 
-    const manageTagsBtn = document.getElementById('manageTagsBtn');
-    if (manageTagsBtn) {
-        manageTagsBtn.addEventListener('click', function() {
-            const tagsUrl = document.getElementById('quickInputSidebar').dataset.tagsUrl;
-            window.location.href = tagsUrl;
-        });
-    }
-
     document.querySelectorAll('[data-dashboard-sheet-close]').forEach((el) => {
         el.addEventListener('click', closeQuickInputSheet);
     });
 
+    initQuickInputSheetSwipeToClose();
     syncQuickInputSheetForLayout();
     window.addEventListener('resize', syncQuickInputSheetForLayout);
+}
+
+// 핸들을 아래로 스와이프하면 닫는다(목업 4a). 핸들에서 시작한 제스처만
+// 반응한다 — 태그 목록 스크롤과 겹치면 안 된다.
+function initQuickInputSheetSwipeToClose() {
+    const handle = document.querySelector('[data-dashboard-sheet-handle]');
+    const sheet = document.getElementById('quickInputSheet');
+    if (!handle || !sheet) return;
+
+    const CLOSE_THRESHOLD_PX = 60;
+    let startY = null;
+    let dragY = 0;
+
+    handle.addEventListener('touchstart', function (event) {
+        if (!sheet.classList.contains('is-open')) return;
+        startY = event.touches[0].clientY;
+        dragY = 0;
+        sheet.style.transition = 'none';
+    }, { passive: true });
+
+    handle.addEventListener('touchmove', function (event) {
+        if (startY === null) return;
+        dragY = Math.max(0, event.touches[0].clientY - startY);
+        sheet.style.transform = `translateY(${dragY}px)`;
+    }, { passive: true });
+
+    handle.addEventListener('touchend', function () {
+        if (startY === null) return;
+        sheet.style.transition = '';
+        sheet.style.transform = '';
+        const shouldClose = dragY > CLOSE_THRESHOLD_PX;
+        startY = null;
+        if (shouldClose) closeQuickInputSheet();
+    });
 }
 
 function syncQuickInputSheetForLayout() {
@@ -564,7 +591,7 @@ const showSlotInfo = (slotIndexes) => {
 
     if (!slotIndexes || slotIndexes.length === 0) {
         const promptText = gettext('그리드에서 시간을 선택하세요');
-        inlineEl.innerHTML = `<small class="text-muted"><i class="fas fa-hand-pointer me-1"></i>${promptText}</small>`;
+        inlineEl.innerHTML = `<span class="quick-input-sheet__prompt">${escapeHtml(promptText)}</span>`;
         return;
     }
 
@@ -572,52 +599,37 @@ const showSlotInfo = (slotIndexes) => {
         isSlotFilled(idx)
     );
 
+    // 시간을 선택했어요. 원하는 태그를 선택하세요. — 아래 infoHTML 대입보다
+    // 앞에 두는 순서를 테스트가 고정한다(test_selected_slot_info_prompts_tag_selection).
     const nextActionPrompt = gettext('시간을 선택했어요. 원하는 태그를 선택하세요.');
-    let infoHTML = '';
+    const deleteLabel = gettext('삭제');
+    let timeRange, metaLine, memoLine = '';
+
     if (slotIndexes.length === 1) {
         const slotIndex = slotIndexes[0];
-        const timeRange = `${slotIndexToTime(slotIndex)}–${slotIndexToTime(slotIndex + 1)}`;
+        timeRange = `${slotIndexToTime(slotIndex)}–${slotIndexToTime(slotIndex + 1)}`;
         const tagInfo = slotTagInfo(slotIndex);
         const tagName = tagInfo ? tagInfo.tagName : gettext('빈 슬롯');
-        const memo = tagInfo ? tagInfo.memo : '';
-
-        const labelTime = gettext('시간:');
-        const labelStatus = gettext('상태:');
-        const deleteLabel = gettext('삭제');
-        infoHTML = `<div class="d-flex justify-content-between align-items-start">
-            <div>
-                <div class="text-muted"><strong>${labelTime}</strong> ${timeRange}</div>
-                <div class="text-muted"><strong>${labelStatus}</strong> ${tagName}</div>
-                ${memo ? `<div class="text-muted small">${memo}</div>` : ''}
-                <div class="text-primary small mt-1"><i class="fas fa-tags me-1"></i>${nextActionPrompt}</div>
-            </div>
-            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
-        </div>`;
+        metaLine = `${escapeHtml(tagName)} · ${escapeHtml(nextActionPrompt)}`;
+        if (tagInfo && tagInfo.memo) {
+            memoLine = `<span class="quick-input-sheet__memo-preview">${escapeHtml(tagInfo.memo)}</span>`;
+        }
     } else {
         const sortedSlots = slotIndexes.slice().sort((a, b) => a - b);
-        const startTime = slotIndexToTime(sortedSlots[0]);
-        const endTime = slotIndexToTime(sortedSlots[sortedSlots.length - 1] + 1);
-        const duration = slotIndexes.length * 10;
+        timeRange = `${slotIndexToTime(sortedSlots[0])}–${slotIndexToTime(sortedSlots[sortedSlots.length - 1] + 1)}`;
         const slotsLabel = interpolate(
-            ngettext('%s개 슬롯', '%s개 슬롯', slotIndexes.length),
+            ngettext('%s칸 선택', '%s칸 선택', slotIndexes.length),
             [slotIndexes.length]
         );
-        const durationLabel = interpolate(
-            gettext('%(h)s시간 %(m)s분'),
-            { h: Math.floor(duration / 60), m: duration % 60 },
-            true
-        );
-        const deleteLabel = gettext('삭제');
-
-        infoHTML = `<div class="d-flex justify-content-between align-items-start">
-            <div>
-                <div class="text-muted"><strong>${slotsLabel}</strong> ${startTime} - ${endTime}</div>
-                <div class="text-muted small">${durationLabel}</div>
-                <div class="text-primary small mt-1"><i class="fas fa-tags me-1"></i>${nextActionPrompt}</div>
-            </div>
-            ${hasFilledSlot ? `<button class="btn btn-outline-danger btn-sm" onclick="deleteSlot()"><i class="fas fa-trash me-1"></i>${deleteLabel}</button>` : ''}
-        </div>`;
+        metaLine = `${escapeHtml(slotsLabel)} · ${escapeHtml(nextActionPrompt)}`;
     }
+
+    const infoHTML = `
+        <span class="quick-input-sheet__time num">${escapeHtml(timeRange)}</span>
+        <span class="quick-input-sheet__meta">${metaLine}</span>
+        ${memoLine}
+        ${hasFilledSlot ? `<button type="button" class="quick-input-sheet__delete" onclick="deleteSlot()">${escapeHtml(deleteLabel)}</button>` : ''}
+    `;
 
     inlineEl.innerHTML = infoHTML;
 };
@@ -626,7 +638,11 @@ const showSlotInfo = (slotIndexes) => {
 
 const updateButtons = () => {
     const saveBtn = document.getElementById('saveBtn');
-    if (saveBtn) saveBtn.disabled = !(selectedSlots.size > 0 && selectedTag !== null);
+    if (!saveBtn) return;
+    saveBtn.disabled = !(selectedSlots.size > 0 && selectedTag !== null);
+    saveBtn.textContent = selectedSlots.size > 0
+        ? interpolate(ngettext('%s칸 저장', '%s칸 저장', selectedSlots.size), [selectedSlots.size])
+        : gettext('저장');
 };
 
 const selectTag = (tagId, tagColor, tagName) => {
@@ -784,9 +800,12 @@ const saveSlot = async () => {
 
         renderRows(result.runs);
         renderDayStats(result.stats);
+        // 닫기를 선택 해제보다 먼저 한다. closeQuickInputSheet 는 남아 있는
+        // 선택으로 포커스를 되돌릴 칸을 찾는데, 순서가 뒤집히면 되돌릴 칸이
+        // 없어 포커스가 시트 안에 남은 채 aria-hidden 이 걸린다.
+        closeQuickInputSheet();
         clearSelection();
         updateButtons();
-        closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
 
         // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
@@ -890,9 +909,12 @@ const deleteSlot = async () => {
 
         renderRows(result.runs);
         renderDayStats(result.stats);
+        // 닫기를 선택 해제보다 먼저 한다. closeQuickInputSheet 는 남아 있는
+        // 선택으로 포커스를 되돌릴 칸을 찾는데, 순서가 뒤집히면 되돌릴 칸이
+        // 없어 포커스가 시트 안에 남은 채 aria-hidden 이 걸린다.
+        closeQuickInputSheet();
         clearSelection();
         updateButtons();
-        closeQuickInputSheet();
         showUndoSnackbar(result.message, result.undo_token);
 
         // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
@@ -924,12 +946,11 @@ function renderTagButton(tag) {
     const safeName = escapeHtml(tag.name);
     const safeColor = escapeHtml(tag.color);
     return `
-        <button type="button" class="btn btn-outline-secondary btn-sm tag-btn text-start"
+        <button type="button" class="tag-btn chip chip--pick"
                 data-tag-id="${tag.id}"
                 data-tag-color="${safeColor}"
                 data-tag-name="${safeName}">
-            <span class="badge me-2" style="background-color: ${safeColor};">&nbsp;</span>
-            ${safeName}
+            <span class="chip__swatch" style="background-color: ${safeColor}"></span>${safeName}
         </button>`;
 }
 
@@ -961,17 +982,15 @@ function renderCategoryHeader(categoryName, categoryCount = null) {
 function renderTagContainer(tags) {
     const tagContainer = document.getElementById('tagContainer');
     if (tags.length === 0) {
-        const emptyHtml = gettext("태그가 없습니다.<br>'새 태그' 버튼으로 추가하세요.");
-        tagContainer.innerHTML = `<div class="text-center py-2">
-            <p class="text-muted small">${emptyHtml}</p>
-        </div>`;
+        const emptyText = gettext('태그가 없습니다. 아래에서 추가하세요.');
+        tagContainer.innerHTML = `<p class="quick-input-sheet__empty-tags">${emptyText}</p>`;
         return;
     }
 
     const categories = window._categories || [];
     // 카테고리 메타가 아직 로드되지 않았으면 flat 폴백
     if (categories.length === 0) {
-        tagContainer.innerHTML = tags.map(renderTagButton).join('');
+        tagContainer.innerHTML = `<div class="quick-input-tag-list">${tags.map(renderTagButton).join('')}</div>`;
         return;
     }
 
@@ -991,7 +1010,7 @@ function renderTagContainer(tags) {
         .map(cat => `
             <div class="tag-category-group">
                 ${renderCategoryHeader(cat.name)}
-                <div class="d-grid gap-1">
+                <div class="quick-input-tag-list">
                     ${byCategory.get(cat.id).map(renderTagButton).join('')}
                 </div>
             </div>

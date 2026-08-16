@@ -17,6 +17,29 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (5단계: 입력 패널 → 모바일 바텀시트)
+
+기록 화면 입력 패널을 카드 헤더·FA 아이콘·btn-sm 없이 재구성하고, 모바일 바텀시트를
+시안 4a대로 완성했다(80dvh, 헤더·저장 sticky, 태그 목록만 스크롤, 백드롭 탭·핸들
+스와이프 닫기, z-index 1030<1035<1040). 저장 버튼은 "N칸 저장"으로 칸 수를 보여준다.
+브라우저 실측에서 결함 5건을 잡았고, 그중 하나는 **선존재 ARIA 위반**(포커스가 시트
+안에 있는 채 `aria-hidden` 적용)이었다 — 저장·삭제 경로가 선택 해제를 닫기보다 먼저
+해서 포커스 복원 대상이 사라진 탓. 기존 테스트는 함수 내부 소스 순서만 검사해
+통과하고 있었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase5-input-panel-bottom-sheet.md`
+- 변경: `apps/dashboard/templates/dashboard/index.html`, `apps/dashboard/static/
+  dashboard/js/dashboard.js`, `apps/core/static/core/css/style.css`,
+  `apps/dashboard/tests.py`(마크업 검사 테스트 2건·전용 픽스처 제거),
+  `_tag_image_modal.html` 삭제, `locale/{ko,en}` django·djangojs 4파일
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, i18n fuzzy 0건(msgfmt 4파일 통과), 브라우저 실측 15항목
+  (데스크톱/375px, 시트 열림·닫기 3경로, 적층, 타깃, 저장→스낵바) — 상세는 실행 로그
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 6단계 남음, 머지는 사용자 몫
+- Deferred: 시트 닫기 버튼 32px(시안 명시값, 44px 규칙과 상충), JS/CSS 소스 문자열
+  검사 테스트 정리(이번에 거짓 확신을 준 형태), `tag_usage_guide*.png` 고아화 판단
+
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (4단계: segmented 전환 + 목표 진행 바)
 
 분석 화면의 `card > card-header > nav-tabs` 래핑을 걷어내고 기존 `.segmented`로
