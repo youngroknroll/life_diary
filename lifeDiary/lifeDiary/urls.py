@@ -63,6 +63,4 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # API URLs
     path("api/", api.urls),
-    path("api/", include("apps.dashboard.api_urls")),
-    path("api/", include("apps.tags.api_urls")),
 ]
