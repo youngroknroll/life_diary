@@ -1967,6 +1967,47 @@ footer {
     margin-top: 2px;
 }
 
+/* 축 라벨과 격자를 같은 행 높이·같은 간격으로 맞춘다. 셀 14px + gap 1px 을
+   ylabels 쪽에서 그대로 되풀이해야 날짜가 제 행에 선다. */
+.density__chart {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.density__ylabels {
+    display: grid;
+    grid-auto-rows: 14px;
+    gap: 1px;
+    flex: none;
+}
+
+.density__ylabel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
+.density__plot {
+    flex: 1;
+    min-width: 0;
+}
+
+.density__xlabels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+}
+
+.density__xlabel {
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
 .density__grid {
     display: grid;
     grid-template-columns: repeat(24, 1fr);

@@ -154,14 +154,30 @@
                         {% endif %}
 
                         <h6 class="mb-1">{% trans "기록 밀도" %}</h6>
-                        <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다." %}</p>
+                        <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하루 24시간입니다." %}</p>
                         <figure class="density m-0" role="group" aria-labelledby="densityCaption">
-                            <div class="density__grid" aria-hidden="true">
-                                {% for row in summary.density.grid %}
-                                    {% for minutes in row %}
-                                        <span class="density__cell" data-minutes="{{ minutes }}"></span>
+                            <div class="density__chart" aria-hidden="true">
+                                <div class="density__ylabels">
+                                    {% for row in summary.density.rows %}
+                                        <span class="density__ylabel num">{{ row.date|date:"n/j" }}</span>
                                     {% endfor %}
-                                {% endfor %}
+                                </div>
+                                <div class="density__plot">
+                                    <div class="density__grid">
+                                        {% for row in summary.density.grid %}
+                                            {% for minutes in row %}
+                                                <span class="density__cell" data-minutes="{{ minutes }}"></span>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="density__xlabels">
+                                        <span class="density__xlabel num">0</span>
+                                        <span class="density__xlabel num">6</span>
+                                        <span class="density__xlabel num">12</span>
+                                        <span class="density__xlabel num">18</span>
+                                        <span class="density__xlabel density__xlabel--end num">24</span>
+                                    </div>
+                                </div>
                             </div>
                             <figcaption id="densityCaption" class="density__legend">
                                 <span>{% trans "0분" %}</span>

@@ -17,6 +17,25 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — 분석 화면 가독성 수정 3건 (사용자 지시)
+
+(1) 호버 툴팁이 글자색을 지정하지 않아 Chart.js 기본 회색이 쓰였고, 배경
+`--color-text`가 다크에서 흰색이라 흰 배경에 회색 글자가 되어 읽히지 않던 문제를
+글자색을 반대 토큰(`--color-surface`)으로 못박아 두 테마 동시 해결. (2) 요약 탭
+"기록 밀도" 히트맵이 `aria-hidden`이라 화면에 축 설명이 전혀 없던 것을 날짜(세로)·
+시간(가로) 라벨 노출과 캡션 보강으로 해결(백엔드 무변경). (3) "요일별 기록량" 값
+축을 0–24h 고정으로 바꿔 바로 위 추세 그래프와 척도를 통일.
+
+- 실행 로그: `docs/frontend/2026-08-17_stats-readability-fixes.md`
+- 변경: `apps/stats/static/stats/js/stats.js`, `apps/stats/templates/stats/index.html`,
+  `apps/core/static/core/css/style.css`, `locale/{ko,en}/django.po`
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, i18n fuzzy 오상속 2건 교정 후 0건, 브라우저 실측(툴팁 라이트·
+  다크 각각, 밀도 축 정렬·넘침, 요일별 기록량 눈금)
+- 함께 고침: 두 줄짜리 `{# #}` 주석이 Django에서 한 줄 주석이라 화면에 그대로
+  출력되던 것을 제거
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 머지는 사용자 몫
+
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (5단계: 입력 패널 → 모바일 바텀시트)
 
 기록 화면 입력 패널을 카드 헤더·FA 아이콘·btn-sm 없이 재구성하고, 모바일 바텀시트를

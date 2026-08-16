@@ -114,9 +114,15 @@ function buildCategoryLegend(container, chart, mobileKeys) {
     });
 }
 
+/** 툴팁 배경은 --color-text(라이트=검정, 다크=흰색)라, 글자는 반드시 그 반대인
+ * --color-surface 로 못박는다. 지정하지 않으면 Chart.defaults.color(회색)가
+ * 쓰여 다크 모드에서 흰 배경에 회색 글자가 되어 읽히지 않는다. */
 function tooltipBaseOptions() {
+    const ink = cssToken('--color-surface');
     return {
         backgroundColor: cssToken('--color-text'),
+        titleColor: ink,
+        bodyColor: ink,
         titleFont: { family: cssToken('--font-mono') },
         bodyFont: { family: cssToken('--font-mono') },
         itemSort: function (a, b) { return b.parsed.y - a.parsed.y; },
@@ -375,16 +381,40 @@ function renderWeeklyBarChart(weeklyData) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: { beginAtZero: true }
+                x: { grid: { display: false } },
+                // 0–24h 고정. 기록량에 따라 눈금이 달라지면 다른 주와 눈으로
+                // 비교할 수 없다 — 선 차트들과 같은 규칙이다.
+                y: {
+                    min: 0,
+                    max: 24,
+                    ticks: {
+                        stepSize: isMobileViewport() ? 12 : 6,
+                        callback: function (v) { return v + 'h'; },
+                    },
+                    grid: { color: cssToken('--color-border-soft') },
+                }
             },
             plugins: {
-                legend: { display: false }
+                legend: { display: false },
+                tooltip: Object.assign(tooltipBaseOptions(), {
+                    callbacks: {
+                        label: function (context) {
+                            return interpolate(
+                                gettext('%(label)s: %(h)sh'),
+                                {label: context.dataset.label, h: context.parsed.y.toFixed(1)},
+                                true
+                            );
+                        }
+                    }
+                })
             }
         }
     });
 
     chartRethemeHandlers.push(function () {
         charts.weeklyBar.data.datasets[0].backgroundColor = cssToken('--color-accent-work');
+        charts.weeklyBar.options.scales.y.grid.color = cssToken('--color-border-soft');
+        Object.assign(charts.weeklyBar.options.plugins.tooltip, tooltipBaseOptions());
         charts.weeklyBar.update('none');
     });
 }
