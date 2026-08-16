@@ -17,6 +17,32 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (4단계: segmented 전환 + 목표 진행 바)
+
+분석 화면의 `card > card-header > nav-tabs` 래핑을 걷어내고 기존 `.segmented`로
+바꿨다(모바일 4등분). 요약 탭에 목표 진행 바(일/주/월 목표 진행률 + 페이스
+마커 + 미달 확정만 danger 색)를 신설했다. 브라우저 실측에서 실제 결함 2건을
+잡았다: (1) `nav-link active` → `segmented__item is-active`로 바꾸며 Bootstrap
+Tab이 이전 활성 탭을 못 찾아 두 탭 내용이 겹쳐 렌더되던 문제, (2)
+`initTabHashSync`의 리스너 등록 순서가 늦어 URL hash 진입 시 pill 하이라이트만
+어긋나던 문제. 둘 다 유닛 테스트로는 안 잡히는 순수 브라우저 상태 결함이었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase4-segmented-goal-progress.md`
+- 변경: `apps/stats/aggregation/{category_keys.py,goal_progress.py}`,
+  `apps/stats/{logic.py,test_stats_perf.py}`, `apps/stats/templates/stats/
+  index.html`, `apps/stats/static/stats/js/stats.js`, `apps/core/static/core/
+  css/style.css`, `apps/users/repositories.py`, `locale/{ko,en}` 10개 문자열
+- 검증: 전체 pytest 통과, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  i18n fuzzy 회귀(ko·en 각 3건) 발견·수정, 브라우저 실측(진행 중/확정 미달 두
+  케이스, 탭 클릭+hash 로드 양쪽, 데스크톱/모바일) — 상세는 실행 로그.
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 5~6단계 남음, 머지는 사용자 몫
+- Deferred: **배포 시 유의** — `GetStatsContextUseCase`의 파일 캐시가 스키마
+  버전이 없어, 배포 시 `.cache/`를 비우지 않으면 최근 24시간 안에 캐시된 과거
+  날짜 조회가 TTL 만료 전까지 목표 진행 바 없이 보일 수 있음(자연 소멸,
+  Deployment & Operations Reviewer 검토 권고). 목표 개수 비례 N+1 쿼리 재검토
+  조건부 항목.
+
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (3단계: stats.js 전면 재작성)
 
 "가장 큰 격차"였던 `stats.js`의 Chart.js 기본값을 걷어냈다. 데이터 단위를 태그 →

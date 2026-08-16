@@ -127,6 +127,22 @@ function initTabHashSync() {
     const tabsRoot = document.getElementById('statsTabs');
     if (!tabsRoot || !window.bootstrap) return;
 
+    // 탭 전환 시 hash 갱신(reload 없이) + .segmented__item의 is-active 동기화.
+    // Bootstrap Tab이 자체 "active" 클래스는 관리하지만 이 프로젝트의 세그먼트
+    // 스타일은 is-active를 본다 — nav-tabs를 걷어내며 생긴 차이라 여기서 잇는다.
+    // 리스너를 먼저 붙이고 나서 아래 hash 활성화를 해야 한다 — 순서가 바뀌면
+    // 로드 시 hash가 쏘는 첫 shown.bs.tab을 놓쳐 pill만 요약에 남는다.
+    const tabTriggers = tabsRoot.querySelectorAll('[data-bs-toggle="tab"]');
+    tabTriggers.forEach(function(btn) {
+        btn.addEventListener('shown.bs.tab', function(e) {
+            const target = e.target.getAttribute('data-bs-target');
+            if (target) {
+                history.replaceState(null, '', location.pathname + location.search + target);
+            }
+            tabTriggers.forEach(function(t) { t.classList.toggle('is-active', t === e.target); });
+        });
+    });
+
     // 로드 시 URL hash에 해당하는 탭 활성화
     const hash = window.location.hash;
     if (hash) {
@@ -136,15 +152,6 @@ function initTabHashSync() {
             catch (e) { console.error('탭 활성화 오류:', e); }
         }
     }
-
-    // 탭 전환 시 hash 갱신 (reload 없이)
-    tabsRoot.querySelectorAll('[data-bs-toggle="tab"]').forEach(function(btn) {
-        btn.addEventListener('shown.bs.tab', function(e) {
-            const target = e.target.getAttribute('data-bs-target');
-            if (!target) return;
-            history.replaceState(null, '', location.pathname + location.search + target);
-        });
-    });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

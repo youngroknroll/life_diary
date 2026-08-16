@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-16 23:48+0900\n"
+"POT-Creation-Date: 2026-08-17 00:22+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -437,6 +437,36 @@ msgstr "No days have passed yet"
 
 msgid "설정된 목표가 없습니다"
 msgstr "No tags yet."
+
+msgid "목표 진행"
+msgstr "Goal progress"
+
+msgid "목표 관리"
+msgstr "Manage goals"
+
+msgid "매일"
+msgstr "Daily"
+
+msgid "매주"
+msgstr "Weekly"
+
+msgid "매달"
+msgstr "Monthly"
+
+msgid "오늘"
+msgstr "today"
+
+msgid "이번 주"
+msgstr "this week"
+
+msgid "이번 달"
+msgstr "this month"
+
+msgid "오늘 기준 페이스"
+msgstr "Pace as of today"
+
+msgid "목표를 추가하면 여기 진행률이 보입니다"
+msgstr "Add a goal to see its progress here"
 
 msgid "관찰"
 msgstr "Observations"
@@ -1776,9 +1806,6 @@ msgstr "Service, account, and terms inquiries:"
 
 msgid "날짜 선택"
 msgstr "Pick a date"
-
-msgid "오늘"
-msgstr "today"
 
 msgid "정말로 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete?"

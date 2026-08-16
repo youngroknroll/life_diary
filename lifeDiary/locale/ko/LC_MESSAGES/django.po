@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-16 23:48+0900\n"
+"POT-Creation-Date: 2026-08-17 00:22+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -439,6 +439,36 @@ msgstr "아직 지난 날이 없습니다"
 
 msgid "설정된 목표가 없습니다"
 msgstr "설정된 목표가 없습니다"
+
+msgid "목표 진행"
+msgstr "목표 진행"
+
+msgid "목표 관리"
+msgstr "목표 관리"
+
+msgid "매일"
+msgstr "매일"
+
+msgid "매주"
+msgstr "매주"
+
+msgid "매달"
+msgstr "매달"
+
+msgid "오늘"
+msgstr "오늘"
+
+msgid "이번 주"
+msgstr "이번 주"
+
+msgid "이번 달"
+msgstr "이번 달"
+
+msgid "오늘 기준 페이스"
+msgstr "오늘 기준 페이스"
+
+msgid "목표를 추가하면 여기 진행률이 보입니다"
+msgstr "목표를 추가하면 여기 진행률이 보입니다"
 
 msgid "관찰"
 msgstr "관찰"
@@ -1754,9 +1784,6 @@ msgstr "서비스 이용, 계정, 약관 관련 문의:"
 
 msgid "날짜 선택"
 msgstr "날짜 선택"
-
-msgid "오늘"
-msgstr "오늘"
 
 msgid "정말로 삭제하시겠습니까?"
 msgstr "정말로 삭제하시겠습니까?"
