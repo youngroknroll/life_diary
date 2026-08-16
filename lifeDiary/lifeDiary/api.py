@@ -6,6 +6,7 @@ from ninja.errors import AuthenticationError, HttpError, ValidationError
 from ninja.security import django_auth
 
 from apps.core.schemas import error_payload
+from apps.dashboard.api import router as dashboard_router
 from apps.tags.api import router as tags_router
 
 api = NinjaAPI(
@@ -48,4 +49,5 @@ def on_http_error(request, exc):
     )
 
 
+api.add_router("", dashboard_router)
 api.add_router("", tags_router)
