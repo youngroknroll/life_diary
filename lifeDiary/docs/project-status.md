@@ -17,6 +17,30 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (3단계: stats.js 전면 재작성)
+
+"가장 큰 격차"였던 `stats.js`의 Chart.js 기본값을 걷어냈다. 데이터 단위를 태그 →
+카테고리 5선으로 바꾸고, 라이트/다크 테마 동기화(`applyChartTheme`), 카드 상단 HTML
+범례(클릭 토글+취소선, 모바일은 4개), DOM 기반 빈 상태(`drawEmptyState` canvas 그리기
+삭제)를 구현했다. 목표선(annotation)은 데이터 계약이 없어(UserGoal이 태그·복수
+단위) 4단계로 미뤘다. i18n 작업 중 `project_i18n_fuzzy_trap` 메모리와 일치하는
+회귀(msgmerge의 유사-문자열 오번역 상속, ko·en 각 6건)를 발견해 즉시 고쳤다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase3-stats-js-rewrite.md`
+- 변경: `apps/stats/static/stats/js/stats.js`(전면 재작성), `apps/stats/templates/
+  stats/index.html`(차트 패널에 범례·빈 상태 마크업), `apps/core/static/core/css/
+  style.css`(`.chart-legend`/`.chart-empty` 등 신규 클래스), `apps/stats/logic.py`
+  (2단계가 만든 category_stats를 JSON envelope로 통과), `locale/{ko,en}` 8개 문자열
+- 검증: `node --check` 통과, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `pytest apps/stats apps/dashboard apps/tags apps/users` 전부 통과, i18n
+  `msgfmt --check-format`+`compilemessages`+두 언어 `gettext()` 직접 조회 확인,
+  브라우저 실측(격리 DB+임시 서버, 일/주/월 3탭 × 데이터 있음/빈 상태, 1280px·
+  375px, 라이트/다크, 범례 토글) — 상세는 실행 로그의 Frontend Review Evidence.
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 4~6단계 남음, 머지는 사용자 몫
+- Deferred: 목표선(annotation 상수 데이터셋, 4단계 이후), 라이트 모드 라인 아래
+  장식 영역 채우기(1단계부터 이월)
+
 ## 2026-08-16 — P0 v2 UI 핸드오프 이식 (2단계: category_stats 집계)
 
 `weekly.py`·`monthly.py`에 카테고리 롤업(`category_stats`, 5개 카테고리 항상 시드)과

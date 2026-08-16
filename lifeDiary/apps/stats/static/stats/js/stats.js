@@ -1,22 +1,26 @@
 /**
  * =================================================================================
  * 통계 차트 JavaScript
- * - Chart.js 기반 통계 차트 렌더링
- * - 데이터는 <script id="stats-data" type="application/json"> 에서 로드
+ * - Chart.js 기반 통계 차트 렌더링, 데이터 단위는 태그가 아니라 카테고리 5개
+ * - 데이터는 <script id="*-stats-data" type="application/json"> 에서 로드
  * =================================================================================
  */
 
 let charts = {};
+let chartRethemeHandlers = [];
+let categoryNames = {};
 
-/**
- * 차트 canvas 컨텍스트를 가져오고 기존 차트가 있으면 파괴.
- * @param {string} canvasId - canvas 엘리먼트 id
- * @param {string} key - charts 맵의 키 (예: 'dailyPie')
- * @returns {CanvasRenderingContext2D}
- */
 /** CSS 토큰을 읽어 온다. 차트 색이 그리드 색과 달라 보이면 안 된다. */
 function cssToken(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+}
+
+function isDarkTheme() {
+    return document.documentElement.getAttribute('data-theme') === 'dark';
+}
+
+function isMobileViewport() {
+    return window.matchMedia('(max-width: 767.98px)').matches;
 }
 
 function prepareChart(canvasId, key) {
@@ -25,17 +29,98 @@ function prepareChart(canvasId, key) {
     return ctx;
 }
 
+// 카테고리 5색. 면(파스텔)은 기존 --color-accent-* 토큰, 선(딥)은 신규 —
+// 흰 배경에서 파스텔 선은 대비 1.4~2.2로 안 보인다. 다크 모드는 파스텔
+// 원색을 그대로 선에 쓴다(대비 7.8~11.6) — categoryLineColor가 분기한다.
+const CATEGORY_ORDER = ['work', 'move', 'care', 'sleep', 'life'];
+const CATEGORY_LINE = {
+    work: '#4E8F63', move: '#4F8B9E', care: '#C1715A', life: '#B9C2BA', sleep: '#8A9A91',
+};
+const CATEGORY_FILL_TOKEN = {
+    work: '--color-accent-work', move: '--color-accent-move', care: '--color-accent-care',
+    life: '--color-accent-rest', sleep: '--color-accent-sleep',
+};
+// 모바일 범례는 핵심 4개 — 기초(life)는 선·범례 모두 숨긴다.
+const MOBILE_LEGEND_KEYS = ['work', 'move', 'care', 'sleep'];
+// 데스크톱도 기초 선은 기본 꺼짐(범례에서 다시 켤 수 있다).
+const DEFAULT_OFF_KEYS = ['life'];
+
+function categoryLineColor(key) {
+    return isDarkTheme() ? cssToken(CATEGORY_FILL_TOKEN[key]) : CATEGORY_LINE[key];
+}
+
+function categoryFillColor(key) {
+    return cssToken(CATEGORY_FILL_TOKEN[key]);
+}
+
+function categoryName(key) {
+    return categoryNames[key] || key;
+}
+
+function applyChartTheme() {
+    Chart.defaults.color = cssToken('--color-text-meta');
+    Chart.defaults.font.family = cssToken('--font-body');
+    Chart.defaults.font.size = 11;
+    Chart.defaults.borderColor = cssToken('--color-border-soft');
+}
+
+/** #themeToggle 클릭 시 각 차트의 명시적 색(기본값으로 안 잡히는 것들)을
+ * 다시 계산해 update('none')한다. 오늘은 토글이 통계 화면과 같은 페이지에
+ * 있지 않지만(설정 화면), 스펙이 요구하는 대로 방어적으로 둔다. */
+function rethemeCharts() {
+    applyChartTheme();
+    chartRethemeHandlers.forEach(function (fn) { fn(); });
+}
+
+function isCategoryDataEmpty(categoryStats) {
+    return !categoryStats || categoryStats.every(function (c) { return c.total_hours === 0; });
+}
+
+function toggleChartEmptyState(canvas, emptyEl, legendEl, isEmpty) {
+    if (canvas) canvas.hidden = isEmpty;
+    if (emptyEl) emptyEl.hidden = !isEmpty;
+    if (legendEl) legendEl.hidden = isEmpty;
+}
+
 /**
- * 데이터가 없을 때 canvas 중앙에 placeholder 문구를 그림.
- * @param {CanvasRenderingContext2D} ctx
- * @param {string} [message='데이터가 없습니다']
+ * 카테고리 칩 범례를 그린다. 클릭하면 해당 데이터셋을 토글하고 취소선을 켠다.
+ * datasetIndex는 항상 CATEGORY_ORDER 안에서의 위치와 같다 — buildDatasets가
+ * 그 순서로 데이터셋을 만들기 때문이다.
  */
-function drawEmptyState(ctx, message) {
-    ctx.fillStyle = '#6c757d';
-    if (!message) message = gettext('데이터가 없습니다');
-    ctx.font = '16px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(message, ctx.canvas.width / 2, ctx.canvas.height / 2);
+function buildCategoryLegend(container, chart, mobileKeys) {
+    if (!container) return;
+    container.innerHTML = '';
+    const keys = isMobileViewport() ? mobileKeys : CATEGORY_ORDER;
+
+    keys.forEach(function (key) {
+        const datasetIndex = CATEGORY_ORDER.indexOf(key);
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = 'chart-legend__item';
+        const isOff = DEFAULT_OFF_KEYS.includes(key);
+        if (isOff) item.classList.add('is-off');
+        const swatch = document.createElement('span');
+        swatch.className = 'chart-legend__swatch';
+        swatch.style.backgroundColor = categoryLineColor(key);
+        item.appendChild(swatch);
+        item.appendChild(document.createTextNode(categoryName(key)));
+        item.addEventListener('click', function () {
+            const nowVisible = !chart.isDatasetVisible(datasetIndex);
+            chart.setDatasetVisibility(datasetIndex, nowVisible);
+            item.classList.toggle('is-off', !nowVisible);
+            chart.update();
+        });
+        container.appendChild(item);
+    });
+}
+
+function tooltipBaseOptions() {
+    return {
+        backgroundColor: cssToken('--color-text'),
+        titleFont: { family: cssToken('--font-mono') },
+        bodyFont: { family: cssToken('--font-mono') },
+        itemSort: function (a, b) { return b.parsed.y - a.parsed.y; },
+    };
 }
 
 function initTabHashSync() {
@@ -63,6 +148,7 @@ function initTabHashSync() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    applyChartTheme();
     initTabHashSync();
 
     function parseJsonScript(id) {
@@ -82,65 +168,74 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    (weekly.category_stats || []).forEach(function (c) { categoryNames[c.key] = c.name; });
+
     try {
-        renderHourlyBarChart(daily.hourly_stats, daily.tag_stats);
-        renderWeeklyLineChart(weekly.tag_weekly_stats, weekly.weekly_data);
+        renderHourlyBarChart(daily.hourly_stats);
+        renderWeeklyLineChart(weekly.category_stats, weekly.weekly_data);
         renderWeeklyBarChart(weekly.weekly_data);
         renderMonthlyLineChart(monthly);
     } catch (error) {
         console.error('차트 렌더링 오류:', error);
     }
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) themeToggle.addEventListener('click', rethemeCharts);
 });
 
-function renderHourlyBarChart(hourlyStats, tagStats) {
+function renderHourlyBarChart(hourlyStats) {
+    const canvas = document.getElementById('hourlyBarChart');
+    const emptyEl = document.getElementById('hourlyBarEmpty');
+    const isEmpty = !hourlyStats || hourlyStats.every(function (hour) { return Object.keys(hour).length === 0; });
+    toggleChartEmptyState(canvas, emptyEl, null, isEmpty);
+    if (isEmpty) return;
+
     const ctx = prepareChart('hourlyBarChart', 'hourlyBar');
-    if (hourlyStats.every(hour => Object.keys(hour).length === 0)) {
-        drawEmptyState(ctx);
-        return;
-    }
-
     const hours = Array.from({length: 24}, (_, i) => interpolate(gettext('%s:00'), [i]));
+    const shownHourTicks = [0, 6, 12, 18, 23];
 
-    const allTags = {};
-    if (tagStats) {
-        tagStats.forEach(tag => {
-            allTags[tag.name] = tag.color;
-        });
-    }
-
-    const datasets = Object.keys(allTags).map(tagName => {
+    const datasets = CATEGORY_ORDER.map(function (key) {
         return {
-            label: tagName,
-            data: hourlyStats.map(hourData => hourData[tagName] || 0),
-            backgroundColor: allTags[tagName],
+            label: categoryName(key),
+            data: hourlyStats.map(function (hourData) { return hourData[key] || 0; }),
+            backgroundColor: categoryFillColor(key),
+            borderWidth: 0,
         };
     });
 
     charts.hourlyBar = new Chart(ctx, {
         type: 'bar',
-        data: {
-            labels: hours,
-            datasets: datasets
-        },
+        data: { labels: hours, datasets: datasets },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { stacked: true },
+                x: {
+                    stacked: true,
+                    grid: { display: false },
+                    ticks: {
+                        autoSkip: false,
+                        callback: function (val, idx) {
+                            return shownHourTicks.includes(idx) ? hours[idx] : '';
+                        },
+                    },
+                },
                 y: {
                     stacked: true,
-                    beginAtZero: true,
+                    min: 0,
                     max: 60,
                     ticks: {
+                        stepSize: 30,
                         callback: function(value) {
                             return interpolate(gettext('%s min'), [value]);
                         }
-                    }
+                    },
+                    grid: { color: cssToken('--color-border-soft') },
                 }
             },
             plugins: {
-                legend: { position: 'bottom' },
-                tooltip: {
+                legend: { display: false },
+                tooltip: Object.assign(tooltipBaseOptions(), {
                     callbacks: {
                         label: function(context) {
                             return interpolate(
@@ -150,39 +245,108 @@ function renderHourlyBarChart(hourlyStats, tagStats) {
                             );
                         }
                     }
-                }
+                })
             }
         }
     });
+
+    chartRethemeHandlers.push(function () {
+        charts.hourlyBar.data.datasets.forEach(function (ds, i) {
+            ds.backgroundColor = categoryFillColor(CATEGORY_ORDER[i]);
+        });
+        charts.hourlyBar.options.scales.y.grid.color = cssToken('--color-border-soft');
+        Object.assign(charts.hourlyBar.options.plugins.tooltip, tooltipBaseOptions());
+        charts.hourlyBar.update('none');
+    });
 }
 
-function renderWeeklyLineChart(tagStats, weeklyData) {
+function renderWeeklyLineChart(categoryStats, weeklyData) {
+    const canvas = document.getElementById('weeklyLineChart');
+    const emptyEl = document.getElementById('weeklyLineEmpty');
+    const legendEl = document.getElementById('weeklyLineLegend');
+    const isEmpty = isCategoryDataEmpty(categoryStats);
+    toggleChartEmptyState(canvas, emptyEl, legendEl, isEmpty);
+    if (isEmpty) return;
+
     const ctx = prepareChart('weeklyLineChart', 'weeklyLine');
-    const days = weeklyData.map(day => day.day_korean);
+    const days = weeklyData.map(function (day) { return day.day_korean; });
+    const mobile = isMobileViewport();
+    const mobileShownIndexes = [0, 2, 4, 6]; // 월·수·금·일
+
+    const buildDatasets = function () {
+        return CATEGORY_ORDER.map(function (key) {
+            const cat = categoryStats.find(function (c) { return c.key === key; });
+            return {
+                label: cat ? cat.name : key,
+                data: cat ? cat.daily_hours : days.map(function () { return 0; }),
+                borderColor: categoryLineColor(key),
+                backgroundColor: categoryLineColor(key),
+                tension: 0,
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                borderWidth: mobile ? 2 : 2.5,
+                hidden: DEFAULT_OFF_KEYS.includes(key),
+            };
+        });
+    };
 
     charts.weeklyLine = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: days,
-            datasets: tagStats.map(tag => ({
-                label: tag.name,
-                data: tag.daily_hours,
-                borderColor: tag.color,
-                backgroundColor: tag.color + '20',
-                tension: 0.4,
-                fill: false
-            }))
-        },
+        data: { labels: days, datasets: buildDatasets() },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                y: { beginAtZero: true }
+                x: {
+                    grid: { display: false },
+                    ticks: mobile ? {
+                        autoSkip: false,
+                        callback: function (val, idx) {
+                            return mobileShownIndexes.includes(idx) ? days[idx] : '';
+                        },
+                    } : {},
+                },
+                y: {
+                    min: 0,
+                    max: 24,
+                    ticks: {
+                        stepSize: mobile ? 12 : 6,
+                        callback: function (v) { return v + 'h'; },
+                    },
+                    grid: { color: cssToken('--color-border-soft') },
+                }
             },
             plugins: {
-                legend: { position: 'top' }
+                legend: { display: false },
+                tooltip: Object.assign(tooltipBaseOptions(), {
+                    callbacks: {
+                        label: function (context) {
+                            return interpolate(
+                                gettext('%(label)s: %(h)sh'),
+                                {label: context.dataset.label, h: context.parsed.y.toFixed(1)},
+                                true
+                            );
+                        }
+                    }
+                })
             }
         }
+    });
+
+    buildCategoryLegend(legendEl, charts.weeklyLine, MOBILE_LEGEND_KEYS);
+
+    chartRethemeHandlers.push(function () {
+        charts.weeklyLine.data.datasets.forEach(function (ds, i) {
+            const key = CATEGORY_ORDER[i];
+            ds.borderColor = categoryLineColor(key);
+            ds.backgroundColor = categoryLineColor(key);
+        });
+        charts.weeklyLine.options.scales.y.grid.color = cssToken('--color-border-soft');
+        Object.assign(charts.weeklyLine.options.plugins.tooltip, tooltipBaseOptions());
+        charts.weeklyLine.update('none');
+        buildCategoryLegend(legendEl, charts.weeklyLine, MOBILE_LEGEND_KEYS);
     });
 }
 
@@ -211,68 +375,113 @@ function renderWeeklyBarChart(weeklyData) {
             }
         }
     });
+
+    chartRethemeHandlers.push(function () {
+        charts.weeklyBar.data.datasets[0].backgroundColor = cssToken('--color-accent-work');
+        charts.weeklyBar.update('none');
+    });
+}
+
+/** 월요일 날짜만 x축에 표시한다. start_date(그 달 1일)를 기준으로 요일을
+ * 셈한다 — 응답 순서를 믿지 않는다. */
+function monthWeekdays(startDateIso, dayCount) {
+    const start = new Date(startDateIso + 'T00:00:00');
+    return Array.from({length: dayCount}, function (_, i) {
+        const d = new Date(start);
+        d.setDate(start.getDate() + i);
+        return d.getDay(); // 0=일 ... 1=월
+    });
 }
 
 function renderMonthlyLineChart(monthlyData) {
+    const canvas = document.getElementById('monthlyLineChart');
+    const emptyEl = document.getElementById('monthlyLineEmpty');
+    const legendEl = document.getElementById('monthlyLineLegend');
+    const categoryStats = monthlyData && monthlyData.category_stats;
+    const isEmpty = isCategoryDataEmpty(categoryStats);
+    toggleChartEmptyState(canvas, emptyEl, legendEl, isEmpty);
+    if (isEmpty) return;
+
     const ctx = prepareChart('monthlyLineChart', 'monthlyLine');
-    if (!monthlyData || !monthlyData.tag_stats || monthlyData.tag_stats.length === 0) {
-        drawEmptyState(ctx);
-        return;
-    }
+    const dayLabels = monthlyData.day_labels;
+    const weekdays = monthlyData.start_date ? monthWeekdays(monthlyData.start_date, dayLabels.length) : [];
+
+    const buildDatasets = function () {
+        return CATEGORY_ORDER.map(function (key) {
+            const cat = categoryStats.find(function (c) { return c.key === key; });
+            return {
+                label: cat ? cat.name : key,
+                data: cat ? cat.daily_hours : dayLabels.map(function () { return 0; }),
+                borderColor: categoryLineColor(key),
+                backgroundColor: categoryLineColor(key),
+                tension: 0,
+                fill: false,
+                pointRadius: 0,
+                pointHoverRadius: 4,
+                borderWidth: 2,
+                hidden: DEFAULT_OFF_KEYS.includes(key),
+            };
+        });
+    };
 
     charts.monthlyLine = new Chart(ctx, {
         type: 'line',
-        data: {
-            labels: monthlyData.day_labels,
-            datasets: monthlyData.tag_stats.map(tag => ({
-                label: tag.name,
-                data: tag.daily_hours,
-                borderColor: tag.color,
-                backgroundColor: tag.color + '20',
-                tension: 0.4,
-                fill: false,
-                pointRadius: 3,
-                pointHoverRadius: 5
-            }))
-        },
+        data: { labels: dayLabels, datasets: buildDatasets() },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                x: { title: { display: true, text: gettext('Date') } },
-                y: {
-                    beginAtZero: true,
-                    max: 24,
-                    title: { display: true, text: gettext('Hours') },
+                x: {
+                    grid: { display: false },
                     ticks: {
-                        callback: function(value) {
-                            return interpolate(gettext('%sh'), [value]);
-                        }
-                    }
+                        autoSkip: false,
+                        callback: function (val, idx) {
+                            return weekdays[idx] === 1 ? dayLabels[idx] : '';
+                        },
+                    },
+                },
+                y: {
+                    min: 0,
+                    max: 24,
+                    ticks: {
+                        stepSize: 12,
+                        callback: function (v) { return v + 'h'; },
+                    },
+                    grid: { color: cssToken('--color-border-soft') },
                 }
             },
             plugins: {
-                legend: { position: 'top' },
-                tooltip: {
+                legend: { display: false },
+                tooltip: Object.assign(tooltipBaseOptions(), {
                     callbacks: {
                         label: function(context) {
                             return interpolate(
                                 gettext('%(label)s: %(h)sh'),
-                                {label: context.dataset.label, h: context.parsed.y},
+                                {label: context.dataset.label, h: context.parsed.y.toFixed(1)},
                                 true
                             );
                         }
                     }
-                }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
+                })
             }
         }
     });
-}
 
+    buildCategoryLegend(legendEl, charts.monthlyLine, MOBILE_LEGEND_KEYS);
+
+    chartRethemeHandlers.push(function () {
+        charts.monthlyLine.data.datasets.forEach(function (ds, i) {
+            const key = CATEGORY_ORDER[i];
+            ds.borderColor = categoryLineColor(key);
+            ds.backgroundColor = categoryLineColor(key);
+        });
+        charts.monthlyLine.options.scales.y.grid.color = cssToken('--color-border-soft');
+        Object.assign(charts.monthlyLine.options.plugins.tooltip, tooltipBaseOptions());
+        charts.monthlyLine.update('none');
+        buildCategoryLegend(legendEl, charts.monthlyLine, MOBILE_LEGEND_KEYS);
+    });
+}
 
 
 /**

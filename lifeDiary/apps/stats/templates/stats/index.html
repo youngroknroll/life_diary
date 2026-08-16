@@ -205,9 +205,16 @@
                             </div>
                         </div>
 
-                        <div class="section-title">{% trans "시간대별 기록" %}<span class="section-title__note">{% trans "태그 스택 · 한 칸 최대 60분" %}</span></div>
+                        <div class="section-title">{% trans "시간대별 기록" %}<span class="section-title__note">{% trans "카테고리 스택 · 한 칸 최대 60분" %}</span></div>
                         <div class="chart-panel mb-4">
-                            <canvas id="hourlyBarChart"></canvas>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="hourlyBarChart"></canvas>
+                                <div class="chart-empty" id="hourlyBarEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "오늘 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 시간대가 나타납니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "하루 구성" %}<span class="section-title__note">{% trans "24시간 기준 · 미기록 포함" %}</span></div>
@@ -276,9 +283,17 @@
                             </div>
                         {% endif %}
 
-                        <div class="section-title">{% trans "태그별 추세" %}<span class="section-title__note">{% trans "요일별 시간" %}</span></div>
-                        <div class="chart-panel chart-panel--tall mb-4">
-                            <canvas id="weeklyLineChart"></canvas>
+                        <div class="section-title">{% trans "카테고리별 추세" %}<span class="section-title__note">{% trans "요일별 시간" %}</span></div>
+                        <div class="chart-panel chart-panel--tall has-legend mb-4">
+                            <div class="chart-legend" id="weeklyLineLegend"></div>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="weeklyLineChart"></canvas>
+                                <div class="chart-empty" id="weeklyLineEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "이번 주 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 선이 시작됩니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "요일별 기록량" %}</div>
@@ -338,9 +353,17 @@
                             </div>
                         {% endif %}
 
-                        <div class="section-title">{% trans "태그별 일별 추세" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n/j" }}–{{ monthly_stats.end_date|date:"n/j" }}</span></div>
-                        <div class="chart-panel chart-panel--tall mb-4">
-                            <canvas id="monthlyLineChart"></canvas>
+                        <div class="section-title">{% trans "카테고리별 일별 추세" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n/j" }}–{{ monthly_stats.end_date|date:"n/j" }}</span></div>
+                        <div class="chart-panel chart-panel--tall has-legend mb-4">
+                            <div class="chart-legend" id="monthlyLineLegend"></div>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="monthlyLineChart"></canvas>
+                                <div class="chart-empty" id="monthlyLineEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "이번 달 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 선이 시작됩니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "주차별 요약" %}</div>

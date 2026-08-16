@@ -63,12 +63,16 @@ def get_stats_context(user, selected_date):
                 for d in weekly_stats["weekly_data"]
             ],
             "tag_weekly_stats": weekly_stats["tag_weekly_stats"],
+            "category_stats": weekly_stats["category_stats"],
+            "week_start": weekly_stats["week_start"],
         },
         "tag_analysis_json": tag_analysis,
         "monthly_stats_json": {
             "day_labels": monthly_stats["day_labels"],
             "tag_stats": monthly_stats["tag_stats"],
             "daily_totals": monthly_stats["daily_totals"],
+            "category_stats": monthly_stats["category_stats"],
+            "start_date": monthly_stats["start_date"],
         },
     }
 
