@@ -32,6 +32,25 @@ class TestTagUpdateAPI:
         tag.refresh_from_db()
         assert tag.name == "공부"
 
+    def test_updating_foreign_tag_is_refused_as_not_found(self, auth_client, make_user):
+        stranger = make_user(username="stranger")
+        foreign_tag = _make_tag(stranger)
+        resp = auth_client.put(
+            f"/api/tags/{foreign_tag.id}/",
+            data=json.dumps({
+                "name": "탈취",
+                "color": foreign_tag.color,
+                "category_id": foreign_tag.category_id,
+            }),
+            content_type="application/json",
+        )
+        assert resp.status_code == 404
+        data = resp.json()
+        assert data["success"] is False
+        assert data["error"] == "TAG_NOT_FOUND"
+        foreign_tag.refresh_from_db()
+        assert foreign_tag.name == "독서"
+
 
 @pytest.mark.django_db
 class TestTagDeleteAPI:
@@ -43,6 +62,13 @@ class TestTagDeleteAPI:
         assert data["success"]
         assert "message" in data
         assert not Tag.objects.filter(id=tag.id).exists()
+
+    def test_deleting_missing_tag_is_refused_as_not_found(self, auth_client):
+        resp = auth_client.delete("/api/tags/999999/")
+        assert resp.status_code == 404
+        data = resp.json()
+        assert data["success"] is False
+        assert data["error"] == "TAG_NOT_FOUND"
 
     def test_deleting_tag_moves_blocks_to_requested_tag(self, auth_client):
         source = _make_tag(auth_client.user, name="독서")
