@@ -73,6 +73,5 @@ urlpatterns = [
     path("notes/<int:pk>/edit/", views.usernote_update, name="usernote_update"),
     path("notes/<int:pk>/delete/", views.usernote_delete, name="usernote_delete"),
     path("mypage/", views.mypage, name="mypage"),
-    path("mypage/goals-partial/", views.mypage_goals_partial, name="mypage_goals_partial"),
     path("account/delete/", views.account_delete, name="account_delete"),
 ]

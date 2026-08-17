@@ -17,6 +17,58 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — 헤더 테마·언어 컨트롤 고정 (사용자 지시)
+
+테마·언어 선택이 마이페이지(로그인 필수) 안에만 있어 비로그인 사용자가 쓸 수 없었다.
+브랜드 이름 옆 헤더로 옮겨 모든 방문자에게 노출하고, 마이페이지 화면 그룹은 제거했다.
+시스템 자동 반영은 테마는 `prefers-color-scheme`, 언어는 `LocaleMiddleware`의
+`Accept-Language` 해석으로 동작한다(별도 코드 추가 없음).
+
+- 실행 로그: `docs/frontend/2026-08-17_header-theme-language-controls.md`
+- 변경: `templates/shared/_nav_prefs.html`(신규), `templates/base.html`,
+  `apps/users/templates/users/{mypage,signup}.html`,
+  `apps/core/static/core/css/style.css`, `locale/{ko,en}/LC_MESSAGES/django.po`
+- 같은 세션 지시로 회원가입 문구를 "환영합니다. 처음 뵙네요"로 교체
+- 검증: 전체 pytest 543 passed, `manage.py check` 이슈 0, ko/en 렌더 확인,
+  브라우저 실측(1280/390px × 라이트·다크 × 비로그인·로그인, 콘솔 0건)
+- 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
+- 후속 수정(사용자 지시): 768px 아래에서 숨던 비로그인 로그인·가입 버튼을 다시
+  노출하고, 320px 한 줄에 들어가도록 576px 아래 상단바를 압축(320/375/700/1280px
+  실측, 가로 오버플로 0)
+- 언어에는 테마의 "시스템"에 해당하는 자동 항목을 두지 않는다(사용자 결정)
+
+## 2026-08-17 — 목표 관리 페이지 통합 (사용자 지시)
+
+`users:usergoal_list`가 `{% extends %}` 없는 조각을 렌더해 목표 화면이 껍데기 없이
+그려지고 있었다(HTTP 200, 625바이트). 실제로 되는 것은 목록 표시와 삭제 링크뿐이었다.
+Claude Design 시안(§5·§6 + 목표 관리 문서)에 맞춰 목록·진행률·인라인 수정·추가·삭제를
+한 화면에 모으고, 폼 페이지 두 개(`usergoal_form.html`, `usergoal_list.html`)를 걷어냈다.
+
+- 계획: `docs/plans/2026-08-17_goal-management-page-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_goal-management-page.md`
+- 변경: `apps/users/{views,urls,forms,models}.py`,
+  `apps/users/templates/users/{goals,_goal_manager}.html`(신규),
+  `apps/users/static/users/js/goals.js`, `apps/core/static/core/css/style.css`,
+  `apps/stats/aggregation/goal_progress.py`, `apps/stats/templates/stats/index.html`,
+  `templates/base.html`, `apps/users/test_goal_page.py`(신규), `locale` 4파일
+- 사용자 결정 2건: 진행률이 붉어지는 조건을 "페이스보다 뒤처짐"(`is_behind_pace`)으로
+  바꾸고 **분석 요약 탭도 같은 규칙으로 함께 변경**, 서버를 부르는 모든 조작
+  (저장·추가·삭제·되돌리기)에 스피너·`disabled`·`aria-busy` 대기 상태 표시
+- 계획 대비 이탈 3건: `usergoal_partial`을 되살리지 않고 제거(변경 뷰가 본문을 직접
+  반환), 중복 검증을 use case 대신 `UserGoalForm.clean()`에, 모바일에서 태그·기간을
+  한 줄로 합치지 않음(둘 다 편집 가능한 select)
+- 검증: **전체 pytest 543 passed**, `manage.py check` 이슈 0, 마이그레이션 드리프트
+  없음, `node --check` 통과, i18n 4개 카탈로그 untranslated·fuzzy 0건, 브라우저 실측
+  (1440/768/375/360px × 라이트·다크 × ko·en, Slow 3G 대기 상태, 키보드 전 경로)
+- 브라우저에서 잡은 결함 3건: **전면 로딩 오버레이가 영영 안 걷힘**(`base.html`
+  링크 핸들러가 `e.defaultPrevented` 미검사 — 별도 `fix(core)` 커밋), UA 기본 파란
+  포커스 링, 375px에서 `.goal-count` 좌측 정렬 줄바꿈
+- i18n fuzzy 오상속 1건 교정: `%(tag)s %(period)s 목표가 이미 있습니다.`가 플레이스홀더가
+  다른 항목을 물려받아, 그대로 뒀으면 포맷 시점에 터졌을 것
+- 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
+- Deferred: 마이페이지 POST 목표 분기 제거(B-1), (user, tag, period) DB 유니크 제약,
+  화면에서 쓰이지 않게 된 `is_under_target` 정리 여부
+
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (6단계: 인증·온보딩·설정·홈) — 트랙 완료
 
 병렬 서브에이전트 3개(인증·온보딩 / 설정 / 홈)로 진행했다. Agent Teams는 이 환경에서
@@ -464,7 +516,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Priority | Document | Scope | Next decision or action |
 |---|---|---|---|
 | High | `docs/plans/2026-05-07_desktop-auth-single-user-plan.md` | Desktop mode auto-login with one local user; block auth pages only in desktop settings. | Approve or revise scope, then create an integrated implementation plan before code work. |
-| High | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | Finish active design work, re-review the final UI, then remediate confirmed P0 ownership, cache, i18n, and operations defects. | User declares design complete; run the documented dual-review gate before frontend changes. |
+| High | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | Finish active design work, re-review the final UI, then remediate confirmed P0 ownership, cache, i18n, and operations defects. | P0 v2 디자인 트랙이 2026-08-17 PR #54로 머지되면서 "디자인 완료" 전제 조건은 충족됐다. 다음 행동은 문서화된 dual-review gate 수행이다(위 "Next Recommended Work" 6번). |
 | High | `docs/plans/2026-05-03_desktop-app-packaging-plan.md` | Package the Django app as macOS `.app` and Windows `.exe` with pywebview, waitress, and PyInstaller. | Partial code exists (`desktop/launcher.py`, `lifeDiary/settings/desktop.py`, `requirements-desktop.txt`), but no PyInstaller spec or release workflow was found in this pass. Confirm scope before continuing. |
 | Medium | `docs/plans/2026-05-07_stats-dashboard-mobile-ui-plan.md` | Improve mobile stats/dashboard UX: stacked stats sections, goal accordion, feedback reveal, mobile tag bottom sheet. | Goal cards, dashboard mobile bottom sheet, and default-closed stats feedback reveal are implemented and covered by focused tests. Re-check item #1 expectations before marking complete because current tests preserve tab structure rather than requiring all mobile panes to be stacked. |
 | Medium | `docs/plans/2026-04-26_stats-tab-performance-plan.md` | Measure and optimize stats tab backend queries and chart rendering. | Backend query consolidation and query-count guards are implemented and verified. Frontend chart lazy render was not confirmed in this pass. |
@@ -509,37 +561,94 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 
 ## Deferred Or Later Work
 
-| Area | Source | Deferred work |
-|---|---|---|
-| i18n | `docs/refactoring/2026-04-28_i18n-phase1-5-execution-log.md` | Japanese support, DRF API behavior, cache key locale split, and Chart.js locale configuration. |
-| Security | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | CSP, stronger cookie/security flags, production debug review, and login failure notifications. |
-| pytest | `docs/refactoring/2026-04-28_pytest-migration.md` | More locale parametrization, possible `factory_boy`, and optional locale leak guard fixture. |
-| Desktop distribution | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | Code signing, notarization, auto-update, operational metrics, and monetization phases. |
-| Account recovery | `docs/plans/2026-05-01_account-recovery-plan.md` | Social login, email verification, and email backfill policy. |
-| Production auth security | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | `SECURE_PROXY_SSL_HEADER`, deployed `Set-Cookie` header inspection, and live sender-domain verification remain deferred. `ALLOWED_HOSTS`는 2026-08-12에 도메인 변경으로 갱신됐고 운영에서 동작이 확인됐다(위 "Production Domain" 참조). `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요하다. |
-| Account recovery email delivery | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | Live Resend recovery email delivery is deferred until a sender domain is purchased/configured, DNS records are set, and Resend marks the domain as verified. No live delivery verification has been performed. |
-| P0 시안 잔여 | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 웹폰트 CDN 탑재, `Tag.color` 컬럼 드롭, 데스크톱 슬롯 19px의 WCAG 2.5.8 격차. 시안 6a의 행 끌어 순서 바꾸기는 **채택하지 않기로 결정**(2026-08-12). |
-| 시안 정합 잔여 | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `style.css`의 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류, 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달 이중 제출 창, `_table_row_actions.html`의 44px 미달 버튼(메모 화면), sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼 부재를 알리지 않음, `.chip__swatch`(설정·카테고리 안내·온보딩)와 `.category-picker__swatch`(태그 모달)가 테두리 없이 라이트 표면에 놓여 대비 1.44~2.15 — 태그 관리처럼 공용 규칙 하나로 묶는 편이 낫다. |
+2026-08-17에 여러 실행 로그의 Deferred를 여기로 합쳤다. 표는 착수 순서가 아니라
+**성격별 묶음**이다. 그룹 안의 항목은 서로 독립이 아니어서, 같은 그룹은 한 트랙으로
+묶어 처리하는 편이 낫다(특히 C·D는 서로 얽혀 있다 — D-2 참조).
+
+각 항목의 "확인" 열은 이 정리 시점에 저장소에서 실제로 확인한 근거다. 확인란이
+비어 있으면 문서 기록만 있고 코드로 재확인하지 않은 항목이라는 뜻이다.
+
+### A. 배포·운영 (prod 배포 전 처리)
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| A-1 | **배포 시 `.cache/` 비우기.** `GetStatsContextUseCase`의 파일 캐시에 스키마 버전이 없어, 비우지 않으면 최근 24시간 안에 캐시된 과거 날짜 조회가 TTL 만료까지 목표 진행 바 없이 보인다(자연 소멸). 근본 해결은 캐시 키에 버전 붙이기. | `docs/frontend/2026-08-17_p0-v2-phase4-segmented-goal-progress.md` | — |
+| A-2 | 보안 잔여: CSP, 쿠키/보안 플래그 강화, production debug 재점검, 로그인 실패 알림. | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | — |
+| A-3 | `SECURE_PROXY_SSL_HEADER`, 배포된 `Set-Cookie` 헤더 실측. `ALLOWED_HOSTS`는 2026-08-12에 갱신·확인됨. `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요. | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | — |
+| A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
+| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
+
+### B. 백엔드 (Backend TDD 사이클 필요)
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| B-1 | **mypage 목표 편집 백엔드 고아화.** `views.py`의 mypage POST 분기, `mypage_goals_partial`, 그 URL이 6단계 이후 UI에서 도달 불가. 삭제 시 주의: `goals.js`는 `usergoal_form.html`이 계속 쓰므로 삭제 금지, `GetMyPageUseCase`의 goals 반환은 개수 표시에 필요. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | `apps/users/urls.py:76`, `apps/users/views.py:599` 잔존 확인 |
+| B-2 | `category_guide`의 `@login_required` 제거(+ 같은 뷰 breadcrumb의 로그인 가드). 시안대로 비로그인에게 링크를 보이려면 필요. 트리거: 공개 콘텐츠 페이지 단계. 보안 검토 동반. | 같은 로그 | — |
+| B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
+| B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
+| B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
+
+### C. 프런트엔드·정적 자산 정리
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| C-1 | **죽은 CSS 삭제**: `.home-daygrid*`(`style.css:685~`, 여기에 `.settings-row + /* 주석 */ .home-daygrid` 인접 형제 결합자 오류가 포함된다), `.navbar-utility-controls`·`.navbar-language-form`·`.navbar-language-select`·`.theme-toggle`와 480px 미디어 블록, `.auth-split*`(`style.css:2845~`). **D-2를 먼저 풀지 않으면 테스트가 깨진다.** | 6단계 로그 + `docs/plans/2026-08-16_p0-v2-handoff-plan.md` | 템플릿 참조 0건, CSS 규칙 잔존 확인 |
+| C-2 | `apps/core/static/core/img/tag_usage_guide.png`(586KB) · `tag_usage_guide_en.png`(1.56MB) 삭제 여부. 저장소 전체에서 참조 0건. | 5·6단계 로그 | `grep` 참조 0건, 합계 약 2.1MB 확인 |
+| C-3 | FontAwesome 전역 제거. `base.html:29`의 CDN+SRI 로드, `utils.js`의 `showOverlay(..., 'fa-sign-in-alt')`, 그리고 아직 `fa-`를 쓰는 템플릿 7개(`base`, `shared/_date_selector`, `dashboard/index`, `users/{account_delete_confirm,login}`, `users/recovery/*` 2개). | 6단계 로그 | 위 파일 목록 grep 확인 |
+| C-4 | 44px 터치 타깃 전역 재확인 — 저장소 전역으로 함께 올려야 하는 항목이라 개별로 고치지 않았다: `.segmented__item` 약 28px(`style.css:339`, padding 6px 11px), 시트 닫기 버튼 32px(시안 명시값), `_table_row_actions.html`의 미달 버튼(메모 화면), 데스크톱 슬롯 19px(WCAG 2.5.8 격차). | 5·6단계 로그 + `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `.segmented__item` 수치 확인 |
+| C-5 | `.chip__swatch`(설정·카테고리 안내·온보딩·태그 관리)와 `.category-picker__swatch`(태그 모달)가 테두리 없이 라이트 표면에 놓여 대비 1.44~2.15. 공용 테두리 규칙 하나로 묶는 편이 낫다. | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | 두 규칙 모두 `border` 없음 확인(`style.css:317`, `:3694`) |
+| C-6 | `PretendardVariable.woff2` 2.0MB — 서브셋 빌드 파이프라인. 이번 트랙은 전체 가변 폰트를 그대로 넣었다. | `docs/plans/2026-08-16_p0-v2-handoff-plan.md` | 파일 크기 2,057,688B 확인 |
+| C-7 | 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달의 이중 제출 창. | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | — |
+| C-8 | sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼이 없는데 이를 사용자에게 알리지 않는다. | 같은 문서 | — |
+| C-9 | `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지우는 선존재 결함(갱신 행이 늘어 더 자주 드러남, 새로고침하면 복구). | `docs/frontend/2026-08-14-grid-label-and-hour-axis.md` | — |
+| C-10 | 시안 1a의 라이트 모드 work 라인 아래 `opacity:.07` 영역 채우기. 장식적 요소로 판단해 두 번 연속 보류함. | 1·3단계 로그 | — |
+
+### D. 테스트 정리
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| D-1 | **JS/CSS 소스 문자열 검사 테스트 삭제** — Frontend Work Policy가 금지하는 형태이고, 5단계에서 실제로 거짓 확신을 줬다(`test_mobile_sheet_close_moves_focus_before_hiding_dialog`는 함수 **내부** 순서만 검사해 호출부의 ARIA 위반을 통과시켰다). 대상은 `apps/dashboard/tests.py`의 마크업·CSS·JS 소스 검사군 전체. | `docs/frontend/2026-08-17_p0-v2-phase5-...md` | 해당 테스트 3종 잔존 확인 |
+| D-2 | `test_time_grid_prevents_text_selection`이 `".navbar-utility-controls" in source`를 단언한다 — **C-1의 죽은 CSS를 지우면 이 테스트가 깨진다.** C-1과 D-1을 한 트랙으로 묶어야 하는 이유. | 이번 정리에서 확인 | `apps/dashboard/tests.py` 해당 단언 확인 |
+| D-3 | `test_selected_slot_info_prompts_tag_selection`이 같은 클래스에 **똑같은 내용으로 두 번** 정의돼 있어 뒤엣것이 앞엣것을 덮는다(실행 1회). | 이번 정리에서 확인 | `apps/dashboard/tests.py:227`·`:236` |
+| D-4 | 로케일 파라미터화 확대, `factory_boy` 도입 검토, 로케일 누수 가드 픽스처. | `docs/refactoring/2026-04-28_pytest-migration.md` | — |
+
+### E. i18n
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| E-1 | 일본어 지원, 캐시 키 로케일 분리, Chart.js 로케일 설정. | `docs/refactoring/2026-04-28_i18n-phase1-5-execution-log.md` | — |
+| E-2 | 같은 출처의 "DRF API 동작" 항목은 전제가 바뀌었다 — API는 2026-08-16에 django-ninja로 이식됐다. JSON 응답의 로케일 처리를 새 스택 기준으로 다시 규정해야 한다. | 위 + `docs/refactoring/2026-08-16_api-openapi-django-ninja.md` | — |
+
+### F. 장기·제품 단계
+
+| # | 항목 | 출처 | 확인 |
+|---|---|---|---|
+| F-1 | API 후속: rate limiting, 토큰 인증, 버저닝, PyInstaller ninja 정적 번들. | `docs/refactoring/2026-08-16_api-openapi-django-ninja.md` | — |
+| F-2 | 데스크톱 배포: 코드 서명, 공증, 자동 업데이트, 운영 지표, 수익화 단계. | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | — |
+| F-3 | 계정 복구: 이메일 검증, 이메일 백필 정책. (소셜 로그인은 2026-05-22에 구현 완료.) | `docs/plans/2026-05-01_account-recovery-plan.md` | — |
+| F-4 | 스테일 원격 브랜치 11개 정리(`feat/p0-onboarding`, `refactor/*`, `feature/tag` 등 — 모두 머지 후 남은 것으로 `main`보다 뒤처져 있다). | 이번 정리에서 확인 | `git branch -a --no-merged origin/main` |
+
+**해소되어 표에서 뺀 항목**: 웹폰트 CDN 탑재 여부(→ 1단계에서 self-host로 결정·적용),
+`production`에만 있던 도메인 수정 2건(→ `main`과 내용 차이 없음), `locale/en`의
+`"설정된 목표가 없습니다"` 오역(→ 이미 `"No goals set yet"`), 태그 관리 화면의
+카테고리 색 표시(→ `tag_list.js:130`의 `.chip__swatch`로 복원됨, 단 C-5의 대비
+문제는 남는다), 시안 6a의 행 끌어 순서 바꾸기(→ 2026-08-12에 미채택으로 결정).
 
 ## Next Recommended Work
 
-0. 현재 변경 중인 디자인 시안 작업을 완료한 뒤
-   `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md`의
-   post-design dual review gate를 수행한다.
-0-1. P0 데이터 무결성·캐시·i18n·계정 삭제 스케줄링 결함은 디자인 완료 후
-   별도 승인된 백엔드/운영 계획으로 처리한다.
-1. `feat/p0-onboarding` (6·7단계) 리뷰와 머지 결정. PR #40 은 머지 완료.
-1-0. `production` 에만 있던 도메인 수정 2건이 `main` 에 반영되도록
-   이 PR 을 먼저 넣는다. 위 "Production Domain" 절 참조.
-1-1. 결정 대기 세 건 — 웹폰트(Pretendard·IBM Plex Mono) CDN 탑재 여부,
-   `Tag.color` 컬럼 드롭 여부, 태그 관리 화면에 카테고리 색을 어떤 형태로
-   되살릴지(7단계에서 색 표시가 사라졌다).
-2. Choose one active plan as the next approved scope.
-3. Before code work, create an integrated plan document that combines analyst requirements, design, risks, TDD checkpoints, and verification commands.
-4. For a small implementation start, consider either:
-   - `docs/plans/2026-05-07_desktop-auth-single-user-plan.md`; or
-   - the remaining unimplemented items from `docs/plans/2026-05-07_stats-dashboard-mobile-ui-plan.md`.
-5. After each completed implementation, update this `docs/project-status.md` file and write the required refactoring document.
+1. **작은 것부터 묶어 한 트랙**: C-1 + D-1 + D-2 + D-3 + C-2. 죽은 CSS·고아 자산
+   삭제와 소스 문자열 검사 테스트 삭제는 서로 얽혀 있어 함께 처리해야 하고,
+   런타임 동작 변화가 없어 위험이 가장 낮다. C-2(2.1MB 이미지 삭제)는 사용자 확인 필요.
+2. **백엔드 한 트랙**: B-1(도달 불가 코드 삭제). Backend TDD 사이클 대상이고,
+   `goals.js`·`GetMyPageUseCase` 반환은 건드리지 않는다는 제약이 이미 확인돼 있다.
+3. **prod 배포를 실제로 할 때**: A 그룹 전체를 배포 체크리스트로 만든다. A-1은
+   코드 변경 없이도 배포 절차에 한 줄 넣으면 끝난다.
+4. **접근성 한 트랙**: C-4 + C-5. 둘 다 저장소 전역 규칙이라 개별 화면에서
+   고치면 안 되고, 한 번에 올려야 한다.
+5. 어느 트랙이든 착수 전 `docs/plans/`에 계획 문서를 만들고 승인을 받는다
+   (AGENTS.md HARD-GATE). 완료 후 실행 로그와 이 문서를 갱신한다.
+6. `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md`의 post-design
+   dual review gate는 P0 v2 트랙이 끝난 지금 수행 조건을 만족한다.
 
 ## Fresh Verification From This Status Update
 

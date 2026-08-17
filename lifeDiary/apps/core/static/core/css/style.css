@@ -67,6 +67,8 @@
 
     /* 시안의 #14211A 는 투자·주도적 색에서 4.5:1에 못 미쳐 한 단계 낮췄다 */
     --ink-on-accent: #0F1A14;
+    /* 라이트의 danger 는 어두워 흰 글자가 5.40:1 */
+    --ink-on-danger: #FFFFFF;
 
     /* Note (노란 강조 박스) */
     --color-note-bg: #fff7df;
@@ -145,6 +147,8 @@
     --color-accent-muted: #4A554E;
 
     --ink-on-accent: #0F1A14;
+    /* 다크의 danger 는 밝아 흰 글자로는 대비가 안 나온다 — 어두운 잉크로 7.33:1 */
+    --ink-on-danger: var(--ink-on-accent);
 
     --color-note-bg: #2a2615;
     --color-note-border: #5d4a15;
@@ -182,7 +186,8 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-/* App nav — 최상위는 기록·분석·설정 셋뿐이다. 언어와 테마는 설정 안으로 */
+/* App nav — 최상위는 기록·분석·설정 셋뿐이다. 언어와 테마는 로그인 없이도
+   써야 하므로 브랜드 옆에 고정한다 */
 .app-nav {
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
@@ -202,6 +207,77 @@ body {
     color: var(--color-primary);
     text-decoration: none;
     flex: none;
+}
+
+.app-nav__prefs {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+    margin-left: -14px;
+}
+
+.app-nav__pref {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text-body);
+    font-size: 13px;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.app-nav__pref:hover {
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+}
+
+.app-nav__pref:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+.app-nav__pref-code {
+    font-weight: 600;
+    font-size: 11.5px;
+}
+
+.app-nav__pref-menu {
+    min-width: 9.5rem;
+    padding: 4px;
+}
+
+.app-nav__pref-menu form {
+    margin: 0;
+}
+
+.app-nav__pref-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: 12.5px;
+}
+
+.app-nav__pref-item.is-active {
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-primary-soft);
+}
+
+.app-nav__pref-icon {
+    flex: none;
+    width: 1.25rem;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
 }
 
 .app-nav__tabs {
@@ -243,8 +319,10 @@ body {
     background: var(--color-primary-soft);
 }
 
+/* 탭이 접히는 폭에서도 아바타는 오른쪽 끝에 남는다 */
 .app-nav__account {
     flex: none;
+    margin-left: auto;
 }
 
 .app-nav__avatar {
@@ -265,10 +343,32 @@ body {
 
 @media (max-width: 575.98px) {
     .app-nav__inner {
-        gap: 12px;
+        gap: 8px;
     }
     .app-nav__tab {
         padding: 7px 9px;
+    }
+    /* 브랜드·테마·언어·로그인·가입을 320px 한 줄에 들여보낸다. 줄바꿈을 허용하면
+       버튼이 56px 헤더 밖으로 자란다. */
+    .app-nav__prefs {
+        gap: 0;
+        margin-left: -10px;
+    }
+    .app-nav__pref {
+        min-width: 32px;
+        padding: 0 6px;
+    }
+    .app-nav__tabs--guest {
+        gap: 4px;
+    }
+    .app-nav__tabs--guest .app-nav__tab {
+        padding: 7px 6px;
+        font-size: 12px;
+    }
+    .app-nav__tabs--guest .btn-sian {
+        padding: 7px 10px;
+        font-size: 12px;
+        white-space: nowrap;
     }
 }
 
@@ -526,37 +626,6 @@ label.segmented__item {
     color: var(--color-text-meta);
 }
 
-.settings-lang {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.settings-select {
-    width: auto;
-    min-width: 5.75rem;
-    min-height: 44px;
-    font-size: 0.8rem;
-}
-
-@media (max-width: 575.98px) {
-    .settings-row--stack {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-    }
-
-    .settings-row--stack .segmented {
-        display: flex;
-        width: 100%;
-    }
-
-    .settings-row--stack .segmented__item {
-        flex: 1;
-        text-align: center;
-    }
-}
-
 /* 태그 관리의 행 리스트 — 카테고리로 묶고 행마다 이름·누적 기록·버튼 넷. */
 .tag-group__heading {
     display: flex;
@@ -765,6 +834,12 @@ label.segmented__item {
 
     .app-nav__tabs {
         display: none;
+    }
+
+    /* 로그인 탭은 하단 탭바가 대신하지만, 비로그인 진입점은 대신할 것이 없다 */
+    .app-nav__tabs--guest {
+        display: flex;
+        gap: 6px;
     }
 }
 
@@ -3817,29 +3892,463 @@ footer {
     }
 }
 
-/* 목표 표 — 시안 5c 의 인라인 편집 */
-.goal-row-form {
+/* =========================================================
+   목표 관리 — 시안 5·6 + 진행률 카드
+   ========================================================= */
+
+.settings-panel--wide {
+    max-width: 720px;
+}
+
+/* page-head 가 접히면 개수만 남은 줄이 생긴다 — 접혀도 오른쪽에 붙여둔다. */
+.goal-count {
+    flex: none;
+    margin-left: auto;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
+}
+
+.goal-progress__meta,
+.goal-progress__period {
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--color-text-meta);
+}
+
+.goal-progress__note {
+    margin: 2px 0 0;
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-meta);
+}
+
+/* 파스텔 스와치가 흰 표면에서 1.44:1 까지 떨어진다. 링을 둘러 경계를 만든다.
+   전역 .chip__swatch 규칙으로 올리는 것은 별도 접근성 트랙 몫이라 여기서만. */
+.goal-progress-card .chip__swatch,
+.goal-row__tag .chip__swatch {
+    box-shadow: inset 0 0 0 1px var(--color-text-meta);
+}
+
+.chip__swatch--empty {
+    background: transparent;
+}
+
+.goal-manager {
+    --goal-grid: minmax(0, 1fr) 104px 116px minmax(96px, auto);
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    overflow: hidden;
+}
+
+.goal-manager__head {
+    display: grid;
+    grid-template-columns: var(--goal-grid);
+    align-items: center;
+    gap: 12px;
+    padding: 0 16px;
+    height: 36px;
+    background: var(--color-surface-soft);
+    border-bottom: 1px solid var(--color-border-muted);
+    font: 500 10px/1 var(--font-mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-text-meta);
+}
+
+.goal-manager__head .is-num {
+    text-align: right;
+}
+
+.goal-row {
+    display: grid;
+    grid-template-columns: var(--goal-grid);
+    align-items: center;
+    gap: 12px;
+    margin: 0;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.goal-row.is-dirty {
+    background: var(--color-surface-soft);
+}
+
+.goal-row__cell {
     display: flex;
     align-items: center;
+    min-width: 0;
+}
+
+.goal-row__tag {
+    gap: 8px;
+}
+
+.goal-row__select {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 7px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: 400 13px/1 var(--font-body);
+}
+
+.goal-row__hours {
     justify-content: flex-end;
     gap: 6px;
 }
 
-.goal-row-form__hours {
-    width: 84px;
-    min-height: 44px;
+.goal-row__input {
+    width: 64px;
+    height: 38px;
+    padding: 0 9px;
+    border: 1px solid var(--color-border);
+    border-radius: 7px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: 500 13px/1 var(--font-mono);
     text-align: right;
 }
 
-.goal-row-delete {
-    color: var(--color-danger-text);
-    font-size: 11.5px;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    min-height: 44px;
+.goal-row.is-dirty .goal-row__input,
+.goal-row.is-dirty .goal-row__select {
+    border-color: var(--color-primary);
 }
 
-.goal-row-delete:hover {
+.goal-row.has-error .goal-row__input,
+.goal-add.has-error .goal-row__input {
+    border-color: var(--color-danger-text);
+    background: var(--color-danger-soft);
+}
+
+/* UA 기본 파란 포커스 링은 팔레트 밖이다. 다른 폼 컨트롤과 같은 초록 링으로. */
+.goal-row__select:focus-visible,
+.goal-row__input:focus-visible,
+.goal-row__delete:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+.goal-row__unit {
+    font-size: 12px;
+    color: var(--color-text-meta);
+}
+
+.goal-row__action {
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.goal-row__save {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
+.goal-row__delete {
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    font-size: 12px;
+    color: var(--color-text-meta);
     text-decoration: underline;
+}
+
+.goal-row__delete:hover {
+    color: var(--color-danger-text);
+}
+
+.goal-row__error {
+    grid-column: 1 / -1;
+    margin: 4px 0 0;
+    font-size: 11.5px;
+    line-height: 1.5;
+    color: var(--color-danger-text);
+}
+
+/* 삭제 확인 — 행이 통째로 확인 줄로 바뀐다. 별도 화면으로 나가지 않는다. */
+.goal-row.is-confirming {
+    grid-template-columns: minmax(0, 1fr) auto;
+    background: var(--color-danger-soft);
+    box-shadow: inset 2px 0 0 var(--color-danger-text);
+}
+
+.goal-row.is-confirming .goal-row__cell {
+    display: none;
+}
+
+.goal-confirm__text {
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--color-text);
+}
+
+.goal-confirm__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 7px;
+}
+
+.goal-confirm__yes,
+.goal-confirm__no {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
+}
+
+.goal-confirm__yes {
+    border-color: transparent;
+    background: var(--color-danger-text);
+    color: var(--ink-on-danger);
+    font-weight: 600;
+}
+
+.goal-empty {
+    padding: 22px 18px;
+    text-align: center;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.goal-empty__text {
+    margin: 0;
+    font-size: 12.5px;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+}
+
+.goal-add {
+    margin: 0;
+    padding: 14px 16px 16px;
+    background: var(--color-surface-soft);
+}
+
+.goal-add__label {
+    margin-bottom: 9px;
+    font: 500 9.5px/1 var(--font-mono);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--color-text-meta);
+}
+
+.goal-add__grid {
+    display: grid;
+    grid-template-columns: var(--goal-grid);
+    align-items: center;
+    gap: 12px;
+}
+
+.goal-add .goal-row__select,
+.goal-add .goal-row__input {
+    height: 40px;
+}
+
+.goal-add__submit {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 12.5px;
+}
+
+.goal-add__plus {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.goal-add__hint {
+    margin: 8px 0 0;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
+}
+
+.goal-tag-nudge {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.goal-tag-nudge__text {
+    margin: 0;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.goal-tag-nudge__link {
+    min-height: 40px;
+    padding: 0 12px;
+    font-size: 12.5px;
+}
+
+.goal-tag-nudge__plus {
+    font-size: 15px;
+    line-height: 1;
+}
+
+.goal-status {
+    min-height: 22px;
+    margin-top: 12px;
+}
+
+.goal-status__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    background: var(--color-primary-soft);
+    font-size: 12px;
+    color: var(--color-text);
+}
+
+.goal-status__pill.is-error {
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+}
+
+/* 서버 왕복 중에는 버튼이 스스로 말한다 — 라벨 폭을 유지한 채 스피너만 얹어
+   레이아웃이 흔들리지 않게 한다. */
+.is-busy {
+    position: relative;
+    color: transparent !important;
+    pointer-events: none;
+}
+
+.is-busy::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 14px;
+    height: 14px;
+    margin: -7px 0 0 -7px;
+    border: 2px solid var(--color-border);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+}
+
+.goal-confirm__yes.is-busy::after {
+    border-color: var(--color-danger-soft);
+    border-top-color: var(--color-danger-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .is-busy::after {
+        animation: none;
+        border-top-color: var(--color-border);
+        border-right-color: var(--color-primary);
+    }
+}
+
+.goal-snackbar {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    z-index: 1050;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 12px 16px;
+    border-radius: 9px;
+    background: var(--color-text);
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .22);
+}
+
+.goal-snackbar[hidden] {
+    display: none;
+}
+
+.goal-snackbar__text {
+    font-size: 13px;
+    color: var(--color-surface);
+}
+
+.goal-snackbar__undo {
+    border: 0;
+    background: transparent;
+    padding: 4px 0;
+    font-weight: 600;
+    font-size: 12.5px;
+    color: var(--color-accent-work);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 360px 에서는 4열이 들어가지 않는다 — 표를 풀어 행 목록으로 바꾼다(시안 5c). */
+@media (max-width: 767.98px) {
+    .goal-manager__head {
+        display: none;
+    }
+
+    .goal-row,
+    .goal-add__grid {
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 8px 10px;
+        padding: 12px 14px;
+    }
+
+    .goal-add__grid {
+        padding: 0;
+    }
+
+    .goal-row__tag {
+        grid-column: 1;
+    }
+
+    /* 기간은 값이 두 글자뿐이라, 태그 이름 칸만큼 늘리면 행이 어긋나 보인다. */
+    .goal-row__period {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: start;
+    }
+
+    .goal-row__period .goal-row__select {
+        flex: none;
+        width: 128px;
+    }
+
+    .goal-row__hours {
+        grid-column: 2;
+        grid-row: 1;
+    }
+
+    .goal-row__action {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    .goal-row__input,
+    .goal-row__select,
+    .goal-add .goal-row__input,
+    .goal-add .goal-row__select {
+        height: 44px;
+    }
+
+    .goal-row__save,
+    .goal-row__delete,
+    .goal-confirm__yes,
+    .goal-confirm__no,
+    .goal-tag-nudge__link {
+        min-height: 44px;
+    }
+
+    .goal-add__grid > .goal-row__action {
+        grid-column: 1 / -1;
+        grid-row: auto;
+    }
+
+    .goal-add__submit {
+        flex: 1;
+        min-height: 48px;
+    }
+
+    .goal-row.is-confirming {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 02:06+0900\n"
+"POT-Creation-Date: 2026-08-17 16:00+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,241 +18,337 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: apps/core/static/core/js/tag.js:44
 msgid "목표 영역"
 msgstr "목표 영역"
 
+#: apps/core/static/core/js/tag.js:45
 msgid "계획 안"
 msgstr "계획 안"
 
+#: apps/core/static/core/js/tag.js:46
 msgid "계획 밖"
 msgstr "계획 밖"
 
+#: apps/core/static/core/js/tag.js:47
 msgid "준비 · 이동"
 msgstr "준비 · 이동"
 
+#: apps/core/static/core/js/tag.js:48
 msgid "잠 · 낮잠"
 msgstr "잠 · 낮잠"
 
+#: apps/core/static/core/js/tag.js:64 apps/core/static/core/js/tag.js:152
 msgid "새 태그"
 msgstr "새 태그"
 
+#: apps/core/static/core/js/tag.js:71
 #, javascript-format
 msgid "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
 msgstr "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
 
+#: apps/core/static/core/js/tag.js:72
 msgid "카테고리를 고르면 색이 정해집니다."
 msgstr "카테고리를 고르면 색이 정해집니다."
 
+#: apps/core/static/core/js/tag.js:128
 msgid "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
 msgstr "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
 
+#: apps/core/static/core/js/tag.js:143
 msgid "태그 수정"
 msgstr "태그 수정"
 
+#: apps/core/static/core/js/tag.js:144
+#: apps/dashboard/static/dashboard/js/dashboard.js:645
 msgid "저장"
 msgstr "저장"
 
+#: apps/core/static/core/js/tag.js:153
 msgid "태그 만들기"
 msgstr "태그 만들기"
 
+#: apps/core/static/core/js/tag.js:173
 msgid "태그명을 입력해주세요."
 msgstr "태그명을 입력해주세요."
 
+#: apps/core/static/core/js/tag.js:178
 msgid "카테고리를 선택해주세요."
 msgstr "카테고리를 선택해주세요."
 
+#: apps/core/static/core/js/tag.js:200
 #, javascript-format
 msgid "태그 저장 실패: %s"
 msgstr "태그 저장 실패: %s"
 
+#: apps/core/static/core/js/tag.js:234
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "태그 삭제 실패: %s"
 
+#: apps/core/static/core/js/tag.js:256
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
-msgstr "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
+msgstr ""
+"'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
+"간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
 
+#: apps/core/static/core/js/tag.js:280
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr "'%s' 태그를 정말 삭제하시겠습니까?"
 
+#: apps/core/static/core/js/utils.js:104
 msgid "정말 삭제하시겠습니까?"
 msgstr "정말 삭제하시겠습니까?"
 
+#: apps/core/static/core/js/utils.js:114 apps/users/static/users/js/goals.js:87
 msgid "처리 중..."
 msgstr "처리 중..."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:593
 msgid "그리드에서 시간을 선택하세요"
 msgstr "그리드에서 시간을 선택하세요"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:604
 msgid "시간을 선택했어요. 원하는 태그를 선택하세요."
 msgstr "시간을 선택했어요. 원하는 태그를 선택하세요."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:605
+#: apps/tags/static/tags/js/tag_list.js:158
+#: apps/users/static/users/js/goals.js:206
 msgid "삭제"
 msgstr "삭제"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:612
 msgid "빈 슬롯"
 msgstr "빈 슬롯"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:621
 #, javascript-format
 msgid "%s칸 선택"
 msgid_plural "%s칸 선택"
 msgstr[0] "%s칸 선택"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:644
 #, javascript-format
 msgid "%s칸 저장"
 msgid_plural "%s칸 저장"
 msgstr[0] "%s칸 저장"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:688
 msgid "빈 구간"
 msgstr "빈 구간"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:715
 msgid "%(h)s시간 %(m)s분"
 msgstr "%(h)s시간 %(m)s분"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:761
 #, javascript-format
 msgid "되돌리기 실패: %s"
 msgstr "되돌리기 실패: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:771
 msgid "슬롯을 선택해주세요."
 msgstr "슬롯을 선택해주세요."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:776
 msgid "태그를 선택해주세요."
 msgstr "태그를 선택해주세요."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:819
 #, javascript-format
 msgid "저장 실패: %s"
 msgstr "저장 실패: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:872
 msgid "삭제할 슬롯을 선택해주세요."
 msgstr "삭제할 슬롯을 선택해주세요."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:881
 msgid "삭제할 기록이 없습니다."
 msgstr "삭제할 기록이 없습니다."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:887
 #, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[0] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[1] "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:928
 #, javascript-format
 msgid "삭제 실패: %s"
 msgstr "삭제 실패: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:941
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr "태그 로드 중 오류가 발생했습니다."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:985
 msgid "태그가 없습니다. 아래에서 추가하세요."
 msgstr "태그가 없습니다. 아래에서 추가하세요."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:1023
 msgid "생성된 태그가 없습니다."
 msgstr "생성된 태그가 없습니다."
 
+#: apps/stats/static/stats/js/stats.js:207
 #, javascript-format
 msgid "%s:00"
 msgstr "%s:00"
 
+#: apps/stats/static/stats/js/stats.js:243
 #, javascript-format
 msgid "%s min"
 msgstr "%s분"
 
+#: apps/stats/static/stats/js/stats.js:255
 msgid "%(label)s: %(m)s min"
 msgstr "%(label)s: %(m)s분"
 
+#: apps/stats/static/stats/js/stats.js:340
+#: apps/stats/static/stats/js/stats.js:403
+#: apps/stats/static/stats/js/stats.js:497
 msgid "%(label)s: %(h)sh"
 msgstr "%(label)s: %(h)s시간"
 
+#: apps/stats/static/stats/js/stats.js:373
 msgid "Active hours"
 msgstr "활동 시간"
 
+#: apps/tags/static/tags/js/tag_list.js:55
 msgid "태그를 불러오는 중 오류가 발생했습니다."
 msgstr "태그를 불러오는 중 오류가 발생했습니다."
 
+#: apps/tags/static/tags/js/tag_list.js:140
 #, javascript-format
 msgid "누적 %s시간"
 msgstr "누적 %s시간"
 
+#: apps/tags/static/tags/js/tag_list.js:141
 msgid "아직 기록 없음"
 msgstr "아직 기록 없음"
 
+#: apps/tags/static/tags/js/tag_list.js:154
 msgid "수정"
 msgstr "수정"
 
+#: apps/tags/static/tags/js/tag_list.js:155
 #, javascript-format
 msgid "%s 태그 수정"
 msgstr "%s 태그 수정"
 
+#: apps/tags/static/tags/js/tag_list.js:159
 #, javascript-format
 msgid "%s 태그 삭제"
 msgstr "%s 태그 삭제"
 
+#: apps/users/static/users/js/auth-enhance.js:10
+#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 표시"
 msgstr "비밀번호 표시"
 
+#: apps/users/static/users/js/auth-enhance.js:12
+#: apps/users/static/users/js/auth-enhance.js:19
 msgid "표시"
 msgstr "표시"
 
+#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 숨기기"
 msgstr "비밀번호 숨기기"
 
+#: apps/users/static/users/js/auth-enhance.js:19
 msgid "숨기기"
 msgstr "숨기기"
 
+#: apps/users/static/users/js/auth-enhance.js:30
 msgid "Caps Lock이 켜져 있습니다"
 msgstr "Caps Lock이 켜져 있습니다"
 
-#, javascript-format
-msgid "최대 %s시간까지 입력 가능"
-msgstr "최대 %s시간까지 입력 가능"
+#: apps/users/static/users/js/goals.js:116
+#| msgid "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
+msgid "처리하지 못했습니다. 잠시 후 다시 시도해 주세요."
+msgstr "처리하지 못했습니다. 잠시 후 다시 시도해 주세요."
 
-msgid "저장중..."
-msgstr "저장중..."
+#: apps/users/static/users/js/goals.js:183
+msgid "목표를 저장했습니다"
+msgstr "목표를 저장했습니다"
 
-msgid "저장완료!"
-msgstr "저장완료!"
+#: apps/users/static/users/js/goals.js:211
+msgid "취소"
+msgstr "취소"
 
-msgid "저장 실패"
-msgstr "저장 실패"
+#: apps/users/static/users/js/goals.js:255
+msgid "목표를 추가했습니다"
+msgstr "목표를 추가했습니다"
 
-msgid "저장 실패 - 네트워크 오류"
-msgstr "저장 실패 - 네트워크 오류"
+#: apps/users/static/users/js/goals.js:270
+msgid "삭제를 되돌렸습니다"
+msgstr "삭제를 되돌렸습니다"
 
+#: apps/users/static/users/js/onboarding.js:135
 msgid "%(tag)s %(hours)s시간 기준"
 msgstr "%(tag)s %(hours)s시간 기준"
 
+#: apps/users/static/users/js/onboarding.js:171
 msgid "방금 기록을 지웠습니다."
 msgstr "방금 기록을 지웠습니다."
 
+#: apps/users/static/users/js/onboarding.js:174
 #, javascript-format
 msgid "취소 실패: %s"
 msgstr "취소 실패: %s"
 
+#: apps/users/static/users/js/password-strength.js:7
 msgid "너무 짧음"
 msgstr "너무 짧음"
 
+#: apps/users/static/users/js/password-strength.js:8
 msgid "약함"
 msgstr "약함"
 
+#: apps/users/static/users/js/password-strength.js:9
 msgid "보통"
 msgstr "보통"
 
+#: apps/users/static/users/js/password-strength.js:10
 msgid "좋음"
 msgstr "좋음"
 
+#: apps/users/static/users/js/password-strength.js:11
 msgid "강함"
 msgstr "강함"
 
+#: apps/users/static/users/js/signup-validate.js:106
 msgid "비밀번호가 일치합니다."
 msgstr "비밀번호가 일치합니다."
 
+#: apps/users/static/users/js/signup-validate.js:108
 msgid "비밀번호가 일치하지 않습니다."
 msgstr "비밀번호가 일치하지 않습니다."
 
+#: apps/users/static/users/js/signup-validate.js:143
 msgid "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
 msgstr "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
+
+#, javascript-format
+#~ msgid "최대 %s시간까지 입력 가능"
+#~ msgstr "최대 %s시간까지 입력 가능"
+
+#~ msgid "저장중..."
+#~ msgstr "저장중..."
+
+#~ msgid "저장완료!"
+#~ msgstr "저장완료!"
+
+#~ msgid "저장 실패"
+#~ msgstr "저장 실패"
+
+#~ msgid "저장 실패 - 네트워크 오류"
+#~ msgstr "저장 실패 - 네트워크 오류"
 
 #~ msgid "시간:"
 #~ msgstr "시간:"

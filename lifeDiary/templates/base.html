@@ -72,6 +72,8 @@
                 {% trans "라이프 다이어리" %}
             </a>
 
+            {% include 'shared/_nav_prefs.html' %}
+
             {% if user.is_authenticated %}
                 {% with app=request.resolver_match.app_name %}
                 <div class="app-nav__tabs">
@@ -225,6 +227,9 @@
 
         // 페이지 이동 시 오버레이 표시
         document.addEventListener('click', function(e) {
+            // 아래 submit 핸들러와 같은 규칙: 페이지가 기본 동작을 막았다면 이동이
+            // 아니므로 오버레이를 띄우지 않는다. 띄우면 이동이 없어 영영 안 걷힌다.
+            if (e.defaultPrevented) return;
             const link = e.target.closest('a');
             if (link && link.href && !link.href.startsWith('javascript:') && !link.href.startsWith('#') && !link.target && !isNavigating) {
                 if (!link.href.includes('admin') && !link.href.includes('logout') && !link.href.endsWith('#')) {
@@ -268,7 +273,7 @@
         // localStorage.getItem('theme') 을 그대로 data-theme 으로 쓰기 때문에
         // 'system' 을 저장하면 어떤 테마 규칙에도 걸리지 않는다.
         (function() {
-            const group = document.getElementById('themeChoice');
+            const menu = document.getElementById('themeMenu');
             const media = window.matchMedia('(prefers-color-scheme: dark)');
 
             function paint(theme) {
@@ -281,27 +286,45 @@
                 return media.matches ? 'dark' : 'light';
             }
 
-            media.addEventListener('change', function(e) {
-                if (!localStorage.getItem('theme')) {
-                    paint(e.matches ? 'dark' : 'light');
+            function storedChoice() {
+                const stored = localStorage.getItem('theme');
+                return (stored === 'light' || stored === 'dark') ? stored : 'system';
+            }
+
+            function render(choice) {
+                if (!menu) return;
+                menu.querySelectorAll('[data-theme-choice]').forEach(function(item) {
+                    const isCurrent = item.dataset.themeChoice === choice;
+                    item.classList.toggle('is-active', isCurrent);
+                    item.setAttribute('aria-checked', isCurrent ? 'true' : 'false');
+                });
+                const icon = menu.querySelector('[data-theme-icon]');
+                if (icon) {
+                    icon.className = resolve(choice) === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
                 }
+            }
+
+            media.addEventListener('change', function(e) {
+                if (storedChoice() !== 'system') return;
+                paint(e.matches ? 'dark' : 'light');
+                render('system');
             });
 
-            if (!group) return;
+            render(storedChoice());
 
-            const stored = localStorage.getItem('theme');
-            const current = (stored === 'light' || stored === 'dark') ? stored : 'system';
-            const checked = group.querySelector('input[value="' + current + '"]');
-            if (checked) checked.checked = true;
+            if (!menu) return;
 
-            group.addEventListener('change', function(e) {
-                const choice = e.target.value;
+            menu.addEventListener('click', function(e) {
+                const item = e.target.closest('[data-theme-choice]');
+                if (!item) return;
+                const choice = item.dataset.themeChoice;
                 if (choice === 'system') {
                     localStorage.removeItem('theme');
                 } else {
                     localStorage.setItem('theme', choice);
                 }
                 paint(resolve(choice));
+                render(choice);
             });
         })();
 
