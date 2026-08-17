@@ -1,11 +1,11 @@
-"""목표 달성 일수."""
+"""목표 달성 일수, 목표 진행 바 행."""
 
 from datetime import date, timedelta
 
 import pytest
 
 from apps.dashboard.models import TimeBlock
-from apps.stats.aggregation.goal_progress import goal_hit_days
+from apps.stats.aggregation.goal_progress import build_goal_progress_rows, goal_hit_days
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
@@ -101,3 +101,84 @@ class TestGoalHitDays:
         record_hours(user, focus, MONDAY, 0.5)
 
         assert goal_hit_days(user, MONDAY, SUNDAY, zero) == 1
+
+
+@pytest.mark.django_db
+class TestGoalProgressRows:
+    def test_daily_goal_percentage_reflects_selected_dates_recorded_hours(
+        self, user, focus
+    ):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 3.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert len(rows) == 1
+        assert rows[0]["period"] == "daily"
+        assert rows[0]["current_hours"] == 3.0
+        assert rows[0]["target_hours"] == 4.0
+        assert rows[0]["percentage"] == 75
+        assert rows[0]["pace_percentage"] is None
+
+    def test_weekly_goal_sums_the_whole_week_and_reports_pace(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+        wednesday = MONDAY + timedelta(days=2)
+        record_hours(user, focus, MONDAY, 3.0)
+        record_hours(user, focus, wednesday, 2.0)
+
+        rows = build_goal_progress_rows(user, wednesday, today=wednesday)
+
+        assert rows[0]["period"] == "weekly"
+        assert rows[0]["current_hours"] == 5.0
+        assert rows[0]["percentage"] == 50
+        assert rows[0]["pace_percentage"] == round(3 / 7 * 100)
+
+    def test_monthly_goal_sums_the_whole_month_and_reports_pace(self, user, focus):
+        first_of_month = date(2026, 8, 1)
+        UserGoal.objects.create(user=user, tag=focus, period="monthly", target_hours=20.0)
+        record_hours(user, focus, first_of_month, 5.0)
+
+        fifth = date(2026, 8, 5)
+        rows = build_goal_progress_rows(user, fifth, today=fifth)
+
+        assert rows[0]["period"] == "monthly"
+        assert rows[0]["current_hours"] == 5.0
+        assert rows[0]["percentage"] == 25
+        assert rows[0]["pace_percentage"] == round(5 / 31 * 100)
+
+    def test_no_goals_returns_an_empty_list(self, user):
+        assert build_goal_progress_rows(user, MONDAY, today=MONDAY) == []
+
+    def test_in_progress_period_under_target_is_not_marked_danger(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 1.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert rows[0]["is_under_target"] is False
+
+    def test_confirmed_past_period_under_target_is_marked_danger(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 1.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY + timedelta(days=1))
+
+        assert rows[0]["is_under_target"] is True
+
+    def test_percentage_caps_at_100_when_exceeding_target(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=1.0)
+        record_hours(user, focus, MONDAY, 3.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert rows[0]["percentage"] == 100
+        assert rows[0]["is_under_target"] is False
+
+    def test_rows_are_ordered_daily_then_weekly_then_monthly(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="monthly", target_hours=20.0)
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert [r["period"] for r in rows] == ["daily", "weekly", "monthly"]

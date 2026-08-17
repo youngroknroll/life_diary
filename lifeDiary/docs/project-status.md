@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-14
+Last updated: 2026-08-17
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,192 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (6단계: 인증·온보딩·설정·홈) — 트랙 완료
+
+병렬 서브에이전트 3개(인증·온보딩 / 설정 / 홈)로 진행했다. Agent Teams는 이 환경에서
+비활성이라 서브에이전트로 대체하고, 공유 파일(`style.css`, `locale/*.po`)은 리드가
+직렬 반영해 경합을 차단했다. Wave 1 읽기 전용 조사에서 **스펙의 "현재 상태" 기술이
+대부분 낡았음**이 드러났다 — 온보딩 3단계와 비밀번호 강도 위젯은 이미 구현돼 있었고,
+상단바 언어·테마 이동도 이미 끝나 있었으며, 계정 삭제용 danger-panel 모달은 존재한
+적이 없었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase6-auth-onboarding-settings-home.md`
+- 변경: `apps/users/templates/users/{login,signup,welcome,mypage}.html`,
+  `apps/users/static/users/js/auth-enhance.js`, `templates/{base,index}.html`,
+  `apps/core/static/core/css/style.css`, `apps/core/tests.py`,
+  `apps/users/test_{i18n_phase4,auth_enhance_render}.py`, `locale` 4파일
+- 사용자 결정 3건: 홈 가이드 링크는 로그인 사용자에게만 노출(백엔드 무변경),
+  설정에서 로그아웃 행 유지(모바일 로그아웃 경로 보존), 홈 예시 그리드 삭제
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, **팔레트 밖 색 0건**, i18n 4개 카탈로그 빈 msgstr·fuzzy 0건,
+  브라우저 실측 12항목(홈/로그인/가입/온보딩/설정 × 데스크톱·모바일·로그인 상태·
+  테마 3값·영어)
+- 리드가 브라우저에서 잡은 결함 5건: 한글 H1 단어 중간 줄바꿈(`word-break: keep-all`),
+  **ko 카탈로그 msgstr 중복으로 인한 비밀번호 규칙 2회 렌더**, 약관 링크 부트스트랩
+  파란색, 정의되지 않은 `--color-warning` 토큰 폴백, 여러 줄 `{# #}` 주석 화면 출력
+- i18n fuzzy 오상속 6건 교정. 그중 **`화면` → "Tue"**(요일 '화'를 물려받음)가 가장
+  치명적이었다. 이전부터 잘못돼 있던 영어 번역 3건도 함께 수정
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff` **1~6단계 전부 완료**, 머지는 사용자 몫
+- Deferred: `category_guide` 공개화(백엔드), mypage 목표 편집 백엔드 고아화 정리,
+  `.segmented__item` 44px 규칙, `utils.js`의 FontAwesome 잔재, `tag_usage_guide*.png`
+  (약 2.1MB, 참조 0건), 죽은 CSS(`.home-daygrid*`·`.navbar-*`·`.theme-toggle`),
+  온보딩 칩 3번째 상태
+
+## 2026-08-17 — 분석 화면 가독성 수정 3건 (사용자 지시)
+
+(1) 호버 툴팁이 글자색을 지정하지 않아 Chart.js 기본 회색이 쓰였고, 배경
+`--color-text`가 다크에서 흰색이라 흰 배경에 회색 글자가 되어 읽히지 않던 문제를
+글자색을 반대 토큰(`--color-surface`)으로 못박아 두 테마 동시 해결. (2) 요약 탭
+"기록 밀도" 히트맵이 `aria-hidden`이라 화면에 축 설명이 전혀 없던 것을 날짜(세로)·
+시간(가로) 라벨 노출과 캡션 보강으로 해결(백엔드 무변경). (3) "요일별 기록량" 값
+축을 0–24h 고정으로 바꿔 바로 위 추세 그래프와 척도를 통일.
+
+- 실행 로그: `docs/frontend/2026-08-17_stats-readability-fixes.md`
+- 변경: `apps/stats/static/stats/js/stats.js`, `apps/stats/templates/stats/index.html`,
+  `apps/core/static/core/css/style.css`, `locale/{ko,en}/django.po`
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, i18n fuzzy 오상속 2건 교정 후 0건, 브라우저 실측(툴팁 라이트·
+  다크 각각, 밀도 축 정렬·넘침, 요일별 기록량 눈금)
+- 함께 고침: 두 줄짜리 `{# #}` 주석이 Django에서 한 줄 주석이라 화면에 그대로
+  출력되던 것을 제거
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 머지는 사용자 몫
+
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (5단계: 입력 패널 → 모바일 바텀시트)
+
+기록 화면 입력 패널을 카드 헤더·FA 아이콘·btn-sm 없이 재구성하고, 모바일 바텀시트를
+시안 4a대로 완성했다(80dvh, 헤더·저장 sticky, 태그 목록만 스크롤, 백드롭 탭·핸들
+스와이프 닫기, z-index 1030<1035<1040). 저장 버튼은 "N칸 저장"으로 칸 수를 보여준다.
+브라우저 실측에서 결함 5건을 잡았고, 그중 하나는 **선존재 ARIA 위반**(포커스가 시트
+안에 있는 채 `aria-hidden` 적용)이었다 — 저장·삭제 경로가 선택 해제를 닫기보다 먼저
+해서 포커스 복원 대상이 사라진 탓. 기존 테스트는 함수 내부 소스 순서만 검사해
+통과하고 있었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase5-input-panel-bottom-sheet.md`
+- 변경: `apps/dashboard/templates/dashboard/index.html`, `apps/dashboard/static/
+  dashboard/js/dashboard.js`, `apps/core/static/core/css/style.css`,
+  `apps/dashboard/tests.py`(마크업 검사 테스트 2건·전용 픽스처 제거),
+  `_tag_image_modal.html` 삭제, `locale/{ko,en}` django·djangojs 4파일
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, i18n fuzzy 0건(msgfmt 4파일 통과), 브라우저 실측 15항목
+  (데스크톱/375px, 시트 열림·닫기 3경로, 적층, 타깃, 저장→스낵바) — 상세는 실행 로그
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 6단계 남음, 머지는 사용자 몫
+- Deferred: 시트 닫기 버튼 32px(시안 명시값, 44px 규칙과 상충), JS/CSS 소스 문자열
+  검사 테스트 정리(이번에 거짓 확신을 준 형태), `tag_usage_guide*.png` 고아화 판단
+
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (4단계: segmented 전환 + 목표 진행 바)
+
+분석 화면의 `card > card-header > nav-tabs` 래핑을 걷어내고 기존 `.segmented`로
+바꿨다(모바일 4등분). 요약 탭에 목표 진행 바(일/주/월 목표 진행률 + 페이스
+마커 + 미달 확정만 danger 색)를 신설했다. 브라우저 실측에서 실제 결함 2건을
+잡았다: (1) `nav-link active` → `segmented__item is-active`로 바꾸며 Bootstrap
+Tab이 이전 활성 탭을 못 찾아 두 탭 내용이 겹쳐 렌더되던 문제, (2)
+`initTabHashSync`의 리스너 등록 순서가 늦어 URL hash 진입 시 pill 하이라이트만
+어긋나던 문제. 둘 다 유닛 테스트로는 안 잡히는 순수 브라우저 상태 결함이었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase4-segmented-goal-progress.md`
+- 변경: `apps/stats/aggregation/{category_keys.py,goal_progress.py}`,
+  `apps/stats/{logic.py,test_stats_perf.py}`, `apps/stats/templates/stats/
+  index.html`, `apps/stats/static/stats/js/stats.js`, `apps/core/static/core/
+  css/style.css`, `apps/users/repositories.py`, `locale/{ko,en}` 10개 문자열
+- 검증: 전체 pytest 통과, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  i18n fuzzy 회귀(ko·en 각 3건) 발견·수정, 브라우저 실측(진행 중/확정 미달 두
+  케이스, 탭 클릭+hash 로드 양쪽, 데스크톱/모바일) — 상세는 실행 로그.
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 5~6단계 남음, 머지는 사용자 몫
+- Deferred: **배포 시 유의** — `GetStatsContextUseCase`의 파일 캐시가 스키마
+  버전이 없어, 배포 시 `.cache/`를 비우지 않으면 최근 24시간 안에 캐시된 과거
+  날짜 조회가 TTL 만료 전까지 목표 진행 바 없이 보일 수 있음(자연 소멸,
+  Deployment & Operations Reviewer 검토 권고). 목표 개수 비례 N+1 쿼리 재검토
+  조건부 항목.
+
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (3단계: stats.js 전면 재작성)
+
+"가장 큰 격차"였던 `stats.js`의 Chart.js 기본값을 걷어냈다. 데이터 단위를 태그 →
+카테고리 5선으로 바꾸고, 라이트/다크 테마 동기화(`applyChartTheme`), 카드 상단 HTML
+범례(클릭 토글+취소선, 모바일은 4개), DOM 기반 빈 상태(`drawEmptyState` canvas 그리기
+삭제)를 구현했다. 목표선(annotation)은 데이터 계약이 없어(UserGoal이 태그·복수
+단위) 4단계로 미뤘다. i18n 작업 중 `project_i18n_fuzzy_trap` 메모리와 일치하는
+회귀(msgmerge의 유사-문자열 오번역 상속, ko·en 각 6건)를 발견해 즉시 고쳤다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase3-stats-js-rewrite.md`
+- 변경: `apps/stats/static/stats/js/stats.js`(전면 재작성), `apps/stats/templates/
+  stats/index.html`(차트 패널에 범례·빈 상태 마크업), `apps/core/static/core/css/
+  style.css`(`.chart-legend`/`.chart-empty` 등 신규 클래스), `apps/stats/logic.py`
+  (2단계가 만든 category_stats를 JSON envelope로 통과), `locale/{ko,en}` 8개 문자열
+- 검증: `node --check` 통과, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `pytest apps/stats apps/dashboard apps/tags apps/users` 전부 통과, i18n
+  `msgfmt --check-format`+`compilemessages`+두 언어 `gettext()` 직접 조회 확인,
+  브라우저 실측(격리 DB+임시 서버, 일/주/월 3탭 × 데이터 있음/빈 상태, 1280px·
+  375px, 라이트/다크, 범례 토글) — 상세는 실행 로그의 Frontend Review Evidence.
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 4~6단계 남음, 머지는 사용자 몫
+- Deferred: 목표선(annotation 상수 데이터셋, 4단계 이후), 라이트 모드 라인 아래
+  장식 영역 채우기(1단계부터 이월)
+
+## 2026-08-16 — P0 v2 UI 핸드오프 이식 (2단계: category_stats 집계)
+
+`weekly.py`·`monthly.py`에 카테고리 롤업(`category_stats`, 5개 카테고리 항상 시드)과
+`week_start`를 추가하고, `daily.py`의 `hourly_stats` 키를 태그명 → 카테고리 key로
+바꿨다. 미분류(빈 슬롯) 시간은 `hourly_stats`에서 빠지고 `tag_stats` 표에만 남는다.
+구현 중 `get_tag_info`가 `block.tag.category`를 읽게 되면서 쿼리 예산 테스트가
+4408쿼리로 터진 회귀를 발견 — `TimeBlockRepository.find_by_date`·`find_by_month`에
+`tag__category` select_related를 추가해 고쳤다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-16_p0-v2-phase2-category-stats.md`
+- 변경: `apps/stats/aggregation/{category_keys.py(신설),calculator.py,weekly.py,
+  monthly.py,daily.py}`, `apps/dashboard/repositories.py`(N+1 회귀 수정), 신규 테스트
+  3파일(`test_weekly.py`,`test_monthly.py`,`test_daily.py`)
+- 검증: 전체 pytest 523개 수집·전부 통과, `manage.py check` 클린, 마이그레이션 드리프트
+  없음(모델 변경 없음)
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 3~6단계 남음, 머지는 사용자 몫
+- 알려진 비일관 상태: `stats.js`(3단계 대상)가 아직 태그명 기준이라 이 커밋만 단독
+  배포하면 일간 스택 차트가 깨진다 — 같은 브랜치 안의 의도된 과도기, 배포 안 함
+- Deferred: 없음(범위 안 항목 전부 완료)
+
+## 2026-08-16 — P0 v2 UI 핸드오프 이식 (1단계: 폰트·오버레이·clamp)
+
+Claude Design에서 가져온 「Life Diary P0 구현 명세 v2」+「Life Diary 반영 점검 시안」을
+6단계(§1 차트 재작성·§2 category_stats 집계·§3 입력 패널·§4 segmented+목표 진행 바·
+§5 폰트·크롬·§6 인증/온보딩/설정/홈)로 나눠 이식하는 트랙을 시작했다. 1단계만 완료.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-16_p0-v2-phase1-fonts-chrome.md`
+- 변경: `apps/core/static/core/css/style.css`(`@font-face` 4개), `apps/core/static/core/
+  fonts/`(Pretendard Variable + IBM Plex Mono 400/500/600 woff2, 신규), `templates/
+  base.html`(폰트 preload, 로딩 오버레이 300ms 지연), `templates/index.html`(`.home-title`
+  clamp 반응형화)
+- 검증: `manage.py check` 클린, 브라우저 실측(콘솔 0건, 폰트 네트워크 200, `document.fonts`
+  로딩 확인, 오버레이 타이머 3케이스 스크립트 검증, 뷰포트별 `.home-title` 크기 변화 확인)
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff`, 2~6단계 남음, 머지는 사용자 몫
+- Deferred: Windows 등 타 OS 폰트 렌더 실측, Lighthouse FOUT 측정(코드 검토로 대체),
+  Pretendard 동적 서브셋 빌드(전체 Variable 파일 그대로 배포)
+
+## 2026-08-16 — JSON API의 django-ninja 이식과 OpenAPI/Swagger 문서화
+
+5개 JSON 엔드포인트(time-blocks 저장/삭제/undo, categories, tags CRUD)를
+URL·응답 봉투를 보존한 채 django-ninja 라우터로 이식하고 `/api/docs`
+(Swagger UI, 로컬 정적 서빙)와 `/api/openapi.json`(OAS 3.1)을 열었다.
+승인된 계약 변경 4건: 미인증 401 JSON, 깨진 JSON 문구 통일, 미소유 태그
+PUT/DELETE 500→404, 스키마 검증 실패의 봉투 매핑(400 유지). 프론트 JS와
+템플릿은 무변경이다.
+
+- 계획: `docs/plans/2026-08-16_api-openapi-django-ninja-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-16_api-openapi-django-ninja.md`
+- 안내: `docs/architecture/2026-08-16_api-documentation-guide.md`
+- 변경: `lifeDiary/api.py`(신설), `apps/{dashboard,tags}/api.py`·`schemas.py`
+  (신설), `apps/core/schemas.py`(신설), api_urls 2파일 삭제, requirements에
+  `django-ninja==1.6.2`, INSTALLED_APPS(dev·desktop)에 `ninja`
+- 검증: 전체 pytest 506 passed, `manage.py check` 클린, prod deploy check
+  통과(기존 W009 경고만), 마이그레이션 드리프트 없음, 브라우저 실측
+  (슬롯 저장/undo/삭제, 태그 CRUD, Swagger Try-it-out 200)
+- 상태: Active Plan — 브랜치 `feat/api-openapi-ninja`, 머지는 사용자 몫
+- Deferred: rate limiting·토큰 인증·버저닝, PyInstaller ninja 정적 번들,
+  desktop settings의 allauth URLConf 불일치(기존 결함, 이 트랙 이전부터
+  `check --settings=desktop` 실패)
 
 ## 2026-08-14 — 그리드 태그 라벨 위치와 시간축 24:00 경계
 

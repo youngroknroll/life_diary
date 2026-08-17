@@ -212,4 +212,5 @@ class TestUndoEndpoint:
     def test_undo_requires_login(self, client):
         response = undo(client, "무엇이든")
 
-        assert response.status_code in (302, 403)
+        assert response.status_code == 401
+        assert response.json()["success"] is False

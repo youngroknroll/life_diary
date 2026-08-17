@@ -10,6 +10,7 @@ from apps.core.utils import (
     get_week_date_range,
 )
 from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import (
     build_unclassified_analysis_entry,
     build_unclassified_daily_entry,
@@ -47,7 +48,13 @@ class StatsCalculator:
 
     def get_tag_info(self, block):
         if block.tag and block.tag.name:
-            return {"name": block.tag.name, "color": block.tag.color or "#808080"}
+            category = block.tag.category
+            return {
+                "name": block.tag.name,
+                "color": block.tag.color or "#808080",
+                "category_key": CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug),
+                "category_name": category.display_name,
+            }
         return None
 
     def process_blocks_without_tag(self, blocks, process_func):
@@ -80,19 +87,15 @@ class StatsCalculator:
             data_container[UNCLASSIFIED_TAG_NAME]["total_minutes"] += empty_minutes
             data_container[UNCLASSIFIED_TAG_NAME]["total_blocks"] += empty_minutes // MINUTES_PER_SLOT
 
-    def add_unclassified_to_hourly_stats(self, hourly_stats, hour, empty_minutes):
-        if empty_minutes > 0:
-            hourly_stats[hour][UNCLASSIFIED_TAG_NAME] = (
-                hourly_stats[hour].get(UNCLASSIFIED_TAG_NAME, 0) + empty_minutes
-            )
-
     def fill_empty_slots_daily(self, time_blocks, tag_stats, hourly_stats):
+        """미분류(빈 슬롯) 시간은 태그 상세 표(tag_stats)에는 더하되,
+        시간대별 스택 차트(hourly_stats)에는 넣지 않는다 — 표에서만
+        --color-track으로 노출한다(P0 v2 §1.3)."""
         for hour in range(HOURS_PER_DAY):
             total_minutes_in_hour = sum(hourly_stats[hour].values())
             empty_minutes = MINUTES_PER_HOUR - total_minutes_in_hour
             if empty_minutes > 0:
                 self.add_unclassified_data(tag_stats, empty_minutes, data_type="daily")
-                self.add_unclassified_to_hourly_stats(hourly_stats, hour, empty_minutes)
 
     def fill_empty_slots_weekly(self, daily_blocks, daily_tag_stats, tag_weekly_stats, date_item):
         recorded_blocks = len(daily_blocks)

@@ -1,5 +1,4 @@
 import pytest
-from django.urls import reverse
 from django.utils import translation
 
 from apps.tags.models import Category
@@ -30,14 +29,14 @@ class TestCategoryI18n:
             assert cat.display_name == "Passive consumption"
 
     def test_category_list_api_returns_translated_name(self, auth_client):
-        response = auth_client.get(reverse("tags_api:category_list"))
+        response = auth_client.get("/api/categories/")
         assert response.status_code == 200
         # Korean default
         names = [c["name"] for c in response.json()["categories"]]
         assert "수동적 소비시간" in names
 
     def test_category_list_api_returns_english_when_en(self, auth_en_client):
-        response = auth_en_client.get(reverse("tags_api:category_list"))
+        response = auth_en_client.get("/api/categories/")
         assert response.status_code == 200
         names = [c["name"] for c in response.json()["categories"]]
         assert "Passive consumption" in names
