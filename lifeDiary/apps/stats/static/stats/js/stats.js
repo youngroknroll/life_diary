@@ -32,18 +32,17 @@ function prepareChart(canvasId, key) {
 // 카테고리 5색. 면(파스텔)은 기존 --color-accent-* 토큰, 선(딥)은 신규 —
 // 흰 배경에서 파스텔 선은 대비 1.4~2.2로 안 보인다. 다크 모드는 파스텔
 // 원색을 그대로 선에 쓴다(대비 7.8~11.6) — categoryLineColor가 분기한다.
+// 딥 값은 짝이 되는 면의 색상(hue)을 그대로 따라가야 한다 — 어긋나면 같은
+// 카테고리가 표와 그래프에서 다른 색으로 읽힌다. 대비는 3.6~3.9로 맞춘다.
+// category_keys.py의 CATEGORY_LINE_COLOR와 같은 값이어야 한다.
 const CATEGORY_ORDER = ['work', 'move', 'care', 'sleep', 'life'];
 const CATEGORY_LINE = {
-    work: '#4E8F63', move: '#4F8B9E', care: '#C1715A', life: '#B9C2BA', sleep: '#8A9A91',
+    work: '#4E8F63', move: '#4F8B9E', care: '#C1715A', life: '#A87A1A', sleep: '#8A78D0',
 };
 const CATEGORY_FILL_TOKEN = {
     work: '--color-accent-work', move: '--color-accent-move', care: '--color-accent-care',
     life: '--color-accent-rest', sleep: '--color-accent-sleep',
 };
-// 모바일 범례는 핵심 4개 — 기초(life)는 선·범례 모두 숨긴다.
-const MOBILE_LEGEND_KEYS = ['work', 'move', 'care', 'sleep'];
-// 데스크톱도 기초 선은 기본 꺼짐(범례에서 다시 켤 수 있다).
-const DEFAULT_OFF_KEYS = ['life'];
 
 function categoryLineColor(key) {
     return isDarkTheme() ? cssToken(CATEGORY_FILL_TOKEN[key]) : CATEGORY_LINE[key];
@@ -64,12 +63,21 @@ function applyChartTheme() {
     Chart.defaults.borderColor = cssToken('--color-border-soft');
 }
 
-/** #themeToggle 클릭 시 각 차트의 명시적 색(기본값으로 안 잡히는 것들)을
- * 다시 계산해 update('none')한다. 오늘은 토글이 통계 화면과 같은 페이지에
- * 있지 않지만(설정 화면), 스펙이 요구하는 대로 방어적으로 둔다. */
+/** 테마가 바뀌면 각 차트의 명시적 색(기본값으로 안 잡히는 것들)을 다시
+ * 계산해 update('none')한다. */
 function rethemeCharts() {
     applyChartTheme();
     chartRethemeHandlers.forEach(function (fn) { fn(); });
+}
+
+/** 테마 전환은 커스텀 이벤트를 쏘지 않는다. base.html 은 <html data-theme> 만
+ * 바꾸므로 그 속성을 직접 관찰한다 — 헤더 메뉴 클릭과 시스템 테마 변경을
+ * 모두 잡고, 컨트롤의 id 가 바뀌어도 다시 끊기지 않는다. */
+function observeThemeChanges() {
+    new MutationObserver(rethemeCharts).observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+    });
 }
 
 function isCategoryDataEmpty(categoryStats) {
@@ -87,18 +95,17 @@ function toggleChartEmptyState(canvas, emptyEl, legendEl, isEmpty) {
  * datasetIndex는 항상 CATEGORY_ORDER 안에서의 위치와 같다 — buildDatasets가
  * 그 순서로 데이터셋을 만들기 때문이다.
  */
-function buildCategoryLegend(container, chart, mobileKeys) {
+function buildCategoryLegend(container, chart) {
     if (!container) return;
     container.innerHTML = '';
-    const keys = isMobileViewport() ? mobileKeys : CATEGORY_ORDER;
 
-    keys.forEach(function (key) {
-        const datasetIndex = CATEGORY_ORDER.indexOf(key);
+    CATEGORY_ORDER.forEach(function (key, datasetIndex) {
         const item = document.createElement('button');
         item.type = 'button';
         item.className = 'chart-legend__item';
-        const isOff = DEFAULT_OFF_KEYS.includes(key);
-        if (isOff) item.classList.add('is-off');
+        // 표시 상태는 차트에서 읽는다 — 상수로 다시 칠하면 테마 전환으로
+        // 범례를 다시 그릴 때 사용자가 끈 선이 켜진 것처럼 보인다.
+        item.classList.toggle('is-off', !chart.isDatasetVisible(datasetIndex));
         const swatch = document.createElement('span');
         swatch.className = 'chart-legend__swatch';
         swatch.style.backgroundColor = categoryLineColor(key);
@@ -192,8 +199,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('차트 렌더링 오류:', error);
     }
 
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) themeToggle.addEventListener('click', rethemeCharts);
+    observeThemeChanges();
 });
 
 function renderHourlyBarChart(hourlyStats) {
@@ -299,7 +305,6 @@ function renderWeeklyLineChart(categoryStats, weeklyData) {
                 pointRadius: 0,
                 pointHoverRadius: 4,
                 borderWidth: mobile ? 2 : 2.5,
-                hidden: DEFAULT_OFF_KEYS.includes(key),
             };
         });
     };
@@ -348,7 +353,7 @@ function renderWeeklyLineChart(categoryStats, weeklyData) {
         }
     });
 
-    buildCategoryLegend(legendEl, charts.weeklyLine, MOBILE_LEGEND_KEYS);
+    buildCategoryLegend(legendEl, charts.weeklyLine);
 
     chartRethemeHandlers.push(function () {
         charts.weeklyLine.data.datasets.forEach(function (ds, i) {
@@ -359,7 +364,7 @@ function renderWeeklyLineChart(categoryStats, weeklyData) {
         charts.weeklyLine.options.scales.y.grid.color = cssToken('--color-border-soft');
         Object.assign(charts.weeklyLine.options.plugins.tooltip, tooltipBaseOptions());
         charts.weeklyLine.update('none');
-        buildCategoryLegend(legendEl, charts.weeklyLine, MOBILE_LEGEND_KEYS);
+        buildCategoryLegend(legendEl, charts.weeklyLine);
     });
 }
 
@@ -456,7 +461,6 @@ function renderMonthlyLineChart(monthlyData) {
                 pointRadius: 0,
                 pointHoverRadius: 4,
                 borderWidth: 2,
-                hidden: DEFAULT_OFF_KEYS.includes(key),
             };
         });
     };
@@ -505,7 +509,7 @@ function renderMonthlyLineChart(monthlyData) {
         }
     });
 
-    buildCategoryLegend(legendEl, charts.monthlyLine, MOBILE_LEGEND_KEYS);
+    buildCategoryLegend(legendEl, charts.monthlyLine);
 
     chartRethemeHandlers.push(function () {
         charts.monthlyLine.data.datasets.forEach(function (ds, i) {
@@ -516,7 +520,7 @@ function renderMonthlyLineChart(monthlyData) {
         charts.monthlyLine.options.scales.y.grid.color = cssToken('--color-border-soft');
         Object.assign(charts.monthlyLine.options.plugins.tooltip, tooltipBaseOptions());
         charts.monthlyLine.update('none');
-        buildCategoryLegend(legendEl, charts.monthlyLine, MOBILE_LEGEND_KEYS);
+        buildCategoryLegend(legendEl, charts.monthlyLine);
     });
 }
 
