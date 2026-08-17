@@ -17,6 +17,32 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — 분석 화면 카테고리 색 불일치·범례 고정 해소 (사용자 지시)
+
+"그래프의 카테고리 색상이 맞지 않고 기초생활시간이 non-check로 고정된 것 같다"는
+보고에서 원인 셋이 나왔다. 차트 선 팔레트가 파스텔 개편(`0010`, 2026-08-11) 이전
+값이라 `life`(`#B9C2BA` 회색)·`sleep`(`#8A9A91` 회녹)의 색상이 카테고리 색과 달랐고,
+테마 감지가 존재하지 않는 `#themeToggle`을 보고 있어 다크에서 차트만 라이트 색으로
+남았으며, `life`는 기본 꺼짐인데 모바일 범례에 항목이 없어 켤 방법이 없었다.
+
+- 실행 로그: `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md`
+- 변경: `apps/stats/static/stats/js/stats.js`,
+  `apps/stats/aggregation/category_keys.py`
+- 사용자 결정 2건: 선 색을 파스텔과 같은 hue의 딥 변형으로 보정
+  (`life` → `#A87A1A` 대비 3.84, `sleep` → `#8A78D0` 대비 3.70),
+  기초 생활시간을 기본 켜짐 + 전 뷰포트 범례 노출로 변경
+- 테마 감지를 `<html data-theme>` MutationObserver로 교체 — 헤더 메뉴 클릭과 '시스템'
+  설정의 OS 테마 변경을 함께 잡고 컨트롤 id 변경에 다시 끊기지 않는다
+- 집계는 무결함으로 확인해 손대지 않았다(월간 `category_stats` 합계가 원시 블록 수와
+  일치)
+- 검증: **전체 pytest 543 passed**, `manage.py check` 이슈 0, `node --check` 통과,
+  실제 `stats.js`를 로드하는 브라우저 하니스로 500px·라이트/다크 실측(콘솔 0건)
+- 상태: Active Plan — 브랜치 `fix/stats-category-line-colors`, 머지는 사용자 몫
+- **미충족 게이트**: 프런트엔드 dual-review(Web Experience Designer / Browser
+  Interaction Reviewer)를 활성화하지 않았다. 머지 전 판정 필요
+- 미검증: 로그인이 필요한 실제 `/stats/` 페이지 렌더(dev DB 쓰기 회피로 하니스 대체)
+- 신규 Deferred 2건(A-6 캐시에 남는 옛 진행 바 색, C-11 `summary.NEUTRAL_COLOR` 정체)
+
 ## 2026-08-17 — 헤더 테마·언어 컨트롤 고정 (사용자 지시)
 
 테마·언어 선택이 마이페이지(로그인 필수) 안에만 있어 비로그인 사용자가 쓸 수 없었다.
@@ -577,6 +603,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-3 | `SECURE_PROXY_SSL_HEADER`, 배포된 `Set-Cookie` 헤더 실측. `ALLOWED_HOSTS`는 2026-08-12에 갱신·확인됨. `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요. | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | — |
 | A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
 | A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
+| A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -602,6 +629,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | C-8 | sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼이 없는데 이를 사용자에게 알리지 않는다. | 같은 문서 | — |
 | C-9 | `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지우는 선존재 결함(갱신 행이 늘어 더 자주 드러남, 새로고침하면 복구). | `docs/frontend/2026-08-14-grid-label-and-hour-axis.md` | — |
 | C-10 | 시안 1a의 라이트 모드 work 라인 아래 `opacity:.07` 영역 채우기. 장식적 요소로 판단해 두 번 연속 보류함. | 1·3단계 로그 | — |
+| C-11 | `apps/stats/aggregation/summary.py`의 `NEUTRAL_COLOR = "#8A9A91"`이 파스텔 개편 이전 sleep 색과 같다. 관찰 문구의 중립 점 색이라 카테고리 색은 아니지만, 의도적 중립인지 옛 팔레트의 복사 잔재인지 확인되지 않았다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `summary.py:22` 값 일치 확인, 카테고리 매핑에는 미사용 |
 
 ### D. 테스트 정리
 
