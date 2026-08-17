@@ -44,10 +44,15 @@
         <div class="onboarding__picks-foot">
             <button type="button" class="btn-sian" id="onboardingAddTag">{% trans "+ 직접 추가" %}</button>
             <span class="onboarding__count" id="onboardingCount" role="status" aria-live="polite"
-                  data-label="{% blocktrans with n='__N__' %}{{ n }}개 선택{% endblocktrans %}"></span>
+                  data-label="{% blocktrans with n='__N__' %}{{ n }}개 선택됨{% endblocktrans %}"></span>
         </div>
 
-        <a class="btn-sian btn-sian--primary onboarding__next" href="?step=2">{% trans "다음" %}</a>
+        <p class="onboarding__guide">
+            {% url 'tags:category_guide' as guide_url %}
+            {% blocktrans %}분류가 궁금하다면 <a href="{{ guide_url }}">가이드</a>{% endblocktrans %}
+        </p>
+
+        <a class="btn-sian btn-sian--primary onboarding__next" href="?step=2">{% trans "다음 — 하루 채워 보기" %}</a>
 
     {% elif step == 2 %}
         <h1 class="onboarding__title">{% trans "한 구간을 직접 채워보세요" %}</h1>

@@ -10,7 +10,7 @@
     <div class="card auth-card">
         <div class="card-body">
                 <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
-                <h1 class="auth-panel__title">{% trans "다시 오셨네요" %}</h1>
+                <h1 class="auth-panel__title">{% trans "다시 만나서 반갑습니다" %}</h1>
                 <p class="auth-panel__lead">{% trans "어제 기록이 그대로 기다리고 있습니다." %}</p>
                 <form method="post">
                     {% csrf_token %}
@@ -48,32 +48,22 @@
                         </label>
                     </div>
 
-                    <div class="d-grid gap-2">
-                        <button type="submit" class="btn-sian btn-sian--primary">{% trans "로그인" %}</button>
+                    <div class="auth-panel__forgot">
+                        <a href="{% url 'users:password_reset' %}">{% trans "비밀번호를 잊으셨나요?" %}</a>
                     </div>
-                    <div class="d-grid gap-2 mt-2">
-                        <a href="{% provider_login_url 'google' %}" class="btn-sian auth-google-login">
-                            <i class="fab fa-google me-1" aria-hidden="true"></i>
-                            {% trans "Google로 계속하기" %}
-                        </a>
-                    </div>
+                    <button type="submit" class="btn-sian btn-sian--primary auth-panel__submit">{% trans "로그인" %}</button>
+                    <a href="{% provider_login_url 'google' %}" class="btn-sian auth-google-login">
+                        <span class="auth-google__mark" aria-hidden="true">G</span>{% trans "Google로 계속하기" %}
+                    </a>
                 </form>
 
                 <div class="auth-panel__foot">
-                    <p class="mb-2 small">
-                        <a href="{% url 'users:username_recovery' %}" class="text-decoration-none">
-                            {% trans "아이디 찾기" %}
-                        </a>
-                        <span class="text-muted">|</span>
-                        <a href="{% url 'users:password_reset' %}" class="text-decoration-none">
-                            {% trans "비밀번호 찾기" %}
-                        </a>
+                    <p class="auth-panel__foot-alt">
+                        {% url 'users:signup' as signup_url %}
+                        {% blocktrans %}아직 계정이 없다면 <a href="{{ signup_url }}" class="auth-panel__foot-link">무료로 시작</a>{% endblocktrans %}
                     </p>
-                    <p class="mb-0">
-                        {% trans "계정이 없으신가요?" %}
-                        <a href="{% url 'users:signup' %}" class="text-decoration-none">
-                            {% trans "회원가입" %}
-                        </a>
+                    <p class="auth-panel__foot-minor">
+                        <a href="{% url 'users:username_recovery' %}">{% trans "아이디 찾기" %}</a>
                     </p>
                 </div>
         </div>

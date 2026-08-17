@@ -9,9 +9,12 @@ from apps.core.utils import (
     UNCLASSIFIED_TAG_NAME,
 )
 from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import minutes_to_hours
+from apps.tags.repositories import CategoryRepository
 
 _time_block_repo = TimeBlockRepository()
+_category_repo = CategoryRepository()
 
 
 def get_weekly_stats_data(user, selected_date, calculator):
@@ -25,6 +28,15 @@ def get_weekly_stats_data(user, selected_date, calculator):
     weekly_data = []
     tag_weekly_stats = {}
     excluded_tags = {SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME}
+
+    category_weekly_minutes = {
+        CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug): {
+            "key": CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug),
+            "name": category.display_name,
+            "daily_minutes": [0] * DAYS_PER_WEEK,
+        }
+        for category in _category_repo.find_all()
+    }
 
     for date_item in week_dates:
         daily_blocks = blocks_by_date.get(date_item, [])
@@ -48,6 +60,12 @@ def get_weekly_stats_data(user, selected_date, calculator):
             day_index = (_date - calculator.start_of_week).days
             tag_weekly_stats[tag_name]["daily_minutes"][day_index] += MINUTES_PER_SLOT
 
+            category_key = tag_info["category_key"]
+            if category_key in category_weekly_minutes:
+                category_weekly_minutes[category_key]["daily_minutes"][day_index] += (
+                    MINUTES_PER_SLOT
+                )
+
         calculator.process_blocks_without_tag(daily_blocks, process_block)
         calculator.fill_empty_slots_weekly(daily_blocks, daily_tag_stats, tag_weekly_stats, date_item)
         weekly_data.append({
@@ -67,13 +85,25 @@ def get_weekly_stats_data(user, selected_date, calculator):
         active_days = sum(1 for m in tag_data["daily_minutes"] if m > 0)
         tag_data["avg_hours"] = round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
 
+    category_stats = [
+        {
+            "key": category_data["key"],
+            "name": category_data["name"],
+            "daily_hours": [minutes_to_hours(m) for m in category_data["daily_minutes"]],
+            "total_hours": minutes_to_hours(sum(category_data["daily_minutes"])),
+        }
+        for category_data in category_weekly_minutes.values()
+    ]
+
     active_days = sum(1 for day in weekly_data if day["total_blocks"] > 0)
     most_active_day = max(weekly_data, key=lambda d: d["total_minutes"]) if weekly_data else None
     return {
         "start_date": calculator.start_of_week,
         "end_date": week_dates[-1],
+        "week_start": calculator.start_of_week,
         "weekly_data": weekly_data,
         "tag_weekly_stats": list(tag_weekly_stats.values()),
+        "category_stats": category_stats,
         "week_total_hours": round(
             sum(day["total_minutes"] for day in weekly_data) / MINUTES_PER_HOUR, 1
         ),

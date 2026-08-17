@@ -28,7 +28,10 @@ def get_daily_stats_data(user, selected_date, calculator):
         if tag_name != UNCLASSIFIED_TAG_NAME:
             active_blocks_count += 1
         hour = block.slot_index // SLOTS_PER_HOUR
-        hourly_stats[hour][tag_name] = hourly_stats[hour].get(tag_name, 0) + MINUTES_PER_SLOT
+        category_key = tag_info["category_key"]
+        hourly_stats[hour][category_key] = (
+            hourly_stats[hour].get(category_key, 0) + MINUTES_PER_SLOT
+        )
 
     calculator.process_blocks_without_tag(time_blocks, process_block)
     calculator.fill_empty_slots_daily(time_blocks, tag_stats, hourly_stats)

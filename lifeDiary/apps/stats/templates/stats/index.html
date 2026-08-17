@@ -14,38 +14,25 @@
     {% include "shared/_date_selector.html" with ds_onchange="location.href='?date=' + this.value + (window.location.hash || '')" ds_mypage_label=view_goals_label %}
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <ul class="nav nav-tabs card-header-tabs" id="statsTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
-                            {% trans "요약" %}
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
-                            {% trans "일" %}
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
-                            {% trans "주" %}
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
-                            {% trans "월" %}
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <div class="card-body">
-                <div class="tab-content" id="statsTabContent">
+<div class="segmented segmented--tabs mb-3" id="statsTabs" role="tablist">
+    <button class="segmented__item is-active active" id="summary-tab" data-bs-toggle="tab" data-bs-target="#summary" type="button" role="tab">
+        {% trans "요약" %}
+    </button>
+    <button class="segmented__item" id="daily-tab" data-bs-toggle="tab" data-bs-target="#daily" type="button" role="tab">
+        {% trans "일" %}
+    </button>
+    <button class="segmented__item" id="weekly-tab" data-bs-toggle="tab" data-bs-target="#weekly" type="button" role="tab">
+        {% trans "주" %}
+    </button>
+    <button class="segmented__item" id="monthly-tab" data-bs-toggle="tab" data-bs-target="#monthly" type="button" role="tab">
+        {% trans "월" %}
+    </button>
+</div>
 
-                    <div class="tab-pane fade show active" id="summary" role="tabpanel">
-                        <div class="summary-tiles mb-4">
+<div class="tab-content" id="statsTabContent">
+
+    <div class="tab-pane fade show active" id="summary" role="tabpanel">
+        <div class="summary-tiles mb-4">
                             <div class="summary-tile">
                                 <div class="summary-tile__label">{% blocktrans with d=selected_date|date:"n/j" %}오늘 {{ d }}{% endblocktrans %}</div>
                                 <div class="summary-tile__value num">{{ summary.today.hours }}<span class="summary-tile__unit">h</span></div>
@@ -83,6 +70,44 @@
                                     </div>
                                 {% endif %}
                             </div>
+                        </div>
+
+                        <div class="goal-progress mb-4">
+                            <div class="goal-progress__head">
+                                <span class="section-title">{% trans "목표 진행" %}</span>
+                                <a class="goal-progress__manage" href="{% url 'users:usergoal_list' %}">{% trans "목표 관리" %}</a>
+                            </div>
+                            {% if goal_progress_rows %}
+                                {% for row in goal_progress_rows %}
+                                    <a class="goal-progress__row" href="{% url 'users:usergoal_update' row.goal_id %}">
+                                        <span class="goal-progress__label">
+                                            <span class="chip__swatch" style="background-color: {{ row.tag_color }}"></span>
+                                            <span>
+                                                {{ row.tag_name }} ·
+                                                {% if row.period == 'daily' %}{% trans "매일" %}
+                                                {% elif row.period == 'weekly' %}{% trans "매주" %}
+                                                {% else %}{% trans "매달" %}{% endif %}
+                                            </span>
+                                        </span>
+                                        <span class="goal-progress__value num{% if row.is_under_target %} is-under{% endif %}">
+                                            {{ row.current_hours }}<span class="goal-progress__sep">/ {{ row.target_hours }}h ·
+                                            {% if row.period == 'daily' %}{% trans "오늘" %}
+                                            {% elif row.period == 'weekly' %}{% trans "이번 주" %}
+                                            {% else %}{% trans "이번 달" %}{% endif %}</span>
+                                        </span>
+                                    </a>
+                                    <span class="goal-progress__track">
+                                        <span class="goal-progress__fill" style="width: {{ row.percentage }}%; background-color: {{ row.category_line_color }}"></span>
+                                        {% if row.pace_percentage is not None %}
+                                            <span class="goal-progress__pace" style="left: {{ row.pace_percentage }}%" title="{% trans '오늘 기준 페이스' %}"></span>
+                                        {% endif %}
+                                    </span>
+                                {% endfor %}
+                            {% else %}
+                                <p class="goal-progress__empty">
+                                    <a href="{% url 'users:usergoal_create' %}">{% trans "목표를 추가하면 여기 진행률이 보입니다" %}</a>
+                                </p>
+                            {% endif %}
                         </div>
 
                         {% if summary.observations %}
@@ -129,14 +154,30 @@
                         {% endif %}
 
                         <h6 class="mb-1">{% trans "기록 밀도" %}</h6>
-                        <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다." %}</p>
+                        <p class="text-muted small mb-2">{% trans "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하루 24시간입니다." %}</p>
                         <figure class="density m-0" role="group" aria-labelledby="densityCaption">
-                            <div class="density__grid" aria-hidden="true">
-                                {% for row in summary.density.grid %}
-                                    {% for minutes in row %}
-                                        <span class="density__cell" data-minutes="{{ minutes }}"></span>
+                            <div class="density__chart" aria-hidden="true">
+                                <div class="density__ylabels">
+                                    {% for row in summary.density.rows %}
+                                        <span class="density__ylabel num">{{ row.date|date:"n/j" }}</span>
                                     {% endfor %}
-                                {% endfor %}
+                                </div>
+                                <div class="density__plot">
+                                    <div class="density__grid">
+                                        {% for row in summary.density.grid %}
+                                            {% for minutes in row %}
+                                                <span class="density__cell" data-minutes="{{ minutes }}"></span>
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                    <div class="density__xlabels">
+                                        <span class="density__xlabel num">0</span>
+                                        <span class="density__xlabel num">6</span>
+                                        <span class="density__xlabel num">12</span>
+                                        <span class="density__xlabel num">18</span>
+                                        <span class="density__xlabel density__xlabel--end num">24</span>
+                                    </div>
+                                </div>
                             </div>
                             <figcaption id="densityCaption" class="density__legend">
                                 <span>{% trans "0분" %}</span>
@@ -205,9 +246,16 @@
                             </div>
                         </div>
 
-                        <div class="section-title">{% trans "시간대별 기록" %}<span class="section-title__note">{% trans "태그 스택 · 한 칸 최대 60분" %}</span></div>
+                        <div class="section-title">{% trans "시간대별 기록" %}<span class="section-title__note">{% trans "카테고리 스택 · 한 칸 최대 60분" %}</span></div>
                         <div class="chart-panel mb-4">
-                            <canvas id="hourlyBarChart"></canvas>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="hourlyBarChart"></canvas>
+                                <div class="chart-empty" id="hourlyBarEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "오늘 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 시간대가 나타납니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "하루 구성" %}<span class="section-title__note">{% trans "24시간 기준 · 미기록 포함" %}</span></div>
@@ -276,9 +324,17 @@
                             </div>
                         {% endif %}
 
-                        <div class="section-title">{% trans "태그별 추세" %}<span class="section-title__note">{% trans "요일별 시간" %}</span></div>
-                        <div class="chart-panel chart-panel--tall mb-4">
-                            <canvas id="weeklyLineChart"></canvas>
+                        <div class="section-title">{% trans "카테고리별 추세" %}<span class="section-title__note">{% trans "요일별 시간" %}</span></div>
+                        <div class="chart-panel chart-panel--tall has-legend mb-4">
+                            <div class="chart-legend" id="weeklyLineLegend"></div>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="weeklyLineChart"></canvas>
+                                <div class="chart-empty" id="weeklyLineEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "이번 주 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 선이 시작됩니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "요일별 기록량" %}</div>
@@ -338,9 +394,17 @@
                             </div>
                         {% endif %}
 
-                        <div class="section-title">{% trans "태그별 일별 추세" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n/j" }}–{{ monthly_stats.end_date|date:"n/j" }}</span></div>
-                        <div class="chart-panel chart-panel--tall mb-4">
-                            <canvas id="monthlyLineChart"></canvas>
+                        <div class="section-title">{% trans "카테고리별 일별 추세" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n/j" }}–{{ monthly_stats.end_date|date:"n/j" }}</span></div>
+                        <div class="chart-panel chart-panel--tall has-legend mb-4">
+                            <div class="chart-legend" id="monthlyLineLegend"></div>
+                            <div class="chart-panel__canvas-wrap">
+                                <canvas id="monthlyLineChart"></canvas>
+                                <div class="chart-empty" id="monthlyLineEmpty" hidden>
+                                    <p class="chart-empty__title">{% trans "이번 달 기록이 아직 없습니다" %}</p>
+                                    <p class="chart-empty__hint">{% trans "한 칸만 채워도 선이 시작됩니다" %}</p>
+                                    <a class="chart-empty__action" href="{% url 'dashboard:index' %}">{% trans "오늘 기록 이어가기" %}</a>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="section-title">{% trans "주차별 요약" %}</div>
@@ -407,7 +471,7 @@
                 탭 안이 아니라 밖에 둔다. 파일 하나가 일·주·월 시트를 모두 담으므로
                 특정 탭에 넣으면 "이 탭 것만 나간다"로 읽힌다. 상단 page-head 도
                 아니다 — 거기 날짜 선택은 하루 단위 탐색이라 달 단위 선택과 축이
-                다르다. 다만 card-body 안이어야 좌우 여백이 위 내용과 맞는다.
+                다르다.
                 {% endcomment %}
                 {% if export_months %}
                 <form class="stats-export mt-4" method="get" action="{% url 'stats:export' %}">
@@ -448,10 +512,6 @@
                         <strong>{% trans "특이사항:" %}</strong> {{ user_note.note|linebreaksbr }}
                     </div>
                 {% endif %}
-            </div>
-        </div>
-    </div>
-</div>
 
 
 {% load static %}

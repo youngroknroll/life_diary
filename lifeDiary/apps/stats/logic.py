@@ -12,6 +12,7 @@ from .aggregation.analysis import get_tag_analysis_data
 from .aggregation.daily_baseline import get_tag_deltas_vs_week
 from .aggregation.weekly_summary import build_weekly_summary
 from .aggregation.summary import build_summary
+from .aggregation.goal_progress import build_goal_progress_rows
 
 __all__ = [
     "StatsCalculator",
@@ -36,6 +37,7 @@ def get_stats_context(user, selected_date):
     monthly_stats = get_monthly_stats_data(user, selected_date, calculator)
     tag_analysis = get_tag_analysis_data(user, selected_date, calculator)
     summary = build_summary(user, selected_date)
+    goal_progress_rows = build_goal_progress_rows(user, selected_date)
     tag_deltas = get_tag_deltas_vs_week(user, selected_date)
     weekly_summary = build_weekly_summary(monthly_stats, today=selected_date)
     for tag in daily_stats["tag_stats"]:
@@ -48,6 +50,7 @@ def get_stats_context(user, selected_date):
         "total_days": monthly_stats["total_days"],
         "total_hours": monthly_stats["total_hours"],
         "summary": summary,
+        "goal_progress_rows": goal_progress_rows,
         "daily_stats": daily_stats,
         "weekly_stats": weekly_stats,
         "monthly_stats": monthly_stats,
@@ -63,12 +66,16 @@ def get_stats_context(user, selected_date):
                 for d in weekly_stats["weekly_data"]
             ],
             "tag_weekly_stats": weekly_stats["tag_weekly_stats"],
+            "category_stats": weekly_stats["category_stats"],
+            "week_start": weekly_stats["week_start"],
         },
         "tag_analysis_json": tag_analysis,
         "monthly_stats_json": {
             "day_labels": monthly_stats["day_labels"],
             "tag_stats": monthly_stats["tag_stats"],
             "daily_totals": monthly_stats["daily_totals"],
+            "category_stats": monthly_stats["category_stats"],
+            "start_date": monthly_stats["start_date"],
         },
     }
 

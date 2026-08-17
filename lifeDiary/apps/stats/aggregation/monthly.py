@@ -1,4 +1,9 @@
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
+from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
+from apps.stats.services import minutes_to_hours
+from apps.tags.repositories import CategoryRepository
+
+_category_repo = CategoryRepository()
 
 
 def get_monthly_stats_data(user, selected_date, calculator):
@@ -6,6 +11,15 @@ def get_monthly_stats_data(user, selected_date, calculator):
     total_days = (calculator.end_of_month - calculator.start_of_month).days + 1
     daily_tag_stats = {}
     daily_totals = [0] * total_days
+
+    category_monthly_minutes = {
+        CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug): {
+            "key": CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug),
+            "name": category.display_name,
+            "daily_minutes": [0] * total_days,
+        }
+        for category in _category_repo.find_all()
+    }
 
     def process_block(block, tag_info):
         tag_name = tag_info["name"]
@@ -21,8 +35,24 @@ def get_monthly_stats_data(user, selected_date, calculator):
         daily_tag_stats[tag_name]["total_hours"] += hours_inc
         daily_totals[day_index] += hours_inc
 
+        category_key = tag_info["category_key"]
+        if category_key in category_monthly_minutes:
+            category_monthly_minutes[category_key]["daily_minutes"][day_index] += (
+                MINUTES_PER_SLOT
+            )
+
     calculator.process_blocks_without_tag(monthly_blocks, process_block)
     calculator.fill_empty_slots_monthly(user, daily_tag_stats, daily_totals, total_days)
+
+    category_stats = [
+        {
+            "key": category_data["key"],
+            "name": category_data["name"],
+            "daily_hours": [minutes_to_hours(m) for m in category_data["daily_minutes"]],
+            "total_hours": minutes_to_hours(sum(category_data["daily_minutes"])),
+        }
+        for category_data in category_monthly_minutes.values()
+    ]
 
     for tag_data in daily_tag_stats.values():
         tag_data["daily_hours"] = [round(h, 1) for h in tag_data["daily_hours"]]
@@ -45,6 +75,7 @@ def get_monthly_stats_data(user, selected_date, calculator):
         "end_date": calculator.end_of_month,
         "day_labels": [f"{i+1}일" for i in range(total_days)],
         "tag_stats": tag_list,
+        "category_stats": category_stats,
         "daily_totals": daily_totals,
         "total_hours": round(total_hours, 1),
         "active_days": active_days,

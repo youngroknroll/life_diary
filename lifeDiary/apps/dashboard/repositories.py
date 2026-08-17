@@ -7,7 +7,13 @@ class TimeBlockRepository:
     """TimeBlock ORM 쿼리 전담. 다른 레이어는 DB를 직접 보지 않는다."""
 
     def find_by_date(self, user, date):
-        return TimeBlock.objects.filter(user=user, date=date).select_related("tag")
+        """카테고리까지 함께 가져온다 — stats.daily가 카테고리 단위로 묶는다
+        (find_by_date_range와 같은 이유). 이 메서드는 dashboard 화면·API도
+        공유하므로 find_by_date_range와 달리 필드를 .only()로 제한하지
+        않는다."""
+        return TimeBlock.objects.filter(user=user, date=date).select_related(
+            "tag", "tag__category"
+        )
 
     def find_by_slots(self, user, date, slot_indexes):
         return TimeBlock.objects.filter(
@@ -24,10 +30,21 @@ class TimeBlockRepository:
         )
 
     def find_by_month(self, user, start, end):
+        """카테고리까지 함께 가져온다 — stats.monthly/analysis가 카테고리
+        단위로 묶는다(find_by_date_range와 같은 이유)."""
         return (
             TimeBlock.objects.filter(user=user, date__range=[start, end])
-            .select_related("tag")
-            .only("date", "slot_index", "tag__id", "tag__name", "tag__color")
+            .select_related("tag", "tag__category")
+            .only(
+                "date",
+                "slot_index",
+                "tag__id",
+                "tag__name",
+                "tag__color",
+                "tag__category__slug",
+                "tag__category__name",
+                "tag__category__color",
+            )
         )
 
     def build(self, user, target_date, slot_index, tag, memo):

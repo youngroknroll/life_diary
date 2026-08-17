@@ -1,4 +1,34 @@
 /* =========================================================
+   Self-hosted fonts — base.html이 PretendardVariable.woff2를
+   preload한다. CSP font-src가 gstatic 등 외부 폰트 CDN을 막으므로
+   반드시 self-host 한다.
+   ========================================================= */
+@font-face {
+    font-family: 'Pretendard Variable';
+    src: url('../fonts/PretendardVariable.woff2') format('woff2-variations');
+    font-weight: 45 920;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-display: swap;
+}
+
+/* =========================================================
    Design Tokens — 단일 팔레트 출처
    ========================================================= */
 :root {
@@ -73,7 +103,7 @@
     --chart-cap-md: clamp(220px, 35vh, 320px);
     --chart-cap-lg: clamp(260px, 45vh, 420px);
 
-    /* Typography — 웹폰트 CDN 미탑재. CSP font-src가 gstatic을 막는다 */
+    /* Typography — self-host (위 @font-face), CDN 미사용 */
     --font-body: 'Pretendard Variable', Pretendard, 'Noto Sans KR',
         system-ui, -apple-system, 'Segoe UI', sans-serif;
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo,
@@ -322,6 +352,45 @@ body {
     color: var(--color-text);
 }
 
+/* 세그먼트를 라디오 그룹으로도 쓴다(설정의 테마 3값). 네이티브 라디오라
+   방향키 순회·그룹 이름·상태 안내가 공짜로 따라온다 — 직접 구현하지 않는다.
+   display:none 이 아니라 clip-path 로 숨겨야 포커스를 받는다. */
+.segmented__radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+.segmented__radio:checked + .segmented__item {
+    background: var(--color-surface);
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.segmented__radio:focus-visible + .segmented__item {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+label.segmented__item {
+    cursor: pointer;
+}
+
+@media (max-width: 767.98px) {
+    .segmented--tabs {
+        display: flex;
+        width: 100%;
+    }
+
+    .segmented--tabs .segmented__item {
+        flex: 1;
+        text-align: center;
+    }
+}
+
 .btn-sian {
     display: inline-flex;
     align-items: center;
@@ -406,8 +475,86 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    min-height: 44px;
+    min-height: 48px;
     padding: 6px 0;
+}
+
+.settings-panel {
+    max-width: 560px;
+    margin: 0 auto;
+}
+
+.settings-panel__account {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 4px 0 0;
+}
+
+.settings-group__label {
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--color-text-meta);
+    margin: 14px 0 2px;
+}
+
+/* 행 전체가 링크다 — 48px 띠 어디를 눌러도 이동한다. */
+.settings-row--link {
+    text-decoration: none;
+    color: inherit;
+    transition: background-color .15s ease;
+}
+
+.settings-row--link:hover {
+    background: var(--color-surface-soft);
+}
+
+.settings-row--link:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: -2px;
+}
+
+.settings-row__meta {
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--color-text-meta);
+}
+
+.settings-row__chevron {
+    flex: none;
+    margin-left: 8px;
+    font-size: 13px;
+    color: var(--color-text-meta);
+}
+
+.settings-lang {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-select {
+    width: auto;
+    min-width: 5.75rem;
+    min-height: 44px;
+    font-size: 0.8rem;
+}
+
+@media (max-width: 575.98px) {
+    .settings-row--stack {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+
+    .settings-row--stack .segmented {
+        display: flex;
+        width: 100%;
+    }
+
+    .settings-row--stack .segmented__item {
+        flex: 1;
+        text-align: center;
+    }
 }
 
 /* 태그 관리의 행 리스트 — 카테고리로 묶고 행마다 이름·누적 기록·버튼 넷. */
@@ -781,7 +928,11 @@ body {
     transition: background-color .15s ease, border-color .15s ease;
 }
 
-.chip--pick:not(:has(.chip__check:checked)):hover {
+/* `:has(.chip__check)` 로 한정하는 이유: .chip--pick 은 두 상태 모델을 쓴다 —
+   온보딩은 숨은 체크박스, 기록 화면 시트는 .active 클래스다. 이 한정이 없으면
+   체크박스가 없는 시트 칩에서 `:not(:has(:checked))` 가 항상 참이 되어
+   선택된 칩까지 흐려진다. */
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)):hover {
     border-color: var(--color-primary-border);
     background-color: var(--color-surface-soft);
 }
@@ -805,7 +956,7 @@ body {
     outline-offset: 2px;
 }
 
-.chip--pick:not(:has(.chip__check:checked)) .chip__swatch {
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)) .chip__swatch {
     opacity: 0.35;
 }
 
@@ -820,6 +971,17 @@ body {
 .onboarding__count {
     font-size: 12px;
     color: var(--color-text-muted);
+}
+
+.onboarding__guide {
+    margin: -8px 0 16px;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
+}
+
+.onboarding__guide a {
+    color: var(--color-text-muted);
+    text-decoration: underline;
 }
 
 /* STEP2 는 기록 화면의 그리드를 그대로 얹는다. 온보딩 열은 420px 이라
@@ -1101,13 +1263,13 @@ body {
 }
 
 .auth-panel {
-    max-width: 420px;
+    max-width: 400px;
     margin: 0 auto;
 }
 
 .auth-panel__brand {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 15px;
     color: var(--color-primary);
     margin-bottom: 22px;
 }
@@ -1123,6 +1285,52 @@ body {
     font-size: 13px;
     color: var(--color-text-muted);
     margin: 0 0 22px;
+}
+
+.auth-card .form-label {
+    display: block;
+    font-weight: 500;
+    font-size: 11.5px;
+    color: var(--color-text-body);
+    margin-bottom: 5px;
+}
+
+.auth-panel__forgot {
+    display: flex;
+    justify-content: flex-end;
+    margin: -2px 0 12px;
+    font-size: 12px;
+}
+
+.auth-panel__forgot a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.auth-panel__forgot a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+/* 주 CTA 는 44px 기준선보다 한 단 크다(시안 4d). */
+.auth-panel__submit {
+    width: 100%;
+    min-height: 50px;
+    font-size: 15px;
+}
+
+.auth-card .auth-google-login {
+    width: 100%;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--color-text-body);
+}
+
+.auth-google__mark {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1;
 }
 
 /* Errors sit under their own field, not in a page-top banner. */
@@ -1152,6 +1360,12 @@ body {
     color: var(--color-text-body);
 }
 
+/* 부트스트랩 기본 링크색(#0d6efd)이 팔레트 밖이라 여기서 덮는다. */
+.consent-check .form-check-label a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
 .consent-check .field-error {
     margin-left: -1.5em;
 }
@@ -1161,6 +1375,29 @@ body {
     padding-top: 16px;
     border-top: 1px solid var(--color-border-muted);
     text-align: center;
+}
+
+.auth-panel__foot-alt {
+    margin: 0 0 6px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.auth-panel__foot-alt a,
+.auth-panel__foot-link {
+    color: var(--color-primary);
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+.auth-panel__foot-minor {
+    margin: 0;
+    font-size: 11.5px;
+}
+
+.auth-panel__foot-minor a {
+    color: var(--color-text-meta);
+    text-decoration: none;
 }
 
 .auth-card .card-body {
@@ -1307,10 +1544,180 @@ body {
 .chart-panel {
     position: relative;
     height: 150px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
 }
 
 .chart-panel--tall {
     height: 220px;
+}
+
+.chart-panel--tall.has-legend {
+    height: 248px;
+}
+
+.chart-panel__canvas-wrap {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+}
+
+.chart-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    flex: none;
+}
+
+.chart-legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    min-height: 24px;
+    padding: 2px 0;
+    border: none;
+    background: none;
+    font: 500 11px/1 var(--font-body);
+    color: var(--color-text-body);
+    cursor: pointer;
+}
+
+.chart-legend__item.is-off {
+    color: var(--color-text-disabled);
+    text-decoration: line-through;
+}
+
+.chart-legend__swatch {
+    display: inline-block;
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+}
+
+.chart-empty {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 12px;
+    text-align: center;
+    background: var(--color-surface-soft);
+    border-radius: 8px;
+}
+
+.chart-empty__title {
+    margin: 0;
+    font: 500 12.5px/1.4 var(--font-body);
+    color: var(--color-text-body);
+}
+
+.chart-empty__hint {
+    margin: 0;
+    font: 400 11px/1.4 var(--font-body);
+    color: var(--color-text-meta);
+}
+
+.chart-empty__action {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    margin-top: 4px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    background: var(--color-surface);
+    color: var(--color-primary);
+    font: 500 12px/1 var(--font-body);
+    text-decoration: none;
+}
+
+.goal-progress__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.goal-progress__manage {
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
+.goal-progress__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 44px;
+    text-decoration: none;
+    color: inherit;
+}
+
+.goal-progress__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.goal-progress__value {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-text);
+    white-space: nowrap;
+}
+
+.goal-progress__value.is-under {
+    color: var(--color-danger-text);
+}
+
+.goal-progress__sep {
+    font-weight: 400;
+    color: var(--color-text-meta);
+}
+
+.goal-progress__track {
+    position: relative;
+    display: block;
+    height: 10px;
+    margin-bottom: 14px;
+    border-radius: 5px;
+    background: var(--color-track);
+}
+
+.goal-progress__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 5px;
+}
+
+.goal-progress__pace {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 2px;
+    background: var(--color-text-meta);
+}
+
+.goal-progress__empty {
+    margin: 0;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.goal-progress__empty a {
+    color: var(--color-primary);
+    text-decoration: underline;
 }
 
 .settings-row {
@@ -1751,6 +2158,47 @@ footer {
     margin-top: 2px;
 }
 
+/* 축 라벨과 격자를 같은 행 높이·같은 간격으로 맞춘다. 셀 14px + gap 1px 을
+   ylabels 쪽에서 그대로 되풀이해야 날짜가 제 행에 선다. */
+.density__chart {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.density__ylabels {
+    display: grid;
+    grid-auto-rows: 14px;
+    gap: 1px;
+    flex: none;
+}
+
+.density__ylabel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
+.density__plot {
+    flex: 1;
+    min-width: 0;
+}
+
+.density__xlabels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+}
+
+.density__xlabel {
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
 .density__grid {
     display: grid;
     grid-template-columns: repeat(24, 1fr);
@@ -1880,6 +2328,220 @@ footer {
     white-space: normal;
 }
 
+.quick-input-sheet__empty-tags {
+    margin: 4px 0;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+/* 데스크톱: 사이드바 안의 평범한 패널. 시안에는 카드 헤더가 없다 —
+   .quick-input-sheet 자체가 표면을 갖는다. */
+.quick-input-sheet {
+    display: flex;
+    flex-direction: column;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 1px 3px rgba(20, 33, 26, 0.06);
+    overflow: hidden;
+}
+
+.quick-input-sheet__handle {
+    display: none;
+}
+
+.quick-input-sheet__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 16px;
+    border-bottom: 1px solid var(--color-border-muted);
+}
+
+.quick-input-sheet__range {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+}
+
+.quick-input-sheet__prompt {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__time {
+    font: 600 14px/1.3 var(--font-mono);
+    color: var(--color-text);
+}
+
+.quick-input-sheet__meta {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__memo-preview {
+    display: block;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__delete {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 4px 0;
+    border: none;
+    background: none;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-danger-text);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.quick-input-sheet__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: none;
+    padding-top: 1px;
+}
+
+/* 글자는 11.5px 로 작지만 터치 영역은 44px 를 지킨다(시안 4a). */
+.quick-input-sheet__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 0 0 12px;
+    border: none;
+    background: none;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.quick-input-sheet__close {
+    display: none;
+}
+
+.quick-input-sheet__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 14px 16px;
+}
+
+.quick-input-sheet__help {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: var(--color-surface-soft);
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__help ul {
+    margin: 6px 0 0;
+    padding-left: 18px;
+}
+
+.quick-input-sheet__help li {
+    margin-bottom: 2px;
+}
+
+/* .quick-input-sheet__body 가 flex column 이라 align-self 없이는 폭이 늘어난다.
+   칩은 내용만큼만 차지해야 한다. */
+.chip--add {
+    display: inline-flex;
+    align-self: flex-start;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    margin-top: 8px;
+    border: 1px dashed var(--color-text-disabled);
+    border-radius: 16px;
+    background: transparent;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    cursor: pointer;
+}
+
+.chip__swatch--add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 10px;
+    height: 10px;
+    font-size: 11px;
+    line-height: 1;
+    color: var(--color-text-muted);
+}
+
+/* 시트의 칩은 .active 클래스로 선택을 나타낸다. 온보딩은 같은 .chip--pick 에
+   숨은 체크박스를 쓰므로(위쪽 :has(.chip__check) 규칙들), 두 상태 모델이 서로
+   새지 않도록 이쪽은 .quick-input-sheet 안으로 한정한다. */
+.quick-input-sheet .chip--pick {
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+.quick-input-sheet .chip--pick.active {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.quick-input-sheet .chip--pick:not(.active):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
+}
+
+.quick-input-sheet .chip--pick:not(.active) .chip__swatch {
+    opacity: 0.35;
+}
+
+.quick-input-sheet__memo {
+    min-height: 64px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 13px;
+    resize: vertical;
+}
+
+.quick-input-sheet__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.quick-input-sheet__save {
+    min-height: 50px;
+}
+
+.quick-input-sheet__footmeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--color-text-muted);
+}
+
+.quick-input-sheet__footmeta a {
+    color: var(--color-primary);
+    text-decoration: underline;
+}
+
 #saveBtn:disabled {
     background-color: var(--color-text-muted);
     border-color: var(--color-text-muted);
@@ -1897,7 +2559,7 @@ footer {
         display: block;
         position: fixed;
         inset: 0;
-        z-index: 1030;
+        z-index: 1035;
         background: rgba(15, 23, 42, 0.45);
         opacity: 0;
         pointer-events: none;
@@ -1918,10 +2580,11 @@ footer {
         box-sizing: border-box;
         height: 80dvh;
         max-height: calc(100dvh - env(safe-area-inset-bottom, 0px));
-        overflow-y: auto;
+        border: none;
+        border-radius: 16px 16px 8px 8px;
+        box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.24);
         transform: translateY(100%);
         transition: transform 0.24s ease;
-        padding: 0 0.75rem 0.75rem;
         will-change: transform;
     }
 
@@ -1929,37 +2592,55 @@ footer {
         transform: translateY(0);
     }
 
-    .quick-input-sheet .card {
-        border-radius: 12px 12px 8px 8px !important;
-        box-shadow: 0 -12px 32px rgba(15, 23, 42, 0.24);
+    .quick-input-sheet__handle {
+        display: block;
+        flex: none;
+        width: 36px;
+        height: 4px;
+        margin: 10px auto 0;
+        border-radius: 2px;
+        background: var(--color-border);
     }
 
-    .quick-input-sheet .card-header {
+    .quick-input-sheet__header {
+        flex: none;
         position: sticky;
         top: 0;
         z-index: 1;
+        background: var(--color-surface);
     }
 
+    .quick-input-sheet__close {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border: none;
+        background: none;
+        font-size: 20px;
+        line-height: 1;
+        color: var(--color-text-muted);
+        cursor: pointer;
+    }
+
+    .quick-input-sheet__body {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .quick-input-sheet__footer {
+        flex: none;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    }
+
+    /* #saveBtn 을 여기서 빼는 이유: id 선택자가 .quick-input-sheet__save 의
+       50px 를 특정도로 눌러 저장 버튼만 44px 로 주저앉는다. 저장은 시트의
+       주 CTA 라 50px 를 지킨다(시안 4a). */
     .quick-input-sheet .btn,
-    .quick-input-sheet .tag-btn,
-    .quick-input-sheet #saveBtn {
+    .quick-input-sheet .tag-btn {
         min-height: 44px;
-    }
-
-    .quick-input-toolbar {
-        align-items: flex-start !important;
-        gap: 0.5rem;
-    }
-
-    .quick-input-actions {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 0.35rem;
-    }
-
-    .quick-input-actions .btn {
-        margin-right: 0 !important;
     }
 }
 
@@ -2257,7 +2938,9 @@ footer {
 .auth-card .form-control {
     border-radius: var(--radius-md);
     border: 1px solid var(--color-border);
-    padding: 12px 15px;
+    padding: 0 14px;
+    min-height: 44px;
+    font-size: 13px;
 }
 
 .auth-card .form-control:focus {
@@ -2269,13 +2952,6 @@ footer {
     border-radius: var(--radius-md);
     padding: 12px;
     font-weight: bold;
-}
-
-.auth-card .auth-google-login:hover,
-.auth-card .auth-google-login:focus {
-    color: #ffffff;
-    background-color: #2563eb;
-    border-color: #2563eb;
 }
 
 .auth-card .form-text {
@@ -2400,7 +3076,7 @@ footer {
 }
 
 .auth-card .password-field input {
-    padding-right: 44px;
+    padding-right: 58px;
 }
 
 .auth-card .password-toggle {
@@ -2411,8 +3087,12 @@ footer {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 44px;
+    min-width: 50px;
     min-height: 44px;
+    padding-inline: 6px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
     background: transparent;
     border: 0;
     padding: 0;
@@ -2433,7 +3113,7 @@ footer {
 .auth-card .caps-lock-warning {
     margin-top: 6px;
     font-size: 0.8125rem;
-    color: var(--color-warning, #d97706);
+    color: var(--color-danger-text);
     display: flex;
     align-items: center;
     gap: 6px;
@@ -2470,19 +3150,21 @@ footer {
     color: var(--color-text-muted);
 }
 
+/* 팔레트 안의 토큰만 쓴다. 카테고리 강조색(--color-accent-*)은 분류를 뜻하므로
+   강도 표시에 빌려 쓰지 않는다. 토큰이 테마를 따라가 다크 오버라이드도 필요 없다. */
 .auth-card .password-strength.is-veryweak .password-strength__fill,
-.auth-card .password-strength.is-weak .password-strength__fill { background: #dc2626; }
+.auth-card .password-strength.is-weak .password-strength__fill { background: var(--color-danger-text); }
 .auth-card .password-strength.is-veryweak .password-strength__label,
-.auth-card .password-strength.is-weak .password-strength__label { color: #dc2626; }
+.auth-card .password-strength.is-weak .password-strength__label { color: var(--color-danger-text); }
 
-.auth-card .password-strength.is-fair .password-strength__fill { background: #d97706; }
-.auth-card .password-strength.is-fair .password-strength__label { color: #d97706; }
+.auth-card .password-strength.is-fair .password-strength__fill { background: var(--color-text-muted); }
+.auth-card .password-strength.is-fair .password-strength__label { color: var(--color-text-muted); }
 
-.auth-card .password-strength.is-good .password-strength__fill { background: #2563eb; }
-.auth-card .password-strength.is-good .password-strength__label { color: #2563eb; }
+.auth-card .password-strength.is-good .password-strength__fill { background: var(--color-primary-border); }
+.auth-card .password-strength.is-good .password-strength__label { color: var(--color-primary-border); }
 
-.auth-card .password-strength.is-strong .password-strength__fill { background: #059669; }
-.auth-card .password-strength.is-strong .password-strength__label { color: #059669; }
+.auth-card .password-strength.is-strong .password-strength__fill { background: var(--color-primary); }
+.auth-card .password-strength.is-strong .password-strength__label { color: var(--color-primary); }
 
 /* =========================================================
    Loading Overlay (plain div — body 스크롤 락 없음)
@@ -2627,25 +3309,13 @@ footer {
     color: var(--color-primary);
     background: rgba(74, 166, 109, 0.15);
 }
-[data-theme="dark"] .auth-card .caps-lock-warning {
-    color: #fbbf24;
-}
 [data-theme="dark"] .auth-card .password-strength__bar {
     background: rgba(255, 255, 255, 0.1);
 }
 [data-theme="dark"] .auth-card .password-strength__label {
     color: var(--color-text-muted);
 }
-[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__fill,
-[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__fill { background: #f87171; }
-[data-theme="dark"] .auth-card .password-strength.is-veryweak .password-strength__label,
-[data-theme="dark"] .auth-card .password-strength.is-weak .password-strength__label { color: #f87171; }
-[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__fill { background: #fbbf24; }
-[data-theme="dark"] .auth-card .password-strength.is-fair .password-strength__label { color: #fbbf24; }
-[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__fill { background: #60a5fa; }
-[data-theme="dark"] .auth-card .password-strength.is-good .password-strength__label { color: #60a5fa; }
-[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__fill { background: #34d399; }
-[data-theme="dark"] .auth-card .password-strength.is-strong .password-strength__label { color: #34d399; }
+
 
 [data-theme="dark"] .list-group-item {
     background-color: var(--color-surface);

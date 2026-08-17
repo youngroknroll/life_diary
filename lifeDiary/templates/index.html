@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load i18n %}
 
 {% block title %}{{ project_name }}{% endblock %}
@@ -10,186 +9,169 @@
         background: transparent;
     }
 
+    .home-card {
+        max-width: 720px;
+        margin-inline: auto;
+    }
+
+    .home-hero__grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 268px);
+        gap: 20px;
+        align-items: start;
+    }
+
+    .home-hero__main {
+        padding: 4px 0;
+    }
+
     .home-kicker {
         color: var(--color-primary);
         font-weight: 700;
+        font-size: 12px;
         letter-spacing: 0;
     }
 
     .home-title {
         color: var(--color-text);
-        font-size: clamp(2rem, 2.9rem, 3.4rem);
+        font-size: clamp(2rem, 5vw + 1rem, 3.4rem);
         line-height: 1.16;
         letter-spacing: 0;
+        max-width: 9em;
+        /* 한글은 기본값이면 단어 중간에서도 줄이 바뀐다("기/록하세요").
+           keep-all 이라야 어절 단위로 끊긴다. 영문에는 영향이 없다. */
+        word-break: keep-all;
     }
 
     .home-subtitle {
-        color: var(--color-text-muted);
-        font-size: 1.08rem;
+        color: var(--color-text-body);
+        font-size: 0.8125rem;
         line-height: 1.7;
-        max-width: 38rem;
+        max-width: 24em;
     }
 
-    .home-primary-btn,
-    .home-secondary-btn {
-        border-radius: var(--radius-md);
-        min-height: 48px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.5rem;
-        font-weight: 700;
-    }
-
-    .home-primary-btn {
-        background: var(--color-primary);
-        border-color: var(--color-primary);
-        color: var(--color-surface);
-    }
-
-    .home-primary-btn:hover,
-    .home-primary-btn:focus {
-        background: var(--color-primary-hover);
-        border-color: var(--color-primary-hover);
-        color: var(--color-surface);
-    }
-
-    .home-secondary-btn {
-        color: var(--color-primary);
-        border-color: var(--color-primary-border);
-        background: var(--color-surface);
-    }
-
-    .home-secondary-btn:hover,
-    .home-secondary-btn:focus {
-        color: var(--color-primary-hover);
-        border-color: var(--color-primary);
-        background: var(--color-surface-soft);
-    }
-
-    .home-preview {
-        background: var(--color-surface-soft);
-        border-radius: var(--radius-md);
-        min-height: 100%;
-    }
-
-    .home-preview-panel {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
-        border-radius: var(--radius-md);
-        box-shadow: 0 16px 34px rgba(43, 73, 53, 0.11);
-    }
-
-    .home-preview-image {
-        width: 100%;
-        max-height: 280px;
-        object-fit: contain;
-        object-position: center;
-        border-radius: var(--radius-md);
-        border: 1px solid var(--color-border-muted);
-        background: var(--color-surface);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .home-preview-trigger {
-        width: 100%;
-        padding: 0;
-        border: 0;
-        background: transparent;
-        text-align: left;
-        cursor: pointer;
-    }
-
-    .home-preview-trigger:hover .home-preview-image,
-    .home-preview-trigger:focus .home-preview-image {
-        transform: translateY(-1px);
-        box-shadow: 0 12px 24px rgba(43, 73, 53, 0.14);
-    }
-
-    .home-preview-trigger:focus-visible {
-        outline: 3px solid rgba(47, 125, 79, 0.32);
-        outline-offset: 6px;
-        border-radius: var(--radius-md);
-    }
-
-    .home-preview-caption {
-        color: var(--color-text-muted);
-        line-height: 1.6;
-    }
-
-    .home-image-modal .modal-content {
-        background: var(--color-surface);
-        border-radius: var(--radius-md);
-    }
-
-    .home-image-modal .modal-body {
-        padding: 0;
-    }
-
-    .home-modal-image {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-    .home-day-blocks {
-        display: grid;
-        grid-template-columns: repeat(8, minmax(0, 1fr));
-        gap: 0.45rem;
-    }
-
-    .home-day-block {
-        aspect-ratio: 1;
-        border-radius: var(--radius-sm);
-        background: var(--color-accent-muted);
-    }
-
-    .home-day-block.is-work {
-        background: var(--color-accent-work);
-    }
-
-    .home-day-block.is-rest {
-        background: var(--color-accent-rest);
-    }
-
-    .home-day-block.is-move {
-        background: var(--color-accent-move);
-    }
-
-    .home-day-block.is-care {
-        background: var(--color-accent-care);
-    }
-
-    .home-note {
-        background: var(--color-note-bg);
-        border: 1px solid var(--color-note-border);
-        border-radius: var(--radius-md);
-        color: var(--color-note-text);
+    .home-cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .home-section-title {
         color: var(--color-text);
+        font-size: 0.8125rem;
+        font-weight: 700;
         letter-spacing: 0;
     }
 
-    .home-feature {
-        height: 100%;
-        background: var(--color-surface);
-        border: 1px solid var(--color-border-soft);
-        border-radius: var(--radius-md);
-        padding: 1.5rem;
+    .home-usage {
+        display: flex;
+        gap: 8px;
     }
 
-    .home-feature-icon {
-        width: 48px;
-        height: 48px;
+    .home-usage__box {
+        flex: 1 1 0;
+        min-width: 0;
+        border: 1px solid var(--color-border-soft);
+        border-radius: 8px;
+        padding: 10px 12px;
+    }
+
+    .home-usage__title {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-text);
+        margin: 0 0 3px;
+    }
+
+    .home-usage__desc {
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--color-text-muted);
+        margin: 0;
+    }
+
+    .home-guide {
+        background: var(--color-surface-soft);
         border-radius: var(--radius-md);
+        padding: 16px 18px;
+    }
+
+    .home-guide__title {
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--color-text);
+        margin: 0 0 10px;
+    }
+
+    .home-guide__list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .home-guide__row {
+        display: grid;
+        grid-template-columns: 18px minmax(0, 1fr);
+        gap: 9px;
+        align-items: start;
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 8px;
+        padding: 9px 12px;
+    }
+
+    .home-guide__swatch {
+        width: 18px;
+        height: 18px;
+        border-radius: 5px;
+        margin-top: 1px;
+    }
+
+    .home-guide__swatch--work { background: var(--color-accent-work); }
+    .home-guide__swatch--move { background: var(--color-accent-move); }
+    .home-guide__swatch--care { background: var(--color-accent-care); }
+    .home-guide__swatch--rest { background: var(--color-accent-rest); }
+    .home-guide__swatch--sleep { background: var(--color-accent-sleep); }
+
+    .home-guide__name {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    .home-guide__desc {
+        font-size: 10.5px;
+        font-weight: 400;
+        line-height: 1.5;
+        color: var(--color-text-muted);
+        margin: 2px 0 0;
+    }
+
+    .home-guide__more {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        background: var(--color-primary-soft);
+        gap: 4px;
+        min-height: 44px;
+        margin-top: 4px;
+        font-size: 11.5px;
+        font-weight: 600;
         color: var(--color-primary);
-        font-size: 1.25rem;
+        text-decoration: none;
+    }
+
+    .home-guide__more:hover {
+        color: var(--color-primary-hover);
+        text-decoration: underline;
+    }
+
+    .home-guide__more:focus-visible {
+        outline: 2px solid var(--color-primary);
+        outline-offset: 2px;
+        border-radius: var(--radius-sm);
     }
 
     .home-nudge {
@@ -198,269 +180,125 @@
         border-radius: var(--radius-md);
     }
 
-    @media (max-width: 991.98px) {
-        .home-preview {
-            margin-top: 2rem;
+    @media (max-width: 767.98px) {
+        .home-hero__grid {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+    }
+
+    @media (max-width: 479.98px) {
+        .home-usage {
+            flex-direction: column;
         }
     }
 </style>
 {% endblock %}
 
 {% block content %}
-{% get_current_language as LANGUAGE_CODE %}
-{% if LANGUAGE_CODE == "en" %}
-    {% static 'core/img/tag_usage_guide_en.png' as tag_usage_guide_src %}
-{% else %}
-    {% static 'core/img/tag_usage_guide.png' as tag_usage_guide_src %}
-{% endif %}
-<section class="home-hero mb-3">
-    <div class="row g-0 align-items-stretch">
-        <div class="col-lg-7">
-            <div class="p-4 p-md-5">
-                <p class="home-kicker mb-3">{% trans "하루 10분 단위 기록" %}</p>
-                <h1 class="home-title fw-bold mb-4">{% trans "하루를 단순하게 기록하세요" %}</h1>
-                <p class="home-subtitle mb-4">
-                    {% trans "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다." %}
-                    {% trans "비어 있는 구간을 끌어서 태그를 고르면 끝입니다." %}
-                </p>
+<section class="home-hero home-card mb-3">
+    <div class="home-hero__grid">
+        <div class="home-hero__main">
+            <p class="home-kicker mb-2">{% trans "하루 10분 단위 기록" %}</p>
+            <h1 class="home-title fw-bold mb-3">{% trans "하루를 단순하게 기록하세요" %}</h1>
+            <p class="home-subtitle mb-4">
+                {% trans "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다." %}
+                {% trans "비어 있는 구간을 끌어서 태그를 고르면 끝입니다." %}
+            </p>
 
-                <div class="d-flex flex-wrap gap-3 mb-4">
-                    {% if user.is_authenticated %}
-                        <a href="{% url 'dashboard:index' %}" class="btn home-primary-btn px-4">
-                            <i class="fas fa-pen-to-square"></i>
-                            {% trans "오늘 기록하기" %}
-                        </a>
-                        {% if user.is_superuser %}
-                        <a href="{% url 'admin:index' %}" class="btn home-secondary-btn px-4">
-                            <i class="fas fa-cog"></i>
-                            {% trans "관리자 패널" %}
-                        </a>
-                        {% endif %}
-                    {% else %}
-                        <a href="{% url 'users:login' %}" class="btn home-primary-btn px-4">
-                            <i class="fas fa-right-to-bracket"></i>
-                            {% trans "로그인하고 기록 시작" %}
-                        </a>
-                        <a href="{% url 'users:signup' %}" class="btn home-secondary-btn px-4">
-                            {% trans "회원가입" %}
-                        </a>
+            <div class="home-cta mb-4">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:index' %}" class="btn-sian btn-sian--primary">
+                        {% trans "오늘 기록하기" %}
+                    </a>
+                    {% if user.is_superuser %}
+                    <a href="{% url 'admin:index' %}" class="btn-sian">
+                        {% trans "관리자 패널" %}
+                    </a>
                     {% endif %}
-                </div>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="btn-sian btn-sian--primary">
+                        {% trans "로그인하고 기록 시작" %}
+                    </a>
+                    <a href="{% url 'users:signup' %}" class="btn-sian">
+                        {% trans "회원가입" %}
+                    </a>
+                {% endif %}
+            </div>
 
-                <p class="home-kicker mb-1" style="font-size:0.8rem;">How it works</p>
-                <h2 class="home-section-title fw-bold mb-3" style="font-size:1rem;">{% trans "복잡한 정리 없이 이어지는 기록" %}</h2>
-                <div class="row g-2">
-                    <div class="col-4">
-                        <div class="home-feature p-3">
-                            <div class="home-feature-icon mb-2" style="width:36px;height:36px;font-size:1rem;">
-                                <i class="fas fa-pen"></i>
-                            </div>
-                            <h3 class="h6 fw-bold mb-1">{% trans "기록하기" %}</h3>
-                            <p class="text-muted mb-0" style="font-size:0.8rem;">{% trans "오늘 한 일을 가볍게 남깁니다." %}</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="home-feature p-3">
-                            <div class="home-feature-icon mb-2" style="width:36px;height:36px;font-size:1rem;">
-                                <i class="fas fa-tags"></i>
-                            </div>
-                            <h3 class="h6 fw-bold mb-1">{% trans "정리하기" %}</h3>
-                            <p class="text-muted mb-0" style="font-size:0.8rem;">{% trans "태그로 하루의 흐름을 구분합니다." %}</p>
-                        </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="home-feature p-3">
-                            <div class="home-feature-icon mb-2" style="width:36px;height:36px;font-size:1rem;">
-                                <i class="fas fa-chart-simple"></i>
-                            </div>
-                            <h3 class="h6 fw-bold mb-1">{% trans "돌아보기" %}</h3>
-                            <p class="text-muted mb-0" style="font-size:0.8rem;">{% trans "쌓인 기록에서 패턴을 확인합니다." %}</p>
-                        </div>
-                    </div>
+            <h2 class="home-section-title mb-2">{% trans "이렇게 씁니다" %}</h2>
+            <div class="home-usage">
+                <div class="home-usage__box">
+                    <h3 class="home-usage__title">{% trans "기록하기" %}</h3>
+                    <p class="home-usage__desc">{% trans "오늘 한 일을 가볍게 남깁니다." %}</p>
+                </div>
+                <div class="home-usage__box">
+                    <h3 class="home-usage__title">{% trans "정리하기" %}</h3>
+                    <p class="home-usage__desc">{% trans "태그로 하루의 흐름을 구분합니다." %}</p>
+                </div>
+                <div class="home-usage__box">
+                    <h3 class="home-usage__title">{% trans "돌아보기" %}</h3>
+                    <p class="home-usage__desc">{% trans "쌓인 기록에서 패턴을 확인합니다." %}</p>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-5">
-            <div class="home-preview p-4 p-md-5 d-flex align-items-center">
-                <div class="home-preview-panel p-4 w-100">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div>
-                            <p class="text-muted small mb-1">{% trans "오늘의 기록" %}</p>
-                            <h2 class="h5 fw-bold mb-0">{% trans "가볍게 남긴 하루" %}</h2>
-                        </div>
-                        <i class="fas fa-calendar-day text-success fs-4" aria-hidden="true"></i>
+        <aside class="home-guide">
+            <h2 class="home-guide__title">{% trans "소비시간의 분류" %}</h2>
+            <ul class="home-guide__list">
+                <li class="home-guide__row">
+                    <span class="home-guide__swatch home-guide__swatch--work" aria-hidden="true"></span>
+                    <div>
+                        <div class="home-guide__name">{% trans "투자시간" %}</div>
+                        <p class="home-guide__desc">{% trans "성과를 얻길 바라는 목표 영역에 대한 투자시간" %}</p>
                     </div>
-
-                    <div class="mb-4">
-                        <p class="fw-bold mb-2">{% trans "소비시간의 분류" %}</p>
-                        <button
-                            type="button"
-                            class="home-preview-trigger"
-                            data-bs-toggle="modal"
-                            data-bs-target="#homePreviewImageModal"
-                            aria-label="{% trans '소비시간의 분류 이미지 크게 보기' %}"
-                        >
-                            <img src="{{ tag_usage_guide_src }}" class="home-preview-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시' %}">
-                        </button>
-                        <p class="home-preview-caption small mt-2 mb-0">{% trans "클릭해서 크게 볼 수 있습니다." %}</p>
+                </li>
+                <li class="home-guide__row">
+                    <span class="home-guide__swatch home-guide__swatch--move" aria-hidden="true"></span>
+                    <div>
+                        <div class="home-guide__name">{% trans "주도적 사용시간" %}</div>
+                        <p class="home-guide__desc">{% trans "계획과 통제 안에서 내가 주도적으로 사용한 시간" %}</p>
                     </div>
-
-                    <div class="home-daygrid mb-4" role="img" aria-label="{% trans '하루 기록 예시 — 24행 × 6칸, 한 칸이 10분' %}">
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">06:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-sleep" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-track" style="grid-column: span 1"></span>
-                                <span class="home-daygrid__block is-rest" style="grid-column: span 2"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">07:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-track" style="grid-column: span 3"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">08:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-track" style="grid-column: span 1"></span>
-                                <span class="home-daygrid__block is-work" style="grid-column: span 5"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">09:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">10:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">11:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 4"></span>
-                                <span class="home-daygrid__block is-track" style="grid-column: span 2"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">12:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-rest" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-care" style="grid-column: span 3"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">13:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">14:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">15:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-track" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">16:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-track" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">17:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-track" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">18:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-move" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-rest" style="grid-column: span 3"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">19:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-rest" style="grid-column: span 2"></span>
-                                <span class="home-daygrid__block is-care" style="grid-column: span 4"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">20:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-care" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">21:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-work" style="grid-column: span 3"></span>
-                                <span class="home-daygrid__block is-care" style="grid-column: span 3"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">22:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-care" style="grid-column: span 4"></span>
-                                <span class="home-daygrid__block is-track" style="grid-column: span 2"></span>
-                            </span>
-                        </div>
-                        <div class="home-daygrid__row">
-                            <span class="home-daygrid__label">23:00</span>
-                            <span class="home-daygrid__cells">
-                                <span class="home-daygrid__block is-sleep" style="grid-column: span 6"></span>
-                            </span>
-                        </div>
+                </li>
+                <li class="home-guide__row">
+                    <span class="home-guide__swatch home-guide__swatch--care" aria-hidden="true"></span>
+                    <div>
+                        <div class="home-guide__name">{% trans "수동적 소비시간" %}</div>
+                        <p class="home-guide__desc">{% trans "비계획적이고 예정되지 않은 방식으로 소비되어버린 시간" %}</p>
                     </div>
-                    <p class="home-preview-caption small mb-4">{% trans "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분" %}</p>
-                    <div class="home-note p-3">
-                        <p class="fw-bold mb-1">{% trans "오늘의 한 줄" %}</p>
-                        <p class="mb-0 small">{% trans "집중한 시간과 쉬어간 시간을 한눈에 남겼어요." %}</p>
+                </li>
+                <li class="home-guide__row">
+                    <span class="home-guide__swatch home-guide__swatch--rest" aria-hidden="true"></span>
+                    <div>
+                        <div class="home-guide__name">{% trans "기초 생활시간" %}</div>
+                        <p class="home-guide__desc">{% trans "일정과 일정 사이의 기초적인 준비시간" %}</p>
                     </div>
-                </div>
-            </div>
-        </div>
+                </li>
+                <li class="home-guide__row">
+                    <span class="home-guide__swatch home-guide__swatch--sleep" aria-hidden="true"></span>
+                    <div>
+                        <div class="home-guide__name">{% trans "수면시간" %}</div>
+                        <p class="home-guide__desc">{% trans "잠, 낮잠" %}</p>
+                    </div>
+                </li>
+            </ul>
+            {% if user.is_authenticated %}
+            <a class="home-guide__more" href="{% url 'tags:category_guide' %}">
+                {% trans "분류 가이드 전체 보기" %}<span aria-hidden="true">→</span>
+            </a>
+            {% endif %}
+        </aside>
     </div>
 </section>
 
-<div class="modal fade home-image-modal" id="homePreviewImageModal" tabindex="-1" aria-labelledby="homePreviewImageModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header">
-                <h2 class="modal-title h5 fw-bold mb-0" id="homePreviewImageModalLabel">{% trans "소비시간의 분류" %}</h2>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% trans '닫기' %}"></button>
-            </div>
-            <div class="modal-body">
-                <img src="{{ tag_usage_guide_src }}" class="home-modal-image" alt="{% trans '소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시' %}">
-            </div>
-        </div>
-    </div>
-</div>
-
-
 {% if user.is_authenticated %}
-<section class="home-nudge p-4 mb-4">
+<section class="home-nudge home-card p-4 mb-4">
     <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3">
         <div>
             <h2 class="h5 fw-bold mb-1">{% blocktrans with username=user.username %}{{ username }}님, 오늘 기록을 이어가세요{% endblocktrans %}</h2>
             <p class="text-muted mb-0">{% trans "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다." %}</p>
         </div>
-        <a href="{% url 'dashboard:index' %}" class="btn home-primary-btn px-4">
+        <a href="{% url 'dashboard:index' %}" class="btn-sian btn-sian--primary">
             {% trans "오늘 기록하기" %}
         </a>
     </div>

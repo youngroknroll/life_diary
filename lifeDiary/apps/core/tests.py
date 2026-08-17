@@ -1,5 +1,4 @@
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -21,8 +20,6 @@ class TestHomePage:
         assert "로그인하고 기록 시작" in body
         assert "활동을 고르고, 오늘의 흐름을 남기고, 돌아봅니다." in body
         assert "소비시간의 분류" in body
-        assert 'data-bs-target="#homePreviewImageModal"' in body
-        assert 'id="homePreviewImageModal"' in body
         # 시안 5a 는 "하루 10분 단위 기록"을 히어로 kicker 로 쓴다.
         # 홈에서 10분 단위를 감추던 2026-04-11 결정을 뒤집은 것이다.
         assert "10분 단위" in body
@@ -42,22 +39,6 @@ class TestHomePage:
         assert f'href="{reverse("terms")}"' in body
         assert "개인정보처리방침" in body
         assert "이용약관" in body
-
-    def test_home_page_uses_korean_tag_usage_guide_for_non_english_language(self, ko_client):
-        ko_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "ko"
-        response = ko_client.get(reverse("home"))
-        body = response.content.decode()
-
-        assert "/static/core/img/tag_usage_guide.png" in body
-        assert "/static/core/img/tag_usage_guide_en.png" not in body
-
-    def test_home_page_uses_english_tag_usage_guide_for_english_language(self, en_client):
-        en_client.cookies[settings.LANGUAGE_COOKIE_NAME] = "en"
-        response = en_client.get(reverse("home"))
-        body = response.content.decode()
-
-        assert "/static/core/img/tag_usage_guide_en.png" in body
-        assert "/static/core/img/tag_usage_guide.png" not in body
 
     def test_home_page_invites_authenticated_user_to_record_today(self, ko_client, make_user):
         user = make_user(username="daily-user")
