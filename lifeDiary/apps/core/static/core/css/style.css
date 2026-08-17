@@ -186,7 +186,8 @@ body {
     font-variant-numeric: tabular-nums;
 }
 
-/* App nav — 최상위는 기록·분석·설정 셋뿐이다. 언어와 테마는 설정 안으로 */
+/* App nav — 최상위는 기록·분석·설정 셋뿐이다. 언어와 테마는 로그인 없이도
+   써야 하므로 브랜드 옆에 고정한다 */
 .app-nav {
     background: var(--color-surface);
     border-bottom: 1px solid var(--color-border);
@@ -206,6 +207,77 @@ body {
     color: var(--color-primary);
     text-decoration: none;
     flex: none;
+}
+
+.app-nav__prefs {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    flex: none;
+    margin-left: -14px;
+}
+
+.app-nav__pref {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-text-body);
+    font-size: 13px;
+    transition: background-color .15s ease, color .15s ease;
+}
+
+.app-nav__pref:hover {
+    background: var(--color-surface-soft);
+    color: var(--color-text);
+}
+
+.app-nav__pref:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+.app-nav__pref-code {
+    font-weight: 600;
+    font-size: 11.5px;
+}
+
+.app-nav__pref-menu {
+    min-width: 9.5rem;
+    padding: 4px;
+}
+
+.app-nav__pref-menu form {
+    margin: 0;
+}
+
+.app-nav__pref-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 6px;
+    font-size: 12.5px;
+}
+
+.app-nav__pref-item.is-active {
+    font-weight: 600;
+    color: var(--color-text);
+    background: var(--color-primary-soft);
+}
+
+.app-nav__pref-icon {
+    flex: none;
+    width: 1.25rem;
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
 }
 
 .app-nav__tabs {
@@ -247,8 +319,10 @@ body {
     background: var(--color-primary-soft);
 }
 
+/* 탭이 접히는 폭에서도 아바타는 오른쪽 끝에 남는다 */
 .app-nav__account {
     flex: none;
+    margin-left: auto;
 }
 
 .app-nav__avatar {
@@ -269,10 +343,32 @@ body {
 
 @media (max-width: 575.98px) {
     .app-nav__inner {
-        gap: 12px;
+        gap: 8px;
     }
     .app-nav__tab {
         padding: 7px 9px;
+    }
+    /* 브랜드·테마·언어·로그인·가입을 320px 한 줄에 들여보낸다. 줄바꿈을 허용하면
+       버튼이 56px 헤더 밖으로 자란다. */
+    .app-nav__prefs {
+        gap: 0;
+        margin-left: -10px;
+    }
+    .app-nav__pref {
+        min-width: 32px;
+        padding: 0 6px;
+    }
+    .app-nav__tabs--guest {
+        gap: 4px;
+    }
+    .app-nav__tabs--guest .app-nav__tab {
+        padding: 7px 6px;
+        font-size: 12px;
+    }
+    .app-nav__tabs--guest .btn-sian {
+        padding: 7px 10px;
+        font-size: 12px;
+        white-space: nowrap;
     }
 }
 
@@ -530,37 +626,6 @@ label.segmented__item {
     color: var(--color-text-meta);
 }
 
-.settings-lang {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.settings-select {
-    width: auto;
-    min-width: 5.75rem;
-    min-height: 44px;
-    font-size: 0.8rem;
-}
-
-@media (max-width: 575.98px) {
-    .settings-row--stack {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 6px;
-    }
-
-    .settings-row--stack .segmented {
-        display: flex;
-        width: 100%;
-    }
-
-    .settings-row--stack .segmented__item {
-        flex: 1;
-        text-align: center;
-    }
-}
-
 /* 태그 관리의 행 리스트 — 카테고리로 묶고 행마다 이름·누적 기록·버튼 넷. */
 .tag-group__heading {
     display: flex;
@@ -769,6 +834,12 @@ label.segmented__item {
 
     .app-nav__tabs {
         display: none;
+    }
+
+    /* 로그인 탭은 하단 탭바가 대신하지만, 비로그인 진입점은 대신할 것이 없다 */
+    .app-nav__tabs--guest {
+        display: flex;
+        gap: 6px;
     }
 }
 
