@@ -17,6 +17,24 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — 헤더 테마·언어 컨트롤 고정 (사용자 지시)
+
+테마·언어 선택이 마이페이지(로그인 필수) 안에만 있어 비로그인 사용자가 쓸 수 없었다.
+브랜드 이름 옆 헤더로 옮겨 모든 방문자에게 노출하고, 마이페이지 화면 그룹은 제거했다.
+시스템 자동 반영은 테마는 `prefers-color-scheme`, 언어는 `LocaleMiddleware`의
+`Accept-Language` 해석으로 동작한다(별도 코드 추가 없음).
+
+- 실행 로그: `docs/frontend/2026-08-17_header-theme-language-controls.md`
+- 변경: `templates/shared/_nav_prefs.html`(신규), `templates/base.html`,
+  `apps/users/templates/users/{mypage,signup}.html`,
+  `apps/core/static/core/css/style.css`, `locale/{ko,en}/LC_MESSAGES/django.po`
+- 같은 세션 지시로 회원가입 문구를 "환영합니다. 처음 뵙네요"로 교체
+- 검증: 전체 pytest 543 passed, `manage.py check` 이슈 0, ko/en 렌더 확인,
+  브라우저 실측(1280/390px × 라이트·다크 × 비로그인·로그인, 콘솔 0건)
+- 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
+- 발견(범위 밖): 비로그인 헤더의 로그인·가입 버튼이 768px 아래에서 숨는다
+  (`.app-nav__tabs--guest`가 모바일 숨김 규칙에 걸림)
+
 ## 2026-08-17 — 목표 관리 페이지 통합 (사용자 지시)
 
 `users:usergoal_list`가 `{% extends %}` 없는 조각을 렌더해 목표 화면이 껍데기 없이
