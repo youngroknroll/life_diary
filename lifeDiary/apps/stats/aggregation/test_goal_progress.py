@@ -1,6 +1,6 @@
 """목표 달성 일수, 목표 진행 바 행."""
 
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 import pytest
 
@@ -111,14 +111,16 @@ class TestGoalProgressRows:
         UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
         record_hours(user, focus, MONDAY, 3.0)
 
-        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+        rows = build_goal_progress_rows(
+            user, MONDAY, today=MONDAY, now=time(hour=12, minute=0)
+        )
 
         assert len(rows) == 1
         assert rows[0]["period"] == "daily"
         assert rows[0]["current_hours"] == 3.0
         assert rows[0]["target_hours"] == 4.0
         assert rows[0]["percentage"] == 75
-        assert rows[0]["pace_percentage"] is None
+        assert rows[0]["pace_percentage"] == 50
 
     def test_weekly_goal_sums_the_whole_week_and_reports_pace(self, user, focus):
         UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
@@ -145,6 +147,45 @@ class TestGoalProgressRows:
         assert rows[0]["current_hours"] == 5.0
         assert rows[0]["percentage"] == 25
         assert rows[0]["pace_percentage"] == round(5 / 31 * 100)
+
+    def test_a_past_daily_goal_reports_a_fully_elapsed_pace(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 1.0)
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY + timedelta(days=1))
+
+        assert rows[0]["pace_percentage"] == 100
+
+    def test_todays_daily_goal_paces_by_the_elapsed_part_of_the_day(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+
+        rows = build_goal_progress_rows(
+            user, MONDAY, today=MONDAY, now=time(hour=6, minute=0)
+        )
+
+        assert rows[0]["pace_percentage"] == 25
+
+    def test_a_goal_trailing_its_pace_is_marked_behind(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+        wednesday = MONDAY + timedelta(days=2)
+        record_hours(user, focus, MONDAY, 1.0)
+
+        rows = build_goal_progress_rows(user, wednesday, today=wednesday)
+
+        assert rows[0]["percentage"] == 10
+        assert rows[0]["pace_percentage"] == 43
+        assert rows[0]["is_behind_pace"] is True
+
+    def test_a_goal_matching_its_pace_is_not_marked_behind(self, user, focus):
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+        wednesday = MONDAY + timedelta(days=2)
+        record_hours(user, focus, MONDAY, 5.0)
+
+        rows = build_goal_progress_rows(user, wednesday, today=wednesday)
+
+        assert rows[0]["percentage"] == 50
+        assert rows[0]["pace_percentage"] == 43
+        assert rows[0]["is_behind_pace"] is False
 
     def test_no_goals_returns_an_empty_list(self, user):
         assert build_goal_progress_rows(user, MONDAY, today=MONDAY) == []
