@@ -32,8 +32,10 @@ Status values are based on the repository documents available at the update time
 - 검증: 전체 pytest 543 passed, `manage.py check` 이슈 0, ko/en 렌더 확인,
   브라우저 실측(1280/390px × 라이트·다크 × 비로그인·로그인, 콘솔 0건)
 - 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
-- 발견(범위 밖): 비로그인 헤더의 로그인·가입 버튼이 768px 아래에서 숨는다
-  (`.app-nav__tabs--guest`가 모바일 숨김 규칙에 걸림)
+- 후속 수정(사용자 지시): 768px 아래에서 숨던 비로그인 로그인·가입 버튼을 다시
+  노출하고, 320px 한 줄에 들어가도록 576px 아래 상단바를 압축(320/375/700/1280px
+  실측, 가로 오버플로 0)
+- 언어에는 테마의 "시스템"에 해당하는 자동 항목을 두지 않는다(사용자 결정)
 
 ## 2026-08-17 — 목표 관리 페이지 통합 (사용자 지시)
 
