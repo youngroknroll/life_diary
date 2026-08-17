@@ -343,10 +343,32 @@ body {
 
 @media (max-width: 575.98px) {
     .app-nav__inner {
-        gap: 12px;
+        gap: 8px;
     }
     .app-nav__tab {
         padding: 7px 9px;
+    }
+    /* 브랜드·테마·언어·로그인·가입을 320px 한 줄에 들여보낸다. 줄바꿈을 허용하면
+       버튼이 56px 헤더 밖으로 자란다. */
+    .app-nav__prefs {
+        gap: 0;
+        margin-left: -10px;
+    }
+    .app-nav__pref {
+        min-width: 32px;
+        padding: 0 6px;
+    }
+    .app-nav__tabs--guest {
+        gap: 4px;
+    }
+    .app-nav__tabs--guest .app-nav__tab {
+        padding: 7px 6px;
+        font-size: 12px;
+    }
+    .app-nav__tabs--guest .btn-sian {
+        padding: 7px 10px;
+        font-size: 12px;
+        white-space: nowrap;
     }
 }
 
@@ -812,6 +834,12 @@ label.segmented__item {
 
     .app-nav__tabs {
         display: none;
+    }
+
+    /* 로그인 탭은 하단 탭바가 대신하지만, 비로그인 진입점은 대신할 것이 없다 */
+    .app-nav__tabs--guest {
+        display: flex;
+        gap: 6px;
     }
 }
 
