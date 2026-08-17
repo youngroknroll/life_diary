@@ -17,6 +17,38 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-17 — 목표 관리 페이지 통합 (사용자 지시)
+
+`users:usergoal_list`가 `{% extends %}` 없는 조각을 렌더해 목표 화면이 껍데기 없이
+그려지고 있었다(HTTP 200, 625바이트). 실제로 되는 것은 목록 표시와 삭제 링크뿐이었다.
+Claude Design 시안(§5·§6 + 목표 관리 문서)에 맞춰 목록·진행률·인라인 수정·추가·삭제를
+한 화면에 모으고, 폼 페이지 두 개(`usergoal_form.html`, `usergoal_list.html`)를 걷어냈다.
+
+- 계획: `docs/plans/2026-08-17_goal-management-page-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_goal-management-page.md`
+- 변경: `apps/users/{views,urls,forms,models}.py`,
+  `apps/users/templates/users/{goals,_goal_manager}.html`(신규),
+  `apps/users/static/users/js/goals.js`, `apps/core/static/core/css/style.css`,
+  `apps/stats/aggregation/goal_progress.py`, `apps/stats/templates/stats/index.html`,
+  `templates/base.html`, `apps/users/test_goal_page.py`(신규), `locale` 4파일
+- 사용자 결정 2건: 진행률이 붉어지는 조건을 "페이스보다 뒤처짐"(`is_behind_pace`)으로
+  바꾸고 **분석 요약 탭도 같은 규칙으로 함께 변경**, 서버를 부르는 모든 조작
+  (저장·추가·삭제·되돌리기)에 스피너·`disabled`·`aria-busy` 대기 상태 표시
+- 계획 대비 이탈 3건: `usergoal_partial`을 되살리지 않고 제거(변경 뷰가 본문을 직접
+  반환), 중복 검증을 use case 대신 `UserGoalForm.clean()`에, 모바일에서 태그·기간을
+  한 줄로 합치지 않음(둘 다 편집 가능한 select)
+- 검증: **전체 pytest 543 passed**, `manage.py check` 이슈 0, 마이그레이션 드리프트
+  없음, `node --check` 통과, i18n 4개 카탈로그 untranslated·fuzzy 0건, 브라우저 실측
+  (1440/768/375/360px × 라이트·다크 × ko·en, Slow 3G 대기 상태, 키보드 전 경로)
+- 브라우저에서 잡은 결함 3건: **전면 로딩 오버레이가 영영 안 걷힘**(`base.html`
+  링크 핸들러가 `e.defaultPrevented` 미검사 — 별도 `fix(core)` 커밋), UA 기본 파란
+  포커스 링, 375px에서 `.goal-count` 좌측 정렬 줄바꿈
+- i18n fuzzy 오상속 1건 교정: `%(tag)s %(period)s 목표가 이미 있습니다.`가 플레이스홀더가
+  다른 항목을 물려받아, 그대로 뒀으면 포맷 시점에 터졌을 것
+- 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
+- Deferred: 마이페이지 POST 목표 분기 제거(B-1), (user, tag, period) DB 유니크 제약,
+  화면에서 쓰이지 않게 된 `is_under_target` 정리 여부
+
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (6단계: 인증·온보딩·설정·홈) — 트랙 완료
 
 병렬 서브에이전트 3개(인증·온보딩 / 설정 / 홈)로 진행했다. Agent Teams는 이 환경에서
