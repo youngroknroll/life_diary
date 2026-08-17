@@ -79,7 +79,7 @@
                             </div>
                             {% if goal_progress_rows %}
                                 {% for row in goal_progress_rows %}
-                                    <a class="goal-progress__row" href="{% url 'users:usergoal_update' row.goal_id %}">
+                                    <a class="goal-progress__row" href="{% url 'users:usergoal_list' %}">
                                         <span class="goal-progress__label">
                                             <span class="chip__swatch" style="background-color: {{ row.tag_color }}"></span>
                                             <span>
@@ -89,8 +89,8 @@
                                                 {% else %}{% trans "매달" %}{% endif %}
                                             </span>
                                         </span>
-                                        <span class="goal-progress__value num{% if row.is_under_target %} is-under{% endif %}">
-                                            {{ row.current_hours }}<span class="goal-progress__sep">/ {{ row.target_hours }}h ·
+                                        <span class="goal-progress__value num{% if row.is_behind_pace %} is-under{% endif %}">
+                                            {{ row.current_hours|floatformat:"-1" }}<span class="goal-progress__sep">/ {{ row.target_hours|floatformat:"-1" }}h ·
                                             {% if row.period == 'daily' %}{% trans "오늘" %}
                                             {% elif row.period == 'weekly' %}{% trans "이번 주" %}
                                             {% else %}{% trans "이번 달" %}{% endif %}</span>
@@ -98,14 +98,12 @@
                                     </a>
                                     <span class="goal-progress__track">
                                         <span class="goal-progress__fill" style="width: {{ row.percentage }}%; background-color: {{ row.category_line_color }}"></span>
-                                        {% if row.pace_percentage is not None %}
-                                            <span class="goal-progress__pace" style="left: {{ row.pace_percentage }}%" title="{% trans '오늘 기준 페이스' %}"></span>
-                                        {% endif %}
+                                        <span class="goal-progress__pace" style="left: {{ row.pace_percentage }}%" title="{% trans '오늘 기준 페이스' %}"></span>
                                     </span>
                                 {% endfor %}
                             {% else %}
                                 <p class="goal-progress__empty">
-                                    <a href="{% url 'users:usergoal_create' %}">{% trans "목표를 추가하면 여기 진행률이 보입니다" %}</a>
+                                    <a href="{% url 'users:usergoal_list' %}">{% trans "목표를 추가하면 여기 진행률이 보입니다" %}</a>
                                 </p>
                             {% endif %}
                         </div>

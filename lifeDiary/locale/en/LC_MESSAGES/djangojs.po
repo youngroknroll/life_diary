@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 02:06+0900\n"
+"POT-Creation-Date: 2026-08-17 16:00+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -16,245 +16,341 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: apps/core/static/core/js/tag.js:44
 msgid "목표 영역"
 msgstr "Goal area"
 
+#: apps/core/static/core/js/tag.js:45
 msgid "계획 안"
 msgstr "Planned"
 
+#: apps/core/static/core/js/tag.js:46
 msgid "계획 밖"
 msgstr "Unplanned"
 
+#: apps/core/static/core/js/tag.js:47
 msgid "준비 · 이동"
 msgstr "Prep · transit"
 
+#: apps/core/static/core/js/tag.js:48
 msgid "잠 · 낮잠"
 msgstr "Sleep · naps"
 
+#: apps/core/static/core/js/tag.js:64 apps/core/static/core/js/tag.js:152
 msgid "새 태그"
 msgstr "New tag"
 
+#: apps/core/static/core/js/tag.js:71
 #, javascript-format
 msgid "%s 색으로 저장됩니다. 같은 카테고리 태그와 한 덩어리로 보입니다."
 msgstr ""
 "Saved in the %s color. It reads as one block with tags in the same category."
 
+#: apps/core/static/core/js/tag.js:72
 msgid "카테고리를 고르면 색이 정해집니다."
 msgstr "Pick a category and the color is set."
 
+#: apps/core/static/core/js/tag.js:128
 msgid "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
 msgstr "Loading categories. Please try again in a moment."
 
+#: apps/core/static/core/js/tag.js:143
 msgid "태그 수정"
 msgstr "Edit tag"
 
+#: apps/core/static/core/js/tag.js:144
+#: apps/dashboard/static/dashboard/js/dashboard.js:645
 msgid "저장"
 msgstr "Save"
 
+#: apps/core/static/core/js/tag.js:153
 msgid "태그 만들기"
 msgstr "Create tag"
 
+#: apps/core/static/core/js/tag.js:173
 msgid "태그명을 입력해주세요."
 msgstr "Please enter a tag name."
 
+#: apps/core/static/core/js/tag.js:178
 msgid "카테고리를 선택해주세요."
 msgstr "Please select a category."
 
+#: apps/core/static/core/js/tag.js:200
 #, javascript-format
 msgid "태그 저장 실패: %s"
 msgstr "Failed to save tag: %s"
 
+#: apps/core/static/core/js/tag.js:234
 #, javascript-format
 msgid "태그 삭제 실패: %s"
 msgstr "Failed to delete tag: %s"
 
+#: apps/core/static/core/js/tag.js:256
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
-msgstr "'%(name)s' has %(hours)s hours (%(blocks)s slots) attached. Deleting it returns that time to unlogged and changes your statistics."
+msgstr ""
+"'%(name)s' has %(hours)s hours (%(blocks)s slots) attached. Deleting it "
+"returns that time to unlogged and changes your statistics."
 
+#: apps/core/static/core/js/tag.js:280
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete the '%s' tag?"
 
+#: apps/core/static/core/js/utils.js:104
 msgid "정말 삭제하시겠습니까?"
 msgstr "Are you sure you want to delete?"
 
+#: apps/core/static/core/js/utils.js:114 apps/users/static/users/js/goals.js:87
 msgid "처리 중..."
 msgstr "Processing..."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:593
 msgid "그리드에서 시간을 선택하세요"
 msgstr "Pick a time on the grid"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:604
 msgid "시간을 선택했어요. 원하는 태그를 선택하세요."
 msgstr "Selected. Now pick a tag."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:605
+#: apps/tags/static/tags/js/tag_list.js:158
+#: apps/users/static/users/js/goals.js:206
 msgid "삭제"
 msgstr "Delete"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:612
 msgid "빈 슬롯"
 msgstr "Empty slot"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:621
 #, javascript-format
 msgid "%s칸 선택"
 msgid_plural "%s칸 선택"
 msgstr[0] "%s slot selected"
 msgstr[1] "%s slots selected"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:644
 #, javascript-format
 msgid "%s칸 저장"
 msgid_plural "%s칸 저장"
 msgstr[0] "Save %s slot"
 msgstr[1] "Save %s slots"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:688
 msgid "빈 구간"
 msgstr "Empty slot"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:715
 msgid "%(h)s시간 %(m)s분"
 msgstr "%(h)sh %(m)sm"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:761
 #, javascript-format
 msgid "되돌리기 실패: %s"
 msgstr "Undo failed: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:771
 msgid "슬롯을 선택해주세요."
 msgstr "Please select a slot."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:776
 msgid "태그를 선택해주세요."
 msgstr "Please select a tag."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:819
 #, javascript-format
 msgid "저장 실패: %s"
 msgstr "Save failed: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:872
 msgid "삭제할 슬롯을 선택해주세요."
 msgstr "Please select a slot to delete."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:881
 msgid "삭제할 기록이 없습니다."
 msgstr "No records to delete."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:887
 #, javascript-format
 msgid "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgid_plural "%s개의 기록된 슬롯을 삭제하시겠습니까?"
 msgstr[0] "Delete %s logged slot?"
 msgstr[1] "Delete %s logged slots?"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:928
 #, javascript-format
 msgid "삭제 실패: %s"
 msgstr "Delete failed: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:941
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr "An error occurred while loading tags."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:985
 msgid "태그가 없습니다. 아래에서 추가하세요."
 msgstr "No tags yet. Add one below."
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:1023
 msgid "생성된 태그가 없습니다."
 msgstr "No tags yet."
 
+#: apps/stats/static/stats/js/stats.js:207
 #, javascript-format
 msgid "%s:00"
 msgstr "%s:00"
 
+#: apps/stats/static/stats/js/stats.js:243
 #, javascript-format
 msgid "%s min"
 msgstr "%s min"
 
+#: apps/stats/static/stats/js/stats.js:255
 msgid "%(label)s: %(m)s min"
 msgstr "%(label)s: %(m)s min"
 
+#: apps/stats/static/stats/js/stats.js:340
+#: apps/stats/static/stats/js/stats.js:403
+#: apps/stats/static/stats/js/stats.js:497
 msgid "%(label)s: %(h)sh"
 msgstr "%(label)s: %(h)sh"
 
+#: apps/stats/static/stats/js/stats.js:373
 msgid "Active hours"
 msgstr "Active hours"
 
+#: apps/tags/static/tags/js/tag_list.js:55
 msgid "태그를 불러오는 중 오류가 발생했습니다."
 msgstr "An error occurred while loading tags."
 
+#: apps/tags/static/tags/js/tag_list.js:140
 #, javascript-format
 msgid "누적 %s시간"
 msgstr "%sh logged"
 
+#: apps/tags/static/tags/js/tag_list.js:141
 msgid "아직 기록 없음"
 msgstr "No records yet"
 
+#: apps/tags/static/tags/js/tag_list.js:154
 msgid "수정"
 msgstr "Edit"
 
+#: apps/tags/static/tags/js/tag_list.js:155
 #, javascript-format
 msgid "%s 태그 수정"
 msgstr "Edit the %s tag"
 
+#: apps/tags/static/tags/js/tag_list.js:159
 #, javascript-format
 msgid "%s 태그 삭제"
 msgstr "Delete the %s tag"
 
+#: apps/users/static/users/js/auth-enhance.js:10
+#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 표시"
 msgstr "Show password"
 
+#: apps/users/static/users/js/auth-enhance.js:12
+#: apps/users/static/users/js/auth-enhance.js:19
 msgid "표시"
 msgstr "Show"
 
+#: apps/users/static/users/js/auth-enhance.js:18
 msgid "비밀번호 숨기기"
 msgstr "Hide password"
 
+#: apps/users/static/users/js/auth-enhance.js:19
 msgid "숨기기"
 msgstr "Hide"
 
+#: apps/users/static/users/js/auth-enhance.js:30
 msgid "Caps Lock이 켜져 있습니다"
 msgstr "Caps Lock is on"
 
-#, javascript-format
-msgid "최대 %s시간까지 입력 가능"
-msgstr "Up to %sh"
+#: apps/users/static/users/js/goals.js:116
+#| msgid "카테고리를 불러오는 중입니다. 잠시 후 다시 눌러주세요."
+msgid "처리하지 못했습니다. 잠시 후 다시 시도해 주세요."
+msgstr "Something went wrong. Please try again in a moment."
 
-msgid "저장중..."
-msgstr "Saving..."
+#: apps/users/static/users/js/goals.js:183
+msgid "목표를 저장했습니다"
+msgstr "Goal saved"
 
-msgid "저장완료!"
-msgstr "Saved!"
+#: apps/users/static/users/js/goals.js:211
+msgid "취소"
+msgstr "Cancel"
 
-msgid "저장 실패"
-msgstr "Save failed"
+#: apps/users/static/users/js/goals.js:255
+msgid "목표를 추가했습니다"
+msgstr "Goal added"
 
-msgid "저장 실패 - 네트워크 오류"
-msgstr "Save failed - network error"
+#: apps/users/static/users/js/goals.js:270
+msgid "삭제를 되돌렸습니다"
+msgstr "Deletion undone"
 
+#: apps/users/static/users/js/onboarding.js:135
 msgid "%(tag)s %(hours)s시간 기준"
 msgstr "%(tag)s, %(hours)s h target"
 
+#: apps/users/static/users/js/onboarding.js:171
 msgid "방금 기록을 지웠습니다."
 msgstr "Removed what you just recorded."
 
+#: apps/users/static/users/js/onboarding.js:174
 #, javascript-format
 msgid "취소 실패: %s"
 msgstr "Undo failed: %s"
 
+#: apps/users/static/users/js/password-strength.js:7
 msgid "너무 짧음"
 msgstr "Too short"
 
+#: apps/users/static/users/js/password-strength.js:8
 msgid "약함"
 msgstr "Weak"
 
+#: apps/users/static/users/js/password-strength.js:9
 msgid "보통"
 msgstr "Fair"
 
+#: apps/users/static/users/js/password-strength.js:10
 msgid "좋음"
 msgstr "Good"
 
+#: apps/users/static/users/js/password-strength.js:11
 msgid "강함"
 msgstr "Strong"
 
+#: apps/users/static/users/js/signup-validate.js:106
 msgid "비밀번호가 일치합니다."
 msgstr "Passwords match."
 
+#: apps/users/static/users/js/signup-validate.js:108
 msgid "비밀번호가 일치하지 않습니다."
 msgstr "Passwords don't match."
 
+#: apps/users/static/users/js/signup-validate.js:143
 msgid "이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다."
 msgstr ""
 "You must agree to the Terms of Service and the Privacy Policy to sign up."
+
+#, javascript-format
+#~ msgid "최대 %s시간까지 입력 가능"
+#~ msgstr "Up to %sh"
+
+#~ msgid "저장중..."
+#~ msgstr "Saving..."
+
+#~ msgid "저장완료!"
+#~ msgstr "Saved!"
+
+#~ msgid "저장 실패"
+#~ msgstr "Save failed"
+
+#~ msgid "저장 실패 - 네트워크 오류"
+#~ msgstr "Save failed - network error"
 
 #~ msgid "시간:"
 #~ msgstr "Time:"

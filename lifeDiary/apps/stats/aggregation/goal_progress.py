@@ -15,6 +15,7 @@ _time_block_repo = TimeBlockRepository()
 _goal_repo = GoalRepository()
 
 DAYS_PER_PERIOD = {"daily": 1, "weekly": 7, "monthly": 30}
+MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR
 
 
 def goal_hit_dates(user, start, end, goal) -> set:
@@ -64,15 +65,18 @@ def _minutes_recorded(user, tag_id, start, end):
     )
 
 
-def _pace_percentage(period, selected_date, start, end):
+def _pace_percentage(period, selected_date, start, end, today, now):
     if period == "daily":
-        return None
+        if selected_date < today:
+            return 100
+        elapsed = now.hour * MINUTES_PER_HOUR + now.minute
+        return round(elapsed / MINUTES_PER_DAY * 100)
     total_days = (end - start).days + 1
     elapsed_days = (selected_date - start).days + 1
     return round(elapsed_days / total_days * 100)
 
 
-def _goal_progress_row(user, goal, selected_date, today):
+def _goal_progress_row(user, goal, selected_date, today, now):
     start, end = _period_bounds(goal.period, selected_date)
     current_minutes = _minutes_recorded(user, goal.tag_id, start, end)
     target_minutes = goal.target_hours * MINUTES_PER_HOUR
@@ -87,6 +91,10 @@ def _goal_progress_row(user, goal, selected_date, today):
         period_ended and target_minutes > 0 and current_minutes < target_minutes
     )
 
+    pace_percentage = _pace_percentage(
+        goal.period, selected_date, start, end, today, now
+    )
+
     category_slug = goal.tag.category.slug
     category_key = CATEGORY_KEY_BY_SLUG.get(category_slug, category_slug)
     return {
@@ -99,24 +107,27 @@ def _goal_progress_row(user, goal, selected_date, today):
         "current_hours": round(current_minutes / MINUTES_PER_HOUR, 1),
         "target_hours": goal.target_hours,
         "percentage": percentage,
-        "pace_percentage": _pace_percentage(goal.period, selected_date, start, end),
+        "pace_percentage": pace_percentage,
+        "is_behind_pace": percentage < pace_percentage,
         "is_under_target": is_under_target,
     }
 
 
-def build_goal_progress_rows(user, selected_date, today=None):
+def build_goal_progress_rows(user, selected_date, today=None, now=None):
     """요약 탭 목표 진행 바 행. 일간 → 주간 → 월간 순, 조회일(selected_date)
     기준 그 기간의 누적 진행률이다.
 
     `today`(실제 오늘)와 `selected_date`(조회 중인 날)를 분리하는 이유는
     "미달 확정"을 판단하려면 그 기간이 실제로 끝났는지가 필요한데,
     전역 시각을 모킹하지 않고 테스트하기 위해서다(comparison.get_period_delta와
-    같은 이유).
+    같은 이유). `now`도 같은 이유로 주입한다 — 일간 페이스는 하루 중 경과
+    시각에 달려 있다.
     """
     today = today or timezone.localdate()
+    now = now or timezone.localtime().time()
     grouped = _goal_repo.find_grouped_by_period(user)
     return [
-        _goal_progress_row(user, goal, selected_date, today)
+        _goal_progress_row(user, goal, selected_date, today, now)
         for period in ("daily", "weekly", "monthly")
         for goal in grouped[period]
     ]

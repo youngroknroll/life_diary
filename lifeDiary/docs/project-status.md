@@ -17,30 +17,37 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
-## 2026-08-17 — P0 v2 트랙 머지 완료 · 백로그 통합 정리
+## 2026-08-17 — 목표 관리 페이지 통합 (사용자 지시)
 
-PR #54(`feat/p0-v2-handoff`)가 `main`에 머지됐다(`cf3ae0d`). 열린 PR은 없고
-`origin/production`과 `origin/main`의 내용 차이도 없다 — 아래 "Production Domain"
-절이 남긴 "production에만 있는 도메인 수정 2건"은 해소됐다.
+`users:usergoal_list`가 `{% extends %}` 없는 조각을 렌더해 목표 화면이 껍데기 없이
+그려지고 있었다(HTTP 200, 625바이트). 실제로 되는 것은 목록 표시와 삭제 링크뿐이었다.
+Claude Design 시안(§5·§6 + 목표 관리 문서)에 맞춰 목록·진행률·인라인 수정·추가·삭제를
+한 화면에 모으고, 폼 페이지 두 개(`usergoal_form.html`, `usergoal_list.html`)를 걷어냈다.
 
-아래 각 단계 항목의 "상태: Active Plan — 머지는 사용자 몫" 기술은 이 시점으로
-모두 낡았다. P0 v2 트랙 1~6단계와 후속 가독성 수정은 전부 머지 완료다.
-
-여러 실행 로그에 흩어져 있던 Deferred 항목을 이 문서 아래 **"Deferred Or Later
-Work"** 표 하나로 합쳤다. 합치면서 저장소 상태로 사실 확인을 다시 했고, 이미
-해소된 항목 3건은 표에서 뺐다(웹폰트 self-host 결정·적용 완료, production/main
-도메인 드리프트 해소, `locale/en`의 `"설정된 목표가 없습니다"` 오역은 이미
-`"No goals set yet"`으로 고쳐져 있었다).
-
-- 확인 명령: `git diff --stat origin/main origin/production`(차이 없음),
-  `gh pr list --state open`(없음), `grep -rn "tag_usage_guide" --include="*.html"
-  --include="*.py" --include="*.js" --include="*.css"`(참조 0건)
-- 정리 중 새로 확인한 사실 2건은 아래 표 D 그룹에 넣었다:
-  `apps/dashboard/tests.py`의 `test_selected_slot_info_prompts_tag_selection`이
-  같은 이름으로 두 번 정의돼 뒤엣것이 앞엣것을 덮고 있고,
-  `test_time_grid_prevents_text_selection`이 죽은 CSS `.navbar-utility-controls`의
-  존재를 단언하고 있어 C 그룹의 죽은 CSS 삭제를 막는다.
-- 상태: 정리 작업. 표의 각 항목은 승인된 범위가 아니며, 착수는 사용자 판단.
+- 계획: `docs/plans/2026-08-17_goal-management-page-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_goal-management-page.md`
+- 변경: `apps/users/{views,urls,forms,models}.py`,
+  `apps/users/templates/users/{goals,_goal_manager}.html`(신규),
+  `apps/users/static/users/js/goals.js`, `apps/core/static/core/css/style.css`,
+  `apps/stats/aggregation/goal_progress.py`, `apps/stats/templates/stats/index.html`,
+  `templates/base.html`, `apps/users/test_goal_page.py`(신규), `locale` 4파일
+- 사용자 결정 2건: 진행률이 붉어지는 조건을 "페이스보다 뒤처짐"(`is_behind_pace`)으로
+  바꾸고 **분석 요약 탭도 같은 규칙으로 함께 변경**, 서버를 부르는 모든 조작
+  (저장·추가·삭제·되돌리기)에 스피너·`disabled`·`aria-busy` 대기 상태 표시
+- 계획 대비 이탈 3건: `usergoal_partial`을 되살리지 않고 제거(변경 뷰가 본문을 직접
+  반환), 중복 검증을 use case 대신 `UserGoalForm.clean()`에, 모바일에서 태그·기간을
+  한 줄로 합치지 않음(둘 다 편집 가능한 select)
+- 검증: **전체 pytest 543 passed**, `manage.py check` 이슈 0, 마이그레이션 드리프트
+  없음, `node --check` 통과, i18n 4개 카탈로그 untranslated·fuzzy 0건, 브라우저 실측
+  (1440/768/375/360px × 라이트·다크 × ko·en, Slow 3G 대기 상태, 키보드 전 경로)
+- 브라우저에서 잡은 결함 3건: **전면 로딩 오버레이가 영영 안 걷힘**(`base.html`
+  링크 핸들러가 `e.defaultPrevented` 미검사 — 별도 `fix(core)` 커밋), UA 기본 파란
+  포커스 링, 375px에서 `.goal-count` 좌측 정렬 줄바꿈
+- i18n fuzzy 오상속 1건 교정: `%(tag)s %(period)s 목표가 이미 있습니다.`가 플레이스홀더가
+  다른 항목을 물려받아, 그대로 뒀으면 포맷 시점에 터졌을 것
+- 상태: Active Plan — 브랜치 `feat/goal-management-page`, 머지는 사용자 몫
+- Deferred: 마이페이지 POST 목표 분기 제거(B-1), (user, tag, period) DB 유니크 제약,
+  화면에서 쓰이지 않게 된 `is_under_target` 정리 여부
 
 ## 2026-08-17 — P0 v2 UI 핸드오프 이식 (6단계: 인증·온보딩·설정·홈) — 트랙 완료
 

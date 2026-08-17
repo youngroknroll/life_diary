@@ -24,6 +24,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from .forms import SignupForm, UserGoalForm, UserNoteForm, UsernameRecoveryForm
+from .models import UserGoal
 from .account_deletion import cancel_account_deletion, request_account_deletion
 from .repositories import GoalRepository, NoteRepository, UserAccountRepository
 from apps.tags.models import Category
@@ -32,6 +33,7 @@ from apps.tags.seed_tags import create_seed_tags
 from apps.dashboard.day_window import annotate_future, current_slot_index
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.dashboard.services import build_slot_rows, build_time_headers
+from apps.stats.aggregation.goal_progress import build_goal_progress_rows
 from .use_cases import (
     DeleteGoalUseCase,
     DeleteNoteUseCase,
@@ -485,31 +487,105 @@ def welcome_view(request):
     return render(request, "users/welcome.html", context)
 
 
+def _submitted_goal_values(request):
+    """거절된 폼이 사용자가 입력한 값을 그대로 들고 있게 한다 — 저장된 값으로
+    되돌리면 무엇을 잘못 넣었는지 화면에서 사라진다."""
+    return {
+        "tag": request.POST.get("tag", ""),
+        "period": request.POST.get("period", ""),
+        "target_hours": request.POST.get("target_hours", ""),
+    }
+
+
+def _goal_page_context(
+    request, add_error="", row_error="", error_goal_id=None, keep_values=False
+):
+    submitted = _submitted_goal_values(request) if keep_values else None
+    return {
+        "goals": _goal_repo.find_by_user(request.user),
+        "goal_progress_rows": build_goal_progress_rows(
+            request.user, timezone.localdate()
+        ),
+        "assignable_tags": _get_user_tag_queryset(request.user),
+        "period_choices": UserGoal.PERIOD_CHOICES,
+        "add_error": add_error,
+        "row_error": row_error,
+        "error_goal_id": error_goal_id,
+        "add_values": submitted if add_error else None,
+        "row_values": submitted if row_error else None,
+    }
+
+
+def _wants_goal_partial(request) -> bool:
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+def _render_goal_partial(request, status=200, **context_kwargs):
+    return render(
+        request,
+        "users/_goal_manager.html",
+        _goal_page_context(request, **context_kwargs),
+        status=status,
+    )
+
+
+def _goal_mutation_done(request):
+    """성공 응답. XHR 이면 페이지를 갈아끼우지 않고 본문만 되받는다."""
+    if _wants_goal_partial(request):
+        return _render_goal_partial(request)
+    return redirect("users:usergoal_list")
+
+
+def _goal_mutation_failed(request, **errors):
+    if _wants_goal_partial(request):
+        return _render_goal_partial(request, status=422, keep_values=True, **errors)
+    return render(
+        request,
+        "users/goals.html",
+        _goal_page_context(request, keep_values=True, **errors),
+    )
+
+
+def _first_form_error(form) -> str:
+    """행 안에 한 줄로 보여줄 오류. 세 필드뿐이라 첫 오류면 충분하다."""
+    for errors in form.errors.values():
+        if errors:
+            return errors[0]
+    return ""
+
+
 @login_required
 def usergoal_list(request):
-    goals = _goal_repo.find_by_user(request.user)
-    return render(request, "users/usergoal_list.html", {"goals": goals})
+    return render(request, "users/goals.html", _goal_page_context(request))
 
 
 @login_required
 def usergoal_create(request):
-    form = UserGoalForm(request.POST or None)
+    if request.method != "POST":
+        return redirect("users:usergoal_list")
+
+    form = UserGoalForm(request.POST, user=request.user)
     form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
-    if request.method == "POST" and form.is_valid():
+    if form.is_valid():
         _save_goal.execute(_goal_data_from_form(form), request.user)
-        return redirect("users:mypage")
-    return render(request, "users/usergoal_form.html", {"form": form, "mode": "create"})
+        return _goal_mutation_done(request)
+    return _goal_mutation_failed(request, add_error=_first_form_error(form))
 
 
 @login_required
 def usergoal_update(request, pk):
     goal = _goal_repo.get_or_404(pk, request.user)
-    form = UserGoalForm(request.POST or None, instance=goal)
+    if request.method != "POST":
+        return redirect("users:usergoal_list")
+
+    form = UserGoalForm(request.POST, instance=goal, user=request.user)
     form.fields["tag"].queryset = _get_user_tag_queryset(request.user)
-    if request.method == "POST" and form.is_valid():
+    if form.is_valid():
         _save_goal.execute(_goal_data_from_form(form), request.user, goal_id=pk)
-        return redirect("users:mypage")
-    return render(request, "users/usergoal_form.html", {"form": form, "mode": "update"})
+        return _goal_mutation_done(request)
+    return _goal_mutation_failed(
+        request, row_error=_first_form_error(form), error_goal_id=pk
+    )
 
 
 @login_required
@@ -518,7 +594,8 @@ def usergoal_delete(request, pk):
     goal = _goal_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         _delete_goal.execute(request.user, pk)
-        return redirect("users:mypage")
+        return _goal_mutation_done(request)
+    # JS 없는 환경 폴백. 목록에서 이 화면으로 가는 링크는 없다 — 행 안에서 확인한다.
     return render(request, "users/usergoal_confirm_delete.html", {"goal": goal})
 
 
@@ -593,12 +670,6 @@ def mypage(request):
             "categories": Category.objects.all(),
         },
     )
-
-
-@login_required
-def mypage_goals_partial(request):
-    data = _mypage_use_case.execute(request.user)
-    return render(request, "users/usergoal_list.html", {"goals": data["goals"]})
 
 
 @login_required
