@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from .models import UserGoal, UserNote
 
@@ -82,13 +83,28 @@ class UserGoalForm(forms.ModelForm):
             "target_hours": _("주간/월간은 해당 기간의 총 목표 시간입니다."),
         }
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
-        # period 필드 변경 시 target_hours 필드의 max 속성을 동적으로 설정
-        if "period" in self.fields:
-            self.fields["period"].widget.attrs.update(
-                {"onchange": "updateTargetHoursMax()"}
+        self._user = user or (self.instance.user if self.instance.pk else None)
+
+    def clean(self):
+        """같은 태그·기간 목표는 하나만 둔다. 둘이면 어느 쪽이 진행률에
+        반영되는지 사용자가 알 수 없다."""
+        cleaned = super().clean()
+        tag = cleaned.get("tag")
+        period = cleaned.get("period")
+        if not (self._user and tag and period):
+            return cleaned
+
+        duplicate = UserGoal.objects.filter(
+            user=self._user, tag=tag, period=period
+        ).exclude(pk=self.instance.pk)
+        if duplicate.exists():
+            raise ValidationError(
+                _("%(tag)s %(period)s 목표가 이미 있습니다.")
+                % {"tag": tag.name, "period": dict(UserGoal.PERIOD_CHOICES)[period]}
             )
+        return cleaned
 
 
 class UserNoteForm(forms.ModelForm):

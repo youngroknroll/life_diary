@@ -27,14 +27,14 @@ class TestUsersAuthEnglish:
 
 
 @pytest.mark.django_db
-class TestUserGoalFormEnglish:
-    def test_usergoal_create_form_english(self, auth_en_client):
-        response = auth_en_client.get(reverse("users:usergoal_create"))
+class TestUserGoalPageEnglish:
+    def test_goal_page_english(self, auth_en_client):
+        response = auth_en_client.get(reverse("users:usergoal_list"))
         body = response.content.decode()
+        assert "Manage goals" in body
         assert "Add goal" in body
-        assert "Save" in body
-        assert "Back to list" in body
-        assert "목록으로" not in body
+        assert "Settings" in body
+        assert "목표 관리" not in body
 
 
 @pytest.mark.django_db

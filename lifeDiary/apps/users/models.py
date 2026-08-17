@@ -9,12 +9,15 @@ from apps.tags.models import Tag
 
 
 class UserGoal(models.Model):
+    PERIOD_CHOICES = [
+        ("daily", _("일간")),
+        ("weekly", _("주간")),
+        ("monthly", _("월간")),
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    period = models.CharField(
-        max_length=10,
-        choices=[("daily", _("일간")), ("weekly", _("주간")), ("monthly", _("월간"))],
-    )
+    period = models.CharField(max_length=10, choices=PERIOD_CHOICES)
     target_hours = models.FloatField(validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

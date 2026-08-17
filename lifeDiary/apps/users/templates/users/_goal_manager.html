@@ -1,0 +1,165 @@
+{% load i18n %}
+{% comment %}
+목표 관리 본문. 진행률 카드와 CRUD 표를 한 조각에 담는 이유는, 목표를 고치면
+진행률도 같이 낡기 때문이다 — AJAX 갱신 한 번으로 둘을 같이 되받는다.
+{% endcomment %}
+
+<section class="card goal-progress-card mb-3" aria-labelledby="goalProgressTitle">
+    <div class="card-body">
+        <div class="goal-progress__head">
+            <span class="section-title" id="goalProgressTitle">{% trans "현재 진행률" %}</span>
+            <span class="goal-progress__meta num">{% trans "오늘 기준 · 세로선 = 페이스" %}</span>
+        </div>
+
+        {% if goal_progress_rows %}
+            {% for row in goal_progress_rows %}
+                <div class="goal-progress__row">
+                    <span class="goal-progress__label">
+                        <span class="chip__swatch" style="background-color: {{ row.tag_color }}"></span>
+                        <span>{{ row.tag_name }}
+                            <span class="goal-progress__period">·
+                                {% if row.period == 'daily' %}{% trans "일간" %}
+                                {% elif row.period == 'weekly' %}{% trans "주간" %}
+                                {% else %}{% trans "월간" %}{% endif %}
+                            </span>
+                        </span>
+                    </span>
+                    <span class="goal-progress__value num{% if row.is_behind_pace %} is-under{% endif %}">
+                        {{ row.current_hours|floatformat:"-1" }}<span class="goal-progress__sep">/ {{ row.target_hours|floatformat:"-1" }}h · {{ row.percentage }}%</span>
+                    </span>
+                </div>
+                <span class="goal-progress__track">
+                    <span class="goal-progress__fill" style="width: {{ row.percentage }}%; background-color: {{ row.category_line_color }}"></span>
+                    <span class="goal-progress__pace" style="left: {{ row.pace_percentage }}%" title="{% trans '오늘 기준 페이스' %}"></span>
+                </span>
+            {% endfor %}
+        {% else %}
+            <p class="goal-progress__empty">{% trans "목표를 추가하면 여기 진행률이 보입니다." %}</p>
+        {% endif %}
+
+        <p class="goal-progress__note">{% trans "진행률은 읽기 전용입니다 — 목표를 고치려면 아래 표에서." %}</p>
+    </div>
+</section>
+
+<div class="goal-manager" id="goalManager"
+     data-count-label="{% blocktrans count n=goals|length %}{{ n }}개{% plural %}{{ n }}개{% endblocktrans %}">
+    <div class="goal-manager__head" aria-hidden="true">
+        <span>{% trans "태그" %}</span>
+        <span>{% trans "기간" %}</span>
+        <span class="is-num">{% trans "목표" %}</span>
+        <span></span>
+    </div>
+
+    {% for goal in goals %}
+        {% comment %}
+        한 행이 곧 하나의 usergoal_update POST 폼이다. 삭제는 같은 폼 안에서
+        formaction 으로 갈라 보내므로 폼을 겹치지 않는다.
+        {% endcomment %}
+        <form class="goal-row{% if error_goal_id == goal.pk and row_error %} has-error{% endif %}" method="post"
+              action="{% url 'users:usergoal_update' goal.pk %}"
+              data-goal-id="{{ goal.pk }}"
+              data-delete-url="{% url 'users:usergoal_delete' goal.pk %}"
+              data-goal-label="{% blocktrans with t=goal.tag.name p=goal.get_period_display h=goal.target_hours|floatformat:'-1' %}{{ t }} {{ p }} {{ h }}h 목표를 삭제합니다.{% endblocktrans %}"
+              data-goal-deleted-label="{% blocktrans with t=goal.tag.name p=goal.get_period_display %}{{ t }} {{ p }} 목표를 삭제했습니다{% endblocktrans %}">
+            {% csrf_token %}
+
+            <span class="goal-row__cell goal-row__tag">
+                <span class="chip__swatch" data-goal-swatch style="background-color: {{ goal.tag.color }}"></span>
+                <label class="visually-hidden" for="goalTag{{ goal.pk }}">{% blocktrans with t=goal.tag.name %}{{ t }} 태그{% endblocktrans %}</label>
+                <select class="goal-row__select" id="goalTag{{ goal.pk }}" name="tag">
+                    {% for tag in assignable_tags %}
+                        <option value="{{ tag.id }}" data-color="{{ tag.color }}"
+                                {% if error_goal_id == goal.pk and row_values %}{% if tag.id|stringformat:"s" == row_values.tag %}selected{% endif %}{% elif tag.id == goal.tag_id %}selected{% endif %}>{{ tag.name }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+
+            <span class="goal-row__cell goal-row__period">
+                <label class="visually-hidden" for="goalPeriod{{ goal.pk }}">{% blocktrans with t=goal.tag.name %}{{ t }} 기간{% endblocktrans %}</label>
+                <select class="goal-row__select" id="goalPeriod{{ goal.pk }}" name="period">
+                    {% for value, label in period_choices %}
+                        <option value="{{ value }}" {% if error_goal_id == goal.pk and row_values %}{% if value == row_values.period %}selected{% endif %}{% elif value == goal.period %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+
+            <span class="goal-row__cell goal-row__hours">
+                <label class="visually-hidden" for="goalHours{{ goal.pk }}">{% blocktrans with t=goal.tag.name %}{{ t }} 목표 시간{% endblocktrans %}</label>
+                <input class="goal-row__input num" id="goalHours{{ goal.pk }}" name="target_hours"
+                       type="number" step="0.5" min="0"
+                       value="{% if error_goal_id == goal.pk and row_values %}{{ row_values.target_hours }}{% else %}{{ goal.target_hours|floatformat:'-1' }}{% endif %}">
+                <span class="goal-row__unit num" aria-hidden="true">h</span>
+            </span>
+
+            <span class="goal-row__cell goal-row__action">
+                <button type="submit" class="btn-sian btn-sian--primary goal-row__save">{% trans "저장" %}</button>
+                <a class="goal-row__delete" href="{% url 'users:usergoal_delete' goal.pk %}">{% trans "삭제" %}</a>
+            </span>
+
+            {% if error_goal_id == goal.pk and row_error %}
+                <p class="goal-row__error">{{ row_error }}</p>
+            {% endif %}
+        </form>
+    {% empty %}
+        <div class="goal-empty">
+            <p class="goal-empty__text">{% trans "아직 목표가 없습니다. 하나만 정해두면 분석 화면이 달성한 날을 셉니다." %}</p>
+        </div>
+    {% endfor %}
+
+    <form class="goal-add{% if add_error %} has-error{% endif %}" method="post" action="{% url 'users:usergoal_create' %}" id="goalAddForm">
+        {% csrf_token %}
+        <div class="goal-add__label">{% trans "목표 추가" %}</div>
+
+        <div class="goal-add__grid">
+            <span class="goal-row__cell goal-row__tag">
+                <span class="chip__swatch chip__swatch--empty" data-goal-swatch></span>
+                <label class="visually-hidden" for="goalAddTag">{% trans "추가할 태그" %}</label>
+                <select class="goal-row__select" id="goalAddTag" name="tag" required>
+                    <option value="">{% trans "태그 선택" %}</option>
+                    {% for tag in assignable_tags %}
+                        <option value="{{ tag.id }}" data-color="{{ tag.color }}"
+                                {% if add_values and tag.id|stringformat:"s" == add_values.tag %}selected{% endif %}>{{ tag.name }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+
+            <span class="goal-row__cell goal-row__period">
+                <label class="visually-hidden" for="goalAddPeriod">{% trans "추가할 기간" %}</label>
+                <select class="goal-row__select" id="goalAddPeriod" name="period">
+                    {% for value, label in period_choices %}
+                        <option value="{{ value }}" {% if add_values and value == add_values.period %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </span>
+
+            <span class="goal-row__cell goal-row__hours">
+                <label class="visually-hidden" for="goalAddHours">{% trans "추가할 목표 시간" %}</label>
+                <input class="goal-row__input num" id="goalAddHours" name="target_hours"
+                       type="number" step="0.5" min="0" placeholder="0" required
+                       value="{% if add_values %}{{ add_values.target_hours }}{% endif %}">
+                <span class="goal-row__unit num" aria-hidden="true">h</span>
+            </span>
+
+            <span class="goal-row__cell goal-row__action">
+                <button type="submit" class="btn-sian btn-sian--primary goal-add__submit">
+                    <span class="goal-add__plus" aria-hidden="true">+</span>
+                    <span class="goal-add__submit-text">{% trans "목표 추가" %}</span>
+                </button>
+            </span>
+        </div>
+
+        {% if add_error %}
+            <p class="goal-row__error">{{ add_error }}</p>
+        {% else %}
+            <p class="goal-add__hint">{% trans "일간 최대 24h · 주간 100h · 월간 300h" %}</p>
+        {% endif %}
+    </form>
+
+    <div class="goal-tag-nudge">
+        <p class="goal-tag-nudge__text">{% trans "원하는 태그가 없다면 태그를 추가하세요." %}</p>
+        <a class="btn-sian goal-tag-nudge__link" href="{% url 'tags:index' %}"
+           aria-label="{% trans '태그 추가' %}">
+            <span class="goal-tag-nudge__plus" aria-hidden="true">+</span>{% trans "태그" %}
+        </a>
+    </div>
+</div>

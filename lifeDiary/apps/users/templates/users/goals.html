@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "목표 관리" %} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<div class="settings-panel settings-panel--wide">
+    <nav class="breadcrumb-trail" aria-label="{% trans '현재 위치' %}">
+        <a href="{% url 'users:mypage' %}">{% trans "설정" %}</a>
+        <span aria-hidden="true">›</span>
+        <span class="is-current">{% trans "목표 관리" %}</span>
+    </nav>
+
+    <div class="page-head mb-3">
+        <div>
+            <h1 class="page-title">{% trans "목표 관리" %}</h1>
+            <p class="page-subtitle">{% trans "태그마다 기간과 목표 시간을 정합니다. 달성률과 실제 기록 시간은 분석에서 봅니다." %}</p>
+        </div>
+        <span class="goal-count num" id="goalCount">{% blocktrans count n=goals|length %}{{ n }}개{% plural %}{{ n }}개{% endblocktrans %}</span>
+    </div>
+
+    <div id="goalManagerBlock">
+        {% include 'users/_goal_manager.html' %}
+    </div>
+
+    <div class="goal-status" id="goalSaveStatus" role="status" aria-live="polite"></div>
+</div>
+
+<div class="goal-snackbar" id="goalSnackbar" hidden>
+    <span class="goal-snackbar__text" id="goalSnackbarText"></span>
+    <form method="post" action="{% url 'users:usergoal_create' %}" id="goalUndoForm">
+        {% csrf_token %}
+        <input type="hidden" name="tag" value="">
+        <input type="hidden" name="period" value="">
+        <input type="hidden" name="target_hours" value="">
+        <button type="submit" class="goal-snackbar__undo">{% trans "되돌리기" %}</button>
+    </form>
+</div>
+
+<script src="{% static 'users/js/goals.js' %}" defer></script>
+{% endblock %}
