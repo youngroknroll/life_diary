@@ -9,14 +9,14 @@
         btn.className = 'password-toggle';
         btn.setAttribute('aria-label', gettext('비밀번호 표시'));
         btn.setAttribute('aria-pressed', 'false');
-        btn.innerHTML = '<i class="fas fa-eye" aria-hidden="true"></i>';
+        btn.textContent = gettext('표시');
 
         btn.addEventListener('click', () => {
             const showing = input.type === 'text';
             input.type = showing ? 'password' : 'text';
             btn.setAttribute('aria-pressed', String(!showing));
             btn.setAttribute('aria-label', showing ? gettext('비밀번호 표시') : gettext('비밀번호 숨기기'));
-            btn.querySelector('i').className = showing ? 'fas fa-eye' : 'fas fa-eye-slash';
+            btn.textContent = showing ? gettext('표시') : gettext('숨기기');
         });
 
         return btn;
@@ -27,11 +27,7 @@
         el.className = 'caps-lock-warning';
         el.setAttribute('role', 'status');
         el.hidden = true;
-        const icon = document.createElement('i');
-        icon.className = 'fas fa-arrow-up';
-        icon.setAttribute('aria-hidden', 'true');
-        el.appendChild(icon);
-        el.appendChild(document.createTextNode(' ' + gettext('Caps Lock이 켜져 있습니다')));
+        el.textContent = gettext('Caps Lock이 켜져 있습니다');
         return el;
     }
 

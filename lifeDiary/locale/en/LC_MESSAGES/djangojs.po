@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: lifeDiary 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 00:54+0900\n"
+"POT-Creation-Date: 2026-08-17 02:06+0900\n"
 "PO-Revision-Date: 2026-04-27 19:30+0900\n"
 "Last-Translator: \n"
 "Language-Team: English\n"
@@ -71,7 +71,7 @@ msgstr "Failed to delete tag: %s"
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
-msgstr ""
+msgstr "'%(name)s' has %(hours)s hours (%(blocks)s slots) attached. Deleting it returns that time to unlogged and changes your statistics."
 
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
@@ -193,8 +193,14 @@ msgstr "Delete the %s tag"
 msgid "비밀번호 표시"
 msgstr "Show password"
 
+msgid "표시"
+msgstr "Show"
+
 msgid "비밀번호 숨기기"
 msgstr "Hide password"
+
+msgid "숨기기"
+msgstr "Hide"
 
 msgid "Caps Lock이 켜져 있습니다"
 msgstr "Caps Lock is on"

@@ -263,40 +263,45 @@
             }
         });
         
-        // 다크모드 토글
+        // 테마 3값 선택 (라이트 / 다크 / 시스템)
+        // '시스템'은 키를 저장하지 않는다. head 앞 FOUC 스크립트가
+        // localStorage.getItem('theme') 을 그대로 data-theme 으로 쓰기 때문에
+        // 'system' 을 저장하면 어떤 테마 규칙에도 걸리지 않는다.
         (function() {
-            const toggle = document.getElementById('themeToggle');
-            if (!toggle) return;
-            const label = toggle.querySelector('.theme-toggle__label');
+            const group = document.getElementById('themeChoice');
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
 
-            function applyTheme(theme) {
+            function paint(theme) {
                 document.documentElement.setAttribute('data-theme', theme);
                 document.documentElement.setAttribute('data-bs-theme', theme);
-                const isDark = theme === 'dark';
-                const nextLabel = isDark ? toggle.dataset.labelLight : toggle.dataset.labelDark;
-                const nextAria = isDark ? toggle.dataset.ariaLight : toggle.dataset.ariaDark;
-                if (label) {
-                    label.textContent = nextLabel;
-                }
-                toggle.setAttribute('aria-label', nextAria);
-                toggle.setAttribute('aria-pressed', isDark ? 'true' : 'false');
             }
 
-            // 초기 아이콘 동기화
-            applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+            function resolve(choice) {
+                if (choice === 'light' || choice === 'dark') return choice;
+                return media.matches ? 'dark' : 'light';
+            }
 
-            toggle.addEventListener('click', function() {
-                var current = document.documentElement.getAttribute('data-theme');
-                var next = current === 'dark' ? 'light' : 'dark';
-                localStorage.setItem('theme', next);
-                applyTheme(next);
+            media.addEventListener('change', function(e) {
+                if (!localStorage.getItem('theme')) {
+                    paint(e.matches ? 'dark' : 'light');
+                }
             });
 
-            // 시스템 설정 변경 감지 (수동 선택 없을 때만)
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
-                if (!localStorage.getItem('theme')) {
-                    applyTheme(e.matches ? 'dark' : 'light');
+            if (!group) return;
+
+            const stored = localStorage.getItem('theme');
+            const current = (stored === 'light' || stored === 'dark') ? stored : 'system';
+            const checked = group.querySelector('input[value="' + current + '"]');
+            if (checked) checked.checked = true;
+
+            group.addEventListener('change', function(e) {
+                const choice = e.target.value;
+                if (choice === 'system') {
+                    localStorage.removeItem('theme');
+                } else {
+                    localStorage.setItem('theme', choice);
                 }
+                paint(resolve(choice));
             });
         })();
 

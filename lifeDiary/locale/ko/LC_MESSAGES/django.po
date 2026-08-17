@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 01:29+0900\n"
+"POT-Creation-Date: 2026-08-17 02:06+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -470,7 +470,8 @@ msgstr "기록 밀도"
 msgid ""
 "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하"
 "루 24시간입니다."
-msgstr "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하"
+msgstr ""
+"태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하"
 "루 24시간입니다."
 
 msgid "60분"
@@ -955,8 +956,8 @@ msgstr "탈퇴 요청"
 msgid "로그인"
 msgstr "로그인"
 
-msgid "다시 오셨네요"
-msgstr "다시 오셨네요"
+msgid "다시 만나서 반갑습니다"
+msgstr "다시 만나서 반갑습니다"
 
 msgid "어제 기록이 그대로 기다리고 있습니다."
 msgstr "어제 기록이 그대로 기다리고 있습니다."
@@ -977,44 +978,38 @@ msgstr "%(remaining_attempts)s회 남음"
 msgid "로그인 상태 유지"
 msgstr "로그인 상태 유지"
 
+msgid "비밀번호를 잊으셨나요?"
+msgstr "비밀번호를 잊으셨나요?"
+
 msgid "Google로 계속하기"
 msgstr "Google로 계속하기"
+
+#, python-format
+msgid ""
+"아직 계정이 없다면 <a href=\"%(signup_url)s\" class=\"auth-panel__foot-link"
+"\">무료로 시작</a>"
+msgstr "아직 계정이 없다면 <a href=\"%(signup_url)s\" class=\"auth-panel__foot-link\">무료로 시작</a>"
 
 msgid "아이디 찾기"
 msgstr "아이디 찾기"
 
-msgid "비밀번호 찾기"
-msgstr "비밀번호 찾기"
+msgid "화면"
+msgstr "화면"
 
-msgid "계정이 없으신가요?"
-msgstr "계정이 없으신가요?"
+msgid "테마"
+msgstr "테마"
 
-msgid "회원가입"
-msgstr "회원가입"
+msgid "테마 선택"
+msgstr "테마 선택"
 
-msgid "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다"
-msgstr "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다"
+msgid "라이트"
+msgstr "라이트"
 
-msgid "+ 목표 추가"
-msgstr "+ 목표 추가"
+msgid "다크"
+msgstr "다크"
 
-msgid "목표 저장"
-msgstr "목표 저장"
-
-msgid "저장완료!"
-msgstr "저장완료!"
-
-msgid "태그와 카테고리"
-msgstr "태그와 카테고리"
-
-msgid "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
-msgstr "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
-
-msgid "+ 새 태그"
-msgstr "+ 새 태그"
-
-msgid "표시"
-msgstr "표시"
+msgid "시스템"
+msgstr "시스템"
 
 msgid "언어"
 msgstr "언어"
@@ -1022,20 +1017,17 @@ msgstr "언어"
 msgid "언어 선택"
 msgstr "언어 선택"
 
-msgid "테마"
-msgstr "테마"
+msgid "적용"
+msgstr "적용"
 
-msgid "다크 모드로 전환"
-msgstr "다크 모드로 전환"
+msgid "기록 설정"
+msgstr "기록 설정"
 
-msgid "다크"
-msgstr "다크"
+msgid "%(n)s개"
+msgstr "%(n)s개"
 
-msgid "라이트"
-msgstr "라이트"
-
-msgid "라이트 모드로 전환"
-msgstr "라이트 모드로 전환"
+msgid "특이사항 메모"
+msgstr "특이사항 메모"
 
 msgid "계정"
 msgstr "계정"
@@ -1046,11 +1038,8 @@ msgstr "비밀번호 변경"
 msgid "로그아웃"
 msgstr "로그아웃"
 
-msgid "회원 탈퇴"
-msgstr "회원 탈퇴"
-
-msgid "탈퇴 진행"
-msgstr "탈퇴 진행"
+msgid "계정 삭제"
+msgstr "계정 삭제"
 
 msgid "비밀번호 변경 완료"
 msgstr "비밀번호 변경 완료"
@@ -1135,6 +1124,9 @@ msgstr "본인이 요청하지 않으셨다면 이 메일은 무시하셔도 됩
 msgid "— 라이프 다이어리"
 msgstr "— 라이프 다이어리"
 
+msgid "비밀번호 찾기"
+msgstr "비밀번호 찾기"
+
 msgid ""
 "가입 시 등록한 이메일을 입력하세요. 비밀번호 재설정 링크를 보내드립니다."
 msgstr ""
@@ -1181,6 +1173,9 @@ msgstr "아이디 받기"
 msgid "[라이프 다이어리] 아이디 찾기 안내"
 msgstr "[라이프 다이어리] 아이디 찾기 안내"
 
+msgid "회원가입"
+msgstr "회원가입"
+
 msgid "30초면 됩니다"
 msgstr "30초면 됩니다"
 
@@ -1194,10 +1189,6 @@ msgid ""
 "                                • 숫자로만 구성될 수 없습니다"
 msgstr ""
 "• 8자 이상이어야 합니다<br>\n"
-"                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
-"<br>\n"
-"                                • 숫자로만 구성될 수 없습니다• 8자 이상이어"
-"야 합니다<br>\n"
 "                                • 너무 일반적인 비밀번호는 사용할 수 없습니다"
 "<br>\n"
 "                                • 숫자로만 구성될 수 없습니다"
@@ -1221,8 +1212,11 @@ msgstr ""
 msgid "가입하고 시작하기"
 msgstr "가입하고 시작하기"
 
-msgid "이미 계정이 있으신가요?"
-msgstr "이미 계정이 있으신가요?"
+#, python-format
+msgid ""
+"이미 계정이 있다면 <a href=\"%(login_url)s\" class=\"auth-panel__foot-link\">"
+"로그인</a>"
+msgstr "이미 계정이 있다면 <a href=\"%(login_url)s\" class=\"auth-panel__foot-link\">로그인</a>"
 
 msgid "목표 삭제"
 msgstr "목표 삭제"
@@ -1325,12 +1319,15 @@ msgstr ""
 msgid "+ 직접 추가"
 msgstr "+ 직접 추가"
 
-#, python-format
-msgid "%(n)s개 선택"
-msgstr "%(n)s개 선택"
+msgid "%(n)s개 선택됨"
+msgstr "%(n)s개 선택됨"
 
-msgid "다음"
-msgstr "다음"
+#, python-format
+msgid "분류가 궁금하다면 <a href=\"%(guide_url)s\">가이드</a>"
+msgstr "분류가 궁금하다면 <a href=\"%(guide_url)s\">가이드</a>"
+
+msgid "다음 — 하루 채워 보기"
+msgstr "다음 — 하루 채워 보기"
 
 msgid "한 구간을 직접 채워보세요"
 msgstr "한 구간을 직접 채워보세요"
@@ -1499,8 +1496,8 @@ msgstr "관리자 패널"
 msgid "로그인하고 기록 시작"
 msgstr "로그인하고 기록 시작"
 
-msgid "복잡한 정리 없이 이어지는 기록"
-msgstr "복잡한 정리 없이 이어지는 기록"
+msgid "이렇게 씁니다"
+msgstr "이렇게 씁니다"
 
 msgid "기록하기"
 msgstr "기록하기"
@@ -1520,41 +1517,11 @@ msgstr "돌아보기"
 msgid "쌓인 기록에서 패턴을 확인합니다."
 msgstr "쌓인 기록에서 패턴을 확인합니다."
 
-msgid "오늘의 기록"
-msgstr "오늘의 기록"
-
-msgid "가볍게 남긴 하루"
-msgstr "가볍게 남긴 하루"
-
 msgid "소비시간의 분류"
 msgstr "소비시간의 분류"
 
-msgid "소비시간의 분류 이미지 크게 보기"
-msgstr "소비시간의 분류 이미지 크게 보기"
-
-msgid "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
-msgstr "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
-
-msgid "클릭해서 크게 볼 수 있습니다."
-msgstr "클릭해서 크게 볼 수 있습니다."
-
-msgid "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
-msgstr "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
-
-msgid "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
-msgstr "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
-
-msgid "오늘의 한 줄"
-msgstr "오늘의 한 줄"
-
-msgid "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
-msgstr "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
-
-msgid "닫기"
-msgstr "닫기"
-
-msgid "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
-msgstr "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
+msgid "분류 가이드 전체 보기"
+msgstr "분류 가이드 전체 보기"
 
 #, python-format
 msgid "%(username)s님, 오늘 기록을 이어가세요"
@@ -1772,6 +1739,91 @@ msgstr "날짜 선택"
 
 msgid "정말로 삭제하시겠습니까?"
 msgstr "정말로 삭제하시겠습니까?"
+
+#~ msgid "다시 오셨네요"
+#~ msgstr "다시 오셨네요"
+
+#~ msgid "계정이 없으신가요?"
+#~ msgstr "계정이 없으신가요?"
+
+#~ msgid "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다"
+#~ msgstr ""
+#~ "분석 화면의 달성 일수 계산 기준입니다 — 여기서 바로 고칠 수 있습니다"
+
+#~ msgid "+ 목표 추가"
+#~ msgstr "+ 목표 추가"
+
+#~ msgid "목표 저장"
+#~ msgstr "목표 저장"
+
+#~ msgid "저장완료!"
+#~ msgstr "저장완료!"
+
+#~ msgid "태그와 카테고리"
+#~ msgstr "태그와 카테고리"
+
+#~ msgid "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
+#~ msgstr "태그는 다섯 카테고리 중 하나에 속하고, 색은 카테고리를 따릅니다"
+
+#~ msgid "+ 새 태그"
+#~ msgstr "+ 새 태그"
+
+#~ msgid "표시"
+#~ msgstr "표시"
+
+#~ msgid "다크 모드로 전환"
+#~ msgstr "다크 모드로 전환"
+
+#~ msgid "라이트 모드로 전환"
+#~ msgstr "라이트 모드로 전환"
+
+#~ msgid "회원 탈퇴"
+#~ msgstr "회원 탈퇴"
+
+#~ msgid "탈퇴 진행"
+#~ msgstr "탈퇴 진행"
+
+#~ msgid "이미 계정이 있으신가요?"
+#~ msgstr "이미 계정이 있으신가요?"
+
+#~ msgid "다음"
+#~ msgstr "다음"
+
+#~ msgid "복잡한 정리 없이 이어지는 기록"
+#~ msgstr "복잡한 정리 없이 이어지는 기록"
+
+#~ msgid "오늘의 기록"
+#~ msgstr "오늘의 기록"
+
+#~ msgid "가볍게 남긴 하루"
+#~ msgstr "가볍게 남긴 하루"
+
+#~ msgid "소비시간의 분류 이미지 크게 보기"
+#~ msgstr "소비시간의 분류 이미지 크게 보기"
+
+#~ msgid "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
+#~ msgstr "소비시간의 분류와 태그 사용 방법을 설명하는 화면 예시"
+
+#~ msgid "클릭해서 크게 볼 수 있습니다."
+#~ msgstr "클릭해서 크게 볼 수 있습니다."
+
+#~ msgid "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
+#~ msgstr "하루 기록 예시 — 24행 × 6칸, 한 칸이 10분"
+
+#~ msgid "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
+#~ msgstr "실제 기록 화면입니다 — 24행 × 6칸, 한 칸이 10분"
+
+#~ msgid "오늘의 한 줄"
+#~ msgstr "오늘의 한 줄"
+
+#~ msgid "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
+#~ msgstr "집중한 시간과 쉬어간 시간을 한눈에 남겼어요."
+
+#~ msgid "닫기"
+#~ msgstr "닫기"
+
+#~ msgid "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
+#~ msgstr "소비시간의 분류와 태그 사용 방법을 크게 보여주는 화면 예시"
 
 #~ msgid "태그 사용법 이미지"
 #~ msgstr "태그 사용법 이미지"

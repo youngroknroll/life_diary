@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-17 00:54+0900\n"
+"POT-Creation-Date: 2026-08-17 02:06+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgstr "태그 삭제 실패: %s"
 msgid ""
 "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구"
 "간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
-msgstr ""
+msgstr "'%(name)s'에는 %(hours)s시간(%(blocks)s칸)이 붙어 있습니다. 그냥 지우면 그 구간이 미기록으로 되돌아가 통계 수치가 바뀝니다."
 
 #, javascript-format
 msgid "'%s' 태그를 정말 삭제하시겠습니까?"
@@ -192,8 +192,14 @@ msgstr "%s 태그 삭제"
 msgid "비밀번호 표시"
 msgstr "비밀번호 표시"
 
+msgid "표시"
+msgstr "표시"
+
 msgid "비밀번호 숨기기"
 msgstr "비밀번호 숨기기"
+
+msgid "숨기기"
+msgstr "숨기기"
 
 msgid "Caps Lock이 켜져 있습니다"
 msgstr "Caps Lock이 켜져 있습니다"

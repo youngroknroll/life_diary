@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-16
+Last updated: 2026-08-17
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,38 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-08-17 — P0 v2 UI 핸드오프 이식 (6단계: 인증·온보딩·설정·홈) — 트랙 완료
+
+병렬 서브에이전트 3개(인증·온보딩 / 설정 / 홈)로 진행했다. Agent Teams는 이 환경에서
+비활성이라 서브에이전트로 대체하고, 공유 파일(`style.css`, `locale/*.po`)은 리드가
+직렬 반영해 경합을 차단했다. Wave 1 읽기 전용 조사에서 **스펙의 "현재 상태" 기술이
+대부분 낡았음**이 드러났다 — 온보딩 3단계와 비밀번호 강도 위젯은 이미 구현돼 있었고,
+상단바 언어·테마 이동도 이미 끝나 있었으며, 계정 삭제용 danger-panel 모달은 존재한
+적이 없었다.
+
+- 계획: `docs/plans/2026-08-16_p0-v2-handoff-plan.md`
+- 실행 로그: `docs/frontend/2026-08-17_p0-v2-phase6-auth-onboarding-settings-home.md`
+- 변경: `apps/users/templates/users/{login,signup,welcome,mypage}.html`,
+  `apps/users/static/users/js/auth-enhance.js`, `templates/{base,index}.html`,
+  `apps/core/static/core/css/style.css`, `apps/core/tests.py`,
+  `apps/users/test_{i18n_phase4,auth_enhance_render}.py`, `locale` 4파일
+- 사용자 결정 3건: 홈 가이드 링크는 로그인 사용자에게만 노출(백엔드 무변경),
+  설정에서 로그아웃 행 유지(모바일 로그아웃 경로 보존), 홈 예시 그리드 삭제
+- 검증: 전체 pytest exit 0, `manage.py check` 클린, 마이그레이션 드리프트 없음,
+  `node --check` 통과, **팔레트 밖 색 0건**, i18n 4개 카탈로그 빈 msgstr·fuzzy 0건,
+  브라우저 실측 12항목(홈/로그인/가입/온보딩/설정 × 데스크톱·모바일·로그인 상태·
+  테마 3값·영어)
+- 리드가 브라우저에서 잡은 결함 5건: 한글 H1 단어 중간 줄바꿈(`word-break: keep-all`),
+  **ko 카탈로그 msgstr 중복으로 인한 비밀번호 규칙 2회 렌더**, 약관 링크 부트스트랩
+  파란색, 정의되지 않은 `--color-warning` 토큰 폴백, 여러 줄 `{# #}` 주석 화면 출력
+- i18n fuzzy 오상속 6건 교정. 그중 **`화면` → "Tue"**(요일 '화'를 물려받음)가 가장
+  치명적이었다. 이전부터 잘못돼 있던 영어 번역 3건도 함께 수정
+- 상태: Active Plan — 브랜치 `feat/p0-v2-handoff` **1~6단계 전부 완료**, 머지는 사용자 몫
+- Deferred: `category_guide` 공개화(백엔드), mypage 목표 편집 백엔드 고아화 정리,
+  `.segmented__item` 44px 규칙, `utils.js`의 FontAwesome 잔재, `tag_usage_guide*.png`
+  (약 2.1MB, 참조 0건), 죽은 CSS(`.home-daygrid*`·`.navbar-*`·`.theme-toggle`),
+  온보딩 칩 3번째 상태
 
 ## 2026-08-17 — 분석 화면 가독성 수정 3건 (사용자 지시)
 
