@@ -1746,12 +1746,8 @@ msgid "회원가입"
 msgstr "Sign up"
 
 #: apps/users/templates/users/signup.html:12
-msgid "30초면 됩니다"
-msgstr "Takes 30 seconds"
-
-#: apps/users/templates/users/signup.html:13
-msgid "아이디와 비밀번호만 있으면 바로 기록을 시작할 수 있습니다."
-msgstr "A username and a password are all you need to start recording."
+msgid "환영합니다. 처음 뵙네요"
+msgstr "Welcome. Nice to meet you"
 
 #: apps/users/templates/users/signup.html:51
 msgid ""
