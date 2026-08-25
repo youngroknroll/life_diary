@@ -3,6 +3,15 @@ name: Update deploy PR
 on:
   push:
     branches: [main]
+    # 문서만 바뀐 커밋은 배포 후보가 아니다. 이 목록은
+    # .github/workflows/deploy.yml 의 EXCLUDE_RE 와 같은 경로를 가리킨다.
+    paths-ignore:
+      - 'lifeDiary/docs/**'
+      - '.claude/**'
+      - 'README.md'
+      - 'lifeDiary/prompt_plan.md'
+      - 'lifeDiary/AGENTS.md'
+      - 'lifeDiary/CLAUDE.md'
 
 permissions:
   contents: read
