@@ -8,6 +8,12 @@ urlpatterns = [
     path("signup/", views.signup_view, name="signup"),
     path("signup/check-username/", views.check_username_view, name="check_username"),
     path("signup/check-email/", views.check_email_view, name="check_email"),
+    path("signup/verify/", views.signup_verify_view, name="signup_verify"),
+    path(
+        "signup/verify/resend/",
+        views.signup_verify_resend_view,
+        name="signup_verify_resend",
+    ),
     path("welcome/", views.welcome_view, name="welcome"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),

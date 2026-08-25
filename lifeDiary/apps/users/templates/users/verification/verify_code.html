@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load form_fields %}
+
+{% block title %}{{ page_title }} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<div class="auth-panel">
+    <div class="card auth-card">
+        <div class="card-body">
+            <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
+            <h1 class="auth-panel__title">{{ heading }}</h1>
+            <p class="auth-panel__lead">
+                {% blocktrans %}{{ masked_email }} 으로 6자리 코드를 보냈습니다.{% endblocktrans %}
+            </p>
+
+            <form method="post" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.code.id_for_label }}" class="form-label">{% trans "인증 코드" %}</label>
+                    {% if verification_error %}
+                        {% form_field form.code invalid=True %}
+                        <div class="field-error" id="{{ form.code|field_error_id }}" role="alert">
+                            <span>{{ verification_error }}</span>
+                            {% if attempts_remaining %}<span class="field-error__count">{% blocktrans %}{{ attempts_remaining }}회 남음{% endblocktrans %}</span>{% endif %}
+                        </div>
+                    {% else %}
+                        {% form_field form.code %}
+                        {% include 'shared/_field_errors.html' with field=form.code %}
+                    {% endif %}
+                </div>
+
+                <div class="auth-code__meta">
+                    <span class="auth-code__expiry"
+                          role="status"
+                          aria-live="polite"
+                          data-expires-in="{{ expires_in_seconds }}"
+                          data-template="{% trans '%s 후 만료' %}"
+                          data-expired-text="{% trans '코드가 만료되었습니다' %}">
+                        {% if expires_in_seconds %}{% blocktrans %}{{ expires_in_minutes }}분 안에 입력하세요{% endblocktrans %}{% else %}{% trans "코드가 만료되었습니다" %}{% endif %}
+                    </span>
+                    <button type="submit"
+                            class="auth-code__resend"
+                            formaction="{{ resend_url }}"
+                            formnovalidate
+                            data-resend-in="{{ resend_in_seconds }}"
+                            data-label="{% trans '코드 다시 받기' %}"
+                            data-waiting="{% trans '%s초 후 다시 받기' %}"
+                            {% if resend_in_seconds %}disabled{% endif %}>
+                        {% trans "코드 다시 받기" %}
+                    </button>
+                </div>
+
+                <button type="submit" class="btn-sian btn-sian--primary auth-panel__submit">
+                    {% trans "확인" %}
+                </button>
+            </form>
+
+            <div class="auth-panel__foot">
+                <p class="auth-panel__foot-minor">
+                    <a href="{{ back_url }}">{{ back_label }}</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% load static %}
+<script src="{% static 'users/js/verification.js' %}" defer></script>
+{% endblock %}
