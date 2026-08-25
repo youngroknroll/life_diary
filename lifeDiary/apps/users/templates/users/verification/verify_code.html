@@ -36,7 +36,7 @@
                           role="status"
                           aria-live="polite"
                           data-expires-in="{{ expires_in_seconds }}"
-                          data-template="{% trans '%s 후 만료' %}"
+                          data-template="{% trans '{time} 후 만료' %}"
                           data-expired-text="{% trans '코드가 만료되었습니다' %}">
                         {% if expires_in_seconds %}{% blocktrans %}{{ expires_in_minutes }}분 안에 입력하세요{% endblocktrans %}{% else %}{% trans "코드가 만료되었습니다" %}{% endif %}
                     </span>
@@ -46,7 +46,7 @@
                             formnovalidate
                             data-resend-in="{{ resend_in_seconds }}"
                             data-label="{% trans '코드 다시 받기' %}"
-                            data-waiting="{% trans '%s초 후 다시 받기' %}"
+                            data-waiting="{% trans '{seconds}초 후 다시 받기' %}"
                             {% if resend_in_seconds %}disabled{% endif %}>
                         {% trans "코드 다시 받기" %}
                     </button>

@@ -25,7 +25,7 @@
             seconds,
             (remaining) => {
                 const clock = `${Math.floor(remaining / 60)}:${pad(remaining % 60)}`;
-                node.textContent = template.replace("%s", clock);
+                node.textContent = template.replace("{time}", clock);
             },
             () => {
                 node.textContent = node.dataset.expiredText || "";
@@ -44,7 +44,7 @@
         countDown(
             seconds,
             (remaining) => {
-                button.textContent = waiting.replace("%s", remaining);
+                button.textContent = waiting.replace("{seconds}", remaining);
             },
             () => {
                 button.disabled = false;
