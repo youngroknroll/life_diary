@@ -378,11 +378,46 @@ auth-panel > card auth-card > card-body
 - 콘솔 오류 0건 확인
 - `node --check apps/users/static/users/js/verification_resend.js`
 
-### 사후 검증 (구현 후 채움)
+### 사후 검증 (2026-08-25)
 
-- Web Experience Designer 판정: (미실시)
-- Browser Interaction Reviewer 판정: (미실시)
-- Quality Verification Lead 완료 판정: (미실시)
+두 리뷰 역할은 서브에이전트로 활성화하지 않고 이 문서 안에서 해당 관점으로
+직접 작성했다. 이는 `AGENTS.md` Frontend Dual Review Gate 가 요구하는 독립
+산출물에 못 미친다. **미충족 게이트로 기록하고 머지 전 사용자 판정을 받는다.**
+
+**Web Experience Designer — Conforms (부분)**
+
+- 코드 화면: 브랜드·제목·마스킹된 수신 주소·단일 입력·만료/재발송 한 줄·주
+  CTA·이탈구가 명세대로다. 1280 다크 실측으로 확인했다.
+- 1a: 읽기 전용 신원 행(G 마크 + 주소 + `GOOGLE` 라벨), 아이디 라벨 우측 힌트,
+  약관 동의, 「가입 완료」/「취소하고 로그인으로」가 시안과 일치한다.
+- 1b: 가운데 정렬, 두 줄 설명, 아웃라인 「Google로 다시 시도」 → 실린
+  「아이디로 로그인」 순서까지 시안과 같다.
+- `Unverified`: 1c 는 이미지로 남기지 않았다(1b 와 동일 구조, 렌더는 테스트로
+  확인). 모바일 뷰포트는 아래 참조.
+
+**Browser Interaction Reviewer — Conforms (부분)**
+
+- `inputmode="numeric"`, `autocomplete="one-time-code"`, `maxlength="6"`,
+  `pattern="[0-9]*"` 적용. 진입 시 코드 필드에 포커스가 간다(실측).
+- 검증 실패 후 입력값이 비워지고 포커스가 코드 필드로 돌아간다(실측).
+- 오류는 `role="alert"`, 만료 표시는 `role="status"`/`aria-live="polite"`.
+- 재발송은 서버가 쿨다운을 강제하고, 버튼은 쿨다운 동안 `disabled` 로 렌더된다.
+  JS 는 남은 초만 센다. JS 없이도 폼 제출과 재발송 POST 가 동작한다
+  (같은 폼의 `formaction` 이라 중첩 form 없이 valid HTML 이다).
+- 재발송 버튼 `min-height: 44px`. 카운트다운에 애니메이션 없음.
+- `Unverified`: 360px 실측. 캡처에서 카드가 넘치지만 **기존 로그인 화면도 같은
+  캡처에서 동일하게 넘친다**. 헤드리스 window-size 캡처가 뷰포트 에뮬레이션을
+  하지 않는 한계로 보이며, 신규 화면이 기존과 다르게 동작한다는 증거는 없다.
+
+**Quality Verification Lead — 조건부**
+
+전체 pytest 592 passed, `manage.py check` 이슈 0, 마이그레이션 드리프트 없음,
+prod deploy check ERROR 0, `node --check` 통과, ko/en 미번역 0건. 수락 기준
+A1~A13, A14~A18 은 테스트와 브라우저 실측으로 충족했다.
+
+**완료로 표시하지 않는다.** 두 프런트엔드 리뷰가 독립 산출물이 아니고, 360px
+실측과 1c 이미지가 없다. 사용자가 잔여 위험을 수용하거나 리뷰를 다시 돌린 뒤
+판정한다.
 
 ## 운영·배포 검토 (Deployment & Operations Reviewer)
 
@@ -440,3 +475,19 @@ Deferred Refactoring Note
 - 이메일 주소 변경 기능과 변경 시 재인증
 - 미인증 계정 자동 정리(예: 7일 경과 시 삭제) 관리 명령
 - 인증 메일 다국어 본문 선택 (현재는 요청 시점 활성 언어를 따른다)
+
+
+## 구현에서 계획과 달라진 점 (2026-08-25)
+
+- `apps/users/signals.py` 를 만들지 않았다. `SOCIALACCOUNT_AUTO_SIGNUP = False`
+  로 모든 소셜 가입이 우리 폼을 거치므로 폼 `save()` 에서 인증 표시로 충분하다.
+  시그널은 `apps.py` 에서 allauth 를 import 하게 만들어 데스크톱 설정을 깬다.
+- `apps/users/verification_policy.py` 를 추가했다. 모델과 도메인 서비스가 같은
+  정책값을 봐야 하는데 서로 import 하면 순환이 된다.
+- `ACCOUNT_EMAIL_VERIFICATION = "none"` 을 추가했다. account URL 을 닫자 allauth
+  가 자기 확인 메일을 보내려다 실패했다. 우리 코드 인증과 중복이다.
+- `reverse("account_login")` 별칭을 남겼다. allauth 내부가 이 이름을 reverse 한다.
+- 카운트다운 자리표시자를 `%s` → `{time}`·`{seconds}` 로 바꿨다. Django 의
+  `templatize` 가 `{% trans %}` 안의 `%` 를 `%%` 로 이스케이프한다.
+- 루트 `conftest.py` 의 `make_user` 가 인증 완료 행을 만든다. 이 픽스처가 대신하는
+  것은 "이미 쓰고 있던 계정"이다.
