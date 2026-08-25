@@ -58,7 +58,6 @@
         <h1 class="onboarding__title">{% trans "한 구간을 직접 채워보세요" %}</h1>
         <p class="onboarding__lead">{% trans "비어 있는 구간을 위아래로 쓸면 그만큼 선택됩니다. 방향키로 옮기고 Shift+방향키로 넓힌 뒤 Enter 로 고를 수도 있습니다. 여기서 채운 기록은 그대로 저장됩니다." %}</p>
 
-        {# dashboard.js 가 요구하는 값. 온보딩은 날짜를 고르지 않고 메모도 받지 않는다. #}
         <input type="hidden" id="dateSelector" value="{{ today|date:'Y-m-d' }}">
         <input type="hidden" id="memoInput" value="">
 

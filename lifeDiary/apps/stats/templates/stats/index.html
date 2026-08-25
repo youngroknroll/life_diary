@@ -60,7 +60,6 @@
                                     <div class="summary-tile__value num">{{ summary.goal.hit_days }}<span class="summary-tile__unit">{% blocktrans with t=summary.goal.total_days %}/{{ t }}일{% endblocktrans %}</span></div>
                                     <div class="summary-tile__note">{% blocktrans with t=summary.goal.tag_name h=summary.goal.target_hours %}{{ t }} {{ h }}시간 기준{% endblocktrans %}</div>
                                 {% elif summary.goal %}
-                                    {# 창이 전부 앞날이면 셀 것이 없다. 0/0 은 실패로 읽힌다. #}
                                     <div class="summary-tile__value summary-tile__value--empty">—</div>
                                     <div class="summary-tile__note">{% trans "아직 지난 날이 없습니다" %}</div>
                                 {% else %}
@@ -441,7 +440,6 @@
                             </table>
                         </div>
 
-                        {# 시안 3d 는 데스크톱에서 태그 합계를 유지한다. 뺀 것은 4d 모바일뿐이다. #}
                         <div class="tag-totals is-wide-only-block">
                             <div class="section-title">{% trans "태그 합계" %}<span class="section-title__note">{{ monthly_stats.start_date|date:"n월" }}</span></div>
                             <ul class="tag-totals__list">

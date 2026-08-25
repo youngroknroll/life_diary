@@ -1,9 +1,7 @@
 {% load i18n %}
 {% get_current_language as LANGUAGE_CODE %}
 {% get_available_languages as LANGUAGES %}
-{# 전환기는 각 언어를 그 언어의 이름으로 보여야 한다 — name_local 을 쓴다. #}
 {% get_language_info_list for LANGUAGES as language_options %}
-{# 테마·언어는 비로그인 사용자도 써야 하므로 설정 페이지가 아니라 헤더에 둔다. #}
 <div class="app-nav__prefs">
     <div class="dropdown" id="themeMenu">
         <button class="app-nav__pref" type="button" data-bs-toggle="dropdown" aria-expanded="false"

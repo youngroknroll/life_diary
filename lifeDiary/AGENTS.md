@@ -680,6 +680,10 @@ exempt from the backend TDD cycle.
 - Frontend implementation requires an approved plan under `docs/plans/` and a
   completed work log under `docs/frontend/` or `docs/refactoring/` unless the
   user explicitly approves different document locations.
+- Do not comment frontend code. Django templates, CSS, and browser JavaScript
+  carry no comments unless the user approves a specific one. A template comment
+  that leaks reaches the user as visible page text: `{# #}` is single-line only,
+  so a comment wrapped across two lines renders literally in the browser.
 
 ### Frontend Dual Review Gate
 
