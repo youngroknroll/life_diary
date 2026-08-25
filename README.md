@@ -1,120 +1,204 @@
-# Life Diary
+# LifeDiary
 
-Life Diary로 오늘 한 일, 기분, 집중도, 소비 시간, 메모를 간단히 남기세요.
-기록이 쌓이면 앱이 생활 패턴을 통계로 보여줍니다.
-입력 부담은 낮추고, 회고는 구조적으로 하자는 방향으로 만든 프로젝트입니다.
+하루를 **144개의 10분 슬롯**으로 기록하고, 태그로 분류해 생활 패턴을 통계로 돌려주는 Django 웹 서비스입니다.
 
-배포사이트 : [라이프 다이어리](https://lifediary.onrender.com/)
-## 무엇을 할 수 있나
+| | |
+|---|---|
+| 서비스 | https://lifediary.kr |
+| API 문서 | https://lifediary.kr/api/docs (Swagger UI) |
+| 기간 | 2025-07 ~ 현재 (진행 중) |
+| 형태 | 1인 개발 |
 
-- 하루를 144개의 10분 슬롯으로 나눠 기록
-- 태그와 카테고리로 활동 분류
-- 태그별 일간, 주간, 월간 목표 시간 관리
-- 메모와 함께 개인 운영 기록 보관
-- 일간, 주간, 월간 통계와 규칙 기반 라이프 피드백 제공
+---
 
-## 핵심 흐름
+## 1. 프로젝트 설명
 
-1. 사용자가 대시보드에서 시간 구간을 선택합니다.
-2. 선택한 슬롯에 태그와 메모를 저장합니다.
-3. 저장된 기록은 목표, 통계, 피드백 화면으로 연결됩니다.
-4. 사용자는 자신의 생활 패턴을 다시 확인하고 조정합니다.
+기록은 "쓸 게 많으면 안 쓴다"는 문제에서 출발했습니다.
+입력은 슬롯 선택 + 태그 지정으로 최소화하고,
+대신 쌓인 기록을 통계로 되돌려주는 쪽에 복잡도를 몰았습니다.
 
-조금 더 자세한 비즈니스 로직과 아키텍처 설명은 아래 문서를 보면 됩니다.
+**주요 기능**
 
-- [비즈니스 로직 및 아키텍처 플로우 가이드](lifeDiary/docs/architecture/2026-04-21_business-logic-and-architecture-guide.md)
-- [백엔드 플로우 및 개선 메모](lifeDiary/docs/refactoring/2026-04-21_backend-flow-and-improvements.md)
-- [아키텍처/비용 최적화 계획](lifeDiary/docs/plans/2026-04-21_architecture-and-cost-plan.md)
+- 10분 슬롯 단위 기록 저장·삭제·되돌리기
+- 태그·카테고리로 활동 분류, 태그 삭제 시 기록 이관
+- 태그별 일간·주간·월간 목표 시간과 진행률 판정
+- 일·주·월·분석 4종 통계 집계, 월간 엑셀 내보내기
+- 계정 수명주기 — 가입·소셜 로그인·15일 유예 삭제·마스킹 감사 기록
+- 다국어(ko/en) 메시지 카탈로그
 
-## 기술 스택
+**스택**
 
-- Python 3.13
-- Django 5.2
-- SQLite(dev) / PostgreSQL(prod)
-- WhiteNoise
-- Gunicorn
-- Pydantic
-- Pytest / Django test runner
+Python 3.13 · Django 5.2 · django-ninja · PostgreSQL(Supabase) ·
+pytest / pytest-django · django-allauth · django-axes · openpyxl ·
+Render(gunicorn + whitenoise) · GitHub Actions CI
 
-## 프로젝트 구조
+---
+
+## 2. 프로젝트 구조
+
+계층 흐름은 `views → use_cases → repositories/domain_services → models` 입니다.
+`stats`는 다른 앱을 **시그널로 구독만** 하고, 소유 앱은 `stats`를 import하지 않습니다.
+이 의존 방향은 계약 테스트(`apps/dashboard/test_domain_boundaries.py`)로 고정돼 있습니다.
 
 ```text
 lifeDiary/
 ├─ apps/
-│  ├─ dashboard/   # 시간 기록 조회/저장/삭제
-│  ├─ tags/        # 태그, 카테고리 관리
-│  ├─ users/       # 인증, 목표, 메모, 마이페이지
-│  ├─ stats/       # 집계, 피드백, 캐시
-│  └─ core/        # 공통 유틸리티와 정적 자산
-├─ docs/           # 설계, 리팩터링, 구조 문서
-├─ lifeDiary/      # Django 프로젝트 설정
-├─ templates/      # 공용 템플릿
-├─ manage.py
+│  ├─ dashboard/   # 10분 슬롯 기록·삭제·되돌리기, 슬롯 API
+│  ├─ tags/        # 태그·카테고리 관리, 태그 API
+│  ├─ users/       # 인증, 계정 수명주기, 목표, 메모
+│  ├─ stats/       # 통계 집계·캐시 (aggregation/ 하위 집계 모듈)
+│  └─ core/        # 공용 유틸리티, 미들웨어, 공통 스키마
+├─ lifeDiary/
+│  ├─ api.py       # NinjaAPI 조립 + 전역 예외 핸들러
+│  └─ settings/    # dev · prod · desktop
+├─ locale/         # ko · en 메시지 카탈로그
+├─ desktop/        # pywebview 데스크톱 런처
+├─ docs/           # 설계·계획·실행 로그·상태 인덱스
 └─ Procfile
 ```
 
-현재 구조는 Django 모놀리스를 유지하면서도 앱 단위 책임 분리와 `views / use_cases / repositories / domain_services / models` 흐름을 점진적으로 정리하는 방향으로 운영하고 있습니다.
+**API 엔드포인트** — 인증은 Django 세션 기반(`NinjaAPI(auth=django_auth)`)
 
-## 로컬 실행
+| 메서드 | 경로 | 설명 |
+|---|---|---|
+| POST · DELETE | `/api/time-blocks/` | 슬롯 저장 · 삭제 |
+| POST | `/api/time-blocks/undo/` | 직전 작업 되돌리기 |
+| GET | `/api/categories/` · `/api/tags/` | 카테고리 · 태그 목록 |
+| POST · PUT · DELETE | `/api/tags/` · `/api/tags/{id}/` | 태그 생성 · 수정 · 삭제 |
 
-### 1. 가상환경 생성 및 의존성 설치
+**주요 제약과 인덱스**
 
-```bash
-python -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-```
+| 대상 | 내용 | 이유 |
+|---|---|---|
+| `TimeBlock` | `UniqueConstraint(user, date, slot_index)` | 같은 시간대에 기록이 둘 생기면 통계 합이 하루 24시간을 넘습니다. 동시 요청은 애플리케이션 검증으로 못 막아 DB로 내렸습니다 |
+| `Tag` | `UniqueConstraint(user, name)` | 태그 이름이 사실상 식별자로 쓰여 사용자 범위 안에서 유일해야 합니다 |
+| `TimeBlock` | `Index(user, date)` / `Index(user, tag)` | 각각 "이 사용자의 이 날짜 전체", "태그별 합계"가 주 조회 축입니다 |
+| `AccountDeletionRequest` | `Index(scheduled_delete_at)` | 만기 계정만 골라내는 배치 조회용 |
 
-### 2. 환경 변수 설정
+---
 
-루트에 `.env` 파일을 두고 최소한 아래 값을 넣습니다.
+## 3. 작업 상황
 
-```env
-DJANGO_SECRET_KEY=your-secret-key
-```
+| | |
+|---|---|
+| 코드 | Python 13,963줄 (마이그레이션 제외) |
+| 테스트 | **pytest 543개 통과** (2026-08-18) |
+| 배포 | Render + Supabase PostgreSQL, 운영 중 |
 
-프로덕션 설정을 사용할 경우 PostgreSQL 연결 정보도 필요합니다.
+**완료**
 
-```env
-DB_NAME=
-DB_USER=
-DB_PASSWORD=
-DB_HOST=
-DB_PORT=6543
-```
+- 슬롯 기록·통계·목표·메모 도메인 전체
+- JSON API의 django-ninja 이식 + OpenAPI 문서 공개
+- 계층 분리(`use_cases` / `repositories`)와 의존 방향 계약 테스트
+- 계정 삭제 15일 유예 + 마스킹된 감사 기록
+- 보안 베이스라인 — 브루트포스 방어(axes), 반복 실패 시 reCAPTCHA,
+  저장형 XSS 대응, CSP, 복구 엔드포인트 스로틀링, 쿠키 하드닝
+- 다국어(ko/en) 전체 적용
 
-### 3. 마이그레이션 및 실행
+**진행 중 / 하지 않은 것**
 
-```bash
-python manage.py migrate
-python manage.py runserver
-```
+- **에러 추적·메트릭 미연동** — 현재는 배포 콘솔 로그(`django.request` ERROR 이상)만
+  봅니다. 알림도 대시보드도 없어, 가장 먼저 메울 구멍으로 보고 있습니다
+- **계정 삭제 배치 스케줄링** — 관리 명령 `purge_deleted_accounts`는 구현·테스트
+  완료, 운영 스케줄러 미적용
+- **복구 메일 실발송** — 발신 도메인·DNS 검증 전이라 미확인
+- **데스크톱 앱**(pywebview + PyInstaller) — 기반 코드만, 패키징 미완
 
-기본 개발 설정은 `lifeDiary.settings.dev`를 사용합니다.
+**알려진 한계**
 
-## 테스트
+- 목표 개수에 비례하는 N+1이 있습니다 (§4-3)
+- 통계 캐시 키에 스키마 버전이 없어, 배포 시 캐시를 비우지 않으면 과거 날짜
+  조회가 TTL(24시간) 만료 전까지 옛 결과로 보일 수 있습니다
+- 캐시 무효화가 날짜 단위라, 바뀐 날짜를 포함하는 주간·월간 조회 캐시는
+  TTL이 끝날 때까지 남습니다
 
-두 방식 모두 사용 가능합니다.
+---
 
-```bash
-pytest
-```
+## 4. 트러블슈팅
 
-```bash
-python manage.py test
-```
+### 4-1. 10분 기록이 1,440분으로 표시된 데이터 정합성 결함
 
-## 배포 메모
+**증상** — 하루 10분짜리 기록이 통계에 1,440분(24시간)으로 잡혔습니다.
+집계는 단순 합산이라 처음엔 원인이 보이지 않았습니다.
 
-- 개발 환경은 SQLite를 사용합니다.
-- 프로덕션 환경은 `lifeDiary.settings.prod` 기준 PostgreSQL을 사용합니다.
-- `Procfile` 기준 실행 명령은 아래와 같습니다.
+**원인** — 집계가 태그의 **표시명(name)을 dict key로** 쓰고 있었습니다.
+빈 시간을 채우려고 코드가 만드는 합성 항목 `미분류`와, 사용자가 직접
+`미분류`로 지은 태그가 **같은 key로 병합**됐습니다.
+영어 UI에서는 `Unclassified`로 똑같이 재현됐습니다.
+근본 원인은 **사용자가 바꿀 수 있는 값을 식별자로 쓴 것**이었습니다.
 
-```bash
-gunicorn lifeDiary.wsgi --workers=2 --threads=4 --worker-class=gthread --bind 0.0.0.0:$PORT
-```
+**해결** — 표시명과 식별자를 분리했습니다. 내부 key 계약을 소유하는 순수 모듈을
+두고 key를 `tag:<id>` / `unclassified`로 고정한 뒤, 일·주·월·분석 4종 집계를
+전부 key 기반으로 전환했습니다. 같은 뿌리였던 '수면 제외' 정책도 편집 가능한
+태그명 대신 `Category.slug` 기준으로 바꿨습니다.
+시나리오 12개를 **예상한 이유로 실패하는지 먼저 확인(Red)** 한 뒤 구현했습니다.
 
-## 이 프로젝트를 한 문장으로 설명하면
+**한계** — 이미 캐시된 과거 통계는 TTL이 끝나야 정상값이 됩니다.
 
-Life Diary는 생활 기록을 많이 쓰지 않고도 남길 수 있게 하고, 그 기록을 다시 목표와 통계, 피드백으로 돌려주는 구조화된 회고 서비스입니다.
+---
 
+### 4-2. API 미인증 요청이 로그인 HTML을 200으로 돌려주던 문제
+
+**증상** — JSON API를 로그인 없이 호출하면 401이 아니라 **302 리다이렉트가
+나가고, 따라가면 로그인 페이지 HTML이 200으로** 돌아왔습니다.
+API 클라이언트 입장에선 "성공 응답"을 받고 JSON 파싱에서 터지는 셈이라,
+실패 원인을 알 수 없었습니다.
+
+**원인** — API가 Django 함수 뷰로 구현돼 있어 일반 페이지와 같은
+로그인 리다이렉트 흐름을 그대로 탔습니다. 응답 형식이 뷰마다 제각각이라
+오류 처리를 한곳에서 볼 수도 없었습니다.
+
+**해결** — API 5개를 django-ninja 라우터로 이식하면서 전역 예외 핸들러를 두고
+오류 응답을 하나의 형식으로 통일했습니다.
+
+| 상황 | 응답 | 코드 |
+|---|---|---|
+| 미인증 | 401 | `UNAUTHORIZED` |
+| 스키마 검증 실패 | 400 | `VALIDATION_ERROR` |
+| 본문이 JSON 아님 | 400 | `INVALID_JSON` |
+| 없거나 남의 태그 | 404 | `TAG_NOT_FOUND` |
+
+남의 태그에 403이 아니라 404를 쓴 건, 403이면 **"그 id는 존재한다"는 정보가
+새어나가기** 때문입니다.
+
+이식에서 가장 신경 쓴 건 **URL과 응답 모양을 바꾸지 않는 것**이었습니다.
+그래서 옮기기 전에 기존 동작을 **특성화 테스트로 먼저 고정**하고, 그 테스트가
+초록인 상태를 유지하며 이식했습니다. 계약 변경은 위 4건만 의도적으로 했습니다.
+404 처리는 예외 처리를 일부러 제거하면 500으로 실패하는지 확인해,
+테스트가 실제로 그 결함을 잡는지 검증했습니다.
+
+**결과** — `/api/docs`(Swagger UI)와 `/api/openapi.json`이 함께 생겼고,
+**엔드포인트가 문서에서 누락되면 실패하는 계약 테스트**를 걸어 문서가
+코드보다 뒤처지지 않게 했습니다.
+
+---
+
+### 4-3. 통계 화면 쿼리가 조용히 늘어나던 문제
+
+**증상** — 통계 화면은 한 번 그릴 때 집계를 여러 번 돕니다.
+기능을 붙일 때마다 쿼리가 늘었는데, 늘어난 사실 자체를 아무도 몰랐습니다.
+
+**해결** — 쿼리 수 상한을 **테스트로 고정**했습니다(`apps/stats/test_stats_perf.py`).
+`CaptureQueriesContext`로 실제 쿼리를 세고 상한을 넘으면 실패시킵니다.
+숫자가 움직일 때마다 이유를 주석에 남기게 했습니다.
+
+| 시점 | 예산 | 이유 |
+|---|---|---|
+| 2026-04 (베이스라인) | 10 | — |
+| Phase 1 → A1 | 8 → 6 | 목표 조회 통합 |
+| 2026-08-01 | 16 | 요약 탭 신설(기간 비교·기준선·밀도 격자 등) |
+| 2026-08-10 | 17 | '7일 평균 대비' — 월 경계를 넘어 월간 조회 재사용 불가 |
+| 2026-08-17 | 18 | 목표 진행률 |
+
+**중요한 건 숫자가 아니라 성질입니다.** 17까지 늘어난 항목은 전부
+**기록량과 무관한 상수 횟수**라, 기록이 10배 늘어도 쿼리는 그대로입니다.
+
+**한계 — 18번째는 성질이 다릅니다.** 목표 진행률이 목표마다 그 기간의 합계를
+한 번씩 조회하는 N+1입니다. 알고도 뒀습니다 — 온보딩이 "목표는 하나면 충분하다"고
+안내해 실사용 목표 수가 작다고 봤기 때문이고, 이 판단 근거도 테스트 주석에
+남겼습니다. 목표를 여럿 쓰는 사용자가 늘면 (태그, 기간) 조합을 모아
+`values().annotate(Sum())`으로 한 번에 집계하도록 바꿀 계획입니다.
+
+**캐시** — 통계 결과를 `stats:{user}:{date}:{lang}` 키로 캐시하고, 과거 날짜는
+24시간, 오늘은 5분 TTL을 씁니다. 무효화는 슬롯 변경 시그널을 `stats`가
+구독해 처리합니다. 남은 한계는 §3에 적었습니다.

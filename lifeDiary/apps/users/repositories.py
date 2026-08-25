@@ -21,6 +21,9 @@ class UserAccountRepository:
             .first()
         )
 
+    def find_by_id(self, user_id):
+        return get_user_model().objects.filter(pk=user_id).first()
+
     def find_active_by_email(self, email):
         return list(
             get_user_model().objects.filter(email__iexact=email, is_active=True)

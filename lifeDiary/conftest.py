@@ -223,15 +223,20 @@ def test_password():
 @pytest.fixture
 def make_user(db, django_user_model):
     """user factory — 호출마다 새 user 생성."""
+    from apps.users.email_verification import mark_email_verified
+
     counter = {"n": 0}
 
     def _make(username=None, password=DEFAULT_TEST_PASSWORD, **kwargs):
         counter["n"] += 1
-        return django_user_model.objects.create_user(
+        user = django_user_model.objects.create_user(
             username=username or f"u{counter['n']}",
             password=password,
             **kwargs,
         )
+        # 이미 쓰고 있던 계정을 대신한다. 미인증 계정은 명시적으로 만든다.
+        mark_email_verified(user)
+        return user
 
     return _make
 

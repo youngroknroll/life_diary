@@ -2,8 +2,11 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from apps.tags.models import Tag
+
+from . import verification_policy
 
 # Create your models here.
 
@@ -95,3 +98,81 @@ class DeletedAccountRecord(models.Model):
 
     def __str__(self):
         return f"{self.username} purged at {self.purged_at}"
+
+
+class EmailVerification(models.Model):
+    """계정의 이메일 소유 확인 상태."""
+
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name="email_verification",
+    )
+    verified_at = models.DateTimeField(null=True, blank=True)
+
+    @property
+    def is_verified(self) -> bool:
+        return self.verified_at is not None
+
+    def __str__(self):
+        state = self.verified_at or "unverified"
+        return f"{self.user.username} email {state}"
+
+
+class EmailVerificationCode(models.Model):
+    """이메일로 보낸 1회용 인증 코드. 평문은 저장하지 않는다."""
+
+    PURPOSE_SIGNUP = "signup"
+    PURPOSE_PASSWORD_RESET = "password_reset"
+    PURPOSE_CHOICES = [
+        (PURPOSE_SIGNUP, _("가입 인증")),
+        (PURPOSE_PASSWORD_RESET, _("비밀번호 재설정")),
+    ]
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="verification_codes",
+    )
+    purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES)
+    code_hash = models.CharField(max_length=128)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    attempt_count = models.PositiveSmallIntegerField(default=0)
+    consumed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(
+                fields=["user", "purpose", "consumed_at"],
+                name="verif_code_lookup_idx",
+            ),
+            models.Index(fields=["created_at"], name="verif_code_created_idx"),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} {self.purpose} code"
+
+    def is_expired(self, now=None) -> bool:
+        return (now or timezone.now()) >= self.expires_at
+
+    def is_locked(self) -> bool:
+        return self.attempt_count >= verification_policy.max_attempts()
+
+    def attempts_remaining(self) -> int:
+        return max(verification_policy.max_attempts() - self.attempt_count, 0)
+
+    def is_usable(self, now=None) -> bool:
+        return (
+            self.consumed_at is None
+            and not self.is_locked()
+            and not self.is_expired(now)
+        )
+
+    def register_failure(self) -> None:
+        self.attempt_count += 1
+        self.save(update_fields=["attempt_count"])
+
+    def consume(self) -> None:
+        self.consumed_at = timezone.now()
+        self.save(update_fields=["consumed_at"])

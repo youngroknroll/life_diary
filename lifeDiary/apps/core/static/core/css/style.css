@@ -1408,6 +1408,122 @@ label.segmented__item {
     line-height: 1;
 }
 
+.auth-panel--centered .card-body {
+    text-align: center;
+}
+
+.auth-panel--centered .auth-panel__lead {
+    margin-bottom: 20px;
+}
+
+.auth-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.auth-panel__actions .auth-panel__submit {
+    margin-top: 0;
+}
+
+.auth-panel__actions .auth-google-login {
+    margin-top: 0;
+}
+
+/* 입력이 아니라 이미 확인된 신원이다. 고칠 수 있는 칸처럼 보이면 안 된다. */
+.auth-identity {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 13px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-soft);
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.auth-identity__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-identity__source {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-meta);
+}
+
+.form-label__hint {
+    float: right;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--color-text-meta);
+}
+
+/* 화면에서는 지우고 보조기술에는 남긴다. 코드 화면의 Enter 가드 버튼과
+   만료 알림이 쓴다. */
+.u-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: -1px;
+    border: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
+.auth-code-input {
+    font-family: var(--font-mono);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .4em;
+    text-align: center;
+    /* letter-spacing 이 마지막 글자 뒤에도 붙어 가운데가 왼쪽으로 밀린다. */
+    text-indent: .4em;
+}
+
+.auth-code__meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: -2px 0 12px;
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.auth-code__resend {
+    flex: none;
+    min-height: 44px;
+    padding: 8px 4px;
+    border: 0;
+    background: none;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-primary);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.auth-code__resend:disabled {
+    color: var(--color-text-disabled);
+    text-decoration: none;
+    cursor: default;
+}
+
+.auth-code__resend:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
 /* Errors sit under their own field, not in a page-top banner. */
 .field-error {
     display: flex;

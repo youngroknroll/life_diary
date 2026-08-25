@@ -1,6 +1,6 @@
 """환영 화면(#7) 회귀 테스트.
 
-- 회원가입 성공 시 welcome으로 리다이렉트
+- 회원가입 성공 시 이메일 인증 화면으로 리다이렉트
 - 환영 화면은 로그인 필수
 - CTA가 dashboard로, skip이 home으로 향함
 """
@@ -9,8 +9,8 @@ from django.urls import reverse
 
 
 @pytest.mark.django_db
-class TestSignupRedirectsToWelcome:
-    def test_signup_redirects_to_welcome(self, client):
+class TestSignupRedirectsToVerification:
+    def test_signup_redirects_to_email_verification(self, client):
         response = client.post(
             reverse("users:signup"),
             {
@@ -23,7 +23,7 @@ class TestSignupRedirectsToWelcome:
             follow=False,
         )
         assert response.status_code == 302
-        assert response.url == reverse("users:welcome")
+        assert response.url == reverse("users:signup_verify")
 
 
 @pytest.mark.django_db

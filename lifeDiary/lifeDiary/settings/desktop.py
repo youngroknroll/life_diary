@@ -165,6 +165,9 @@ CACHES = {
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "noreply@lifediary.local"
 
+# 로컬 단일 사용자이고 실제 메일 발송 경로가 없어 코드 인증을 끈다.
+EMAIL_VERIFICATION_ENABLED = False
+
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
