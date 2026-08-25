@@ -33,7 +33,6 @@
                 <span class="settings-row__label">{% trans "비밀번호 변경" %}</span>
                 <span class="settings-row__chevron" aria-hidden="true">›</span>
             </a>
-            {# 데스크톱은 상단바 메뉴에 로그아웃이 있지만 767px 아래에서는 접히므로 여기에도 둔다. #}
             <div class="settings-row is-narrow-only-row">
                 <span class="settings-row__label">{% trans "로그아웃" %}</span>
                 <form action="{% url 'users:logout' %}" method="post" class="settings-row__control">

@@ -18,7 +18,6 @@
     <div>
         <h1 class="page-title">{{ selected_date|date:"DATE_FORMAT" }} ({{ selected_date|date:"l" }})</h1>
         {% if filled_slots == 0 %}
-            {# 0시간 0분 기록 · 기록률 0% 는 아무것도 말해 주지 않는다. #}
             <p class="page-subtitle">{% trans "아직 기록이 없습니다" %}{% if is_today %} · {% blocktrans with t=now_time|time:"H:i" %}지금 시각 {{ t }}{% endblocktrans %}{% endif %}</p>
         {% else %}
             <p class="page-subtitle">{% blocktrans with h=total_hours m=remaining_minutes p=fill_percentage %}{{ h }}시간 {{ m }}분 기록 · 기록률 {{ p }}%{% endblocktrans %}</p>
@@ -110,7 +109,6 @@
                     {% for row in slot_rows %}
                         {% include 'dashboard/_day_row.html' %}
                     {% endfor %}
-                    {# 23시 행은 24:00 에 끝난다. 끝선이 없으면 하루가 23시에 멎은 것처럼 읽힌다. #}
                     <div class="day-row" aria-hidden="true">
                         <div class="day-row__label">24:00</div>
                         <div class="day-row__cells"></div>
