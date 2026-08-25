@@ -54,6 +54,45 @@ class SignupForm(UserCreationForm):
         return user
 
 
+class VerificationCodeForm(forms.Form):
+    code = forms.CharField(
+        required=True,
+        label=_("인증 코드"),
+        min_length=6,
+        max_length=6,
+        error_messages={
+            "min_length": _("6자리 숫자를 입력해주세요."),
+            "max_length": _("6자리 숫자를 입력해주세요."),
+            "required": _("메일로 받은 인증 코드를 입력해주세요."),
+        },
+        widget=forms.TextInput(
+            attrs={
+                "class": "auth-code-input",
+                "inputmode": "numeric",
+                "autocomplete": "one-time-code",
+                "pattern": "[0-9]*",
+                "maxlength": "6",
+                "autofocus": "autofocus",
+                "aria-label": _("인증 코드 6자리"),
+            }
+        ),
+    )
+
+    def clean_code(self):
+        code = self.cleaned_data["code"].strip()
+        if not code.isdigit():
+            raise forms.ValidationError(_("6자리 숫자를 입력해주세요."))
+        return code
+
+
+class PasswordResetEmailForm(forms.Form):
+    email = forms.EmailField(
+        required=True,
+        label=_("이메일"),
+        widget=forms.EmailInput(attrs={"autocomplete": "email", "autofocus": "autofocus"}),
+    )
+
+
 class UsernameRecoveryForm(forms.Form):
     email = forms.EmailField(
         required=True,
