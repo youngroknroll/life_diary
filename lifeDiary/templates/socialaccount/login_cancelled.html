@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans "로그인 취소" %} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<div class="auth-panel auth-panel--centered">
+    <div class="card auth-card">
+        <div class="card-body">
+            <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
+            <h1 class="auth-panel__title">{% trans "Google 로그인을 취소했습니다" %}</h1>
+            <p class="auth-panel__lead">
+                {% trans "계정에는 아무 변화가 없습니다." %}<br>
+                {% trans "준비되면 다시 시도하세요." %}
+            </p>
+
+            <div class="auth-panel__actions">
+                <a href="{% provider_login_url 'google' %}" class="btn-sian auth-google-login">
+                    <span class="auth-google__mark" aria-hidden="true">G</span>{% trans "Google로 다시 시도" %}
+                </a>
+                <a href="{% url 'users:login' %}" class="btn-sian btn-sian--primary auth-panel__submit">
+                    {% trans "아이디로 로그인" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

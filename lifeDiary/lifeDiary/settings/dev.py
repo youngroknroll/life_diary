@@ -82,7 +82,12 @@ LOGIN_REDIRECT_URL = "home"
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_AUTO_SIGNUP = True
+# 일반 가입은 약관 동의가 필수다. 자동 가입은 그 단계를 건너뛰므로 끈다.
+SOCIALACCOUNT_AUTO_SIGNUP = False
+# 이메일 확인은 users 의 6자리 코드가 담당한다. allauth 의 링크 확인 메일은
+# 중복이고, account URL 을 닫은 뒤로는 보낼 수도 없다.
+ACCOUNT_EMAIL_VERIFICATION = "none"
+SOCIALACCOUNT_FORMS = {"signup": "apps.users.social_forms.SocialSignupForm"}
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
 SOCIALACCOUNT_PROVIDERS = {

@@ -18,6 +18,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from allauth.urls import build_provider_urlpatterns
+from django.views.generic.base import RedirectView
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.views.i18n import JavaScriptCatalog
@@ -65,6 +66,13 @@ urlpatterns = [
     # 방식 비밀번호 재설정이 코드 방식 옆에 그대로 살아 있게 된다.
     path("accounts/3rdparty/", include("allauth.socialaccount.urls")),
     path("accounts/", include(build_provider_urlpatterns())),
+    # allauth 내부가 reverse("account_login") 을 쓴다. 해석은 위의 users 로그인이
+    # 먼저 가져가고, 이 항목은 이름만 채운다.
+    path(
+        "accounts/login/",
+        RedirectView.as_view(pattern_name="users:login"),
+        name="account_login",
+    ),
     # API URLs
     path("api/", api.urls),
 ]

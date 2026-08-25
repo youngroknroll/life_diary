@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load socialaccount %}
+
+{% block title %}{% trans "로그인 오류" %} | {% trans "라이프 다이어리" %}{% endblock %}
+
+{% block content %}
+<div class="auth-panel auth-panel--centered">
+    <div class="card auth-card">
+        <div class="card-body">
+            <div class="auth-panel__brand">{% trans "라이프 다이어리" %}</div>
+            <h1 class="auth-panel__title">{% trans "로그인이 완료되지 않았습니다" %}</h1>
+            <p class="auth-panel__lead">
+                {% trans "Google 인증 과정에서 문제가 생겼습니다." %}<br>
+                {% trans "잠시 후 다시 시도하거나 아이디로 로그인하세요." %}
+            </p>
+
+            <div class="auth-panel__actions">
+                <a href="{% provider_login_url 'google' %}" class="btn-sian auth-google-login">
+                    <span class="auth-google__mark" aria-hidden="true">G</span>{% trans "Google로 다시 시도" %}
+                </a>
+                <a href="{% url 'users:login' %}" class="btn-sian btn-sian--primary auth-panel__submit">
+                    {% trans "아이디로 로그인" %}
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

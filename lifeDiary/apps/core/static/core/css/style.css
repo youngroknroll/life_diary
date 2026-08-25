@@ -1408,6 +1408,62 @@ label.segmented__item {
     line-height: 1;
 }
 
+.auth-panel--centered .card-body {
+    text-align: center;
+}
+
+.auth-panel--centered .auth-panel__lead {
+    margin-bottom: 20px;
+}
+
+.auth-panel__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.auth-panel__actions .auth-panel__submit {
+    margin-top: 0;
+}
+
+.auth-panel__actions .auth-google-login {
+    margin-top: 0;
+}
+
+/* 입력이 아니라 이미 확인된 신원이다. 고칠 수 있는 칸처럼 보이면 안 된다. */
+.auth-identity {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 13px;
+    border: 1px solid var(--color-border-soft);
+    border-radius: var(--radius-sm);
+    background: var(--color-surface-soft);
+    font-size: 13px;
+    color: var(--color-text-muted);
+}
+
+.auth-identity__value {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.auth-identity__source {
+    margin-left: auto;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--color-text-meta);
+}
+
+.form-label__hint {
+    float: right;
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--color-text-meta);
+}
+
 .auth-code-input {
     font-family: var(--font-mono);
     font-size: 22px;
