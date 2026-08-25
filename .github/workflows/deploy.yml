@@ -1,0 +1,214 @@
+--- # main 의 트리에서 문서 경로를 뺀 스냅샷을 production 으로 올린다.
+#
+# 머지로 배포하면 main 의 트리가 그대로 실려 경로를 뺄 방법이 없다. 그래서
+# 트리를 직접 만들어 커밋한다. 부모를 현재 production 으로 두므로 fast-forward
+# 이고 force-push 가 필요 없다.
+#
+# 문서만 바뀐 커밋은 필터 후 트리가 이전과 완전히 같아서 푸시할 것이 없다.
+# 트리거를 막는 게 아니라 배포할 내용이 없어서 못 하는 구조다.
+name: Deploy to production
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: '배포할 커밋 또는 ref (롤백은 직전 정상 SHA)'
+        default: main
+        required: true
+      dry_run:
+        description: '푸시 없이 무엇이 배포될지만 확인'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  # 배포 트리에서 뺄 경로. 런타임이 읽지 않는 문서·거버넌스 파일이다.
+  EXCLUDE_RE: '^(lifeDiary/docs/|\.claude/|README\.md$|lifeDiary/(prompt_plan|AGENTS|CLAUDE)\.md$)'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # Environments 에 required reviewers 를 켜면 여기서 승인 게이트가 걸린다.
+    # 켜지 않아도 워크플로는 그대로 돈다.
+    environment: production
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
+
+      - name: Fetch main and production
+        run: git fetch --no-tags origin main production
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install LifeDiary dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r lifeDiary/requirements.txt
+
+      - name: Verify LifeDiary deploy readiness
+        working-directory: lifeDiary
+        env:
+          DJANGO_SECRET_KEY: test-ci-secret-value-for-deploy-readiness-checks-only-1234567890
+          DB_NAME: test_db
+          DB_USER: test_user
+          DB_PASSWORD: test_password
+          DB_HOST: localhost
+          DB_PORT: '6543'
+          RESEND_API_KEY: re_test_dummy
+          DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
+        run: |
+          python -m pytest lifeDiary/test_prod_settings.py apps/core/test_email_backends.py --tb=short
+          python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR
+
+      - name: Refuse to deploy over production-only content
+        run: |
+          set -euo pipefail
+
+          # production 에만 있는 blob 은 거기에 직접 커밋된 것이다. 이 배포는
+          # main 의 트리로 production 을 덮으므로 그대로 진행하면 사라진다.
+          # 2026-08-12 에 ALLOWED_HOSTS 도메인 수정이 이 경우였다.
+          git rev-list --objects origin/main | awk '{print $1}' | sort -u > /tmp/main_objects
+          git ls-tree -r --format='%(objectname)%x09%(path)' origin/production \
+            | while IFS=$'\t' read -r blob path; do
+                grep -qx "$blob" /tmp/main_objects || echo "- ${path}"
+              done > /tmp/orphans
+
+          if [ -s /tmp/orphans ]; then
+            echo "::error::production 에만 있는 파일이 있습니다. main 에 먼저 반영하세요."
+            cat /tmp/orphans
+            {
+              echo "## ❌ 배포 중단 — production 에만 있는 내용"
+              echo
+              echo "아래 파일은 main 이력 어디에도 없습니다. 이대로 배포하면 사라집니다."
+              echo
+              cat /tmp/orphans
+              echo
+              echo "복구: 해당 변경을 main 에 반영하는 PR 을 올린 뒤 다시 배포하세요."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "production-only 파일 없음."
+
+      - name: Build filtered deploy tree
+        id: tree
+        run: |
+          set -euo pipefail
+
+          SOURCE_SHA=$(git rev-parse HEAD)
+          EXCLUDED=(
+            lifeDiary/docs
+            .claude
+            README.md
+            lifeDiary/prompt_plan.md
+            lifeDiary/AGENTS.md
+            lifeDiary/CLAUDE.md
+          )
+
+          export GIT_INDEX_FILE="${RUNNER_TEMP}/deploy-index"
+          rm -f "$GIT_INDEX_FILE"
+          git read-tree "$SOURCE_SHA"
+          git rm -r --cached -f -q --ignore-unmatch "${EXCLUDED[@]}"
+          TREE=$(git write-tree)
+
+          BEFORE=$(git ls-tree -r --name-only "$SOURCE_SHA" | wc -l | tr -d ' ')
+          AFTER=$(git ls-tree -r --name-only "$TREE" | wc -l | tr -d ' ')
+          REMOVED=$((BEFORE - AFTER))
+
+          # 필터가 조용히 실패하면 문서가 그대로 배포된다. 셸이 경로 인자를 한
+          # 덩어리로 넘겨 --ignore-unmatch 가 에러를 삼키는 실수가 실제로 있었다.
+          if [ "$REMOVED" -le 0 ]; then
+            echo "::error::필터가 파일을 하나도 제거하지 못했습니다."
+            exit 1
+          fi
+
+          LEFTOVER=$(git ls-tree -r --name-only "$TREE" | grep -cE "$EXCLUDE_RE" | tr -d ' ' || true)
+          if [ "$LEFTOVER" -ne 0 ]; then
+            echo "::error::필터 후에도 제외 경로가 ${LEFTOVER}건 남았습니다."
+            exit 1
+          fi
+
+          # 제외 경로 말고는 한 바이트도 달라지면 안 된다.
+          # -v 는 값의 \. 를 이스케이프로 먹는다. ENVIRON 은 원문 그대로 준다.
+          git ls-tree -r "$SOURCE_SHA" | awk -F'\t' 'BEGIN{re=ENVIRON["EXCLUDE_RE"]} $2 !~ re' > /tmp/source_rest
+          git ls-tree -r "$TREE" > /tmp/deploy_tree
+          if ! diff -q /tmp/source_rest /tmp/deploy_tree > /dev/null; then
+            echo "::error::제외 경로 외 파일이 달라졌습니다."
+            diff /tmp/source_rest /tmp/deploy_tree | head -40
+            exit 1
+          fi
+
+          {
+            echo "source_sha=${SOURCE_SHA}"
+            echo "tree=${TREE}"
+            echo "removed=${REMOVED}"
+            echo "kept=${AFTER}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Stop when the deployed tree would not change
+        id: changed
+        run: |
+          set -euo pipefail
+          PROD_TREE=$(git rev-parse origin/production^{tree})
+          if [ "${{ steps.tree.outputs.tree }}" = "$PROD_TREE" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            {
+              echo "## 배포할 변경 없음"
+              echo
+              echo "필터 후 트리가 현재 production 과 같습니다."
+              echo "문서만 바뀐 경우가 여기에 해당합니다."
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Summarize the deploy
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          LAST=$(git log -1 --pretty=%B origin/production | grep -oE 'main@[0-9a-f]{7,40}' | head -1 | cut -d@ -f2 || true)
+          {
+            echo "## 배포 후보"
+            echo
+            echo "- source: \`${{ steps.tree.outputs.source_sha }}\`"
+            echo "- 배포 파일 ${{ steps.tree.outputs.kept }}개 (문서 ${{ steps.tree.outputs.removed }}개 제외)"
+            echo "- dry run: \`${{ inputs.dry_run }}\`"
+            echo
+            if [ -n "$LAST" ]; then
+              echo "### 직전 배포(\`${LAST}\`) 이후 커밋"
+              echo
+              git log --no-merges --pretty='- %s (%h)' "${LAST}..${{ steps.tree.outputs.source_sha }}" | head -50
+            else
+              echo "직전 배포 SHA 를 커밋 메시지에서 찾지 못했습니다(첫 배포로 보입니다)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Push deploy commit to production
+        if: steps.changed.outputs.changed == 'true' && inputs.dry_run == false
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+
+          COMMIT=$(git commit-tree "${{ steps.tree.outputs.tree }}" \
+            -p origin/production \
+            -m "ci: deploy main@${{ steps.tree.outputs.source_sha }}" \
+            -m "문서 경로를 뺀 배포 스냅샷. 제외 ${{ steps.tree.outputs.removed }}개, 배포 ${{ steps.tree.outputs.kept }}개.")
+
+          # 부모가 현재 production 이므로 fast-forward 다. force 를 쓰지 않는다.
+          git push origin "${COMMIT}:refs/heads/production"
+          echo "pushed ${COMMIT}"
+          echo "- pushed: \`${COMMIT}\`" >> "$GITHUB_STEP_SUMMARY"
