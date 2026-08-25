@@ -17,6 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from allauth.urls import build_provider_urlpatterns
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
 from django.views.i18n import JavaScriptCatalog
@@ -60,7 +61,10 @@ urlpatterns = [
     path("stats/", include("apps.stats.urls")),
     path("tags/", include("apps.tags.urls")),
     path("accounts/", include("apps.users.urls")),
-    path("accounts/", include("allauth.urls")),
+    # allauth.urls 전체 대신 소셜 경로만 연다. account URL 을 열어 두면 링크
+    # 방식 비밀번호 재설정이 코드 방식 옆에 그대로 살아 있게 된다.
+    path("accounts/3rdparty/", include("allauth.socialaccount.urls")),
+    path("accounts/", include(build_provider_urlpatterns())),
     # API URLs
     path("api/", api.urls),
 ]

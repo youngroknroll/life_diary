@@ -17,33 +17,24 @@ urlpatterns = [
     path("welcome/", views.welcome_view, name="welcome"),
     path("login/", views.login_view, name="login"),
     path("logout/", views.logout_view, name="logout"),
+    path("password-reset/", views.password_reset_view, name="password_reset"),
     path(
-        "password-reset/",
-        views.RateLimitedPasswordResetView.as_view(
-            template_name="users/password/password_reset_form.html",
-            email_template_name="users/password/password_reset_email.txt",
-            subject_template_name="users/password/password_reset_subject.txt",
-            success_url=reverse_lazy("users:password_reset_done"),
-        ),
-        name="password_reset",
+        "password-reset/verify/",
+        views.password_reset_verify_view,
+        name="password_reset_verify",
     ),
     path(
-        "password-reset/done/",
-        auth_views.PasswordResetDoneView.as_view(
-            template_name="users/password/password_reset_done.html",
-        ),
-        name="password_reset_done",
+        "password-reset/verify/resend/",
+        views.password_reset_resend_view,
+        name="password_reset_resend",
     ),
     path(
-        "reset/<uidb64>/<token>/",
-        auth_views.PasswordResetConfirmView.as_view(
-            template_name="users/password/password_reset_confirm.html",
-            success_url=reverse_lazy("users:password_reset_complete"),
-        ),
-        name="password_reset_confirm",
+        "password-reset/set/",
+        views.password_reset_set_view,
+        name="password_reset_set",
     ),
     path(
-        "reset/done/",
+        "password-reset/complete/",
         auth_views.PasswordResetCompleteView.as_view(
             template_name="users/password/password_reset_complete.html",
         ),

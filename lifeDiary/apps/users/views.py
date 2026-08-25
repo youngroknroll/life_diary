@@ -1,6 +1,7 @@
 import logging
 import re
 import json
+from datetime import datetime
 from smtplib import SMTPException
 from urllib import parse, request as urlrequest
 from urllib.error import URLError
@@ -10,8 +11,7 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
-from django.contrib.auth.forms import AuthenticationForm
-from django.contrib.auth.views import PasswordResetView
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
@@ -38,6 +38,7 @@ from .email_verification import (
     PASSWORD_RESET,
     SIGNUP,
     ResendBlocked,
+    VerificationOutcome,
     VerificationStatus,
     ensure_active_code,
     is_email_verified,
@@ -363,14 +364,25 @@ def _verification_error_message(outcome):
     return gettext("코드가 맞지 않습니다.")
 
 
-def _verification_context(user, purpose, form, outcome=None, **extra):
-    remaining_seconds = seconds_until_expiry(user, purpose)
+def _verification_context(email, user, purpose, form, outcome=None, **extra):
+    """코드 화면 컨텍스트.
+
+    `user`가 없어도 화면은 똑같이 그려진다. 재설정 흐름에서 가입되지 않은
+    주소를 구분할 수 없게 하려면 타이머까지 같아야 한다.
+    """
+    if user is not None:
+        remaining_seconds = seconds_until_expiry(user, purpose)
+        resend_seconds = seconds_until_resend_allowed(user, purpose)
+    else:
+        remaining_seconds = verification_policy.code_ttl_seconds()
+        resend_seconds = verification_policy.resend_cooldown_seconds()
+
     context = {
         "form": form,
-        "masked_email": mask_email(user.email),
+        "masked_email": mask_email(email),
         "expires_in_seconds": remaining_seconds,
         "expires_in_minutes": -(-remaining_seconds // 60),
-        "resend_in_seconds": seconds_until_resend_allowed(user, purpose),
+        "resend_in_seconds": resend_seconds,
         "verification_error": _verification_error_message(outcome) if outcome else "",
         "attempts_remaining": outcome.attempts_remaining if outcome else None,
     }
@@ -414,6 +426,7 @@ def signup_verify_view(request):
         request,
         "users/verification/verify_code.html",
         _verification_context(
+            user.email,
             user,
             SIGNUP,
             form,
@@ -564,28 +577,157 @@ def check_email_view(request):
     return JsonResponse({"available": True, "message": gettext("사용 가능합니다.")})
 
 
-class RateLimitedPasswordResetView(PasswordResetView):
-    def form_valid(self, form):
-        if _is_rate_limited(
-            self.request,
-            "password-reset",
-            "RECOVERY_RATE_LIMIT_MAX_ATTEMPTS",
-            "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
-        ):
-            return redirect(self.get_success_url())
-        opts = {
-            "use_https": self.request.is_secure(),
-            "token_generator": self.token_generator,
-            "from_email": self.from_email,
-            "email_template_name": self.email_template_name,
-            "subject_template_name": self.subject_template_name,
-            "request": self.request,
-            "domain_override": self.request.get_host(),
-            "html_email_template_name": self.html_email_template_name,
-            "extra_email_context": self.extra_email_context,
-        }
-        form.save(**opts)
-        return super(PasswordResetView, self).form_valid(form)
+PASSWORD_RESET_EMAIL_KEY = "password_reset_email"
+PASSWORD_RESET_CANDIDATES_KEY = "password_reset_candidate_ids"
+PASSWORD_RESET_VERIFIED_KEY = "password_reset_verified_user_id"
+PASSWORD_RESET_VERIFIED_AT_KEY = "password_reset_verified_at"
+
+
+def _clear_password_reset_session(request):
+    for key in (
+        PASSWORD_RESET_EMAIL_KEY,
+        PASSWORD_RESET_CANDIDATES_KEY,
+        PASSWORD_RESET_VERIFIED_KEY,
+        PASSWORD_RESET_VERIFIED_AT_KEY,
+    ):
+        request.session.pop(key, None)
+
+
+def _send_password_reset_codes(request, email):
+    """가입 여부와 무관하게 같은 다음 화면으로 보낸다."""
+    _clear_password_reset_session(request)
+    request.session[PASSWORD_RESET_EMAIL_KEY] = email
+    request.session[PASSWORD_RESET_CANDIDATES_KEY] = []
+
+    if _is_rate_limited(
+        request,
+        "password-reset",
+        "RECOVERY_RATE_LIMIT_MAX_ATTEMPTS",
+        "RECOVERY_RATE_LIMIT_WINDOW_SECONDS",
+    ):
+        return
+
+    users = _user_repo.find_active_by_email(email)
+    request.session[PASSWORD_RESET_CANDIDATES_KEY] = [user.pk for user in users]
+    for user in users:
+        issue_and_send(user, PASSWORD_RESET)
+
+
+def _password_reset_candidates(request):
+    ids = request.session.get(PASSWORD_RESET_CANDIDATES_KEY) or []
+    return [user for user in (_user_repo.find_by_id(pk) for pk in ids) if user]
+
+
+def _match_password_reset_code(candidates, raw_code):
+    """한 이메일에 여러 계정이 있을 수 있어 후보를 모두 시도한다."""
+    last_outcome = None
+    for user in candidates:
+        outcome = verify_code(user, PASSWORD_RESET, raw_code)
+        if outcome.ok:
+            return user, outcome
+        last_outcome = outcome
+    return None, last_outcome
+
+
+@require_http_methods(["GET", "POST"])
+def password_reset_view(request):
+    """이메일을 받아 재설정 코드를 보낸다."""
+    if request.method == "POST":
+        form = PasswordResetEmailForm(request.POST)
+        if form.is_valid():
+            _send_password_reset_codes(request, form.cleaned_data["email"])
+            return redirect("users:password_reset_verify")
+    else:
+        form = PasswordResetEmailForm()
+
+    return render(
+        request,
+        "users/password/password_reset_form.html",
+        {"form": form, "page_title": gettext("비밀번호 재설정")},
+    )
+
+
+@require_http_methods(["GET", "POST"])
+def password_reset_verify_view(request):
+    email = request.session.get(PASSWORD_RESET_EMAIL_KEY)
+    if not email:
+        return redirect("users:password_reset")
+
+    candidates = _password_reset_candidates(request)
+    form = VerificationCodeForm(request.POST or None)
+    outcome = None
+    if request.method == "POST" and form.is_valid():
+        user, outcome = _match_password_reset_code(candidates, form.cleaned_data["code"])
+        if user is not None:
+            mark_email_verified(user)
+            request.session[PASSWORD_RESET_VERIFIED_KEY] = user.pk
+            request.session[PASSWORD_RESET_VERIFIED_AT_KEY] = timezone.now().isoformat()
+            return redirect("users:password_reset_set")
+        outcome = outcome or VerificationOutcome(VerificationStatus.INVALID)
+        form = VerificationCodeForm()
+
+    return render(
+        request,
+        "users/verification/verify_code.html",
+        _verification_context(
+            email,
+            candidates[0] if candidates else None,
+            PASSWORD_RESET,
+            form,
+            outcome,
+            page_title=gettext("비밀번호 재설정"),
+            heading=gettext("메일로 보낸 코드를 입력하세요"),
+            resend_url=reverse("users:password_reset_resend"),
+            back_url=reverse("users:login"),
+            back_label=gettext("로그인으로 돌아가기"),
+            attempts_remaining=None,
+        ),
+    )
+
+
+@require_POST
+def password_reset_resend_view(request):
+    if not request.session.get(PASSWORD_RESET_EMAIL_KEY):
+        return redirect("users:password_reset")
+    for user in _password_reset_candidates(request):
+        _resend_verification(request, user, PASSWORD_RESET)
+    return redirect("users:password_reset_verify")
+
+
+def _verified_password_reset_user(request):
+    user_id = request.session.get(PASSWORD_RESET_VERIFIED_KEY)
+    verified_at = request.session.get(PASSWORD_RESET_VERIFIED_AT_KEY)
+    if not user_id or not verified_at:
+        return None
+
+    elapsed = (timezone.now() - datetime.fromisoformat(verified_at)).total_seconds()
+    if elapsed > verification_policy.reset_session_ttl_seconds():
+        _clear_password_reset_session(request)
+        return None
+    return _user_repo.find_by_id(user_id)
+
+
+@require_http_methods(["GET", "POST"])
+def password_reset_set_view(request):
+    user = _verified_password_reset_user(request)
+    if user is None:
+        return redirect("users:password_reset")
+
+    if request.method == "POST":
+        form = SetPasswordForm(user, request.POST)
+        if form.is_valid():
+            form.save()
+            _clear_password_reset_session(request)
+            request.session.cycle_key()
+            return redirect("users:password_reset_complete")
+    else:
+        form = SetPasswordForm(user)
+
+    return render(
+        request,
+        "users/password/password_reset_set.html",
+        {"form": form, "page_title": gettext("새 비밀번호 설정")},
+    )
 
 
 ONBOARDING_STEPS = 3

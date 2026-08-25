@@ -10,8 +10,8 @@ from apps.users.email_verification import (
     is_email_verified,
     issue_code,
     mark_email_verified,
-    start_verification,
 )
+from apps.users.models import EmailVerification
 
 SIGNUP_PAYLOAD = {
     "username": "newbie",
@@ -111,14 +111,19 @@ class TestSignupVerification:
         assert response.url == reverse("users:welcome")
 
 
+@pytest.fixture
+def pending_user(make_user):
+    """이메일을 아직 확인하지 않은 계정."""
+    user = make_user(username="pending", email="pending@example.com")
+    EmailVerification.objects.filter(user=user).update(verified_at=None)
+    return user
+
+
 @pytest.mark.django_db
 class TestLoginGate:
     def test_unverified_account_cannot_open_a_session(
-        self, client, make_user, test_password
+        self, client, pending_user, test_password
     ):
-        user = make_user(username="pending", email="pending@example.com")
-        start_verification(user)
-
         response = client.post(
             reverse("users:login"), {"username": "pending", "password": test_password}
         )
@@ -128,11 +133,8 @@ class TestLoginGate:
         assert response.url == reverse("users:signup_verify")
 
     def test_gated_login_sends_a_code_when_none_is_active(
-        self, client, make_user, test_password
+        self, client, pending_user, test_password
     ):
-        user = make_user(username="pending", email="pending@example.com")
-        start_verification(user)
-
         client.post(
             reverse("users:login"), {"username": "pending", "password": test_password}
         )
@@ -140,11 +142,9 @@ class TestLoginGate:
         assert len(mail.outbox) == 1
 
     def test_gated_login_reuses_a_still_valid_code(
-        self, client, make_user, test_password
+        self, client, pending_user, test_password
     ):
-        user = make_user(username="pending", email="pending@example.com")
-        start_verification(user)
-        issue_code(user, SIGNUP)
+        issue_code(pending_user, SIGNUP)
 
         client.post(
             reverse("users:login"), {"username": "pending", "password": test_password}
