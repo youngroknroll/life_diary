@@ -1464,6 +1464,22 @@ label.segmented__item {
     color: var(--color-text-meta);
 }
 
+/* 화면에서는 지우고 보조기술에는 남긴다. 코드 화면의 Enter 가드 버튼과
+   만료 알림이 쓴다. */
+.u-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    margin: -1px;
+    border: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
 .auth-code-input {
     font-family: var(--font-mono);
     font-size: 22px;

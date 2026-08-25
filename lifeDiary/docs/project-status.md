@@ -42,10 +42,14 @@ Status values are based on the repository documents available at the update time
 - 브라우저 실측(1280, 다크): 코드 화면·오류 상태·소셜 가입 1a·로그인 취소 1b.
   dev DB 를 건드리지 않으려고 별도 SQLite 서버로 확인
 - 상태: Active Plan — 브랜치 `feat/email-code-verification`, 머지는 사용자 몫
-- **미충족 게이트**: 프런트엔드 dual-review 를 서브에이전트로 활성화하지 않고
-  계획 문서 안에서 두 역할 관점으로 직접 작성했다. 머지 전 판정 필요
-- 미검증: 모바일 뷰포트 실측(기존 로그인 화면과 동일 거동), 1c 스크린샷, 실제
-  구글 OAuth 왕복, prod Gmail SMTP 발송량 한도
+- 프런트엔드 dual-review 를 정식으로(독립 서브에이전트) 실행했다. BIR 판정
+  `Deviates` — Critical 1(소셜 화면에서 실시간 아이디 중복검사 JS 가 폼 id
+  불일치로 완전히 죽어 있었다), High 1(Enter 암묵 제출이 검증 대신 재발송으로
+  갔다), Medium 2, WXD Minor 1. **5건 모두 수정하고 puppeteer 실측으로 재확인**
+- 수정 후 재검증: **전체 pytest 592 passed**, `manage.py check` 이슈 0,
+  `node --check` 통과. QVL 판정 완료
+- 미검증(잔여 위험): 실제 모바일 기기 렌더(기존 로그인 화면과 동일 거동), 코드
+  입력 커서 위치, 실제 구글 OAuth 왕복, prod Gmail SMTP 발송량 한도
 - desktop settings check 는 변경 전후 모두 같은 allauth import 오류로 실패한다
   (기존 실패, 이번 범위 밖)
 

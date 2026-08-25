@@ -378,46 +378,74 @@ auth-panel > card auth-card > card-body
 - 콘솔 오류 0건 확인
 - `node --check apps/users/static/users/js/verification_resend.js`
 
-### 사후 검증 (2026-08-25)
+### 사후 검증 (2026-08-25, 2차 — 정식 dual review)
 
-두 리뷰 역할은 서브에이전트로 활성화하지 않고 이 문서 안에서 해당 관점으로
-직접 작성했다. 이는 `AGENTS.md` Frontend Dual Review Gate 가 요구하는 독립
-산출물에 못 미친다. **미충족 게이트로 기록하고 머지 전 사용자 판정을 받는다.**
+두 리뷰 역할을 각각 독립 서브에이전트로 실행했다. 1차(문서 내 자체 작성) 판정은
+폐기하고 아래 판정으로 대체한다.
 
-**Web Experience Designer — Conforms (부분)**
+**1차 판정 결과**
 
-- 코드 화면: 브랜드·제목·마스킹된 수신 주소·단일 입력·만료/재발송 한 줄·주
-  CTA·이탈구가 명세대로다. 1280 다크 실측으로 확인했다.
-- 1a: 읽기 전용 신원 행(G 마크 + 주소 + `GOOGLE` 라벨), 아이디 라벨 우측 힌트,
-  약관 동의, 「가입 완료」/「취소하고 로그인으로」가 시안과 일치한다.
-- 1b: 가운데 정렬, 두 줄 설명, 아웃라인 「Google로 다시 시도」 → 실린
-  「아이디로 로그인」 순서까지 시안과 같다.
-- `Unverified`: 1c 는 이미지로 남기지 않았다(1b 와 동일 구조, 렌더는 테스트로
-  확인). 모바일 뷰포트는 아래 참조.
+- Web Experience Designer: `Conforms`(부분) + `Deviates(Minor)` 2건 + `Unverified` 3건
+- Browser Interaction Reviewer: **`Deviates`** — Critical 1, High 1, Medium 2
 
-**Browser Interaction Reviewer — Conforms (부분)**
+**반영한 결함**
 
-- `inputmode="numeric"`, `autocomplete="one-time-code"`, `maxlength="6"`,
-  `pattern="[0-9]*"` 적용. 진입 시 코드 필드에 포커스가 간다(실측).
-- 검증 실패 후 입력값이 비워지고 포커스가 코드 필드로 돌아간다(실측).
-- 오류는 `role="alert"`, 만료 표시는 `role="status"`/`aria-live="polite"`.
-- 재발송은 서버가 쿨다운을 강제하고, 버튼은 쿨다운 동안 `disabled` 로 렌더된다.
-  JS 는 남은 초만 센다. JS 없이도 폼 제출과 재발송 POST 가 동작한다
-  (같은 폼의 `formaction` 이라 중첩 form 없이 valid HTML 이다).
-- 재발송 버튼 `min-height: 44px`. 카운트다운에 애니메이션 없음.
-- `Unverified`: 360px 실측. 캡처에서 카드가 넘치지만 **기존 로그인 화면도 같은
-  캡처에서 동일하게 넘친다**. 헤드리스 window-size 캡처가 뷰포트 에뮬레이션을
-  하지 않는 한계로 보이며, 신규 화면이 기존과 다르게 동작한다는 증거는 없다.
+| # | 심각도 | 결함 | 조치 |
+|---|---|---|---|
+| 1 | Critical | `signup-validate.js` 는 `id="signupForm"` 을 하드코딩으로 찾는데 소셜 템플릿이 `socialSignupForm` 을 써서 실시간 아이디 중복검사와 클라이언트 동의 가드가 통째로 죽어 있었다 | 소셜 폼 id 를 `signupForm` 으로 맞췄다 |
+| 2 | High | 재발송 버튼이 DOM 순서상 첫 submit 이라 Enter 암묵 제출이 검증 대신 재발송으로 가거나(쿨다운 종료 후) 아무 일도 일어나지 않았다(쿨다운 중) | 폼 첫 자식으로 화면에서 감춘 검증 submit(Enter 가드)을 넣었다. 탭 순서·시각 순서는 그대로다 |
+| 3 | Medium | 만료 카운트다운이 `aria-live="polite"` 영역을 매초 갱신해 스크린리더가 최대 600회 읽는다 | 카운트다운 노드에서 live region 을 걷어내고, 만료 순간에만 별도 `role="status"` 노드로 한 번 알린다 |
+| 4 | Medium | 재설정 화면에서만 남은 시도 횟수를 숨기는 이탈이 코드·계획 어디에도 기록되지 않았다 | `views.py` 주석과 이 문서 이탈 절에 근거를 남겼다 |
+| 5 | Minor (WXD) | 1a 충돌 화면에 `users:login` 링크가 둘(주 CTA + 푸터) | 푸터를 `{% if %}` 안으로 옮겨 충돌 화면에는 주 CTA 하나만 남겼다. 신원 행과 CTA 사이 여백도 넣었다 |
 
-**Quality Verification Lead — 조건부**
+**메운 증거 공백 (WXD `Unverified` 3건)**
 
-전체 pytest 592 passed, `manage.py check` 이슈 0, 마이그레이션 드리프트 없음,
-prod deploy check ERROR 0, `node --check` 통과, ko/en 미번역 0건. 수락 기준
-A1~A13, A14~A18 은 테스트와 브라우저 실측으로 충족했다.
+- 1c 스크린샷 1280 ✔
+- 1a 충돌 변형 스크린샷 ✔ (결함 #5 를 확인시켜 준 증거)
+- 1a 360px ✔ — `.form-label__hint` 의 `float: right` 는 라벨과 겹치거나 줄바꿈되지
+  않는다
 
-**완료로 표시하지 않는다.** 두 프런트엔드 리뷰가 독립 산출물이 아니고, 360px
-실측과 1c 이미지가 없다. 사용자가 잔여 위험을 수용하거나 리뷰를 다시 돌린 뒤
-판정한다.
+**수정 후 실제 브라우저 실측 (puppeteer, 실제 키 입력·클릭)**
+
+```
+재발송 버튼 활성 상태(쿨다운 0)에서 코드 입력 후 Enter
+  default button   -> (form action) | class=u-visually-hidden
+  POST urls        -> ["/accounts/password-reset/verify/"]     ← 재발송 아님
+  verify error     -> true      resend flash -> false
+  focus after error-> auth-code-input        input value -> ""
+
+만료(TTL 5초)
+  notice before -> ""            notice after -> "코드가 만료되었습니다"
+  expiry node   -> role=null aria-live=null  ← 더 이상 live region 아님
+
+재발송 버튼 클릭
+  POST urls -> ["/accounts/password-reset/verify/resend/"]     ← formaction 경로 정상
+
+소셜 가입(1a)
+  form id -> signupForm
+  check-username 요청 -> ["/accounts/signup/check-username/?username=existing"]
+  피드백 -> "이미 사용 중인 사용자명입니다."
+  동의 없이 제출 -> 서버 왕복 없이 클라이언트가 차단
+  로그인 링크 수 -> 1 (충돌 화면도 1, "기존 계정으로 로그인")
+```
+
+**미확인으로 남는 것**
+
+- 실제 모바일 기기 렌더. 360px 캡처의 잘림은 기존 로그인 화면과 동일해 캡처 방식의
+  한계로 판단하지만 기기 확인은 못 했다.
+- `.auth-code-input` 의 `letter-spacing` + `text-indent` 가 타이핑 중 커서 위치에
+  주는 영향.
+- 실제 구글 OAuth 왕복 (1a 는 대기 세션을 심어 확인).
+
+**Quality Verification Lead 판정**
+
+수정 후 전체 pytest 592 passed, `manage.py check` 이슈 0, `node --check` 통과.
+BIR 이 `Deviates` 로 지목한 4건과 WXD 의 Minor 1건을 모두 고쳤고, 고친 내용은
+정적 추론이 아니라 실제 브라우저 입력으로 재확인했다. 남은 `Unverified` 3건은
+모두 이번 변경이 만든 위험이 아니라 확인 수단의 한계다.
+
+**완료로 표시한다.** 단, 위 미확인 3건은 잔여 위험으로 남으며 사용자가 실제 기기
+확인과 구글 OAuth 왕복을 배포 전에 해야 한다.
 
 ## 운영·배포 검토 (Deployment & Operations Reviewer)
 
@@ -491,3 +519,7 @@ Deferred Refactoring Note
   `templatize` 가 `{% trans %}` 안의 `%` 를 `%%` 로 이스케이프한다.
 - 루트 `conftest.py` 의 `make_user` 가 인증 완료 행을 만든다. 이 픽스처가 대신하는
   것은 "이미 쓰고 있던 계정"이다.
+- 재설정 코드 화면은 사전 기준과 달리 남은 시도 횟수를 표시하지 않는다.
+  가입되지 않은 주소에는 셀 코드 자체가 없어, 숫자가 보이는지 여부로 가입 여부가
+  드러난다. 사전 기준을 쓸 때 이 충돌을 예상하지 못했고, 열거 방지가 우선한다.
+  가입 인증 화면에서는 그대로 표시한다.

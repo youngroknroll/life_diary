@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-25 19:19+0900\n"
+"POT-Creation-Date: 2026-08-25 19:52+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1259,7 +1259,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "이미 사용 중인 이메일입니다."
 
 #: apps/users/forms.py:60
-#: apps/users/templates/users/verification/verify_code.html:21
+#: apps/users/templates/users/verification/verify_code.html:24
 msgid "인증 코드"
 msgstr "인증 코드"
 
@@ -1425,7 +1425,7 @@ msgstr "태그 추가"
 
 #: apps/users/templates/users/account_delete_confirm.html:4
 #: apps/users/templates/users/account_delete_confirm.html:12
-#: apps/users/views.py:976
+#: apps/users/views.py:978
 msgid "계정 탈퇴"
 msgstr "계정 탈퇴"
 
@@ -1623,7 +1623,7 @@ msgid "로그인으로 돌아가기"
 msgstr "로그인으로 돌아가기"
 
 #: apps/users/templates/users/password/password_reset_set.html:5
-#: apps/users/views.py:729
+#: apps/users/views.py:731
 msgid "새 비밀번호 설정"
 msgstr "새 비밀번호 설정"
 
@@ -1846,41 +1846,41 @@ msgstr "[라이프 다이어리] 이메일 인증 코드"
 msgid "%(masked_email)s 으로 6자리 코드를 보냈습니다."
 msgstr "%(masked_email)s 으로 6자리 코드를 보냈습니다."
 
-#: apps/users/templates/users/verification/verify_code.html:26
+#: apps/users/templates/users/verification/verify_code.html:29
 #, python-format
 msgid "%(attempts_remaining)s회 남음"
 msgstr "%(attempts_remaining)s회 남음"
 
-#: apps/users/templates/users/verification/verify_code.html:39
+#: apps/users/templates/users/verification/verify_code.html:42
 #, python-brace-format
 msgid "{time} 후 만료"
 msgstr "{time} 후 만료"
 
-#: apps/users/templates/users/verification/verify_code.html:40
-#: apps/users/templates/users/verification/verify_code.html:41
+#: apps/users/templates/users/verification/verify_code.html:43
+#: apps/users/templates/users/verification/verify_code.html:44
 msgid "코드가 만료되었습니다"
 msgstr "코드가 만료되었습니다"
 
-#: apps/users/templates/users/verification/verify_code.html:41
+#: apps/users/templates/users/verification/verify_code.html:44
 #, python-format
 msgid "%(expires_in_minutes)s분 안에 입력하세요"
 msgstr "%(expires_in_minutes)s분 안에 입력하세요"
 
-#: apps/users/templates/users/verification/verify_code.html:48
 #: apps/users/templates/users/verification/verify_code.html:51
+#: apps/users/templates/users/verification/verify_code.html:54
 msgid "코드 다시 받기"
 msgstr "코드 다시 받기"
 
-#: apps/users/templates/users/verification/verify_code.html:49
+#: apps/users/templates/users/verification/verify_code.html:52
 #, python-brace-format
 msgid "{seconds}초 후 다시 받기"
 msgstr "{seconds}초 후 다시 받기"
 
-#: apps/users/templates/users/verification/verify_code.html:56
+#: apps/users/templates/users/verification/verify_code.html:61
 msgid "확인"
 msgstr "확인"
 
-#: apps/users/templates/users/welcome.html:5 apps/users/views.py:750
+#: apps/users/templates/users/welcome.html:5 apps/users/views.py:752
 msgid "시작하기"
 msgstr "시작하기"
 
@@ -2092,15 +2092,15 @@ msgstr "이메일을 입력해주세요."
 msgid "올바른 이메일 형식이 아닙니다."
 msgstr "올바른 이메일 형식이 아닙니다."
 
-#: apps/users/views.py:772
+#: apps/users/views.py:774
 msgid "하루"
 msgstr "하루"
 
-#: apps/users/views.py:772
+#: apps/users/views.py:774
 msgid "한 주"
 msgstr "한 주"
 
-#: apps/users/views.py:970
+#: apps/users/views.py:972
 msgid "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."
 msgstr "계정 탈퇴 요청이 접수되었습니다. 15일 안에 다시 로그인하면 취소됩니다."
 
@@ -2592,6 +2592,6 @@ msgstr "기록·통계에 표시됩니다"
 msgid "가입 완료"
 msgstr "가입 완료"
 
-#: templates/socialaccount/signup.html:84
+#: templates/socialaccount/signup.html:82
 msgid "취소하고 로그인으로"
 msgstr "취소하고 로그인으로"

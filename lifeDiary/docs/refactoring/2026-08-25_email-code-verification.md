@@ -101,15 +101,45 @@ msgfmt --check-format locale/{ko,en}/LC_MESSAGES/django.po
 브라우저 실측(1280, 다크): 재설정 코드 화면, 코드 오류 상태, 소셜 가입 완성(1a),
 로그인 취소(1b). dev DB 를 건드리지 않으려고 별도 SQLite 로 서버를 띄웠다.
 
+## 정식 dual review 후 수정 (2026-08-25 2차)
+
+Web Experience Designer / Browser Interaction Reviewer 를 각각 독립 서브에이전트로
+실행했다. BIR 판정은 `Deviates` 였고 다음을 고쳤다.
+
+- **Critical.** `signup-validate.js` 가 `id="signupForm"` 을 하드코딩으로 찾는데
+  소셜 가입 템플릿은 `socialSignupForm` 을 썼다. `getElementById` 가 null 을
+  반환해 스크립트 전체가 즉시 return 했고, 콘솔 에러도 없어 화면상으로는 멀쩡해
+  보였다. 실시간 아이디 중복검사와 클라이언트 동의 가드가 통째로 죽어 있었다.
+  폼 id 를 맞췄다.
+- **High.** Enter 암묵 제출은 트리 순서상 첫 submit 버튼을 누른다. 재발송 버튼이
+  그 자리라 쿨다운 종료 후에는 Enter 가 코드를 검증하지 않고 새 코드를 보냈고,
+  쿨다운 중(가장 흔한 상태)에는 그 버튼이 disabled 라 아무 일도 일어나지 않았다.
+  폼 첫 자식에 화면에서 감춘 검증 submit 을 넣어 Enter 가 항상 검증으로 가게 했다.
+  탭 순서와 시각 순서는 건드리지 않았다.
+- **Medium.** 만료 카운트다운이 `aria-live="polite"` 노드를 매초 갱신해 스크린리더가
+  10분 동안 최대 600회 읽었다. 카운트다운에서 live region 을 걷어내고, 만료
+  순간에만 별도 `role="status"` 노드로 한 번 알린다.
+- **Medium.** 재설정 화면에서만 남은 시도 횟수를 숨기는 이탈이 기록되지 않았다.
+  `views.py` 주석과 계획 문서에 근거를 남겼다.
+- **Minor (WXD).** 1a 충돌 화면에 로그인 링크가 둘이었다. 푸터를 조건 안으로 옮겨
+  주 CTA 하나만 남기고 신원 행과 CTA 사이 여백을 넣었다.
+
+수정은 정적 추론이 아니라 puppeteer 로 실제 키 입력·클릭을 발생시켜 재확인했다.
+재발송 버튼이 **활성 상태**일 때 코드 입력 후 Enter 를 눌러 POST 가
+`/accounts/password-reset/verify/` 로 가는 것, 재발송 버튼 클릭은 여전히
+`/resend/` 로 가는 것, 만료 시각에만 알림 노드가 채워지는 것, 소셜 화면에서
+`check-username` 요청이 실제로 나가는 것을 각각 관찰했다.
+
+수정 후 전체 pytest **592 passed**, `manage.py check` 이슈 0, `node --check` 통과.
+
 ## 미검증
 
-- **모바일 뷰포트 실측.** 360px 캡처에서 카드가 넘치지만 기존 로그인 화면도
+- **실제 모바일 기기 렌더.** 360px 캡처에서 카드가 넘치지만 기존 로그인 화면도
   같은 캡처에서 동일하게 넘친다. 캡처 방식(헤드리스 window-size, 뷰포트 에뮬레이션
   없음)의 한계로 보이며, 신규 화면이 기존 화면과 다르게 동작한다는 증거는 없다.
-  실제 기기 확인이 필요하다.
-- **인증 오류 화면(1c) 스크린샷.** 마크업은 1b 와 같은 구조이고 렌더(401)는
-  테스트로 확인했지만 이미지로는 남기지 않았다.
-- **실제 구글 OAuth 왕복.** 1a 는 대기 세션을 심어 확인했다.
+- **`.auth-code-input` 의 `letter-spacing` + `text-indent` 가 타이핑 중 커서 위치에
+  주는 영향.**
+- **실제 구글 OAuth 왕복.** 1a·충돌 변형은 대기 세션을 심어 확인했다.
 - **prod 메일 발송량.** Gmail SMTP 일일 한도는 배포 전 확인 대상이다.
 
 ## Deferred

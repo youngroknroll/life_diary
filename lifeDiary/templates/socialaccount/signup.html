@@ -15,7 +15,7 @@
                 <p class="auth-panel__lead">
                     {% trans "이 이메일로 만든 계정이 이미 있습니다. 기존 아이디와 비밀번호로 로그인해주세요." %}
                 </p>
-                <div class="auth-identity">
+                <div class="auth-identity mb-3">
                     <span class="auth-google__mark" aria-hidden="true">G</span>
                     <span class="auth-identity__value">{{ form.conflicting_email }}</span>
                     <span class="auth-identity__source">GOOGLE</span>
@@ -31,7 +31,7 @@
                     {% trans "Google 계정은 확인했습니다. 기록에서 쓸 아이디만 정하면 됩니다." %}
                 </p>
 
-                <form id="socialSignupForm" method="post"
+                <form id="signupForm" method="post"
                       action="{% url 'socialaccount_signup' %}"
                       data-check-username-url="{% url 'users:check_username' %}"
                       novalidate>
@@ -77,13 +77,12 @@
                         {% trans "가입 완료" %}
                     </button>
                 </form>
+                <div class="auth-panel__foot">
+                    <p class="auth-panel__foot-minor">
+                        <a href="{% url 'users:login' %}">{% trans "취소하고 로그인으로" %}</a>
+                    </p>
+                </div>
             {% endif %}
-
-            <div class="auth-panel__foot">
-                <p class="auth-panel__foot-minor">
-                    <a href="{% url 'users:login' %}">{% trans "취소하고 로그인으로" %}</a>
-                </p>
-            </div>
         </div>
     </div>
 </div>

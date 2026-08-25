@@ -680,6 +680,8 @@ def password_reset_verify_view(request):
             resend_url=reverse("users:password_reset_resend"),
             back_url=reverse("users:login"),
             back_label=gettext("로그인으로 돌아가기"),
+            # 가입 화면과 달리 남은 횟수를 숨긴다. 가입되지 않은 주소는 셀 코드
+            # 자체가 없어, 숫자가 보이는지 여부로 가입 여부가 드러난다.
             attempts_remaining=None,
         ),
     )

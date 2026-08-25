@@ -16,6 +16,9 @@
 
             <form method="post" novalidate>
                 {% csrf_token %}
+                {# Enter 키 암묵 제출은 트리 순서상 첫 submit 버튼을 누른다. 재발송이
+                   그 자리에 있으면 Enter 가 코드를 검증하는 대신 새 코드를 보낸다. #}
+                <button type="submit" class="u-visually-hidden" tabindex="-1" aria-hidden="true"></button>
 
                 <div class="mb-3">
                     <label for="{{ form.code.id_for_label }}" class="form-label">{% trans "인증 코드" %}</label>
@@ -32,9 +35,9 @@
                 </div>
 
                 <div class="auth-code__meta">
+                    {# 매초 갱신되는 값이라 live region 에 두지 않는다. 만료 순간만
+                       아래 auth-code__notice 로 한 번 알린다. #}
                     <span class="auth-code__expiry"
-                          role="status"
-                          aria-live="polite"
                           data-expires-in="{{ expires_in_seconds }}"
                           data-template="{% trans '{time} 후 만료' %}"
                           data-expired-text="{% trans '코드가 만료되었습니다' %}">
@@ -51,6 +54,8 @@
                         {% trans "코드 다시 받기" %}
                     </button>
                 </div>
+
+                <span class="auth-code__notice u-visually-hidden" role="status" aria-live="polite"></span>
 
                 <button type="submit" class="btn-sian btn-sian--primary auth-panel__submit">
                     {% trans "확인" %}
