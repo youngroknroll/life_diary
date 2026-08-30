@@ -31,8 +31,10 @@
     </div>
 
     <div class="dropdown">
+        {% trans '언어 선택' as lang_label %}
         <button class="app-nav__pref" type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                aria-label="{% trans '언어 선택' %}" title="{% trans '언어 선택' %}">
+                aria-label="{{ lang_label }} ({{ LANGUAGE_CODE|slice:':2'|upper }})"
+                title="{{ lang_label }} ({{ LANGUAGE_CODE|slice:':2'|upper }})">
             <span class="app-nav__pref-code">{{ LANGUAGE_CODE|slice:":2"|upper }}</span>
         </button>
         <ul class="dropdown-menu dropdown-menu-end app-nav__pref-menu" role="menu">
