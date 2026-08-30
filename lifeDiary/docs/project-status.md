@@ -17,6 +17,17 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-31 — 파비콘 교체: 파스텔 파이 차트 (사용자 지시)
+
+링크 공유 시 사이트 아이콘이 뜨도록 이모지 데이터 URI 파비콘을 실제
+파일(SVG + PNG)로 교체했다. 사용자가 제공한 파이 차트 이미지에서 도형만
+벡터로 재생성. OG 대표 이미지는 사용자 결정으로 생략.
+
+- 실행 로그: `docs/frontend/2026-08-31_favicon-pie-icon.md`
+- 검증: `manage.py check` 0 이슈, 로컬 HTTP 렌더 확인(링크 태그 3종 +
+  `/favicon.ico` 302), prod collectstatic manifest 3항목 등록.
+- Deferred: OG 태그(`og:title`/`og:image` 등)는 미도입 상태 유지.
+
 ## 2026-08-31 — Lighthouse 최적화 (사용자 지시)
 
 www.lifediary.kr 모바일 Lighthouse 점검(SEO 63, BP 92)에서 나온 4개 근본

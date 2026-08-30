@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.conf import settings
 from django.contrib import admin
 from django.urls import path, include
 from allauth.urls import build_provider_urlpatterns
@@ -41,6 +42,13 @@ urlpatterns = [
             content_type="text/plain",
         ),
         name="robots-txt",
+    ),
+    path(
+        "favicon.ico",
+        # 링크 미리보기 크롤러와 구형 브라우저는 <link> 태그 대신 루트
+        # 경로를 직접 요청한다. manifest 해시 조회 없이 원본 경로로 보낸다.
+        RedirectView.as_view(url=settings.STATIC_URL + "core/img/favicon-32.png"),
+        name="favicon",
     ),
     path(
         "jsi18n/",
