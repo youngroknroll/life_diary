@@ -34,8 +34,10 @@ urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path(
         "robots.txt",
+        # 홈만 색인 허용(2026-08-31 결정). /static/ 은 색인이 아니라 홈
+        # 렌더링 평가용 자산 크롤 허용이다. RFC 9309 최장 일치 규칙.
         lambda request: HttpResponse(
-            "User-agent: *\nDisallow: /\n",
+            "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n",
             content_type="text/plain",
         ),
         name="robots-txt",

@@ -49,12 +49,14 @@ class TestHomePage:
         assert "오늘 기록하기" in body
         assert "로그인하고 기록 시작" not in body
 
-    def test_robots_txt_disallows_all_crawlers(self, ko_client):
+    def test_robots_txt_allows_only_home_indexing(self, ko_client):
         response = ko_client.get("/robots.txt")
 
         assert response.status_code == 200
         assert response["Content-Type"] == "text/plain"
-        assert response.content.decode() == "User-agent: *\nDisallow: /\n"
+        assert response.content.decode() == (
+            "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n"
+        )
 
     def test_privacy_policy_page_renders_current_service_scope(self, ko_client):
         response = ko_client.get(reverse("privacy"))

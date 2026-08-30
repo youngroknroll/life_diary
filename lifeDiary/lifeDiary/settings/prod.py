@@ -95,6 +95,19 @@ CACHES = {
     }
 }
 
+# manifest 해시 + whitenoise 압축·장기 캐시. prod 에만 둔다: pytest 는
+# DEBUG=False 로 강제되므로 dev 에 manifest 를 두면 collectstatic 없이는
+# 템플릿의 {% static %} 해석이 깨진다. 배포 빌드의 collectstatic 은 반드시
+# prod 설정으로 실행되어야 한다(아니면 manifest 부재로 기동 후 500).
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
 # Email (production: Gmail SMTP)
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
