@@ -515,5 +515,11 @@
 {{ weekly_stats_json|json_script:"weekly-stats-data" }}
 {{ monthly_stats_json|json_script:"monthly-stats-data" }}
 {{ tag_analysis_json|json_script:"tag-analysis-data" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"
+        integrity="sha384-9MhbyIRcBVQiiC7FSd7T38oJNj2Zh+EfxS7/vjhBi4OOT78NlHSnzM31EZRWR1LZ"
+        crossorigin="anonymous" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"
+        integrity="sha384-Crp3O/636k0LjUK6uxSF2i5herKUb8UIA16lRYz/PGAlkuavAVGFH5v2YlBayW8d"
+        crossorigin="anonymous" defer></script>
 <script src="{% static 'stats/js/stats.js' %}" defer></script>
 {% endblock %} 
