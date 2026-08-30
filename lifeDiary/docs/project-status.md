@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-17
+Last updated: 2026-08-31
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,26 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-08-31 — Lighthouse 최적화 (사용자 지시)
+
+www.lifediary.kr 모바일 Lighthouse 점검(SEO 63, BP 92)에서 나온 4개 근본
+원인을 해소했다. 사용자 결정: robots.txt 는 홈만 색인 허용.
+
+- 계획: `docs/plans/2026-08-31_lighthouse-optimization-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-31_lighthouse-optimization.md`
+- 핵심 발견: `STATICFILES_STORAGE` 는 Django 5.1에서 제거된 설정이라
+  5.2에서 무시되고 있었고, prod 정적 파일이 비해시 + `max-age=60` 으로
+  서빙 중이었다. `STORAGES` 로 이전. htmx·Alpine.js 는 저장소 전체에서
+  사용처 0건인 죽은 의존성이라 제거, chart.js 는 stats 전용으로 이동,
+  jsi18n defer 전환, 언어 버튼 접근 이름 수정.
+- 검증: 전체 pytest **593 passed**, prod collectstatic manifest 생성
+  확인, 로컬 모바일 Lighthouse 홈 **A11y 100 / BP 100 / SEO 100**,
+  브라우저 콘솔 무에러, 프론트엔드 이중 리뷰 사전·사후 산출물 완료.
+- 배포 주의: Render 빌드의 collectstatic 이 prod 설정으로 실행되는지
+  확인 필요(실행 로그의 배포 체크리스트). manifest 없이 기동하면 500.
+- Deferred: CSP 소스맵(BP 92), unpkg.com 허용 출처 정리, desktop.py
+  STORAGES, jsi18n 캐시 헤더, 비공개 페이지 noindex.
 
 ## 2026-08-25 — 이메일 6자리 코드 인증 (가입 + 비밀번호 재설정) (사용자 지시)
 
