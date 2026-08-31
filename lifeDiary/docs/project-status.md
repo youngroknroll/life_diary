@@ -17,6 +17,23 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-08-31 — 서치 콘솔 등록 지원 + GA4 도입 (사용자 지시)
+
+구글 서치 콘솔 소유권 확인(HTML 메타 태그)과 GA4 추적을 환경변수
+스위치 방식으로 도입했다. 공개 페이지(홈·개인정보·약관)에만 렌더링되고
+로그인 후 화면 비추적은 테스트로 계약화. sitemap.xml(홈 1개)과 robots
+`Sitemap:` 줄, prod CSP GA 출처, 개인정보처리방침 웹 분석 고지(ko/en)
+포함. 사용자 결정: 공개 페이지만 추적, TDD 웨이버.
+
+- 계획: `docs/plans/2026-08-31_search-console-ga4-plan.md`
+- 실행 로그: `docs/refactoring/2026-08-31_search-console-ga4.md`
+- 검증: 전체 회귀 597 passed, prod deploy check exit 0, msgfmt 통과,
+  브라우저 렌더·콘솔 확인.
+- 후속(사용자): GA4 속성 생성 → Render에 `GA_MEASUREMENT_ID`, 서치 콘솔
+  URL 접두어 속성 등록 → `GOOGLE_SITE_VERIFICATION` 설정·재배포 후 확인
+  클릭 → sitemap 제출.
+- Deferred: 쿠키 동의 배너 검토, AdSense 신청.
+
 ## 2026-08-31 — 파비콘 교체: 파스텔 파이 차트 (사용자 지시)
 
 링크 공유 시 사이트 아이콘이 뜨도록 이모지 데이터 URI 파비콘을 실제
