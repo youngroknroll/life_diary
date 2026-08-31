@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-25 19:52+0900\n"
+"POT-Creation-Date: 2026-08-31 20:57+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,7 +33,7 @@ msgstr "%(hours)s시간"
 msgid "%(minutes)s분"
 msgstr "%(minutes)s분"
 
-#: apps/core/utils.py:173 apps/stats/templates/stats/index.html:181
+#: apps/core/utils.py:173 apps/stats/templates/stats/index.html:180
 msgid "0분"
 msgstr "0분"
 
@@ -79,7 +79,7 @@ msgstr "되돌렸습니다."
 msgid "사용자"
 msgstr "사용자"
 
-#: apps/dashboard/models.py:20 apps/stats/templates/stats/index.html:193
+#: apps/dashboard/models.py:20 apps/stats/templates/stats/index.html:192
 msgid "날짜"
 msgstr "날짜"
 
@@ -91,8 +91,8 @@ msgstr "슬롯 인덱스"
 msgid "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 msgstr "0~143 (0: 00:00-00:10, 143: 23:50-24:00)"
 
-#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:270
-#: apps/stats/templates/stats/index.html:347 apps/tags/models.py:110
+#: apps/dashboard/models.py:27 apps/stats/templates/stats/index.html:269
+#: apps/stats/templates/stats/index.html:346 apps/tags/models.py:110
 #: apps/users/forms.py:109 apps/users/templates/users/_goal_manager.html:47
 #: apps/users/templates/users/_goal_manager.html:163
 msgid "태그"
@@ -139,31 +139,31 @@ msgstr "빈 구간"
 msgid "대시보드 - %(d)s | 라이프 다이어리"
 msgstr "대시보드 - %(d)s | 라이프 다이어리"
 
-#: apps/dashboard/templates/dashboard/index.html:22
+#: apps/dashboard/templates/dashboard/index.html:21
 msgid "아직 기록이 없습니다"
 msgstr "아직 기록이 없습니다"
 
-#: apps/dashboard/templates/dashboard/index.html:22
+#: apps/dashboard/templates/dashboard/index.html:21
 #, python-format
 msgid "지금 시각 %(t)s"
 msgstr "지금 시각 %(t)s"
 
-#: apps/dashboard/templates/dashboard/index.html:24
+#: apps/dashboard/templates/dashboard/index.html:23
 #, python-format
 msgid "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
 msgstr "%(h)s시간 %(m)s분 기록 · 기록률 %(p)s%%"
 
-#: apps/dashboard/templates/dashboard/index.html:27
+#: apps/dashboard/templates/dashboard/index.html:26
 #: apps/users/templates/users/_goal_manager.html:112
 #: apps/users/templates/users/_goal_manager.html:147
 msgid "목표 추가"
 msgstr "목표 추가"
 
-#: apps/dashboard/templates/dashboard/index.html:34
+#: apps/dashboard/templates/dashboard/index.html:33
 msgid "방금 한 일부터 채워 보세요"
 msgstr "방금 한 일부터 채워 보세요"
 
-#: apps/dashboard/templates/dashboard/index.html:35
+#: apps/dashboard/templates/dashboard/index.html:34
 msgid ""
 "지금 시각 근처 한 칸이면 충분합니다. 한 칸(10분)만 채워도 아래 수치와 분석 화"
 "면이 함께 움직입니다."
@@ -171,19 +171,19 @@ msgstr ""
 "지금 시각 근처 한 칸이면 충분합니다. 한 칸(10분)만 채워도 아래 수치와 분석 화"
 "면이 함께 움직입니다."
 
-#: apps/dashboard/templates/dashboard/index.html:37
+#: apps/dashboard/templates/dashboard/index.html:36
 msgid "지금 시각 채우기"
 msgstr "지금 시각 채우기"
 
-#: apps/dashboard/templates/dashboard/index.html:43
+#: apps/dashboard/templates/dashboard/index.html:42
 msgid "자주 쓰는 태그"
 msgstr "자주 쓰는 태그"
 
-#: apps/dashboard/templates/dashboard/index.html:46
+#: apps/dashboard/templates/dashboard/index.html:45
 msgid "자주 쓰는 순서로 보여드립니다."
 msgstr "자주 쓰는 순서로 보여드립니다."
 
-#: apps/dashboard/templates/dashboard/index.html:48
+#: apps/dashboard/templates/dashboard/index.html:47
 msgid ""
 "아직 사용 이력이 없어 만든 순서대로 보여드립니다. 쓰기 시작하면 자주 쓰는 순"
 "으로 바뀝니다."
@@ -191,140 +191,140 @@ msgstr ""
 "아직 사용 이력이 없어 만든 순서대로 보여드립니다. 쓰기 시작하면 자주 쓰는 순"
 "으로 바뀝니다."
 
-#: apps/dashboard/templates/dashboard/index.html:68
+#: apps/dashboard/templates/dashboard/index.html:67
 msgid "기록된 슬롯"
 msgstr "기록된 슬롯"
 
-#: apps/dashboard/templates/dashboard/index.html:70
+#: apps/dashboard/templates/dashboard/index.html:69
 #, python-format
 msgid "전체 %(t)s칸"
 msgstr "전체 %(t)s칸"
 
-#: apps/dashboard/templates/dashboard/index.html:73
-#: apps/stats/templates/stats/index.html:230
+#: apps/dashboard/templates/dashboard/index.html:72
+#: apps/stats/templates/stats/index.html:229
 msgid "기록률"
 msgstr "기록률"
 
-#: apps/dashboard/templates/dashboard/index.html:75
+#: apps/dashboard/templates/dashboard/index.html:74
 msgid "24시간 기준"
 msgstr "24시간 기준"
 
-#: apps/dashboard/templates/dashboard/index.html:78
+#: apps/dashboard/templates/dashboard/index.html:77
 msgid "총 기록 시간"
 msgstr "총 기록 시간"
 
-#: apps/dashboard/templates/dashboard/index.html:79
+#: apps/dashboard/templates/dashboard/index.html:78
 #, python-format
 msgid "%(h)s시간 %(m)s분"
 msgstr "%(h)s시간 %(m)s분"
 
-#: apps/dashboard/templates/dashboard/index.html:80
+#: apps/dashboard/templates/dashboard/index.html:79
 msgid "한 칸 10분"
 msgstr "한 칸 10분"
 
-#: apps/dashboard/templates/dashboard/index.html:83
+#: apps/dashboard/templates/dashboard/index.html:82
 msgid "미기록"
 msgstr "미기록"
 
-#: apps/dashboard/templates/dashboard/index.html:85
+#: apps/dashboard/templates/dashboard/index.html:84
 msgid "채우면 기록률이 오릅니다"
 msgstr "채우면 기록률이 오릅니다"
 
-#: apps/dashboard/templates/dashboard/index.html:96
+#: apps/dashboard/templates/dashboard/index.html:95
 msgid "시간 그리드 (10분 단위)"
 msgstr "시간 그리드 (10분 단위)"
 
-#: apps/dashboard/templates/dashboard/index.html:122
+#: apps/dashboard/templates/dashboard/index.html:120
 msgid "지금까지 지난 시간"
 msgstr "지금까지 지난 시간"
 
-#: apps/dashboard/templates/dashboard/index.html:123
+#: apps/dashboard/templates/dashboard/index.html:121
 msgid "아직 오지 않은 시간"
 msgstr "아직 오지 않은 시간"
 
-#: apps/dashboard/templates/dashboard/index.html:135
+#: apps/dashboard/templates/dashboard/index.html:133
 msgid "생성된 태그가 없습니다."
 msgstr "생성된 태그가 없습니다."
 
-#: apps/dashboard/templates/dashboard/index.html:151
+#: apps/dashboard/templates/dashboard/index.html:149
 msgid "입력정보"
 msgstr "입력정보"
 
-#: apps/dashboard/templates/dashboard/index.html:153
+#: apps/dashboard/templates/dashboard/index.html:151
 msgid "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!"
 msgstr "그리드에서 시간을 선택 후 태그를 지정하고 저장하세요!"
 
-#: apps/dashboard/templates/dashboard/index.html:157
+#: apps/dashboard/templates/dashboard/index.html:155
 msgid "사용법"
 msgstr "사용법"
 
-#: apps/dashboard/templates/dashboard/index.html:160
+#: apps/dashboard/templates/dashboard/index.html:158
 msgid "입력정보 닫기"
 msgstr "입력정보 닫기"
 
-#: apps/dashboard/templates/dashboard/index.html:169
+#: apps/dashboard/templates/dashboard/index.html:167
 msgid "사용법:"
 msgstr "사용법:"
 
-#: apps/dashboard/templates/dashboard/index.html:171
+#: apps/dashboard/templates/dashboard/index.html:169
 msgid "단일 선택:"
 msgstr "단일 선택:"
 
-#: apps/dashboard/templates/dashboard/index.html:171
+#: apps/dashboard/templates/dashboard/index.html:169
 msgid "슬롯 클릭"
 msgstr "슬롯 클릭"
 
-#: apps/dashboard/templates/dashboard/index.html:172
+#: apps/dashboard/templates/dashboard/index.html:170
 msgid "드래그 선택:"
 msgstr "드래그 선택:"
 
-#: apps/dashboard/templates/dashboard/index.html:172
+#: apps/dashboard/templates/dashboard/index.html:170
 msgid "마우스로 드래그"
 msgstr "마우스로 드래그"
 
-#: apps/dashboard/templates/dashboard/index.html:173
+#: apps/dashboard/templates/dashboard/index.html:171
 msgid "다중 선택:"
 msgstr "다중 선택:"
 
-#: apps/dashboard/templates/dashboard/index.html:173
+#: apps/dashboard/templates/dashboard/index.html:171
 msgid "Ctrl/Cmd + 클릭"
 msgstr "Ctrl/Cmd + 클릭"
 
-#: apps/dashboard/templates/dashboard/index.html:174
+#: apps/dashboard/templates/dashboard/index.html:172
 msgid "터치:"
 msgstr "터치:"
 
-#: apps/dashboard/templates/dashboard/index.html:174
+#: apps/dashboard/templates/dashboard/index.html:172
 msgid "터치 후 드래그"
 msgstr "터치 후 드래그"
 
-#: apps/dashboard/templates/dashboard/index.html:182
+#: apps/dashboard/templates/dashboard/index.html:180
 #: apps/users/templates/users/_goal_manager.html:119
 msgid "태그 선택"
 msgstr "태그 선택"
 
-#: apps/dashboard/templates/dashboard/index.html:202
+#: apps/dashboard/templates/dashboard/index.html:200
 msgid "태그가 없습니다. 아래에서 추가하세요."
 msgstr "태그가 없습니다. 아래에서 추가하세요."
 
-#: apps/dashboard/templates/dashboard/index.html:206
+#: apps/dashboard/templates/dashboard/index.html:204
 #: apps/tags/templates/tags/_tag_modal.html:13
 #: apps/tags/templates/tags/_tag_modal.html:37
 #: apps/tags/templates/tags/index.html:19
 msgid "새 태그"
 msgstr "새 태그"
 
-#: apps/dashboard/templates/dashboard/index.html:209
+#: apps/dashboard/templates/dashboard/index.html:207
 msgid "메모 (선택사항)"
 msgstr "메모 (선택사항)"
 
-#: apps/dashboard/templates/dashboard/index.html:214
+#: apps/dashboard/templates/dashboard/index.html:212
 #: apps/users/templates/users/_goal_manager.html:96
 #: apps/users/templates/users/usernote_form.html:13
 msgid "저장"
 msgstr "저장"
 
-#: apps/dashboard/templates/dashboard/index.html:217
+#: apps/dashboard/templates/dashboard/index.html:215
 #: apps/tags/templates/tags/category_guide.html:10
 #: apps/tags/templates/tags/index.html:4 apps/tags/templates/tags/index.html:10
 #: apps/tags/templates/tags/index.html:15
@@ -332,11 +332,11 @@ msgstr "저장"
 msgid "태그 관리"
 msgstr "태그 관리"
 
-#: apps/dashboard/templates/dashboard/index.html:218
+#: apps/dashboard/templates/dashboard/index.html:216
 msgid "저장 후 되돌리기 가능"
 msgstr "저장 후 되돌리기 가능"
 
-#: apps/dashboard/templates/dashboard/index.html:235
+#: apps/dashboard/templates/dashboard/index.html:233
 #: apps/users/templates/users/goals.html:36
 msgid "되돌리기"
 msgstr "되돌리기"
@@ -441,7 +441,7 @@ msgstr "기록 합계"
 msgid "그래프용 데이터"
 msgstr "그래프용 데이터"
 
-#: apps/stats/export.py:214 apps/stats/templates/stats/index.html:457
+#: apps/stats/export.py:214 apps/stats/templates/stats/index.html:455
 msgid "합계"
 msgstr "합계"
 
@@ -459,8 +459,8 @@ msgstr "달 합계"
 msgid "%(name)s 추세"
 msgstr "%(name)s 추세"
 
-#: apps/stats/export.py:247 apps/stats/templates/stats/index.html:138
-#: apps/stats/templates/stats/index.html:271
+#: apps/stats/export.py:247 apps/stats/templates/stats/index.html:137
+#: apps/stats/templates/stats/index.html:270
 msgid "시간"
 msgstr "시간"
 
@@ -497,7 +497,7 @@ msgstr "통계"
 #: apps/users/templates/users/verification/verify_code.html:5
 #: apps/users/templates/users/verification/verify_code.html:11
 #: apps/users/templates/users/welcome.html:5 templates/base.html:18
-#: templates/base.html:72 templates/legal/privacy.html:4
+#: templates/base.html:64 templates/legal/privacy.html:4
 #: templates/legal/terms.html:4
 #: templates/socialaccount/authentication_error.html:5
 #: templates/socialaccount/authentication_error.html:11
@@ -507,8 +507,8 @@ msgstr "통계"
 msgid "라이프 다이어리"
 msgstr "라이프 다이어리"
 
-#: apps/stats/templates/stats/index.html:10 templates/base.html:85
-#: templates/base.html:148
+#: apps/stats/templates/stats/index.html:10 templates/base.html:77
+#: templates/base.html:140
 msgid "분석"
 msgstr "분석"
 
@@ -527,7 +527,7 @@ msgid "요약"
 msgstr "요약"
 
 #: apps/stats/templates/stats/index.html:22
-#: apps/stats/templates/stats/index.html:425
+#: apps/stats/templates/stats/index.html:424
 msgid "일"
 msgstr "일"
 
@@ -565,12 +565,12 @@ msgid "%(e)s/%(t)s일 경과"
 msgstr "%(e)s/%(t)s일 경과"
 
 #: apps/stats/templates/stats/index.html:58
-#: apps/users/templates/users/welcome.html:140
+#: apps/users/templates/users/welcome.html:139
 msgid "목표 달성"
 msgstr "목표 달성"
 
 #: apps/stats/templates/stats/index.html:60
-#: apps/users/templates/users/welcome.html:141
+#: apps/users/templates/users/welcome.html:140
 #, python-format
 msgid "/%(t)s일"
 msgstr "/%(t)s일"
@@ -580,19 +580,19 @@ msgstr "/%(t)s일"
 msgid "%(t)s %(h)s시간 기준"
 msgstr "%(t)s %(h)s시간 기준"
 
-#: apps/stats/templates/stats/index.html:65
+#: apps/stats/templates/stats/index.html:64
 msgid "아직 지난 날이 없습니다"
 msgstr "아직 지난 날이 없습니다"
 
-#: apps/stats/templates/stats/index.html:69
+#: apps/stats/templates/stats/index.html:68
 msgid "설정된 목표가 없습니다"
 msgstr "설정된 목표가 없습니다"
 
-#: apps/stats/templates/stats/index.html:77
+#: apps/stats/templates/stats/index.html:76
 msgid "목표 진행"
 msgstr "목표 진행"
 
-#: apps/stats/templates/stats/index.html:78
+#: apps/stats/templates/stats/index.html:77
 #: apps/users/templates/users/goals.html:4
 #: apps/users/templates/users/goals.html:11
 #: apps/users/templates/users/goals.html:16
@@ -600,66 +600,66 @@ msgstr "목표 진행"
 msgid "목표 관리"
 msgstr "목표 관리"
 
-#: apps/stats/templates/stats/index.html:87
+#: apps/stats/templates/stats/index.html:86
 msgid "매일"
 msgstr "매일"
 
-#: apps/stats/templates/stats/index.html:88
+#: apps/stats/templates/stats/index.html:87
 msgid "매주"
 msgstr "매주"
 
-#: apps/stats/templates/stats/index.html:89
+#: apps/stats/templates/stats/index.html:88
 msgid "매달"
 msgstr "매달"
 
-#: apps/stats/templates/stats/index.html:94
+#: apps/stats/templates/stats/index.html:93
 #: templates/shared/_date_selector.html:10
 msgid "오늘"
 msgstr "오늘"
 
-#: apps/stats/templates/stats/index.html:95
+#: apps/stats/templates/stats/index.html:94
 msgid "이번 주"
 msgstr "이번 주"
 
-#: apps/stats/templates/stats/index.html:96
+#: apps/stats/templates/stats/index.html:95
 msgid "이번 달"
 msgstr "이번 달"
 
-#: apps/stats/templates/stats/index.html:101
+#: apps/stats/templates/stats/index.html:100
 #: apps/users/templates/users/_goal_manager.html:33
 msgid "오늘 기준 페이스"
 msgstr "오늘 기준 페이스"
 
-#: apps/stats/templates/stats/index.html:106
+#: apps/stats/templates/stats/index.html:105
 msgid "목표를 추가하면 여기 진행률이 보입니다"
 msgstr "목표를 추가하면 여기 진행률이 보입니다"
 
-#: apps/stats/templates/stats/index.html:112
+#: apps/stats/templates/stats/index.html:111
 msgid "관찰"
 msgstr "관찰"
 
-#: apps/stats/templates/stats/index.html:127
+#: apps/stats/templates/stats/index.html:126
 msgid "카테고리 비중"
 msgstr "카테고리 비중"
 
-#: apps/stats/templates/stats/index.html:127
+#: apps/stats/templates/stats/index.html:126
 msgid "지난 7일 · 태그가 아니라 카테고리 단위"
 msgstr "지난 7일 · 태그가 아니라 카테고리 단위"
 
-#: apps/stats/templates/stats/index.html:137 apps/tags/models.py:55
+#: apps/stats/templates/stats/index.html:136 apps/tags/models.py:55
 #: apps/tags/models.py:82
 msgid "카테고리"
 msgstr "카테고리"
 
-#: apps/stats/templates/stats/index.html:139
+#: apps/stats/templates/stats/index.html:138
 msgid "비중"
 msgstr "비중"
 
-#: apps/stats/templates/stats/index.html:154
+#: apps/stats/templates/stats/index.html:153
 msgid "기록 밀도"
 msgstr "기록 밀도"
 
-#: apps/stats/templates/stats/index.html:155
+#: apps/stats/templates/stats/index.html:154
 msgid ""
 "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하"
 "루 24시간입니다."
@@ -667,116 +667,116 @@ msgstr ""
 "태그와 무관하게 지난 7일 동안 기록이 있던 시간입니다. 세로는 날짜, 가로는 하"
 "루 24시간입니다."
 
-#: apps/stats/templates/stats/index.html:187
+#: apps/stats/templates/stats/index.html:186
 msgid "60분"
 msgstr "60분"
 
-#: apps/stats/templates/stats/index.html:190
+#: apps/stats/templates/stats/index.html:189
 msgid "지난 7일 시간대별 기록 분"
 msgstr "지난 7일 시간대별 기록 분"
 
-#: apps/stats/templates/stats/index.html:212
+#: apps/stats/templates/stats/index.html:211
 #, python-format
 msgid "규칙적 %(s)s–%(e)s시"
 msgstr "규칙적 %(s)s–%(e)s시"
 
-#: apps/stats/templates/stats/index.html:215
+#: apps/stats/templates/stats/index.html:214
 #, python-format
 msgid "공백 %(s)s–%(e)s시"
 msgstr "공백 %(s)s–%(e)s시"
 
-#: apps/stats/templates/stats/index.html:226
+#: apps/stats/templates/stats/index.html:225
 msgid "기록 시간"
 msgstr "기록 시간"
 
-#: apps/stats/templates/stats/index.html:234
+#: apps/stats/templates/stats/index.html:233
 msgid "피크 시간"
 msgstr "피크 시간"
 
-#: apps/stats/templates/stats/index.html:239
+#: apps/stats/templates/stats/index.html:238
 msgid "전날 대비"
 msgstr "전날 대비"
 
-#: apps/stats/templates/stats/index.html:242
-#: apps/stats/templates/stats/index.html:382
+#: apps/stats/templates/stats/index.html:241
+#: apps/stats/templates/stats/index.html:381
 msgid "지난 기간 없음"
 msgstr "지난 기간 없음"
 
-#: apps/stats/templates/stats/index.html:247
+#: apps/stats/templates/stats/index.html:246
 msgid "시간대별 기록"
 msgstr "시간대별 기록"
 
-#: apps/stats/templates/stats/index.html:247
+#: apps/stats/templates/stats/index.html:246
 msgid "카테고리 스택 · 한 칸 최대 60분"
 msgstr "카테고리 스택 · 한 칸 최대 60분"
 
-#: apps/stats/templates/stats/index.html:252
+#: apps/stats/templates/stats/index.html:251
 msgid "오늘 기록이 아직 없습니다"
 msgstr "오늘 기록이 아직 없습니다"
 
-#: apps/stats/templates/stats/index.html:253
+#: apps/stats/templates/stats/index.html:252
 msgid "한 칸만 채워도 시간대가 나타납니다"
 msgstr "한 칸만 채워도 시간대가 나타납니다"
 
-#: apps/stats/templates/stats/index.html:254
-#: apps/stats/templates/stats/index.html:321
-#: apps/stats/templates/stats/index.html:333
-#: apps/stats/templates/stats/index.html:391
-#: apps/stats/templates/stats/index.html:403
+#: apps/stats/templates/stats/index.html:253
+#: apps/stats/templates/stats/index.html:320
+#: apps/stats/templates/stats/index.html:332
+#: apps/stats/templates/stats/index.html:390
+#: apps/stats/templates/stats/index.html:402
 msgid "오늘 기록 이어가기"
 msgstr "오늘 기록 이어가기"
 
-#: apps/stats/templates/stats/index.html:259
+#: apps/stats/templates/stats/index.html:258
 msgid "하루 구성"
 msgstr "하루 구성"
 
-#: apps/stats/templates/stats/index.html:259
+#: apps/stats/templates/stats/index.html:258
 msgid "24시간 기준 · 미기록 포함"
 msgstr "24시간 기준 · 미기록 포함"
 
-#: apps/stats/templates/stats/index.html:266
+#: apps/stats/templates/stats/index.html:265
 msgid "하루 구성 표"
 msgstr "하루 구성 표"
 
-#: apps/stats/templates/stats/index.html:272
+#: apps/stats/templates/stats/index.html:271
 msgid "24h 비율"
 msgstr "24h 비율"
 
-#: apps/stats/templates/stats/index.html:273
+#: apps/stats/templates/stats/index.html:272
 msgid "슬롯"
 msgstr "슬롯"
 
-#: apps/stats/templates/stats/index.html:274
+#: apps/stats/templates/stats/index.html:273
 msgid "7일 평균 대비"
 msgstr "7일 평균 대비"
 
-#: apps/stats/templates/stats/index.html:301
+#: apps/stats/templates/stats/index.html:300
 msgid "주 합계"
 msgstr "주 합계"
 
-#: apps/stats/templates/stats/index.html:305
-#: apps/stats/templates/stats/index.html:374
+#: apps/stats/templates/stats/index.html:304
+#: apps/stats/templates/stats/index.html:373
 msgid "기록한 날"
 msgstr "기록한 날"
 
-#: apps/stats/templates/stats/index.html:309
+#: apps/stats/templates/stats/index.html:308
 msgid "가장 많은 요일"
 msgstr "가장 많은 요일"
 
-#: apps/stats/templates/stats/index.html:313 apps/users/forms.py:110
+#: apps/stats/templates/stats/index.html:312 apps/users/forms.py:110
 #: apps/users/templates/users/_goal_manager.html:48
-#: apps/users/templates/users/welcome.html:116
+#: apps/users/templates/users/welcome.html:115
 msgid "기간"
 msgstr "기간"
 
-#: apps/stats/templates/stats/index.html:319
-#: apps/stats/templates/stats/index.html:389
+#: apps/stats/templates/stats/index.html:318
+#: apps/stats/templates/stats/index.html:388
 #, python-format
 msgid "추세선은 %(d)s일 더 필요합니다"
 msgstr "추세선은 %(d)s일 더 필요합니다"
 
-#: apps/stats/templates/stats/index.html:320
-#: apps/stats/templates/stats/index.html:390
+#: apps/stats/templates/stats/index.html:319
+#: apps/stats/templates/stats/index.html:389
 #, python-format
 msgid ""
 "지금까지 %(n)s일 기록했습니다. 선으로 읽히려면 점이 더 있어야 해서, 그때까지"
@@ -785,94 +785,94 @@ msgstr ""
 "지금까지 %(n)s일 기록했습니다. 선으로 읽히려면 점이 더 있어야 해서, 그때까지"
 "는 아래 누적으로 보여드립니다."
 
-#: apps/stats/templates/stats/index.html:325
+#: apps/stats/templates/stats/index.html:324
 msgid "카테고리별 추세"
 msgstr "카테고리별 추세"
 
-#: apps/stats/templates/stats/index.html:325
+#: apps/stats/templates/stats/index.html:324
 msgid "요일별 시간"
 msgstr "요일별 시간"
 
-#: apps/stats/templates/stats/index.html:331
+#: apps/stats/templates/stats/index.html:330
 msgid "이번 주 기록이 아직 없습니다"
 msgstr "이번 주 기록이 아직 없습니다"
 
-#: apps/stats/templates/stats/index.html:332
-#: apps/stats/templates/stats/index.html:402
+#: apps/stats/templates/stats/index.html:331
+#: apps/stats/templates/stats/index.html:401
 msgid "한 칸만 채워도 선이 시작됩니다"
 msgstr "한 칸만 채워도 선이 시작됩니다"
 
-#: apps/stats/templates/stats/index.html:338
+#: apps/stats/templates/stats/index.html:337
 msgid "요일별 기록량"
 msgstr "요일별 기록량"
 
-#: apps/stats/templates/stats/index.html:343
+#: apps/stats/templates/stats/index.html:342
 msgid "태그 순위"
 msgstr "태그 순위"
 
-#: apps/stats/templates/stats/index.html:343
+#: apps/stats/templates/stats/index.html:342
 msgid "기록한 날 기준 하루 평균"
 msgstr "기록한 날 기준 하루 평균"
 
-#: apps/stats/templates/stats/index.html:348
+#: apps/stats/templates/stats/index.html:347
 msgid "하루 평균"
 msgstr "하루 평균"
 
-#: apps/stats/templates/stats/index.html:366
+#: apps/stats/templates/stats/index.html:365
 msgid "월 합계"
 msgstr "월 합계"
 
-#: apps/stats/templates/stats/index.html:370
-#: apps/stats/templates/stats/index.html:415
+#: apps/stats/templates/stats/index.html:369
+#: apps/stats/templates/stats/index.html:414
 msgid "일 평균"
 msgstr "일 평균"
 
-#: apps/stats/templates/stats/index.html:379
+#: apps/stats/templates/stats/index.html:378
 msgid "지난달 대비"
 msgstr "지난달 대비"
 
-#: apps/stats/templates/stats/index.html:395
+#: apps/stats/templates/stats/index.html:394
 msgid "카테고리별 일별 추세"
 msgstr "카테고리별 일별 추세"
 
-#: apps/stats/templates/stats/index.html:401
+#: apps/stats/templates/stats/index.html:400
 msgid "이번 달 기록이 아직 없습니다"
 msgstr "이번 달 기록이 아직 없습니다"
 
-#: apps/stats/templates/stats/index.html:408
+#: apps/stats/templates/stats/index.html:407
 msgid "주차별 요약"
 msgstr "주차별 요약"
 
-#: apps/stats/templates/stats/index.html:409
+#: apps/stats/templates/stats/index.html:408
 msgid "주차별 요약 표"
 msgstr "주차별 요약 표"
 
-#: apps/stats/templates/stats/index.html:413
+#: apps/stats/templates/stats/index.html:412
 msgid "주차"
 msgstr "주차"
 
-#: apps/stats/templates/stats/index.html:414 templates/base.html:83
-#: templates/base.html:144
+#: apps/stats/templates/stats/index.html:413 templates/base.html:75
+#: templates/base.html:136
 msgid "기록"
 msgstr "기록"
 
-#: apps/stats/templates/stats/index.html:418
+#: apps/stats/templates/stats/index.html:417
 msgid "직전 대비"
 msgstr "직전 대비"
 
-#: apps/stats/templates/stats/index.html:431
+#: apps/stats/templates/stats/index.html:430
 msgid "진행 중"
 msgstr "진행 중"
 
-#: apps/stats/templates/stats/index.html:446
+#: apps/stats/templates/stats/index.html:444
 msgid "태그 합계"
 msgstr "태그 합계"
 
-#: apps/stats/templates/stats/index.html:477
+#: apps/stats/templates/stats/index.html:475
 msgid "엑셀로 내보내기"
 msgstr "엑셀로 내보내기"
 
-#: apps/stats/templates/stats/index.html:480
+#: apps/stats/templates/stats/index.html:478
 msgid ""
 "하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받"
 "습니다."
@@ -880,19 +880,19 @@ msgstr ""
 "하루 24시간을 10분 칸으로 채운 한 장짜리 표와 카테고리별 추세 그래프로 내려받"
 "습니다."
 
-#: apps/stats/templates/stats/index.html:490
+#: apps/stats/templates/stats/index.html:488
 msgid "내보낼 달"
 msgstr "내보낼 달"
 
-#: apps/stats/templates/stats/index.html:501
+#: apps/stats/templates/stats/index.html:499
 msgid "내보내는 중…"
 msgstr "내보내는 중…"
 
-#: apps/stats/templates/stats/index.html:502
+#: apps/stats/templates/stats/index.html:500
 msgid "다운로드"
 msgstr "다운로드"
 
-#: apps/stats/templates/stats/index.html:512
+#: apps/stats/templates/stats/index.html:510
 msgid "특이사항:"
 msgstr "특이사항:"
 
@@ -1143,7 +1143,7 @@ msgstr "현재 위치"
 #: apps/users/templates/users/goals.html:9
 #: apps/users/templates/users/mypage.html:7
 #: apps/users/templates/users/password/password_change_form.html:12
-#: templates/base.html:87 templates/base.html:100 templates/base.html:152
+#: templates/base.html:79 templates/base.html:92 templates/base.html:144
 msgid "설정"
 msgstr "설정"
 
@@ -1259,7 +1259,7 @@ msgid "이미 사용 중인 이메일입니다."
 msgstr "이미 사용 중인 이메일입니다."
 
 #: apps/users/forms.py:60
-#: apps/users/templates/users/verification/verify_code.html:24
+#: apps/users/templates/users/verification/verify_code.html:22
 msgid "인증 코드"
 msgstr "인증 코드"
 
@@ -1275,7 +1275,7 @@ msgstr "메일로 받은 인증 코드를 입력해주세요."
 msgid "인증 코드 6자리"
 msgstr "인증 코드 6자리"
 
-#: apps/users/forms.py:111 apps/users/templates/users/welcome.html:126
+#: apps/users/forms.py:111 apps/users/templates/users/welcome.html:125
 msgid "목표 시간"
 msgstr "목표 시간"
 
@@ -1466,7 +1466,7 @@ msgstr ""
 #: apps/users/templates/users/login.html:6
 #: apps/users/templates/users/login.html:54
 #: apps/users/templates/users/password/password_reset_complete.html:14
-#: apps/users/views.py:262 apps/users/views.py:313 templates/base.html:112
+#: apps/users/views.py:262 apps/users/views.py:313 templates/base.html:104
 msgid "로그인"
 msgstr "로그인"
 
@@ -1546,12 +1546,12 @@ msgstr "계정"
 msgid "비밀번호 변경"
 msgstr "비밀번호 변경"
 
-#: apps/users/templates/users/mypage.html:38
-#: apps/users/templates/users/mypage.html:41 templates/base.html:105
+#: apps/users/templates/users/mypage.html:37
+#: apps/users/templates/users/mypage.html:40 templates/base.html:97
 msgid "로그아웃"
 msgstr "로그아웃"
 
-#: apps/users/templates/users/mypage.html:45
+#: apps/users/templates/users/mypage.html:44
 msgid "계정 삭제"
 msgstr "계정 삭제"
 
@@ -1846,37 +1846,37 @@ msgstr "[라이프 다이어리] 이메일 인증 코드"
 msgid "%(masked_email)s 으로 6자리 코드를 보냈습니다."
 msgstr "%(masked_email)s 으로 6자리 코드를 보냈습니다."
 
-#: apps/users/templates/users/verification/verify_code.html:29
+#: apps/users/templates/users/verification/verify_code.html:27
 #, python-format
 msgid "%(attempts_remaining)s회 남음"
 msgstr "%(attempts_remaining)s회 남음"
 
-#: apps/users/templates/users/verification/verify_code.html:42
+#: apps/users/templates/users/verification/verify_code.html:38
 #, python-brace-format
 msgid "{time} 후 만료"
 msgstr "{time} 후 만료"
 
-#: apps/users/templates/users/verification/verify_code.html:43
-#: apps/users/templates/users/verification/verify_code.html:44
+#: apps/users/templates/users/verification/verify_code.html:39
+#: apps/users/templates/users/verification/verify_code.html:40
 msgid "코드가 만료되었습니다"
 msgstr "코드가 만료되었습니다"
 
-#: apps/users/templates/users/verification/verify_code.html:44
+#: apps/users/templates/users/verification/verify_code.html:40
 #, python-format
 msgid "%(expires_in_minutes)s분 안에 입력하세요"
 msgstr "%(expires_in_minutes)s분 안에 입력하세요"
 
-#: apps/users/templates/users/verification/verify_code.html:51
-#: apps/users/templates/users/verification/verify_code.html:54
+#: apps/users/templates/users/verification/verify_code.html:47
+#: apps/users/templates/users/verification/verify_code.html:50
 msgid "코드 다시 받기"
 msgstr "코드 다시 받기"
 
-#: apps/users/templates/users/verification/verify_code.html:52
+#: apps/users/templates/users/verification/verify_code.html:48
 #, python-brace-format
 msgid "{seconds}초 후 다시 받기"
 msgstr "{seconds}초 후 다시 받기"
 
-#: apps/users/templates/users/verification/verify_code.html:61
+#: apps/users/templates/users/verification/verify_code.html:57
 msgid "확인"
 msgstr "확인"
 
@@ -1944,19 +1944,19 @@ msgstr ""
 "키로 넓힌 뒤 Enter 로 고를 수도 있습니다. 여기서 채운 기록은 그대로 저장됩니"
 "다."
 
-#: apps/users/templates/users/welcome.html:91
+#: apps/users/templates/users/welcome.html:90
 msgid "저장하고 다음"
 msgstr "저장하고 다음"
 
-#: apps/users/templates/users/welcome.html:93
+#: apps/users/templates/users/welcome.html:92
 msgid "채우지 않고 넘어가기"
 msgstr "채우지 않고 넘어가기"
 
-#: apps/users/templates/users/welcome.html:96
+#: apps/users/templates/users/welcome.html:95
 msgid "목표를 하나만 정해둘까요"
 msgstr "목표를 하나만 정해둘까요"
 
-#: apps/users/templates/users/welcome.html:97
+#: apps/users/templates/users/welcome.html:96
 msgid ""
 "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 "
 "지장이 없습니다."
@@ -1964,39 +1964,39 @@ msgstr ""
 "분석 화면이 이 기준으로 달성한 날을 셉니다. 하나면 충분하고, 없어도 기록에는 "
 "지장이 없습니다."
 
-#: apps/users/templates/users/welcome.html:100
+#: apps/users/templates/users/welcome.html:99
 msgid "방금 채운 구간을 저장했습니다."
 msgstr "방금 채운 구간을 저장했습니다."
 
-#: apps/users/templates/users/welcome.html:101
+#: apps/users/templates/users/welcome.html:100
 msgid "방금 기록 취소"
 msgstr "방금 기록 취소"
 
-#: apps/users/templates/users/welcome.html:107
+#: apps/users/templates/users/welcome.html:106
 msgid "대상 태그"
 msgstr "대상 태그"
 
-#: apps/users/templates/users/welcome.html:129
+#: apps/users/templates/users/welcome.html:128
 msgid "목표 시간 30분 줄이기"
 msgstr "목표 시간 30분 줄이기"
 
-#: apps/users/templates/users/welcome.html:133
+#: apps/users/templates/users/welcome.html:132
 msgid "목표 시간 30분 늘리기"
 msgstr "목표 시간 30분 늘리기"
 
-#: apps/users/templates/users/welcome.html:138
+#: apps/users/templates/users/welcome.html:137
 msgid "이렇게 보입니다"
 msgstr "이렇게 보입니다"
 
-#: apps/users/templates/users/welcome.html:144
+#: apps/users/templates/users/welcome.html:143
 msgid "예시입니다. 실제 수치는 기록이 쌓이면서 채워집니다."
 msgstr "예시입니다. 실제 수치는 기록이 쌓이면서 채워집니다."
 
-#: apps/users/templates/users/welcome.html:147
+#: apps/users/templates/users/welcome.html:146
 msgid "기록 시작하기"
 msgstr "기록 시작하기"
 
-#: apps/users/templates/users/welcome.html:149
+#: apps/users/templates/users/welcome.html:148
 msgid "설정 › 목표에서 언제든 바꿀 수 있습니다"
 msgstr "설정 › 목표에서 언제든 바꿀 수 있습니다"
 
@@ -2120,45 +2120,45 @@ msgstr "올바른 JSON 형식이 아닙니다."
 msgid "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌아보는 서비스입니다."
 msgstr "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌아보는 서비스입니다."
 
-#: templates/base.html:64
+#: templates/base.html:56
 msgid "페이지를 불러오는 중입니다..."
 msgstr "페이지를 불러오는 중입니다..."
 
-#: templates/base.html:81 templates/base.html:140
+#: templates/base.html:73 templates/base.html:132
 msgid "홈"
 msgstr "홈"
 
-#: templates/base.html:93
+#: templates/base.html:85
 msgid "계정 메뉴"
 msgstr "계정 메뉴"
 
-#: templates/base.html:98
+#: templates/base.html:90
 msgid "관리자"
 msgstr "관리자"
 
-#: templates/base.html:113
+#: templates/base.html:105
 msgid "무료로 시작"
 msgstr "무료로 시작"
 
-#: templates/base.html:137
+#: templates/base.html:129
 msgid "주요 화면"
 msgstr "주요 화면"
 
-#: templates/base.html:162 templates/legal/privacy.html:4
+#: templates/base.html:154 templates/legal/privacy.html:4
 #: templates/legal/privacy.html:10
 msgid "개인정보처리방침"
 msgstr "개인정보처리방침"
 
-#: templates/base.html:164 templates/legal/terms.html:4
+#: templates/base.html:156 templates/legal/terms.html:4
 #: templates/legal/terms.html:10
 msgid "이용약관"
 msgstr "이용약관"
 
-#: templates/base.html:170
+#: templates/base.html:162
 msgid "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 msgstr "라이프 다이어리 &copy; 2025 LogBetter. All rights reserved."
 
-#: templates/base.html:172
+#: templates/base.html:164
 #, python-format
 msgid ""
 "라이프 다이어리 &copy; 2025-%(current_year)s LogBetter. All rights reserved."
@@ -2238,9 +2238,9 @@ msgstr "%(username)s님, 오늘 기록을 이어가세요"
 msgid "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
 msgstr "지금 남긴 작은 기록이 당신 삶의 흐름이 됩니다."
 
-#: templates/legal/privacy.html:9 templates/legal/terms.html:9
-msgid "최종 업데이트: 2026년 5월 25일"
-msgstr "최종 업데이트: 2026년 5월 25일"
+#: templates/legal/privacy.html:9
+msgid "최종 업데이트: 2026년 8월 31일"
+msgstr "최종 업데이트: 2026년 8월 31일"
 
 #: templates/legal/privacy.html:12
 msgid ""
@@ -2303,12 +2303,9 @@ msgstr "3. 쿠키 사용"
 #: templates/legal/privacy.html:45
 msgid ""
 "서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키"
-"를 사용합니다. 현재 별도의 광고 추적 쿠키나 행동 기반 광고 목적의 쿠키는 사용"
-"하지 않습니다."
-msgstr ""
-"서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키"
-"를 사용합니다. 현재 별도의 광고 추적 쿠키나 행동 기반 광고 목적의 쿠키는 사용"
-"하지 않습니다."
+"를 사용합니다. 공개 페이지에서는 방문 통계 측정을 위한 Google Analytics 쿠키"
+"가 사용될 수 있습니다. 행동 기반 광고 목적의 쿠키는 사용하지 않습니다."
+msgstr "서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키를 사용합니다. 공개 페이지에서는 방문 통계 측정을 위한 Google Analytics 쿠키가 사용될 수 있습니다. 행동 기반 광고 목적의 쿠키는 사용하지 않습니다."
 
 #: templates/legal/privacy.html:52
 msgid "4. 보관 및 삭제"
@@ -2339,10 +2336,40 @@ msgstr ""
 "에 필요한 외부 제공자가 사용될 수 있으며, 이 경우 필요한 범위로 제한합니다."
 
 #: templates/legal/privacy.html:70
-msgid "6. 이용자의 권리"
-msgstr "6. 이용자의 권리"
+msgid "6. 웹 분석 도구"
+msgstr "6. 웹 분석 도구"
 
 #: templates/legal/privacy.html:72
+msgid ""
+"공개 페이지(홈, 개인정보처리방침, 이용약관)의 방문 통계를 파악하기 위해 "
+"Google Analytics를 사용할 수 있습니다. 이 과정에서 다음 정보가 Google에 전송"
+"될 수 있습니다."
+msgstr "공개 페이지(홈, 개인정보처리방침, 이용약관)의 방문 통계를 파악하기 위해 Google Analytics를 사용할 수 있습니다. 이 과정에서 다음 정보가 Google에 전송될 수 있습니다."
+
+#: templates/legal/privacy.html:75
+msgid "방문한 공개 페이지 주소와 방문 시각"
+msgstr "방문한 공개 페이지 주소와 방문 시각"
+
+#: templates/legal/privacy.html:76
+msgid "브라우저, 기기, 화면 크기 등 이용 환경 정보"
+msgstr "브라우저, 기기, 화면 크기 등 이용 환경 정보"
+
+#: templates/legal/privacy.html:77
+msgid "쿠키 기반 익명 식별자와 대략적인 지역 정보"
+msgstr "쿠키 기반 익명 식별자와 대략적인 지역 정보"
+
+#: templates/legal/privacy.html:80
+msgid ""
+"로그인 후 이용하는 대시보드, 통계, 태그, 계정 화면에는 분석 도구가 적용되지 "
+"않으며, 사용자가 작성한 일기, 태그, 목표 등 기록 내용은 분석 도구로 전송되지 "
+"않습니다."
+msgstr "로그인 후 이용하는 대시보드, 통계, 태그, 계정 화면에는 분석 도구가 적용되지 않으며, 사용자가 작성한 일기, 태그, 목표 등 기록 내용은 분석 도구로 전송되지 않습니다."
+
+#: templates/legal/privacy.html:87
+msgid "7. 이용자의 권리"
+msgstr "7. 이용자의 권리"
+
+#: templates/legal/privacy.html:89
 msgid ""
 "사용자는 본인의 개인정보 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다. 계"
 "정 또는 기록 삭제가 필요한 경우 아래 연락처로 문의해 주세요."
@@ -2350,13 +2377,17 @@ msgstr ""
 "사용자는 본인의 개인정보 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다. 계"
 "정 또는 기록 삭제가 필요한 경우 아래 연락처로 문의해 주세요."
 
-#: templates/legal/privacy.html:79
-msgid "7. 문의"
-msgstr "7. 문의"
+#: templates/legal/privacy.html:96 templates/legal/terms.html:87
+msgid "8. 문의"
+msgstr "8. 문의"
 
-#: templates/legal/privacy.html:81
+#: templates/legal/privacy.html:98
 msgid "개인정보, 계정, 보안 관련 문의:"
 msgstr "개인정보, 계정, 보안 관련 문의:"
+
+#: templates/legal/terms.html:9
+msgid "최종 업데이트: 2026년 5월 25일"
+msgstr "최종 업데이트: 2026년 5월 25일"
 
 #: templates/legal/terms.html:12
 msgid ""
@@ -2478,10 +2509,6 @@ msgstr ""
 "용, 네트워크 상태, 외부 서비스 장애, 불가항력으로 인한 손해에 대해 법령상 허"
 "용되는 범위 내에서 책임이 제한될 수 있습니다."
 
-#: templates/legal/terms.html:87
-msgid "8. 문의"
-msgstr "8. 문의"
-
 #: templates/legal/terms.html:89
 msgid "서비스 이용, 계정, 약관 관련 문의:"
 msgstr "서비스 이용, 계정, 약관 관련 문의:"
@@ -2490,23 +2517,23 @@ msgstr "서비스 이용, 계정, 약관 관련 문의:"
 msgid "날짜 선택"
 msgstr "날짜 선택"
 
-#: templates/shared/_nav_prefs.html:10
+#: templates/shared/_nav_prefs.html:8
 msgid "테마 선택"
 msgstr "테마 선택"
 
-#: templates/shared/_nav_prefs.html:17
+#: templates/shared/_nav_prefs.html:15
 msgid "라이트"
 msgstr "라이트"
 
-#: templates/shared/_nav_prefs.html:23
+#: templates/shared/_nav_prefs.html:21
 msgid "다크"
 msgstr "다크"
 
-#: templates/shared/_nav_prefs.html:29
+#: templates/shared/_nav_prefs.html:27
 msgid "시스템"
 msgstr "시스템"
 
-#: templates/shared/_nav_prefs.html:37
+#: templates/shared/_nav_prefs.html:34
 msgid "언어 선택"
 msgstr "언어 선택"
 
@@ -2595,3 +2622,6 @@ msgstr "가입 완료"
 #: templates/socialaccount/signup.html:82
 msgid "취소하고 로그인으로"
 msgstr "취소하고 로그인으로"
+
+#~ msgid "7. 문의"
+#~ msgstr "7. 문의"

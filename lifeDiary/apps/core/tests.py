@@ -56,7 +56,53 @@ class TestHomePage:
         assert response["Content-Type"] == "text/plain"
         assert response.content.decode() == (
             "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n"
+            "Sitemap: http://testserver/sitemap.xml\n"
         )
+
+    def test_sitemap_lists_only_home_url(self, ko_client):
+        response = ko_client.get("/sitemap.xml")
+
+        assert response.status_code == 200
+        assert response["Content-Type"] == "application/xml"
+        body = response.content.decode()
+        assert "<loc>http://testserver/</loc>" in body
+        assert body.count("<loc>") == 1
+
+    def test_home_renders_analytics_and_verification_only_when_configured(
+        self, ko_client, settings
+    ):
+        settings.GA_MEASUREMENT_ID = "G-TEST1234"
+        settings.GOOGLE_SITE_VERIFICATION = "verify-token"
+
+        body = ko_client.get(reverse("home")).content.decode()
+
+        assert "googletagmanager.com/gtag/js?id=G-TEST1234" in body
+        assert (
+            '<meta name="google-site-verification" content="verify-token">' in body
+        )
+
+    def test_home_omits_analytics_and_verification_without_configuration(
+        self, ko_client, settings
+    ):
+        settings.GA_MEASUREMENT_ID = ""
+        settings.GOOGLE_SITE_VERIFICATION = ""
+
+        body = ko_client.get(reverse("home")).content.decode()
+
+        assert "googletagmanager" not in body
+        assert "google-site-verification" not in body
+
+    def test_dashboard_never_renders_analytics_even_when_configured(
+        self, ko_client, make_user, settings
+    ):
+        settings.GA_MEASUREMENT_ID = "G-TEST1234"
+        settings.GOOGLE_SITE_VERIFICATION = "verify-token"
+        ko_client.force_login(make_user(username="tracked-user"))
+
+        body = ko_client.get(reverse("dashboard:index")).content.decode()
+
+        assert "googletagmanager" not in body
+        assert "google-site-verification" not in body
 
     def test_privacy_policy_page_renders_current_service_scope(self, ko_client):
         response = ko_client.get(reverse("privacy"))
@@ -67,6 +113,7 @@ class TestHomePage:
         assert "사용자명, 이메일 주소, 비밀번호 해시" in body
         assert "시간 블록, 일기/메모, 태그, 목표" in body
         assert "로그인 상태 유지, CSRF 보호, 언어 설정" in body
+        assert "웹 분석 도구" in body
         assert "logbetter.info@gmail.com" in body
 
     def test_terms_page_renders_current_service_scope(self, ko_client):
