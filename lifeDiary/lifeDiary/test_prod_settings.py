@@ -100,13 +100,17 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
     assert "default-src 'self'" in policy
     assert "object-src 'none'" in policy
     assert "frame-ancestors 'none'" in policy
-    # 현재 템플릿이 실제로 사용하는 CDN과 reCAPTCHA 출처만 허용한다.
+    # 현재 템플릿이 실제로 사용하는 CDN·reCAPTCHA·GA 출처만 허용한다.
     for host in (
         "https://cdn.jsdelivr.net",
         "https://cdnjs.cloudflare.com",
         "https://unpkg.com",
         "https://www.google.com",
         "https://www.gstatic.com",
+        "https://www.googletagmanager.com",
+        "https://*.google-analytics.com",
+        "https://*.analytics.google.com",
+        "https://*.googletagmanager.com",
     ):
         assert host in policy
     assert (

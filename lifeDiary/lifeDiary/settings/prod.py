@@ -58,12 +58,16 @@ CONTENT_SECURITY_POLICY = "; ".join(
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
         " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com"
-        " https://www.google.com https://www.gstatic.com",
+        " https://www.google.com https://www.gstatic.com"
+        " https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline'"
         " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
         "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
-        "img-src 'self' data:",
-        "connect-src 'self'",
+        "img-src 'self' data:"
+        " https://*.google-analytics.com https://*.googletagmanager.com",
+        "connect-src 'self'"
+        " https://*.google-analytics.com https://*.analytics.google.com"
+        " https://*.googletagmanager.com",
         "frame-src https://www.google.com",
         "object-src 'none'",
         "base-uri 'self'",
