@@ -38,10 +38,23 @@ urlpatterns = [
         # 홈만 색인 허용(2026-08-31 결정). /static/ 은 색인이 아니라 홈
         # 렌더링 평가용 자산 크롤 허용이다. RFC 9309 최장 일치 규칙.
         lambda request: HttpResponse(
-            "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n",
+            "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n"
+            f"Sitemap: {request.build_absolute_uri('/sitemap.xml')}\n",
             content_type="text/plain",
         ),
         name="robots-txt",
+    ),
+    path(
+        "sitemap.xml",
+        # robots.txt 가 홈만 색인 허용하므로 sitemap 도 홈 하나만 담는다.
+        lambda request: HttpResponse(
+            '<?xml version="1.0" encoding="UTF-8"?>\n'
+            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+            f"  <url><loc>{request.build_absolute_uri('/')}</loc></url>\n"
+            "</urlset>\n",
+            content_type="application/xml",
+        ),
+        name="sitemap-xml",
     ),
     path(
         "favicon.ico",

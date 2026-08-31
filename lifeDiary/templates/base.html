@@ -17,7 +17,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}{% trans "라이프 다이어리" %}{% endblock %}</title>
     <meta name="description" content="{% block meta_description %}{% trans "하루 시간을 기록하고 태그로 분류해 생활 패턴을 돌아보는 서비스입니다." %}{% endblock %}">
-    
+    {% if google_site_verification %}<meta name="google-site-verification" content="{{ google_site_verification }}">{% endif %}
+    {% if ga_measurement_id %}
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_measurement_id }}"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '{{ ga_measurement_id }}');
+    </script>
+    {% endif %}
+
     {% load static %}
     <link rel="icon" type="image/svg+xml" href="{% static 'core/img/favicon.svg' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'core/img/favicon-32.png' %}">

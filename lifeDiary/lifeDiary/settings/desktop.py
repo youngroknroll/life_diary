@@ -168,6 +168,10 @@ DEFAULT_FROM_EMAIL = "noreply@lifediary.local"
 # 로컬 단일 사용자이고 실제 메일 발송 경로가 없어 코드 인증을 끈다.
 EMAIL_VERIFICATION_ENABLED = False
 
+# 로컬 단일 사용자 앱은 웹 분석·검색 색인 대상이 아니다. env가 있어도 무시한다.
+GA_MEASUREMENT_ID = ""
+GOOGLE_SITE_VERIFICATION = ""
+
 
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False

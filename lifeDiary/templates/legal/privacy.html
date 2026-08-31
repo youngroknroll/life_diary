@@ -6,7 +6,7 @@
 {% block content %}
 <section class="policy-page mx-auto" style="max-width: 860px;">
     <div class="mb-4">
-        <p class="text-muted mb-2">{% trans "최종 업데이트: 2026년 5월 25일" %}</p>
+        <p class="text-muted mb-2">{% trans "최종 업데이트: 2026년 8월 31일" %}</p>
         <h1 class="h2 mb-3">{% trans "개인정보처리방침" %}</h1>
         <p class="lead">
             {% trans "라이프 다이어리는 사용자가 하루 기록과 생활 패턴을 관리할 수 있도록 필요한 최소한의 개인정보를 처리합니다." %}
@@ -42,7 +42,7 @@
         <div class="card-body">
             <h2 class="h5">{% trans "3. 쿠키 사용" %}</h2>
             <p>
-                {% trans "서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키를 사용합니다. 현재 별도의 광고 추적 쿠키나 행동 기반 광고 목적의 쿠키는 사용하지 않습니다." %}
+                {% trans "서비스는 로그인 상태 유지, CSRF 보호, 언어 설정, 보안 확인을 위해 필수 쿠키를 사용합니다. 공개 페이지에서는 방문 통계 측정을 위한 Google Analytics 쿠키가 사용될 수 있습니다. 행동 기반 광고 목적의 쿠키는 사용하지 않습니다." %}
             </p>
         </div>
     </div>
@@ -67,7 +67,24 @@
 
     <div class="card mb-3">
         <div class="card-body">
-            <h2 class="h5">{% trans "6. 이용자의 권리" %}</h2>
+            <h2 class="h5">{% trans "6. 웹 분석 도구" %}</h2>
+            <p>
+                {% trans "공개 페이지(홈, 개인정보처리방침, 이용약관)의 방문 통계를 파악하기 위해 Google Analytics를 사용할 수 있습니다. 이 과정에서 다음 정보가 Google에 전송될 수 있습니다." %}
+            </p>
+            <ul>
+                <li>{% trans "방문한 공개 페이지 주소와 방문 시각" %}</li>
+                <li>{% trans "브라우저, 기기, 화면 크기 등 이용 환경 정보" %}</li>
+                <li>{% trans "쿠키 기반 익명 식별자와 대략적인 지역 정보" %}</li>
+            </ul>
+            <p>
+                {% trans "로그인 후 이용하는 대시보드, 통계, 태그, 계정 화면에는 분석 도구가 적용되지 않으며, 사용자가 작성한 일기, 태그, 목표 등 기록 내용은 분석 도구로 전송되지 않습니다." %}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h2 class="h5">{% trans "7. 이용자의 권리" %}</h2>
             <p>
                 {% trans "사용자는 본인의 개인정보 열람, 정정, 삭제, 처리정지를 요청할 수 있습니다. 계정 또는 기록 삭제가 필요한 경우 아래 연락처로 문의해 주세요." %}
             </p>
@@ -76,7 +93,7 @@
 
     <div class="card">
         <div class="card-body">
-            <h2 class="h5">{% trans "7. 문의" %}</h2>
+            <h2 class="h5">{% trans "8. 문의" %}</h2>
             <p class="mb-0">
                 {% trans "개인정보, 계정, 보안 관련 문의:" %}
                 <a href="mailto:logbetter.info@gmail.com">logbetter.info@gmail.com</a>
