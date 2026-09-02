@@ -55,7 +55,7 @@ class TestHomePage:
         assert response.status_code == 200
         assert response["Content-Type"] == "text/plain"
         assert response.content.decode() == (
-            "User-agent: *\nAllow: /$\nAllow: /static/\nDisallow: /\n"
+            "User-agent: *\nAllow: /$\nAllow: /static/\nAllow: /sitemap.xml\nDisallow: /\n"
             "Sitemap: http://testserver/sitemap.xml\n"
         )
 
