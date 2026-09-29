@@ -89,8 +89,11 @@ def _summarize_group(samples: list[RequestSample]) -> dict:
     }
 
 
-def _distribution(values: list[float]) -> dict:
-    return {"min": min(values), "median": median(values), "max": max(values)}
+def _distribution(values: list[float | None]) -> dict | None:
+    measured = [value for value in values if value is not None]
+    if not measured:
+        return None
+    return {"min": min(measured), "median": median(measured), "max": max(measured)}
 
 
 def _to_ms(duration_ns: int) -> float:

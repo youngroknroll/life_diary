@@ -205,3 +205,19 @@ def test_stats_request_benchmark_reports_cold_and_warm_samples(
     assert len(report["groups"]["warmup"]["samples"]) == 1
     assert len(report["groups"]["cold"]["samples"]) == BENCHMARK_CYCLES
     assert len(report["groups"]["warm"]["samples"]) == BENCHMARK_CYCLES
+
+
+def test_report_keeps_failed_requests_without_render_timing(client, db, settings):
+    samples = [measure_request(client, STATS_REQUEST_PATH) for _ in range(2)]
+
+    report = summarize_samples(
+        {"redirected": samples},
+        cache_backend=settings.CACHES["default"]["BACKEND"],
+    )
+
+    redirected = report["groups"]["redirected"]
+    assert [sample["status_code"] for sample in redirected["samples"]] == [302, 302]
+    assert redirected["before_render_ms"] is None
+    assert redirected["render_ms"] is None
+    elapsed = redirected["elapsed_ms"]
+    assert elapsed["min"] <= elapsed["median"] <= elapsed["max"]
