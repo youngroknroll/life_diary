@@ -144,6 +144,7 @@ def test_monthly_and_analysis_results_unchanged_under_caching(seeded_user):
 
 STATS_REQUEST_PATH = "/stats/?date=2026-04-15"
 LOCMEM_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+DUMMY_CACHE_BACKEND = "django.core.cache.backends.dummy.DummyCache"
 BENCHMARK_CYCLES = 5
 
 
@@ -155,9 +156,12 @@ def test_measurement_retains_redirect_response(client, db, measure_request):
     assert sample.query_count == 0
 
 
-def test_full_stats_request_reports_measured_cost(client, seeded_user, measure_request):
+def test_full_stats_request_reports_measured_cost(
+    client, seeded_user, settings, measure_request
+):
     user, _ = seeded_user
     client.force_login(user)
+    assert settings.CACHES["default"]["BACKEND"] == DUMMY_CACHE_BACKEND
 
     sample = measure_request(client, STATS_REQUEST_PATH)
 
@@ -165,6 +169,7 @@ def test_full_stats_request_reports_measured_cost(client, seeded_user, measure_r
     assert sample.response_bytes > 0
     assert sample.query_count > 0
     assert 0 <= sample.sql_execute_ms <= sample.elapsed_ms
+    assert sample.sql_execute_ms > 0
     assert 0 <= sample.before_render_ms <= sample.elapsed_ms
     assert 0 <= sample.render_ms <= sample.elapsed_ms
     assert sample.database_vendor == connection.vendor
