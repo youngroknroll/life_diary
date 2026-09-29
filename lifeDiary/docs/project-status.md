@@ -45,7 +45,14 @@ Status values are based on the repository documents available at the update time
 - 설계: `docs/plans/2026-09-29-stats-performance-measurement-design.md`
 - 실행 로그: `docs/refactoring/2026-09-29-stats-performance-measurement.md`
 - 검증: 전체 회귀 605 passed, `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0 (기존 W009 1건).
-- Deferred: 백로그 B-6, B-7.
+- PR #74 머지 (`4f1b12e`). 배포 필터 기준으로 `request_performance.py`가 배포 트리에 없음을 확인했다.
+- 후속 검증 (같은 날):
+  - Chrome 154.0.8037.58.
+  - 로컬 PostgreSQL 14 벤치마크: cold 중앙값 849ms, warm 13ms. SQLite보다 cold가 약 2.8배 느리다.
+  - 모바일 에뮬레이션(Slow 4G, CPU 4배): 캐시 미스 TTFB 2,827ms, LCP 3,328ms. 캐시 히트 TTFB 475ms, LCP 1,052ms. 브라우저 캐시가 비어 있으면 폰트 2MB 때문에 load가 약 15초(C-6).
+  - 운영 엣지는 Cloudflare이고 `/stats/`를 캐시하지 않는다(`DYNAMIC`).
+- 다음: 서버 쪽 캐시 미스 확인과 B-6 분해를 위한 Server-Timing 헤더 트랙. 계획 승인 대기.
+- Deferred: 백로그 A-7, B-6, B-7, C-6.
 
 ## 2026-08-31 — 서치 콘솔 등록 지원 + GA4 도입 (사용자 지시)
 
@@ -718,6 +725,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
 | A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
+| A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -728,7 +736,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초다. 쿼리 21회의 Render→Supabase 풀러 왕복, 데이터 양, CPU 중 무엇인지 확인되지 않았다. 트리거: 통계 페이지 최적화를 계획할 때. 일회용 PostgreSQL 테스트 DB 또는 읽기 전용 계측을 별도 계획으로 진행한다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초, 로컬 PostgreSQL 14 cold는 0.85초다. 남은 약 1.9초가 쿼리 21회의 Render→Supabase 풀러 왕복인지, 서버 CPU인지 확인되지 않았다. 진행 중: Server-Timing 헤더 트랙(사용자 결정 2026-09-30). | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms. 로컬 PostgreSQL cold 849ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 
 ### C. 프런트엔드·정적 자산 정리
@@ -740,7 +748,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | C-3 | FontAwesome 전역 제거. `base.html:29`의 CDN+SRI 로드, `utils.js`의 `showOverlay(..., 'fa-sign-in-alt')`, 그리고 아직 `fa-`를 쓰는 템플릿 7개(`base`, `shared/_date_selector`, `dashboard/index`, `users/{account_delete_confirm,login}`, `users/recovery/*` 2개). | 6단계 로그 | 위 파일 목록 grep 확인 |
 | C-4 | 44px 터치 타깃 전역 재확인 — 저장소 전역으로 함께 올려야 하는 항목이라 개별로 고치지 않았다: `.segmented__item` 약 28px(`style.css:339`, padding 6px 11px), 시트 닫기 버튼 32px(시안 명시값), `_table_row_actions.html`의 미달 버튼(메모 화면), 데스크톱 슬롯 19px(WCAG 2.5.8 격차). | 5·6단계 로그 + `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | `.segmented__item` 수치 확인 |
 | C-5 | `.chip__swatch`(설정·카테고리 안내·온보딩·태그 관리)와 `.category-picker__swatch`(태그 모달)가 테두리 없이 라이트 표면에 놓여 대비 1.44~2.15. 공용 테두리 규칙 하나로 묶는 편이 낫다. | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | 두 규칙 모두 `border` 없음 확인(`style.css:317`, `:3694`) |
-| C-6 | `PretendardVariable.woff2` 2.0MB — 서브셋 빌드 파이프라인. 이번 트랙은 전체 가변 폰트를 그대로 넣었다. | `docs/plans/2026-08-16_p0-v2-handoff-plan.md` | 파일 크기 2,057,688B 확인 |
+| C-6 | `PretendardVariable.woff2` 2.0MB — 서브셋 빌드 파이프라인. 이번 트랙은 전체 가변 폰트를 그대로 넣었다. 2026-09-30 모바일 측정(Slow 4G, CPU 4배, 브라우저 캐시 무시)에서 이 폰트 하나가 약 14.3초 걸려 `/stats/` load가 약 15초로 늘어났다. LCP는 약 2.9초로 영향이 없었다. | `docs/plans/2026-08-16_p0-v2-handoff-plan.md`, `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 파일 크기 2,057,688B 확인. 운영 전송 2,010KB 실측 (2026-09-30) |
 | C-7 | 확인 모달 없는 태그 삭제 경로의 이중 제출 가드(`tag.js`), 삭제 모달의 이중 제출 창. | `docs/refactoring/2026-08-12_sian-conformance-stage7.md` | — |
 | C-8 | sessionStorage 차단 환경에서 온보딩 STEP3 취소 버튼이 없는데 이를 사용자에게 알리지 않는다. | 같은 문서 | — |
 | C-9 | `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지우는 선존재 결함(갱신 행이 늘어 더 자주 드러남, 새로고침하면 복구). | `docs/frontend/2026-08-14-grid-label-and-hour-axis.md` | — |
