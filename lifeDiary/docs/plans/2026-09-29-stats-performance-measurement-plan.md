@@ -4,7 +4,7 @@
 
 **Goal:** Make full `/stats/` test requests report total duration, before-render and render phase duration, query count, SQL execute time, response size, and cold/warm cache distributions without changing production request behavior.
 
-**Architecture:** Add one small measurement helper using `connection.execute_wrapper()` and the `template_rendered` test signal around a supplied Django test-client request. Extend the existing fixed-fixture statistics performance test to request the whole page repeatedly under a `LocMemCache` override, after one separately labelled warm-up request, and print structured samples. Record browser measurement conditions and the previously observed live desktop samples in a separate evidence document. All synthetic writes happen inside pytest's test database.
+**Architecture:** Add one small measurement helper, exposed as pytest fixtures in `apps/stats/conftest.py`, using `connection.execute_wrapper()` and the `template_rendered` test signal around a supplied Django test-client request. Extend the existing fixed-fixture statistics performance test to request the whole page repeatedly under a `LocMemCache` override, after one separately labelled warm-up request, and print structured samples. Record browser measurement conditions and the previously observed live desktop samples in a separate evidence document. All synthetic writes happen inside pytest's test database.
 
 **Tech Stack:** Django 5.2 test client, pytest-django, Python stdlib `time` and `statistics`; no new dependency.
 
@@ -21,11 +21,11 @@
 - Backend TDD Coach: define the measurement contract test and Red/Green evidence.
 - Backend & Integration Engineer: implement test-only measurement helper and evidence.
 - Quality Verification Lead: check output and relevant regressions.
+- Domain Architecture Reviewer: activated for the 2026-09-30 re-review of helper placement only.
 
 ## Not Activated
 
 - Product Scope Owner: scope is explicitly selected as performance measurement, without product behavior changes.
-- Domain Architecture Reviewer: no domain dependency direction or schema change.
 - Security & Resilience Reviewer: synthetic test data and no production endpoint change; privacy rules are listed below.
 - Deployment & Operations Reviewer: no deployment or production settings change.
 - Web Experience Designer, Browser Interaction Reviewer, Frontend Implementation Engineer: browser behavior is measured, not changed.
@@ -33,11 +33,11 @@
 
 ## Domain Boundary and Dependency Direction
 
-The helper is only imported by statistics tests. It does not enter views, use cases, or app settings. It calls the test client and observes the DB connection in the same thread. No domain rule or dependency direction changes.
+The helper lives in `apps/stats/conftest.py` as pytest fixtures, following the repository's convention for reusable test tooling (`apps/tags/conftest.py`, `apps/dashboard/conftest.py`). It is not importable by application code, does not enter views, use cases, or app settings, and exists only under pytest-django, which sets up the test environment that emits `template_rendered`. It calls the test client and observes the DB connection in the same thread. No domain rule or dependency direction changes. The first implementation placed it in `apps/stats/request_performance.py`; the 2026-09-30 re-review moved it because that module shipped in the deploy tree and desktop build.
 
 ## Coupling and Cohesion Review
 
-The statistics performance test owns the fixture and full-page benchmark. The helper accepts a callable and returns plain measurement data, so it has no knowledge of statistics business rules. Coupling to Django's documented instrumentation hooks (`execute_wrapper`, `template_rendered`) is limited to the helper.
+The statistics performance test owns the fixture and full-page benchmark. The helper takes a Django test client and a path, performs one GET, and returns plain measurement data, so it has no knowledge of statistics business rules. Coupling to Django's documented instrumentation hooks (`execute_wrapper`, `template_rendered`) is limited to the helper.
 
 ## Pythonic Code Design
 
@@ -49,9 +49,39 @@ Rows are in execution order, smallest scenario first; Scenario IDs are unchanged
 
 | ID | Business behavior | Given | When | Then | Boundary | Rationale | Test name | Status | Evidence |
 |---|---|---|---|---|---|---|---|---|---|
-| PERF-03 | A failed page request remains visible in evidence | Anonymous test client | Measure `/stats/?date=2026-04-15` once | Sample keeps status 302 with zero response bytes and zero queries | contract | Instrumenting a non-200 outcome needs a real test-client round trip | `test_measurement_retains_redirect_response` | Pending | Pending; work log |
-| PERF-01 | A user can measure the complete statistics response | Authenticated user with 2,160 records; default test cache (`DummyCache`, always a miss) | Measure `/stats/?date=2026-04-15` once | 200 response; positive response bytes; query count above zero; SQL execute time, before-render time, and render time each present and no greater than elapsed time; vendor equals `connection.vendor` | contract | Full HTTP, DB, and render instrumentation are the contract | `test_full_stats_request_reports_measured_cost` | Pending | Pending; work log |
-| PERF-02 | Repeated statistics loads show cache state separately | Same user/date; test body overrides `settings.CACHES` to `LocMemCache` and clears it; one warm-up request sent and labelled first | Measure five cycles of invalidate, cold request, warm request, then summarize | Ten successful samples; every warm query count is lower than every cold query count; summary names database vendor and cache backend | contract | Cache-dependent query cost needs a real cache backend and real queries | `test_stats_request_benchmark_reports_cold_and_warm_samples` | Pending | Pending; work log |
+| PERF-03 | A failed page request remains visible in evidence | Anonymous test client | Measure `/stats/?date=2026-04-15` once | Sample keeps status 302 with zero response bytes and zero queries | contract | Instrumenting a non-200 outcome needs a real test-client round trip | `test_measurement_retains_redirect_response` | Green | Work log, PERF-03 |
+| PERF-01 | A user can measure the complete statistics response | Authenticated user with 2,160 records; default test cache (`DummyCache`, always a miss) | Measure `/stats/?date=2026-04-15` once | 200 response; positive response bytes; query count above zero; SQL execute time, before-render time, and render time each present and no greater than elapsed time; vendor equals `connection.vendor` | contract | Full HTTP, DB, and render instrumentation are the contract | `test_full_stats_request_reports_measured_cost` | Green | Work log, PERF-01 |
+| PERF-02 | Repeated statistics loads show cache state separately | Same user/date; test body overrides `settings.CACHES` to `LocMemCache` and clears it; one warm-up request sent and labelled first | Measure five cycles of invalidate, cold request, warm request, then summarize | Ten successful samples; every warm query count is lower than every cold query count; summary names database vendor and cache backend | contract | Cache-dependent query cost needs a real cache backend and real queries | `test_stats_request_benchmark_reports_cold_and_warm_samples` | Green | Work log, PERF-02 |
+| PERF-04 | A report that contains failed requests still summarizes and keeps them visible | Two anonymous samples grouped under one label | Summarize the group | Both samples kept with status 302; before-render and render distributions are `None`; elapsed min, median, max are ordered | contract | Discovered during PERF-02 Green: unmeasured phase values crashed the summary | `test_report_keeps_failed_requests_without_render_timing` | Green | Work log, PERF-04 |
+
+Evidence lives in `docs/refactoring/2026-09-29-stats-performance-measurement.md`.
+
+### Re-review additions (2026-09-30)
+
+The user approved these after the re-review. The Backend TDD Coach fixed the order: refactor R1 first, then PERF-06, PERF-05, the PERF-01 revision, and the PERF-02 revision.
+
+R1 moves `RequestSample` and both helpers verbatim into `apps/stats/conftest.py`, exposes them as the fixtures `measure_request` and `summarize_samples`, makes the four tests take those fixtures, and deletes `apps/stats/request_performance.py`. R1 adds no field, changes no signature, and leaves `DEBUG` and cache cleanup alone. Evidence: 8 passed before and after, and no code reference to `request_performance` remains.
+
+| ID | Business behavior | Given | When | Then | Boundary | Rationale | Test name | Status | Evidence |
+|---|---|---|---|---|---|---|---|---|---|
+| PERF-06 | Asking for a summary with no measured samples fails clearly instead of crashing | No sample anywhere: `{}` and `{"warmup": []}` as parametrized ids `no_groups`, `empty_group` | Summarize once | `ValueError`; only the type is asserted | unit | A pure function over in-memory values; HTTP and DB add nothing | `test_report_without_samples_is_rejected` | Pending | Work log, PERF-06 |
+| PERF-05 | The statistics page finishes all data access before it starts rendering | Authenticated user with 2,160 records; default test cache | Measure `/stats/?date=2026-04-15` once | `queries_before_render` equals `query_count`, and `query_count` is above zero | contract | A count equality checks the split point without timing; the millisecond bounds could not detect swapped phases or a split at the last signal | `test_stats_page_finishes_data_access_before_rendering` | Pending | Work log, PERF-05 |
+| PERF-01 rev. | Same as PERF-01 | Adds a visible precondition check that the default cache is `DummyCache` | Same | Adds `sql_execute_ms` above zero | contract | Zero SQL time passed the original bounds | `test_full_stats_request_reports_measured_cost` | Pending | Mutation-Red, work log |
+| PERF-02 rev. | Same as PERF-02, and the report names the cache backend that actually served the requests | Adds `DEBUG = False` in the body; cache cleanup runs in `finally` | Summarize without a `cache_backend` keyword | `cache_backend` equals `LocMemCache`, now read from the backend in use rather than passed in | contract | The previous check compared a constant with itself | `test_stats_request_benchmark_reports_cold_and_warm_samples` | Pending | Work log, PERF-02 rev. |
+
+Expected Red and minimum Green for each:
+
+- PERF-06. Red: `StopIteration` escapes instead of `ValueError`. Green: detect that no sample exists anywhere and raise `ValueError`. Nothing else changes.
+- PERF-05. Red: `AttributeError` for `queries_before_render`. Green: add `queries_before_render: int | None`, record when each query completes, and count those completed before the first render signal. It is `None` when nothing rendered. The phase-time computation stays unchanged.
+- PERF-01 rev. There is no ordinary Red, because the capability already exists. The Coach accepted mutation-Red instead, recorded as four items:
+  1. The temporary mutation: the SQL wrapper records 0 ns.
+  2. The failure, landing on `assert sample.sql_execute_ms > 0` only.
+  3. Confirmation that the mutation was reverted, not committed.
+  4. A fresh passing run.
+- PERF-02 rev. Red: `TypeError` for the missing `cache_backend` keyword, after the call drops it. Green in one step:
+  - Add `cache_backend: str` to `RequestSample`, read from the class path of the live `caches["default"]` object, not from settings.
+  - Derive it in `summarize_samples` the same way `database_vendor` is derived, and drop the keyword.
+  - Update the PERF-04 call site in the same commit.
 
 ### Backend TDD Coach output: next test (condensed)
 
@@ -93,13 +123,20 @@ Take one scenario at a time. Import the helper inside the test body until that s
 1. PERF-02 Red: add only `test_stats_request_benchmark_reports_cold_and_warm_samples` using the existing `seeded_user` fixture and `client.force_login(user)`. In the test body override `settings.CACHES` to `LocMemCache`, call `cache.clear()`, send one warm-up request, then run five cycles of `invalidate_stats_cache(user.id, today)`, cold request, warm request. Expected Red reason: `ImportError` from the in-body import of `summarize_samples`. The cache override is present from the first run, so Red cannot come from `DummyCache`.
 2. PERF-02 Green: add `summarize_samples()` to `apps/stats/request_performance.py`. Report the warm-up sample under its own label, outside both distributions, and five cold and five warm samples as JSON with database vendor, cache backend, raw samples, min/median/max for elapsed, before-render, render, and SQL execute time, and query counts. Assert all ten status 200 and every warm query count lower than every cold query count. Do not assert milliseconds. Clear the cache when the test ends.
 3. Run targeted and full `apps/stats/test_stats_perf.py` tests. Capture the report with `-s` and verify the database vendor and cache backend are explicit.
+4. PERF-04, discovered during step 2 and taken as its own cycle: add only `test_report_keeps_failed_requests_without_render_timing`. Expected Red reason: `TypeError` from comparing `None` phase values. Green: the distribution skips unmeasured values and is `None` when nothing was measured.
+
+### Task 2b: Re-review changes
+
+**Files:** Create `apps/stats/conftest.py`; delete `apps/stats/request_performance.py`; modify `apps/stats/test_stats_perf.py`.
+
+Run the steps in the order of the "Re-review additions" table. Take R1 first. After R1, one scenario at a time, each with its Red (or mutation-Red) and Green evidence and the whole file as the regression slice.
 
 ### Task 3: Browser protocol and evidence
 
 **Files:** Create `docs/refactoring/2026-09-29-stats-performance-measurement.md`; modify `docs/project-status.md`.
 
-1. Record browser setup: authenticated test account, Chromium version, 1365×900 desktop viewport, network mode, navigation method, cache state, and at least five attempts for future comparisons. Explain that current earlier three-sample desktop results are exploratory and the isolated 3.83-second first load is one observation.
-2. Record backend command and exact observed warm-up, cold, and warm samples. State that the test database is SQLite and does not measure production PostgreSQL or network transfer, and that SQL execute time excludes row fetch and ORM model construction.
+1. Run and record a fresh browser measurement on the live site with the user's own login in the DevTools-controlled Chrome: Chromium version, 1365×900 desktop viewport, network mode, navigation method, browser and server cache state, and at least five loads with the first load reported separately. The earlier three-sample desktop results and the 3.83-second first load have no raw record in the repository; report them only as unrecorded prior observations, never as evidence.
+2. Rerun the benchmark after all code changes and record the exact command and the observed warm-up, cold, and warm samples. State that the test database is SQLite and does not measure production PostgreSQL or network transfer, and give the per-vendor meaning of SQL execute time from the design.
 3. Run `conda run -n knou-life-diary python -m pytest apps/stats/test_stats_perf.py -v -o cache_dir=/tmp/lifediary-pytest-cache`, `conda run -n knou-life-diary python manage.py check`, and `git diff --check`. Report every unverified item.
 
 ## Privacy and safety
