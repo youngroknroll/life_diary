@@ -21,7 +21,7 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
-from apps.stats.request_performance import measure_request
+from apps.stats.request_performance import measure_request, summarize_samples
 from apps.stats.use_cases import invalidate_stats_cache
 from apps.tags.models import Category, Tag
 
@@ -174,8 +174,6 @@ def test_full_stats_request_reports_measured_cost(client, seeded_user):
 def test_stats_request_benchmark_reports_cold_and_warm_samples(
     client, seeded_user, settings
 ):
-    from apps.stats.request_performance import summarize_samples
-
     user, today = seeded_user
     settings.CACHES = {
         "default": {
