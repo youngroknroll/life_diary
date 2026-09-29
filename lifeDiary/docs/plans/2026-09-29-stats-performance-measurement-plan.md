@@ -68,6 +68,19 @@ R1 moves `RequestSample` and both helpers verbatim into `apps/stats/conftest.py`
 | PERF-05 | The statistics page finishes all data access before it starts rendering | Authenticated user with 2,160 records; default test cache | Measure `/stats/?date=2026-04-15` once | `queries_before_render` equals `query_count`, and `query_count` is above zero | contract | A count equality checks the split point without timing; the millisecond bounds could not detect swapped phases or a split at the last signal | `test_stats_page_finishes_data_access_before_rendering` | Pending | Work log, PERF-05 |
 | PERF-01 rev. | Same as PERF-01 | Adds a visible precondition check that the default cache is `DummyCache` | Same | Adds `sql_execute_ms` above zero | contract | Zero SQL time passed the original bounds | `test_full_stats_request_reports_measured_cost` | Pending | Mutation-Red, work log |
 | PERF-02 rev. | Same as PERF-02, and the report names the cache backend that actually served the requests | Adds `DEBUG = False` in the body; cache cleanup runs in `finally` | Summarize without a `cache_backend` keyword | `cache_backend` equals `LocMemCache`, now read from the backend in use rather than passed in | contract | The previous check compared a constant with itself | `test_stats_request_benchmark_reports_cold_and_warm_samples` | Pending | Work log, PERF-02 rev. |
+| PERF-01 rev. (b) | Same as PERF-01 | Same | Same | Adds `before_render_ms` greater than `render_ms` | contract | Mutation checks showed swapped phases passed PERF-01 and PERF-05. The gap is structural (21 queries and model construction against template output, about 35 times), not a tuned threshold | `test_full_stats_request_reports_measured_cost` | Pending | Second mutation-Red, work log |
+| PERF-08 | The measured phase split starts at the page's own template, not at a later included partial | Authenticated user with 2,160 records; default test cache | Measure `/stats/?date=2026-04-15` once | `first_rendered_template` is `stats/index.html` | contract | Mutation checks showed a split at the last signal passed PERF-01 and PERF-05. Django fires the page template's signal before its nodelist, and `{% include %}` fires later ones | `test_stats_page_render_boundary_starts_at_page_template` | Pending | Work log, PERF-08 |
+
+The last two rows came from mutation checks run after PERF-05 went Green, recorded in the work log:
+
+- Splitting at the last render signal passed PERF-01 and PERF-05.
+- Swapping the two phase computations passed both.
+- A query snapshot fixed at 0 failed PERF-05.
+
+The Coach retracted its earlier claim that PERF-05 closed the first two cases. It then approved these two rows. The PERF-02 revision had already been committed when the ruling arrived, so the two rows run after it, not before. They touch different lines.
+
+- PERF-01 rev. (b). Mutation-Red, separate from the SQL one: swap the `before_render_ms` and `render_ms` values. The failure must land on the new assertion only.
+- PERF-08. Red: `AttributeError` for `first_rendered_template`. Green: the render receiver also captures the first sender's template name. It is `None` when nothing rendered.
 
 Expected Red and minimum Green for each:
 
