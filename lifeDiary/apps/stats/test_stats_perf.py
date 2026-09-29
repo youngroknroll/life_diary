@@ -137,3 +137,16 @@ def test_monthly_and_analysis_results_unchanged_under_caching(seeded_user):
     # 일별 합계가 음수가 되거나 24시간을 초과해선 안 됨
     for hours in monthly["daily_totals"]:
         assert 0 <= hours <= 24
+
+
+STATS_REQUEST_PATH = "/stats/?date=2026-04-15"
+
+
+def test_measurement_retains_redirect_response(client, db):
+    from apps.stats.request_performance import measure_request
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.status_code == 302
+    assert sample.response_bytes == 0
+    assert sample.query_count == 0
