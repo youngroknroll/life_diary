@@ -189,6 +189,17 @@ def test_stats_page_finishes_data_access_before_rendering(
     assert sample.queries_before_render == sample.query_count
 
 
+def test_stats_page_render_boundary_starts_at_page_template(
+    client, seeded_user, measure_request
+):
+    user, _ = seeded_user
+    client.force_login(user)
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.first_rendered_template == "stats/index.html"
+
+
 def test_stats_request_benchmark_reports_cold_and_warm_samples(
     client, seeded_user, settings, measure_request, summarize_samples
 ):

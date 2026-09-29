@@ -25,6 +25,7 @@ class RequestSample:
     database_vendor: str
     queries_before_render: int | None
     cache_backend: str
+    first_rendered_template: str | None
 
 
 @pytest.fixture
@@ -50,7 +51,9 @@ def _measure_request(client, path: str) -> RequestSample:
             sql_durations_ns.append(time.perf_counter_ns() - started_ns)
 
     def mark_render_start(sender, **kwargs):
-        render_starts.append((time.perf_counter_ns(), len(sql_durations_ns)))
+        render_starts.append(
+            (time.perf_counter_ns(), len(sql_durations_ns), sender.name)
+        )
 
     template_rendered.connect(mark_render_start)
     try:
@@ -62,8 +65,8 @@ def _measure_request(client, path: str) -> RequestSample:
     finally:
         template_rendered.disconnect(mark_render_start)
 
-    first_render_ns, queries_before_render = (
-        render_starts[0] if render_starts else (None, None)
+    first_render_ns, queries_before_render, first_rendered_template = (
+        render_starts[0] if render_starts else (None, None, None)
     )
     return RequestSample(
         status_code=response.status_code,
@@ -76,6 +79,7 @@ def _measure_request(client, path: str) -> RequestSample:
         database_vendor=connection.vendor,
         queries_before_render=queries_before_render,
         cache_backend=_class_path(caches["default"]),
+        first_rendered_template=first_rendered_template,
     )
 
 
