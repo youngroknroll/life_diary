@@ -149,3 +149,18 @@ def test_measurement_retains_redirect_response(client, db):
     assert sample.status_code == 302
     assert sample.response_bytes == 0
     assert sample.query_count == 0
+
+
+def test_full_stats_request_reports_measured_cost(client, seeded_user):
+    user, _ = seeded_user
+    client.force_login(user)
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.status_code == 200
+    assert sample.response_bytes > 0
+    assert sample.query_count > 0
+    assert 0 <= sample.sql_execute_ms <= sample.elapsed_ms
+    assert 0 <= sample.before_render_ms <= sample.elapsed_ms
+    assert 0 <= sample.render_ms <= sample.elapsed_ms
+    assert sample.database_vendor == connection.vendor
