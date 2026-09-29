@@ -22,6 +22,7 @@ class RequestSample:
     render_ms: float | None
     sql_execute_ms: float
     database_vendor: str
+    queries_before_render: int | None
 
 
 @pytest.fixture
@@ -36,7 +37,7 @@ def summarize_samples():
 
 def _measure_request(client, path: str) -> RequestSample:
     sql_durations_ns = []
-    render_starts_ns = []
+    render_starts = []
 
     # execute 만 잰다. fetch 와 ORM 모델 생성은 래퍼가 끝난 뒤에 일어난다.
     def time_query(execute, sql, params, many, context):
@@ -47,7 +48,7 @@ def _measure_request(client, path: str) -> RequestSample:
             sql_durations_ns.append(time.perf_counter_ns() - started_ns)
 
     def mark_render_start(sender, **kwargs):
-        render_starts_ns.append(time.perf_counter_ns())
+        render_starts.append((time.perf_counter_ns(), len(sql_durations_ns)))
 
     template_rendered.connect(mark_render_start)
     try:
@@ -59,7 +60,9 @@ def _measure_request(client, path: str) -> RequestSample:
     finally:
         template_rendered.disconnect(mark_render_start)
 
-    first_render_ns = render_starts_ns[0] if render_starts_ns else None
+    first_render_ns, queries_before_render = (
+        render_starts[0] if render_starts else (None, None)
+    )
     return RequestSample(
         status_code=response.status_code,
         response_bytes=len(body),
@@ -69,6 +72,7 @@ def _measure_request(client, path: str) -> RequestSample:
         render_ms=_phase_ms(first_render_ns, finished_ns),
         sql_execute_ms=_to_ms(sum(sql_durations_ns)),
         database_vendor=connection.vendor,
+        queries_before_render=queries_before_render,
     )
 
 

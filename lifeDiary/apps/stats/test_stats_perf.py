@@ -170,6 +170,18 @@ def test_full_stats_request_reports_measured_cost(client, seeded_user, measure_r
     assert sample.database_vendor == connection.vendor
 
 
+def test_stats_page_finishes_data_access_before_rendering(
+    client, seeded_user, measure_request
+):
+    user, _ = seeded_user
+    client.force_login(user)
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.query_count > 0
+    assert sample.queries_before_render == sample.query_count
+
+
 def test_stats_request_benchmark_reports_cold_and_warm_samples(
     client, seeded_user, settings, measure_request, summarize_samples
 ):
