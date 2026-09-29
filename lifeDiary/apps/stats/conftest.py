@@ -76,8 +76,11 @@ def _summarize_samples(
     grouped_samples: dict[str, list[RequestSample]], *, cache_backend: str
 ) -> dict:
     first_sample = next(
-        sample for samples in grouped_samples.values() for sample in samples
+        (sample for samples in grouped_samples.values() for sample in samples),
+        None,
     )
+    if first_sample is None:
+        raise ValueError("no samples to summarize")
     return {
         "database_vendor": first_sample.database_vendor,
         "cache_backend": cache_backend,

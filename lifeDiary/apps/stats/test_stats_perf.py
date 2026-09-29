@@ -222,3 +222,11 @@ def test_report_keeps_failed_requests_without_render_timing(
     assert redirected["render_ms"] is None
     elapsed = redirected["elapsed_ms"]
     assert elapsed["min"] <= elapsed["median"] <= elapsed["max"]
+
+
+@pytest.mark.parametrize(
+    "grouped", [{}, {"warmup": []}], ids=["no_groups", "empty_group"]
+)
+def test_report_without_samples_is_rejected(grouped, summarize_samples):
+    with pytest.raises(ValueError):
+        summarize_samples(grouped, cache_backend=LOCMEM_CACHE_BACKEND)
