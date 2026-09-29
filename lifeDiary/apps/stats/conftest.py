@@ -4,6 +4,7 @@ import time
 from dataclasses import asdict, dataclass
 from statistics import median
 
+import pytest
 from django.db import connection
 from django.test.signals import template_rendered
 
@@ -23,7 +24,17 @@ class RequestSample:
     database_vendor: str
 
 
-def measure_request(client, path: str) -> RequestSample:
+@pytest.fixture
+def measure_request():
+    return _measure_request
+
+
+@pytest.fixture
+def summarize_samples():
+    return _summarize_samples
+
+
+def _measure_request(client, path: str) -> RequestSample:
     sql_durations_ns = []
     render_starts_ns = []
 
@@ -61,7 +72,7 @@ def measure_request(client, path: str) -> RequestSample:
     )
 
 
-def summarize_samples(
+def _summarize_samples(
     grouped_samples: dict[str, list[RequestSample]], *, cache_backend: str
 ) -> dict:
     first_sample = next(
