@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-08-31
+Last updated: 2026-09-30
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,36 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-09-30 — 통계 전체 요청 성능 측정 (사용자 지시)
+
+`/stats/` 요청 하나를 통째로 재는 테스트 전용 측정 도구를 만들었다(`apps/stats/conftest.py`). 요청을 다음 항목으로 쪼개서 본다.
+
+- 전체 시간
+- 렌더 전 구간과 렌더 구간
+- 쿼리 수와 SQL execute 시간
+- DB 종류와 캐시 백엔드
+
+벤치마크는 워밍업을 따로 두고 cold 5회, warm 5회의 분포를 보고한다. 운영 사이트에서는 브라우저로 TTFB, LCP, CLS를 쟀다.
+
+구현 뒤 세 검토자가 다시 보았고, 그 결과로 두 가지를 고쳤다.
+
+- 헬퍼를 운영 패키지 모듈에서 conftest 픽스처로 옮겼다.
+- 측정이 결함을 잡는지 돌연변이 검사로 확인하고, 잡지 못한 경우를 막는 테스트를 더했다.
+
+결과 요약:
+
+- 로컬 벤치마크 (SQLite): cold 중앙값 298ms(쿼리 21개), warm 17ms(쿼리 3개).
+- 운영 브라우저: 처음 연 날짜의 TTFB 중앙값 2,817ms, 다시 연 날짜 454ms. LCP 중앙값은 각각 2,868ms와 520ms. CLS는 모두 0. 처음 연 날짜를 서버 캐시 미스로 본 것은 TTFB 차이로 추정한 분류이며, 서버 쪽에서 확인하지 않았다.
+- 로컬과 운영의 캐시 미스 차이(약 0.3초 대 2.7초)는 설명하지 못했고 가설로 남겼다.
+
+링크와 검증:
+
+- 계획: `docs/plans/2026-09-29-stats-performance-measurement-plan.md`
+- 설계: `docs/plans/2026-09-29-stats-performance-measurement-design.md`
+- 실행 로그: `docs/refactoring/2026-09-29-stats-performance-measurement.md`
+- 검증: 전체 회귀 605 passed, `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0 (기존 W009 1건).
+- Deferred: 백로그 B-6, B-7.
 
 ## 2026-08-31 — 서치 콘솔 등록 지원 + GA4 도입 (사용자 지시)
 
@@ -698,6 +728,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
+| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초다. 쿼리 21회의 Render→Supabase 풀러 왕복, 데이터 양, CPU 중 무엇인지 확인되지 않았다. 트리거: 통계 페이지 최적화를 계획할 때. 일회용 PostgreSQL 테스트 DB 또는 읽기 전용 계측을 별도 계획으로 진행한다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms (2026-09-30) |
+| B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 
 ### C. 프런트엔드·정적 자산 정리
 
