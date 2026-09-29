@@ -19,6 +19,7 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
+from apps.stats.request_performance import measure_request
 from apps.tags.models import Category, Tag
 
 # 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6
@@ -143,8 +144,6 @@ STATS_REQUEST_PATH = "/stats/?date=2026-04-15"
 
 
 def test_measurement_retains_redirect_response(client, db):
-    from apps.stats.request_performance import measure_request
-
     sample = measure_request(client, STATS_REQUEST_PATH)
 
     assert sample.status_code == 302
