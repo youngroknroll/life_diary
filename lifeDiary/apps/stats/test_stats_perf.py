@@ -10,9 +10,11 @@
 """
 from __future__ import annotations
 
+import json
 from datetime import date, timedelta
 
 import pytest
+from django.core.cache import cache
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
@@ -20,6 +22,7 @@ from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
 from apps.stats.request_performance import measure_request
+from apps.stats.use_cases import invalidate_stats_cache
 from apps.tags.models import Category, Tag
 
 # 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6
@@ -141,6 +144,8 @@ def test_monthly_and_analysis_results_unchanged_under_caching(seeded_user):
 
 
 STATS_REQUEST_PATH = "/stats/?date=2026-04-15"
+LOCMEM_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+BENCHMARK_CYCLES = 5
 
 
 def test_measurement_retains_redirect_response(client, db):
@@ -164,3 +169,41 @@ def test_full_stats_request_reports_measured_cost(client, seeded_user):
     assert 0 <= sample.before_render_ms <= sample.elapsed_ms
     assert 0 <= sample.render_ms <= sample.elapsed_ms
     assert sample.database_vendor == connection.vendor
+
+
+def test_stats_request_benchmark_reports_cold_and_warm_samples(
+    client, seeded_user, settings
+):
+    from apps.stats.request_performance import summarize_samples
+
+    user, today = seeded_user
+    settings.CACHES = {
+        "default": {
+            "BACKEND": LOCMEM_CACHE_BACKEND,
+            "LOCATION": "stats-request-benchmark",
+        }
+    }
+    cache.clear()
+    client.force_login(user)
+
+    warmup = measure_request(client, STATS_REQUEST_PATH)
+    cold, warm = [], []
+    for _ in range(BENCHMARK_CYCLES):
+        invalidate_stats_cache(user.id, today)
+        cold.append(measure_request(client, STATS_REQUEST_PATH))
+        warm.append(measure_request(client, STATS_REQUEST_PATH))
+    cache.clear()
+
+    report = summarize_samples(
+        {"warmup": [warmup], "cold": cold, "warm": warm},
+        cache_backend=LOCMEM_CACHE_BACKEND,
+    )
+    print(json.dumps(report, indent=2))
+
+    assert [sample.status_code for sample in cold + warm] == [200] * 10
+    assert max(s.query_count for s in warm) < min(s.query_count for s in cold)
+    assert report["database_vendor"] == connection.vendor
+    assert report["cache_backend"] == LOCMEM_CACHE_BACKEND
+    assert len(report["groups"]["warmup"]["samples"]) == 1
+    assert len(report["groups"]["cold"]["samples"]) == BENCHMARK_CYCLES
+    assert len(report["groups"]["warm"]["samples"]) == BENCHMARK_CYCLES

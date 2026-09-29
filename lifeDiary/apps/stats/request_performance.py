@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from statistics import median
 
 from django.db import connection
 from django.test.signals import template_rendered
 
 NANOSECONDS_PER_MILLISECOND = 1_000_000
+DISTRIBUTION_FIELDS = ("elapsed_ms", "before_render_ms", "render_ms", "sql_execute_ms")
 
 
 @dataclass(frozen=True)
@@ -57,6 +59,38 @@ def measure_request(client, path: str) -> RequestSample:
         sql_execute_ms=_to_ms(sum(sql_durations_ns)),
         database_vendor=connection.vendor,
     )
+
+
+def summarize_samples(
+    grouped_samples: dict[str, list[RequestSample]], *, cache_backend: str
+) -> dict:
+    first_sample = next(
+        sample for samples in grouped_samples.values() for sample in samples
+    )
+    return {
+        "database_vendor": first_sample.database_vendor,
+        "cache_backend": cache_backend,
+        "groups": {
+            label: _summarize_group(samples)
+            for label, samples in grouped_samples.items()
+        },
+    }
+
+
+def _summarize_group(samples: list[RequestSample]) -> dict:
+    distributions = {
+        field: _distribution([getattr(sample, field) for sample in samples])
+        for field in DISTRIBUTION_FIELDS
+    }
+    return {
+        "samples": [asdict(sample) for sample in samples],
+        "query_counts": [sample.query_count for sample in samples],
+        **distributions,
+    }
+
+
+def _distribution(values: list[float]) -> dict:
+    return {"min": min(values), "median": median(values), "max": max(values)}
 
 
 def _to_ms(duration_ns: int) -> float:
