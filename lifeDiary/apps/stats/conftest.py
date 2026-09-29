@@ -5,6 +5,7 @@ from dataclasses import asdict, dataclass
 from statistics import median
 
 import pytest
+from django.core.cache import caches
 from django.db import connection
 from django.test.signals import template_rendered
 
@@ -23,6 +24,7 @@ class RequestSample:
     sql_execute_ms: float
     database_vendor: str
     queries_before_render: int | None
+    cache_backend: str
 
 
 @pytest.fixture
@@ -73,12 +75,11 @@ def _measure_request(client, path: str) -> RequestSample:
         sql_execute_ms=_to_ms(sum(sql_durations_ns)),
         database_vendor=connection.vendor,
         queries_before_render=queries_before_render,
+        cache_backend=_class_path(caches["default"]),
     )
 
 
-def _summarize_samples(
-    grouped_samples: dict[str, list[RequestSample]], *, cache_backend: str
-) -> dict:
+def _summarize_samples(grouped_samples: dict[str, list[RequestSample]]) -> dict:
     first_sample = next(
         (sample for samples in grouped_samples.values() for sample in samples),
         None,
@@ -87,7 +88,7 @@ def _summarize_samples(
         raise ValueError("no samples to summarize")
     return {
         "database_vendor": first_sample.database_vendor,
-        "cache_backend": cache_backend,
+        "cache_backend": first_sample.cache_backend,
         "groups": {
             label: _summarize_group(samples)
             for label, samples in grouped_samples.items()
@@ -112,6 +113,10 @@ def _distribution(values: list[float | None]) -> dict | None:
     if not measured:
         return None
     return {"min": min(measured), "median": median(measured), "max": max(measured)}
+
+
+def _class_path(obj) -> str:
+    return f"{type(obj).__module__}.{type(obj).__qualname__}"
 
 
 def _to_ms(duration_ns: int) -> float:

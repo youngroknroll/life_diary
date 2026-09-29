@@ -197,21 +197,21 @@ def test_stats_request_benchmark_reports_cold_and_warm_samples(
             "LOCATION": "stats-request-benchmark",
         }
     }
+    settings.DEBUG = False
     cache.clear()
     client.force_login(user)
 
-    warmup = measure_request(client, STATS_REQUEST_PATH)
-    cold, warm = [], []
-    for _ in range(BENCHMARK_CYCLES):
-        invalidate_stats_cache(user.id, today)
-        cold.append(measure_request(client, STATS_REQUEST_PATH))
-        warm.append(measure_request(client, STATS_REQUEST_PATH))
-    cache.clear()
+    try:
+        warmup = measure_request(client, STATS_REQUEST_PATH)
+        cold, warm = [], []
+        for _ in range(BENCHMARK_CYCLES):
+            invalidate_stats_cache(user.id, today)
+            cold.append(measure_request(client, STATS_REQUEST_PATH))
+            warm.append(measure_request(client, STATS_REQUEST_PATH))
+    finally:
+        cache.clear()
 
-    report = summarize_samples(
-        {"warmup": [warmup], "cold": cold, "warm": warm},
-        cache_backend=LOCMEM_CACHE_BACKEND,
-    )
+    report = summarize_samples({"warmup": [warmup], "cold": cold, "warm": warm})
     print(json.dumps(report, indent=2))
 
     assert [sample.status_code for sample in cold + warm] == [200] * 10
@@ -224,14 +224,11 @@ def test_stats_request_benchmark_reports_cold_and_warm_samples(
 
 
 def test_report_keeps_failed_requests_without_render_timing(
-    client, db, settings, measure_request, summarize_samples
+    client, db, measure_request, summarize_samples
 ):
     samples = [measure_request(client, STATS_REQUEST_PATH) for _ in range(2)]
 
-    report = summarize_samples(
-        {"redirected": samples},
-        cache_backend=settings.CACHES["default"]["BACKEND"],
-    )
+    report = summarize_samples({"redirected": samples})
 
     redirected = report["groups"]["redirected"]
     assert [sample["status_code"] for sample in redirected["samples"]] == [302, 302]
@@ -246,4 +243,4 @@ def test_report_keeps_failed_requests_without_render_timing(
 )
 def test_report_without_samples_is_rejected(grouped, summarize_samples):
     with pytest.raises(ValueError):
-        summarize_samples(grouped, cache_backend=LOCMEM_CACHE_BACKEND)
+        summarize_samples(grouped)
