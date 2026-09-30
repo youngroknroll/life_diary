@@ -17,6 +17,35 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-09-30 — 통계 페이지 Server-Timing 헤더 (사용자 지시)
+
+`GET /stats/` 응답에 `Server-Timing` 헤더를 붙였다. 헤더는 운영 스위치가 켜져 있고 로그인한 사용자의 정상 응답일 때만 붙는다. 담는 값은 다음 네 가지다.
+
+- 캐시 hit/miss
+- 통계 데이터 생성 시간(`ctx`)
+- DB execute 시간(`db`)
+- 쿼리 수(`db-count`)
+
+목적은 두 가지다. 운영에서 추정으로 남은 캐시 미스 분류를 서버 쪽에서 확인하고, 캐시 미스 약 2.7초를 나눈다(B-6).
+
+- 스위치: `lifeDiary/settings/prod.py`의 `STATS_SERVER_TIMING_ENABLED`. 환경변수가 `true`일 때만 켜지고 기본은 꺼짐이다. dev와 desktop 설정에는 없다.
+- 헤더에는 SQL, 캐시 키, 사용자 정보, 조회 날짜를 넣지 않는다. 계측 준비가 실패하면 헤더만 빠지고 화면은 그대로 나온다.
+- 계획: `docs/plans/2026-09-30-stats-server-timing-plan.md`
+- 실행 로그: `docs/refactoring/2026-09-30-stats-server-timing.md`
+- 검증: 전체 회귀 617 passed, 0 failed(경고 221건은 모두 WhiteNoise `No directory at`). `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0 (기존 W009 1건), `git diff --check` exit 0.
+- 검토: Backend TDD Coach는 11개 시나리오 모두 Green으로 판정했고, Security & Resilience Reviewer는 9개 기준 모두 충족, 차단 결함 없음으로 판정했다.
+- 미검증:
+  - Cloudflare를 지나도 원 서버 헤더가 살아남는지
+  - 운영 측정값
+  - PostgreSQL에서의 헤더 값
+- 다음 순서:
+  1. PR 머지(사용자)
+  2. `deploy.yml` dry run, 이어서 실제 배포
+  3. 스위치가 꺼진 상태에서 동작 확인
+  4. Render에서 `STATS_SERVER_TIMING_ENABLED=true` 설정
+  5. 새 날짜 5개가 miss, 재조회 5개가 hit인지 측정하고 B-6 분해
+- Deferred: 백로그 A-8, B-8, B-9. A-7은 그대로 남는다.
+
 ## 2026-09-30 — 통계 전체 요청 성능 측정 (사용자 지시)
 
 `/stats/` 요청 하나를 통째로 재는 테스트 전용 측정 도구를 만들었다(`apps/stats/conftest.py`). 요청을 다음 항목으로 쪼개서 본다.
@@ -51,7 +80,7 @@ Status values are based on the repository documents available at the update time
   - 로컬 PostgreSQL 14 벤치마크: cold 중앙값 849ms, warm 13ms. SQLite보다 cold가 약 2.8배 느리다.
   - 모바일 에뮬레이션(Slow 4G, CPU 4배): 캐시 미스 TTFB 2,827ms, LCP 3,328ms. 캐시 히트 TTFB 475ms, LCP 1,052ms. 브라우저 캐시가 비어 있으면 폰트 2MB 때문에 load가 약 15초(C-6).
   - 운영 엣지는 Cloudflare이고 `/stats/`를 캐시하지 않는다(`DYNAMIC`).
-- 다음: 서버 쪽 캐시 미스 확인과 B-6 분해를 위한 Server-Timing 헤더 트랙. 계획 승인 대기.
+- 다음: 서버 쪽 캐시 미스 확인과 B-6 분해를 위한 Server-Timing 헤더 트랙. 구현을 마쳤고 배포와 운영 측정이 남았다(위 절).
 - Deferred: 백로그 A-7, B-6, B-7, C-6.
 
 ## 2026-08-31 — 서치 콘솔 등록 지원 + GA4 도입 (사용자 지시)
@@ -726,6 +755,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
+| A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`)를 측정 뒤에도 켜 둘 경우의 보존 검토. 트리거: 켜 두기로 할 때. 보안과 운영 검토를 다시 한다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -736,8 +766,10 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초, 로컬 PostgreSQL 14 cold는 0.85초다. 남은 약 1.9초가 쿼리 21회의 Render→Supabase 풀러 왕복인지, 서버 CPU인지 확인되지 않았다. 진행 중: Server-Timing 헤더 트랙(사용자 결정 2026-09-30). | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms. 로컬 PostgreSQL cold 849ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초, 로컬 PostgreSQL 14 cold는 0.85초다. 남은 약 1.9초가 쿼리 21회의 Render→Supabase 풀러 왕복인지, 서버 CPU인지 확인되지 않았다. 진행 중: Server-Timing 헤더 트랙(사용자 결정 2026-09-30). 구현은 마쳤고 배포 뒤 운영 측정으로 분해한다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms. 로컬 PostgreSQL cold 849ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
+| B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
+| B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
 
 ### C. 프런트엔드·정적 자산 정리
 

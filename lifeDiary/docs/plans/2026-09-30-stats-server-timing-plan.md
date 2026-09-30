@@ -110,19 +110,30 @@ Backend TDD Coach가 정한 순서는 ST-01 → ST-08 → ST-09 → ST-10 → ST
 
 | ID | 동작 | Given | When | Then | 경계 | 테스트 | 예상 Red | 상태 |
 |---|---|---|---|---|---|---|---|---|
-| ST-01 | 유스케이스가 자기 답이 캐시에서 왔는지 알려 준다 | LocMemCache, 캐시 비움, 기록이 조금 있는 사용자 | 같은 인자로 `execute` 두 번 | 첫 번째 `cache_hit` False, 두 번째 True, `context` 동일 | domain | `test_second_stats_context_lookup_is_a_cache_hit` | `AttributeError: 'dict' object has no attribute 'cache_hit'` | Pending |
-| ST-08 | 운영 스위치는 기본 꺼짐이고 환경변수로만 켜진다 | 운영 설정 재로드. 환경변수 없음 / `true` | 설정 import | 각각 False / True | contract | `test_prod_settings_server_timing_flag_follows_env_var[default_off, explicitly_on]` | 속성 없음으로 실패 | Pending |
-| ST-09 | 개발 설정은 헤더를 켜지 않는다 | pytest의 dev 설정 | 설정 읽기 | False | contract | `test_dev_settings_leave_server_timing_disabled` | Red 없음(회귀 방지용) | Pending |
-| ST-10 | 데스크톱 설정은 헤더를 켜지 않는다 | desktop 설정 재로드 | 설정 import | False | contract | `test_desktop_settings_leave_server_timing_disabled` | Red 없음(회귀 방지용) | Pending |
-| ST-02 | 켜진 통계 페이지가 자기 비용을 표준 헤더로 알린다 | 로그인, 첫 조회(미스), 스위치 켬 | `GET /stats/?date=...` | 헤더가 `cache;desc="miss"`, `ctx;dur=`, `db;dur=`, `db-count;desc="<n> queries"` 형식. 수치 값은 단언하지 않음 | web | `test_stats_response_reports_server_timing_when_enabled` | 헤더 없음 | Pending |
-| ST-03 | 같은 페이지 재조회는 hit으로 알린다 | ST-02와 같음, LocMemCache | 같은 요청 두 번째 | `cache;desc="hit"` | web | `test_stats_response_server_timing_reports_cache_hit_on_repeat_view` | ST-02 구현에 따라 Red 또는 돌연변이 검사 | Pending |
-| ST-04 | 스위치를 끄면 헤더가 사라진다 | 로그인, 스위치 끔 | 같은 요청 | 헤더 없음 | web | `test_stats_response_omits_server_timing_when_disabled` | ST-02 구현에 따라 Red 또는 돌연변이 검사 | Pending |
-| ST-05 | 익명 리다이렉트에는 헤더가 없다 | 익명, 스위치 켬 | 같은 요청 | 302, 헤더 없음 | web | `test_anonymous_stats_redirect_omits_server_timing` | 돌연변이 검사 예상 | Pending |
-| ST-06 | 헤더에 사용자·조회·쿼리 내용이 없다 | 눈에 띄는 사용자명·이메일, 특정 날짜, 스위치 켬 | 같은 요청 | 헤더에 사용자 ID·이름·이메일, 날짜, `SELECT`/`FROM`, `stats:` 없음 | contract | `test_server_timing_header_excludes_user_and_query_content` | Red 없음(개인정보 누출 방지 계약) | Pending |
-| ST-07 | 측정 코드가 깨져도 페이지는 정상 렌더된다 | 스위치 켬, `connection.execute_wrapper`가 예외를 던지도록 주입 | 같은 요청 | 200, 페이지 정상, 헤더 없음 | web | `test_stats_page_still_renders_when_server_timing_measurement_fails` | 주입한 예외가 전파됨 | Pending |
-| ST-11 | 통계 데이터 생성의 실제 오류는 숨기지 않는다 | 스위치 켬, `apps.stats.logic.get_stats_context`가 예외를 던지도록 주입 | 같은 요청 | 주입한 예외가 전파됨 | web | `test_stats_page_propagates_real_database_errors` | ST-07 구현이 맞으면 처음부터 Green, 기록 | Pending |
+| ST-01 | 유스케이스가 자기 답이 캐시에서 왔는지 알려 준다 | LocMemCache, 캐시 비움, 기록이 조금 있는 사용자 | 같은 인자로 `execute` 두 번 | 첫 번째 `cache_hit` False, 두 번째 True, `context` 동일 | domain | `test_second_stats_context_lookup_is_a_cache_hit` | `AttributeError: 'dict' object has no attribute 'cache_hit'` | Green |
+| ST-08 | 운영 스위치는 기본 꺼짐이고 환경변수로만 켜진다 | 운영 설정 재로드. 환경변수 없음 / `true` | 설정 import | 각각 False / True | contract | `test_prod_settings_server_timing_flag_follows_env_var[default_off, explicitly_on]` | 속성 없음으로 실패 | Green |
+| ST-09 | 개발 설정은 헤더를 켜지 않는다 | pytest의 dev 설정 | 설정 읽기 | False | contract | `test_dev_settings_leave_server_timing_disabled` | Red 없음(회귀 방지용) | Green |
+| ST-10 | 데스크톱 설정은 헤더를 켜지 않는다 | desktop 설정 재로드 | 설정 import | False | contract | `test_desktop_settings_leave_server_timing_disabled` | Red 없음(회귀 방지용) | Green |
+| ST-02 | 켜진 통계 페이지가 자기 비용을 표준 헤더로 알린다 | 로그인, 첫 조회(미스), 스위치 켬 | `GET /stats/?date=...` | 헤더가 `cache;desc="miss"`, `ctx;dur=`, `db;dur=`, `db-count;desc="<n> queries"` 형식. 수치 값은 단언하지 않음 | web | `test_stats_response_reports_server_timing_when_enabled` | 헤더 없음 | Green |
+| ST-03 | 같은 페이지 재조회는 hit으로 알린다 | ST-02와 같음, LocMemCache | 같은 요청 두 번째 | `cache;desc="hit"` | web | `test_stats_response_server_timing_reports_cache_hit_on_repeat_view` | ST-02 구현에 따라 Red 또는 돌연변이 검사 | Green |
+| ST-04 | 스위치를 끄면 헤더가 사라진다 | 로그인, 스위치 끔 | 같은 요청 | 헤더 없음 | web | `test_stats_response_omits_server_timing_when_disabled` | ST-02 구현에 따라 Red 또는 돌연변이 검사 | Green |
+| ST-05 | 익명 리다이렉트에는 헤더가 없다 | 익명, 스위치 켬 | 같은 요청 | 302, 헤더 없음 | web | `test_anonymous_stats_redirect_omits_server_timing` | 돌연변이 검사 예상 | Green |
+| ST-06 | 헤더에 사용자·조회·쿼리 내용이 없다 | 눈에 띄는 사용자명·이메일, 특정 날짜, 스위치 켬 | 같은 요청 | 헤더에 사용자 ID·이름·이메일, 날짜, `SELECT`/`FROM`, `stats:` 없음 | contract | `test_server_timing_header_excludes_user_and_query_content` | Red 없음(개인정보 누출 방지 계약) | Green |
+| ST-07 | 측정 코드가 깨져도 페이지는 정상 렌더된다 | 스위치 켬, `connection.execute_wrapper`가 예외를 던지도록 주입 | 같은 요청 | 200, 페이지 정상, 헤더 없음 | web | `test_stats_page_still_renders_when_server_timing_measurement_fails` | 주입한 예외가 전파됨 | Green |
+| ST-11 | 통계 데이터 생성의 실제 오류는 숨기지 않는다 | 스위치 켬, 유스케이스가 부르는 `get_stats_context`(`apps.stats.use_cases`에서 참조하는 이름)가 예외를 던지도록 주입 | 같은 요청 | 주입한 예외가 전파됨 | web | `test_stats_page_propagates_real_database_errors` | ST-07 구현이 맞으면 처음부터 Green, 기록 | Green |
 
 실패 주입은 Django 공개 API(`connection.execute_wrapper`)와 이미 공개된 함수(`get_stats_context`)에서만 한다. 뷰 내부 구조나 비공개 이름은 고정하지 않는다(Result-Oriented Verification의 실패 주입 허용 범위).
+
+구현 중 결정 (2026-09-30):
+
+- ST-05: 명시적 `response.status_code == 200` 확인을 두지 않았다. 헤더는 뷰 끝의 `render()` 응답에만 붙고, `@login_required`가 익명 302를 뷰 본문 전에 돌려주기 때문이다.
+  - Backend TDD Coach는 "명시적 확인 추가" 또는 "Security & Resilience Reviewer의 구조적 보장 승인" 중 하나를 요구했다.
+  - Security & Resilience Reviewer가 구조적 보장을 승인했다(기준 1·2 충족, 비차단 권고로 명시적 확인 제안).
+  - 명시적 확인은 가상의 향후 분기에 대비한 코드이므로 Over-Engineering 규칙에 따라 넣지 않고 Deferred에 둔다.
+- ST-06: 사용자 ID 부분 문자열 검사를 뺐다. 짧은 ID(`3` 등)가 시간 값 안에 우연히 나타나 테스트가 흔들릴 수 있다. 헤더 전체가 허용된 네 지표 형식과 정확히 일치하는지로 검사한다. Coach는 이것이 더 강한 보장이라며 승인했다.
+- ST-08: 새 파일 대신 기존 `lifeDiary/test_prod_settings.py`에 두었다. Coach 승인.
+- ST-11: 주입 지점을 `apps.stats.use_cases.get_stats_context`로 했다. 유스케이스가 `from .logic import get_stats_context`로 이름을 가져와 쓰므로, `apps.stats.logic` 쪽 이름을 바꾸면 유스케이스에 닿지 않는다.
+- 헤더 조립 실패 보호는 넣지 않았다. 위 "실패 안전성"에는 "헤더 조립이 실패하면 헤더를 생략한다"고 적었지만, 조립은 정수와 불리언을 문자열로 만드는 일이라 실패 경로가 없다. 이를 요구하는 시나리오도 Test List에 없다.
 
 ## 파일과 단계
 
@@ -158,6 +169,7 @@ Backend TDD Coach가 정한 순서는 ST-01 → ST-08 → ST-09 → ST-10 → ST
 
 ## Deferred
 
+- 헤더 부착에 명시적 `status_code == 200` 확인 추가. 트리거: 통계 뷰에 두 번째 응답 분기(오류, 빈 상태 조기 반환 등)가 생길 때 (Security & Resilience Reviewer 비차단 권고).
 - 스위치를 오래 켜 둘 경우의 보존 검토. 트리거: 측정 이후에도 켜 두기로 할 때. 보안과 운영 검토를 다시 한다.
 - DB 측정 래퍼를 `apps/core`로 추출하는 일. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때.
 - 로그인 후 화면의 명시적 `Cache-Control` (백로그 A-7).
