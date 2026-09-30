@@ -1,4 +1,5 @@
 import importlib
+import re
 from datetime import date
 
 import pytest
@@ -10,7 +11,13 @@ from apps.stats.use_cases import GetStatsContextUseCase
 from apps.tags.models import Category, Tag
 
 LOCMEM_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+DUMMY_CACHE_BACKEND = "django.core.cache.backends.dummy.DummyCache"
 STATS_DATE = date(2026, 4, 15)
+STATS_PATH = f"/stats/?date={STATS_DATE.isoformat()}"
+SERVER_TIMING_FORMAT = re.compile(
+    r'cache;desc="(?P<cache>hit|miss)", ctx;dur=\d+\.\d, db;dur=\d+\.\d, '
+    r'db-count;desc="(?P<queries>\d+) queries"'
+)
 
 
 @pytest.fixture
@@ -52,3 +59,19 @@ def test_desktop_settings_leave_server_timing_disabled(monkeypatch, tmp_path):
 
     assert getattr(desktop_settings, "STATS_SERVER_TIMING_ENABLED", False) is False
     assert desktop_settings.USER_DATA_DIR.is_relative_to(tmp_path)
+
+
+def test_stats_response_reports_server_timing_when_enabled(
+    client, recorded_user, settings
+):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+    assert settings.CACHES["default"]["BACKEND"] == DUMMY_CACHE_BACKEND
+    client.force_login(recorded_user)
+
+    response = client.get(STATS_PATH)
+
+    assert "Server-Timing" in response
+    timing = SERVER_TIMING_FORMAT.fullmatch(response["Server-Timing"])
+    assert timing is not None, response["Server-Timing"]
+    assert timing["cache"] == "miss"
+    assert int(timing["queries"]) > 0
