@@ -114,3 +114,25 @@ def test_anonymous_stats_redirect_omits_server_timing(client, db, settings):
 
     assert response.status_code == 302
     assert "Server-Timing" not in response
+
+
+def test_server_timing_header_excludes_user_and_query_content(
+    client, make_user, settings
+):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+    user = make_user(username="leakcheck_owner", email="leakcheck@example.com")
+    client.force_login(user)
+
+    response = client.get("/stats/?date=2026-03-07")
+
+    header = response["Server-Timing"]
+    assert SERVER_TIMING_FORMAT.fullmatch(header), header
+    for private in (
+        "leakcheck_owner",
+        "leakcheck@example.com",
+        "2026-03-07",
+        "SELECT",
+        "FROM",
+        "stats:",
+    ):
+        assert private not in header, private
