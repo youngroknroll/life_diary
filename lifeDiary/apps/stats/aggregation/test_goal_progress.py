@@ -244,3 +244,22 @@ class TestGoalProgressRows:
             "집중": 3.0,
             "독서": 1.0,
         }
+
+    def test_goals_of_different_periods_each_sum_only_their_own_period(
+        self, user, focus
+    ):
+        # SUNDAY 의 주(7/27~8/2)는 지난달에 걸친다.
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+        UserGoal.objects.create(user=user, tag=focus, period="monthly", target_hours=20.0)
+        record_hours(user, focus, date(2026, 7, 28), 2.0)
+        record_hours(user, focus, date(2026, 8, 1), 1.0)
+        record_hours(user, focus, SUNDAY, 0.5)
+
+        rows = build_goal_progress_rows(user, SUNDAY, today=SUNDAY)
+
+        assert {r["period"]: r["current_hours"] for r in rows} == {
+            "daily": 0.5,
+            "weekly": 3.5,
+            "monthly": 1.5,
+        }
