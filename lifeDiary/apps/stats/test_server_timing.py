@@ -40,3 +40,15 @@ def test_second_stats_context_lookup_is_a_cache_hit(recorded_user, settings):
 
 def test_dev_settings_leave_server_timing_disabled():
     assert getattr(django_settings, "STATS_SERVER_TIMING_ENABLED", False) is False
+
+
+def test_desktop_settings_leave_server_timing_disabled(monkeypatch, tmp_path):
+    # desktop 설정은 import 할 때 홈 아래에 데이터 폴더와 secret_key 를 만든다.
+    monkeypatch.setenv("HOME", str(tmp_path))
+    monkeypatch.setenv("APPDATA", str(tmp_path))
+
+    desktop_settings = importlib.import_module("lifeDiary.settings.desktop")
+    desktop_settings = importlib.reload(desktop_settings)
+
+    assert getattr(desktop_settings, "STATS_SERVER_TIMING_ENABLED", False) is False
+    assert desktop_settings.USER_DATA_DIR.is_relative_to(tmp_path)
