@@ -1,4 +1,5 @@
 import time
+from contextlib import ExitStack
 from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
@@ -66,8 +67,14 @@ def _timed_stats_context(user, selected_date):
     if not getattr(settings, "STATS_SERVER_TIMING_ENABLED", False):
         return _get_stats_context.execute(user, selected_date), None
     timer = _QueryTimer()
+    measurement = ExitStack()
+    try:
+        measurement.enter_context(connection.execute_wrapper(timer))
+    except Exception:
+        # 계측은 진단용이다. 계측을 못 해도 통계 화면은 보여야 한다.
+        return _get_stats_context.execute(user, selected_date), None
     started_ns = time.perf_counter_ns()
-    with connection.execute_wrapper(timer):
+    with measurement:
         result = _get_stats_context.execute(user, selected_date)
     timing = _StatsTiming(
         context_ns=time.perf_counter_ns() - started_ns,

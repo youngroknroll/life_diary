@@ -5,6 +5,7 @@ from datetime import date
 import pytest
 from django.conf import settings as django_settings
 from django.core.cache import cache
+from django.db import connection
 
 from apps.dashboard.models import TimeBlock
 from apps.stats.use_cases import GetStatsContextUseCase
@@ -136,3 +137,21 @@ def test_server_timing_header_excludes_user_and_query_content(
         "stats:",
     ):
         assert private not in header, private
+
+
+def test_stats_page_still_renders_when_server_timing_measurement_fails(
+    client, recorded_user, settings, monkeypatch
+):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+    client.force_login(recorded_user)
+
+    def unavailable_wrapper(wrapper):
+        raise RuntimeError("query instrumentation unavailable")
+
+    monkeypatch.setattr(connection, "execute_wrapper", unavailable_wrapper)
+
+    response = client.get(STATS_PATH)
+
+    assert response.status_code == 200
+    assert "stats/index.html" in [template.name for template in response.templates]
+    assert "Server-Timing" not in response
