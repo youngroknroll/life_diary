@@ -3,6 +3,8 @@
 from datetime import date, time, timedelta
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.goal_progress import build_goal_progress_rows, goal_hit_days
@@ -263,3 +265,18 @@ class TestGoalProgressRows:
             "weekly": 3.5,
             "monthly": 1.5,
         }
+
+    def test_goal_progress_query_count_does_not_grow_with_goal_count(
+        self, user, focus
+    ):
+        record_hours(user, focus, MONDAY, 2.0)
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=1.0)
+        with CaptureQueriesContext(connection) as one_goal:
+            build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        for period in ("daily", "weekly", "weekly", "monthly"):
+            UserGoal.objects.create(user=user, tag=focus, period=period, target_hours=2.0)
+        with CaptureQueriesContext(connection) as five_goals:
+            build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert len(five_goals.captured_queries) == len(one_goal.captured_queries)

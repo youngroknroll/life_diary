@@ -57,11 +57,11 @@ def _period_bounds(period, selected_date):
     return selected_date, selected_date
 
 
-def _minutes_recorded(user, tag_id, start, end):
+def _minutes_recorded(blocks, tag_id, start, end):
     return sum(
         MINUTES_PER_SLOT
-        for block in _time_block_repo.find_by_date_range(user, start, end)
-        if block.tag_id == tag_id
+        for block in blocks
+        if block.tag_id == tag_id and start <= block.date <= end
     )
 
 
@@ -76,9 +76,9 @@ def _pace_percentage(period, selected_date, start, end, today, now):
     return round(elapsed_days / total_days * 100)
 
 
-def _goal_progress_row(user, goal, selected_date, today, now):
+def _goal_progress_row(blocks, goal, selected_date, today, now):
     start, end = _period_bounds(goal.period, selected_date)
-    current_minutes = _minutes_recorded(user, goal.tag_id, start, end)
+    current_minutes = _minutes_recorded(blocks, goal.tag_id, start, end)
     target_minutes = goal.target_hours * MINUTES_PER_HOUR
 
     if target_minutes <= 0:
@@ -126,8 +126,19 @@ def build_goal_progress_rows(user, selected_date, today=None, now=None):
     today = today or timezone.localdate()
     now = now or timezone.localtime().time()
     grouped = _goal_repo.find_grouped_by_period(user)
+    goals = [goal for period in ("daily", "weekly", "monthly") for goal in grouped[period]]
+    if not goals:
+        return []
+
+    # 목표마다 조회하면 목표 수만큼 DB 왕복이 는다. 모든 목표 기간을 덮는
+    # 범위를 한 번 읽고 목표별로 나눈다.
+    bounds = [_period_bounds(goal.period, selected_date) for goal in goals]
+    blocks = list(
+        _time_block_repo.find_by_date_range(
+            user, min(start for start, _ in bounds), max(end for _, end in bounds)
+        )
+    )
     return [
-        _goal_progress_row(user, goal, selected_date, today, now)
-        for period in ("daily", "weekly", "monthly")
-        for goal in grouped[period]
+        _goal_progress_row(blocks, goal, selected_date, today, now)
+        for goal in goals
     ]
