@@ -1,6 +1,8 @@
+import importlib
 from datetime import date
 
 import pytest
+from django.conf import settings as django_settings
 from django.core.cache import cache
 
 from apps.dashboard.models import TimeBlock
@@ -34,3 +36,7 @@ def test_second_stats_context_lookup_is_a_cache_hit(recorded_user, settings):
     assert first.cache_hit is False
     assert second.cache_hit is True
     assert second.context == first.context
+
+
+def test_dev_settings_leave_server_timing_disabled():
+    assert getattr(django_settings, "STATS_SERVER_TIMING_ENABLED", False) is False
