@@ -223,3 +223,24 @@ class TestGoalProgressRows:
         rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
 
         assert [r["period"] for r in rows] == ["daily", "weekly", "monthly"]
+
+    def test_two_goals_in_the_same_period_sum_their_own_tags_independently(
+        self, user, focus
+    ):
+        reading = Tag.objects.create(
+            user=user, name="독서", color="#6B8FB5", category=focus.category
+        )
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        UserGoal.objects.create(user=user, tag=reading, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 3.0)
+        for slot_index in range(60, 66):
+            TimeBlock.objects.create(
+                user=user, date=MONDAY, slot_index=slot_index, tag=reading
+            )
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert {r["tag_name"]: r["current_hours"] for r in rows} == {
+            "집중": 3.0,
+            "독서": 1.0,
+        }
