@@ -3,6 +3,8 @@
 from datetime import date, time, timedelta
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.goal_progress import build_goal_progress_rows, goal_hit_days
@@ -223,3 +225,58 @@ class TestGoalProgressRows:
         rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
 
         assert [r["period"] for r in rows] == ["daily", "weekly", "monthly"]
+
+    def test_two_goals_in_the_same_period_sum_their_own_tags_independently(
+        self, user, focus
+    ):
+        reading = Tag.objects.create(
+            user=user, name="독서", color="#6B8FB5", category=focus.category
+        )
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        UserGoal.objects.create(user=user, tag=reading, period="daily", target_hours=4.0)
+        record_hours(user, focus, MONDAY, 3.0)
+        for slot_index in range(60, 66):
+            TimeBlock.objects.create(
+                user=user, date=MONDAY, slot_index=slot_index, tag=reading
+            )
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert {r["tag_name"]: r["current_hours"] for r in rows} == {
+            "집중": 3.0,
+            "독서": 1.0,
+        }
+
+    def test_goals_of_different_periods_each_sum_only_their_own_period(
+        self, user, focus
+    ):
+        # SUNDAY 의 주(7/27~8/2)는 지난달에 걸친다.
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=4.0)
+        UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
+        UserGoal.objects.create(user=user, tag=focus, period="monthly", target_hours=20.0)
+        record_hours(user, focus, date(2026, 7, 28), 2.0)
+        record_hours(user, focus, date(2026, 8, 1), 1.0)
+        record_hours(user, focus, SUNDAY, 0.5)
+
+        rows = build_goal_progress_rows(user, SUNDAY, today=SUNDAY)
+
+        assert {r["period"]: r["current_hours"] for r in rows} == {
+            "daily": 0.5,
+            "weekly": 3.5,
+            "monthly": 1.5,
+        }
+
+    def test_goal_progress_query_count_does_not_grow_with_goal_count(
+        self, user, focus
+    ):
+        record_hours(user, focus, MONDAY, 2.0)
+        UserGoal.objects.create(user=user, tag=focus, period="daily", target_hours=1.0)
+        with CaptureQueriesContext(connection) as one_goal:
+            build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        for period in ("daily", "weekly", "weekly", "monthly"):
+            UserGoal.objects.create(user=user, tag=focus, period=period, target_hours=2.0)
+        with CaptureQueriesContext(connection) as five_goals:
+            build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert len(five_goals.captured_queries) == len(one_goal.captured_queries)
