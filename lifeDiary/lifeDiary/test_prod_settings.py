@@ -1,5 +1,7 @@
 import importlib
 
+import pytest
+
 
 def test_prod_settings_disable_debug_and_use_gmail_smtp(monkeypatch):
     monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
@@ -159,3 +161,26 @@ def test_prod_settings_enable_login_recaptcha_after_failures(monkeypatch):
     assert prod_settings.LOGIN_RECAPTCHA_FAILURE_LIMIT == 5
     assert prod_settings.RECAPTCHA_SITE_KEY == "site-key"
     assert prod_settings.RECAPTCHA_SECRET_KEY == "secret-key"
+
+
+@pytest.mark.parametrize(
+    ("env_value", "expected"),
+    [(None, False), ("true", True)],
+    ids=["default_off", "explicitly_on"],
+)
+def test_prod_settings_server_timing_flag_follows_env_var(monkeypatch, env_value, expected):
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+    if env_value is None:
+        monkeypatch.delenv("STATS_SERVER_TIMING_ENABLED", raising=False)
+    else:
+        monkeypatch.setenv("STATS_SERVER_TIMING_ENABLED", env_value)
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    assert prod_settings.STATS_SERVER_TIMING_ENABLED is expected

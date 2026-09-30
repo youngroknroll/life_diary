@@ -99,6 +99,10 @@ CACHES = {
     }
 }
 
+STATS_SERVER_TIMING_ENABLED = (
+    os.getenv("STATS_SERVER_TIMING_ENABLED", "").lower() == "true"
+)
+
 # manifest 해시 + whitenoise 압축·장기 캐시. prod 에만 둔다: pytest 는
 # DEBUG=False 로 강제되므로 dev 에 manifest 를 두면 collectstatic 없이는
 # 템플릿의 {% static %} 해석이 깨진다. 배포 빌드의 collectstatic 은 반드시

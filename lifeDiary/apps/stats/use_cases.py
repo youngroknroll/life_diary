@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date
 
 from django.core.cache import cache
@@ -38,17 +39,23 @@ class ExportMonthlyWorkbookUseCase:
         return book, f"lifediary-{year:04d}-{month:02d}.xlsx"
 
 
+@dataclass(frozen=True)
+class StatsContextResult:
+    context: dict
+    cache_hit: bool
+
+
 class GetStatsContextUseCase:
-    def execute(self, user, target_date: date) -> dict:
+    def execute(self, user, target_date: date) -> StatsContextResult:
         key = _cache_key(user.id, target_date)
         cached = cache.get(key)
         if cached is not None:
-            return cached
+            return StatsContextResult(context=cached, cache_hit=True)
 
         context = get_stats_context(user, target_date)
         ttl = _PAST_TTL if target_date < date.today() else _TODAY_TTL
         cache.set(key, context, ttl)
-        return context
+        return StatsContextResult(context=context, cache_hit=False)
 
 
 def invalidate_stats_cache(user_id: int, target_date: date) -> None:
