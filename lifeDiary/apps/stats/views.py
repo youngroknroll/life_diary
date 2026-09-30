@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from datetime import date
 from io import BytesIO
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import connection
@@ -56,11 +57,14 @@ def index(request):
     ]
     context["export_selected_month"] = selected_date.strftime("%Y-%m")
     response = render(request, "stats/index.html", context)
-    response["Server-Timing"] = _server_timing_header(result.cache_hit, timing)
+    if timing is not None:
+        response["Server-Timing"] = _server_timing_header(result.cache_hit, timing)
     return response
 
 
 def _timed_stats_context(user, selected_date):
+    if not getattr(settings, "STATS_SERVER_TIMING_ENABLED", False):
+        return _get_stats_context.execute(user, selected_date), None
     timer = _QueryTimer()
     started_ns = time.perf_counter_ns()
     with connection.execute_wrapper(timer):

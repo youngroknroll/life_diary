@@ -93,3 +93,15 @@ def test_stats_response_server_timing_reports_cache_hit_on_repeat_view(
     timing = SERVER_TIMING_FORMAT.fullmatch(response["Server-Timing"])
     assert timing is not None, response["Server-Timing"]
     assert timing["cache"] == "hit"
+
+
+def test_stats_response_omits_server_timing_when_disabled(
+    client, recorded_user, settings
+):
+    settings.STATS_SERVER_TIMING_ENABLED = False
+    client.force_login(recorded_user)
+
+    response = client.get(STATS_PATH)
+
+    assert response.status_code == 200
+    assert "Server-Timing" not in response
