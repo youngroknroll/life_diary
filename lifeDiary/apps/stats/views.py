@@ -22,7 +22,7 @@ XLSX_CONTENT_TYPE = (
 @login_required
 def index(request):
     selected_date = safe_date_parse(request.GET.get("date"))
-    context = _get_stats_context.execute(request.user, selected_date)
+    context = _get_stats_context.execute(request.user, selected_date).context
     # 날짜로 넘겨야 템플릿이 YEAR_MONTH_FORMAT 으로 지역화할 수 있다.
     context["export_months"] = [
         date(year, month, 1)
