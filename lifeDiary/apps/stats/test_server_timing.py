@@ -75,3 +75,21 @@ def test_stats_response_reports_server_timing_when_enabled(
     assert timing is not None, response["Server-Timing"]
     assert timing["cache"] == "miss"
     assert int(timing["queries"]) > 0
+
+
+def test_stats_response_server_timing_reports_cache_hit_on_repeat_view(
+    client, recorded_user, settings
+):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+    settings.CACHES = {
+        "default": {"BACKEND": LOCMEM_CACHE_BACKEND, "LOCATION": "server-timing-repeat-view"}
+    }
+    cache.clear()
+    client.force_login(recorded_user)
+    client.get(STATS_PATH)
+
+    response = client.get(STATS_PATH)
+
+    timing = SERVER_TIMING_FORMAT.fullmatch(response["Server-Timing"])
+    assert timing is not None, response["Server-Timing"]
+    assert timing["cache"] == "hit"

@@ -56,7 +56,7 @@ def index(request):
     ]
     context["export_selected_month"] = selected_date.strftime("%Y-%m")
     response = render(request, "stats/index.html", context)
-    response["Server-Timing"] = _server_timing_header(timing)
+    response["Server-Timing"] = _server_timing_header(result.cache_hit, timing)
     return response
 
 
@@ -73,9 +73,10 @@ def _timed_stats_context(user, selected_date):
     return result, timing
 
 
-def _server_timing_header(timing: _StatsTiming) -> str:
+def _server_timing_header(cache_hit: bool, timing: _StatsTiming) -> str:
+    cache_state = "hit" if cache_hit else "miss"
     return (
-        'cache;desc="miss", '
+        f'cache;desc="{cache_state}", '
         f"ctx;dur={_ms(timing.context_ns)}, "
         f"db;dur={_ms(timing.execute_ns)}, "
         f'db-count;desc="{timing.query_count} queries"'
