@@ -10,15 +10,18 @@
 """
 from __future__ import annotations
 
+import json
 from datetime import date, timedelta
 
 import pytest
+from django.core.cache import cache
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
+from apps.stats.use_cases import invalidate_stats_cache
 from apps.tags.models import Category, Tag
 
 # 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6
@@ -137,3 +140,120 @@ def test_monthly_and_analysis_results_unchanged_under_caching(seeded_user):
     # 일별 합계가 음수가 되거나 24시간을 초과해선 안 됨
     for hours in monthly["daily_totals"]:
         assert 0 <= hours <= 24
+
+
+STATS_REQUEST_PATH = "/stats/?date=2026-04-15"
+LOCMEM_CACHE_BACKEND = "django.core.cache.backends.locmem.LocMemCache"
+DUMMY_CACHE_BACKEND = "django.core.cache.backends.dummy.DummyCache"
+BENCHMARK_CYCLES = 5
+
+
+def test_measurement_retains_redirect_response(client, db, measure_request):
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.status_code == 302
+    assert sample.response_bytes == 0
+    assert sample.query_count == 0
+
+
+def test_full_stats_request_reports_measured_cost(
+    client, seeded_user, settings, measure_request
+):
+    user, _ = seeded_user
+    client.force_login(user)
+    assert settings.CACHES["default"]["BACKEND"] == DUMMY_CACHE_BACKEND
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.status_code == 200
+    assert sample.response_bytes > 0
+    assert sample.query_count > 0
+    assert 0 <= sample.sql_execute_ms <= sample.elapsed_ms
+    assert sample.sql_execute_ms > 0
+    assert 0 <= sample.before_render_ms <= sample.elapsed_ms
+    assert 0 <= sample.render_ms <= sample.elapsed_ms
+    # 튜닝한 임계값이 아니다. 렌더 전 구간은 쿼리 21개와 모델 생성을 담아 렌더보다 수십 배 길다.
+    assert sample.before_render_ms > sample.render_ms
+    assert sample.database_vendor == connection.vendor
+
+
+def test_stats_page_finishes_data_access_before_rendering(
+    client, seeded_user, measure_request
+):
+    user, _ = seeded_user
+    client.force_login(user)
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.query_count > 0
+    assert sample.queries_before_render == sample.query_count
+
+
+def test_stats_page_render_boundary_starts_at_page_template(
+    client, seeded_user, measure_request
+):
+    user, _ = seeded_user
+    client.force_login(user)
+
+    sample = measure_request(client, STATS_REQUEST_PATH)
+
+    assert sample.first_rendered_template == "stats/index.html"
+
+
+def test_stats_request_benchmark_reports_cold_and_warm_samples(
+    client, seeded_user, settings, measure_request, summarize_samples
+):
+    user, today = seeded_user
+    settings.CACHES = {
+        "default": {
+            "BACKEND": LOCMEM_CACHE_BACKEND,
+            "LOCATION": "stats-request-benchmark",
+        }
+    }
+    settings.DEBUG = False
+    cache.clear()
+    client.force_login(user)
+
+    try:
+        warmup = measure_request(client, STATS_REQUEST_PATH)
+        cold, warm = [], []
+        for _ in range(BENCHMARK_CYCLES):
+            invalidate_stats_cache(user.id, today)
+            cold.append(measure_request(client, STATS_REQUEST_PATH))
+            warm.append(measure_request(client, STATS_REQUEST_PATH))
+    finally:
+        cache.clear()
+
+    report = summarize_samples({"warmup": [warmup], "cold": cold, "warm": warm})
+    print(json.dumps(report, indent=2))
+
+    assert [sample.status_code for sample in cold + warm] == [200] * 10
+    assert max(s.query_count for s in warm) < min(s.query_count for s in cold)
+    assert report["database_vendor"] == connection.vendor
+    assert report["cache_backend"] == LOCMEM_CACHE_BACKEND
+    assert len(report["groups"]["warmup"]["samples"]) == 1
+    assert len(report["groups"]["cold"]["samples"]) == BENCHMARK_CYCLES
+    assert len(report["groups"]["warm"]["samples"]) == BENCHMARK_CYCLES
+
+
+def test_report_keeps_failed_requests_without_render_timing(
+    client, db, measure_request, summarize_samples
+):
+    samples = [measure_request(client, STATS_REQUEST_PATH) for _ in range(2)]
+
+    report = summarize_samples({"redirected": samples})
+
+    redirected = report["groups"]["redirected"]
+    assert [sample["status_code"] for sample in redirected["samples"]] == [302, 302]
+    assert redirected["before_render_ms"] is None
+    assert redirected["render_ms"] is None
+    elapsed = redirected["elapsed_ms"]
+    assert elapsed["min"] <= elapsed["median"] <= elapsed["max"]
+
+
+@pytest.mark.parametrize(
+    "grouped", [{}, {"warmup": []}], ids=["no_groups", "empty_group"]
+)
+def test_report_without_samples_is_rejected(grouped, summarize_samples):
+    with pytest.raises(ValueError):
+        summarize_samples(grouped)
