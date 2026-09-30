@@ -34,16 +34,18 @@ Status values are based on the repository documents available at the update time
 - 실행 로그: `docs/refactoring/2026-09-30-stats-server-timing.md`
 - 검증: 전체 회귀 617 passed, 0 failed(경고 221건은 모두 WhiteNoise `No directory at`). `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0 (기존 W009 1건), `git diff --check` exit 0.
 - 검토: Backend TDD Coach는 11개 시나리오 모두 Green으로 판정했고, Security & Resilience Reviewer는 9개 기준 모두 충족, 차단 결함 없음으로 판정했다.
-- 미검증:
-  - Cloudflare를 지나도 원 서버 헤더가 살아남는지
-  - 운영 측정값
-  - PostgreSQL에서의 헤더 값
-- 다음 순서:
-  1. PR 머지(사용자)
-  2. `deploy.yml` dry run, 이어서 실제 배포
-  3. 스위치가 꺼진 상태에서 동작 확인
-  4. Render에서 `STATS_SERVER_TIMING_ENABLED=true` 설정
-  5. 새 날짜 5개가 miss, 재조회 5개가 hit인지 측정하고 B-6 분해
+- 배포와 스위치:
+  - PR #76은 배포 PR #75로 운영에 올라갔다(2026-09-30 21:21 KST, production `55ef6dc`). 계획에 적은 `deploy.yml` dry run은 쓰지 않았다.
+  - 사용자가 Render에서 스위치를 켰다.
+- 운영 측정 (2026-09-30 22시대 KST, 데스크톱 Chrome, 과거 날짜 5개):
+  - 첫 조회는 5개 모두 `miss`, 재조회는 5개 모두 `hit`이다. 원 서버 헤더가 Cloudflare의 `cfExtPri`와 함께 나타났다. 이로써 측정 트랙에서 추정으로 남긴 "처음 연 날짜는 캐시 미스" 분류를 서버 쪽에서 확인했다.
+  - 캐시 미스 TTFB 중앙값은 3,294ms다. 나누면 다음과 같다.
+    - DB execute 2,363ms(약 72%). 쿼리 29개, 쿼리당 81~85ms.
+    - 유스케이스 안 파이썬 계산 370ms(약 11%)
+    - 유스케이스 밖 492ms(약 15%)
+  - 캐시 hit TTFB 중앙값은 465ms다. 유스케이스 몫은 중앙값 0.4ms이고 쿼리가 없다.
+- 미검증: 멀티스레드에서 계측이 섞이지 않는다는 점(소스 확인만 함), 쿼리당 시간이 왕복 지연 때문이라는 가설.
+- 다음: 스위치를 켜 둘지 사용자가 정한다. 켜 둔다면 A-8을 검토한다. B-6에서 무엇을 개선할지는 별도로 결정한다.
 - Deferred: 백로그 A-8, B-8, B-9. A-7은 그대로 남는다.
 
 ## 2026-09-30 — 통계 전체 요청 성능 측정 (사용자 지시)
@@ -80,7 +82,7 @@ Status values are based on the repository documents available at the update time
   - 로컬 PostgreSQL 14 벤치마크: cold 중앙값 849ms, warm 13ms. SQLite보다 cold가 약 2.8배 느리다.
   - 모바일 에뮬레이션(Slow 4G, CPU 4배): 캐시 미스 TTFB 2,827ms, LCP 3,328ms. 캐시 히트 TTFB 475ms, LCP 1,052ms. 브라우저 캐시가 비어 있으면 폰트 2MB 때문에 load가 약 15초(C-6).
   - 운영 엣지는 Cloudflare이고 `/stats/`를 캐시하지 않는다(`DYNAMIC`).
-- 다음: 서버 쪽 캐시 미스 확인과 B-6 분해를 위한 Server-Timing 헤더 트랙. 구현을 마쳤고 배포와 운영 측정이 남았다(위 절).
+- 다음: 서버 쪽 캐시 미스 확인과 B-6 분해를 위한 Server-Timing 헤더 트랙. 2026-09-30에 배포하고 운영에서 측정했다(위 절).
 - Deferred: 백로그 A-7, B-6, B-7, C-6.
 
 ## 2026-08-31 — 서치 콘솔 등록 지원 + GA4 도입 (사용자 지시)
@@ -766,7 +768,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스(추정) 2.7초의 내역 분해.** 로컬 SQLite cold는 0.3초, 로컬 PostgreSQL 14 cold는 0.85초다. 남은 약 1.9초가 쿼리 21회의 Render→Supabase 풀러 왕복인지, 서버 CPU인지 확인되지 않았다. 진행 중: Server-Timing 헤더 트랙(사용자 결정 2026-09-30). 구현은 마쳤고 배포 뒤 운영 측정으로 분해한다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 브라우저 TTFB 미스 2,817ms, 히트 454ms, `/robots.txt` 123ms. 로컬 PostgreSQL cold 849ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 후보(미결정): 쿼리 수 줄이기(B-3과 관련), 왕복 지연 확인. 개선 트랙을 정할 때 사용자 결정과 계획 승인을 거친다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
