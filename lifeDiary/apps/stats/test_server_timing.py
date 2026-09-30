@@ -155,3 +155,22 @@ def test_stats_page_still_renders_when_server_timing_measurement_fails(
     assert response.status_code == 200
     assert "stats/index.html" in [template.name for template in response.templates]
     assert "Server-Timing" not in response
+
+
+class StatsBuildFailure(Exception):
+    pass
+
+
+def test_stats_page_propagates_real_database_errors(
+    client, recorded_user, settings, monkeypatch
+):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+    client.force_login(recorded_user)
+
+    def failing_build(user, target_date):
+        raise StatsBuildFailure("statistics could not be built")
+
+    monkeypatch.setattr("apps.stats.use_cases.get_stats_context", failing_build)
+
+    with pytest.raises(StatsBuildFailure):
+        client.get(STATS_PATH)
