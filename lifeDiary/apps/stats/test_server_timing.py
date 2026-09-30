@@ -105,3 +105,12 @@ def test_stats_response_omits_server_timing_when_disabled(
 
     assert response.status_code == 200
     assert "Server-Timing" not in response
+
+
+def test_anonymous_stats_redirect_omits_server_timing(client, db, settings):
+    settings.STATS_SERVER_TIMING_ENABLED = True
+
+    response = client.get(STATS_PATH)
+
+    assert response.status_code == 302
+    assert "Server-Timing" not in response
