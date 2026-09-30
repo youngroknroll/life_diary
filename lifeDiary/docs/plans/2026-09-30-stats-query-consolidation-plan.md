@@ -91,9 +91,9 @@
 
 | ID | 동작 | Given | When | Then | 경계 | 경계 근거 | 테스트 | 예상 Red | 상태 |
 |---|---|---|---|---|---|---|---|---|---|
-| GQ-01 | 같은 기간의 두 목표는 각자 자기 태그 기록만 더한다 | 일간 목표 2개(태그 다름), 두 태그 모두 선택일에 기록(시간 다름) | `build_goal_progress_rows` | 두 행의 `current_hours`가 각자 태그의 기록 시간 | domain | 한 번 읽은 목록을 여러 목표가 나눠 쓰면 태그 필터가 새기 쉽다 | `test_two_goals_in_the_same_period_sum_their_own_tags_independently` | 처음부터 Green. 돌연변이 검사: 태그 필터 제거 시 실패 | Pending |
-| GQ-02 | 기간이 다른 목표는 각자 자기 기간 기록만 더한다 | 선택일 `SUNDAY`(주는 7/27~8/2로 지난달에 걸침). 같은 태그로 7/28 2시간, 8/1 1시간, 8/2 0.5시간 기록. 일간·주간·월간 목표 각 1개 | 같음 | 일간 0.5, 주간 3.5, 월간 1.5시간 | domain | 합집합 범위가 주의 지난달 부분을 빠뜨리거나 월간 목표가 지난달 기록을 더하면 틀린다 | `test_goals_of_different_periods_each_sum_only_their_own_period` | 처음부터 Green. 돌연변이 검사: 합집합을 월 범위로만 잡거나 목표별 기간 필터를 빼면 실패 | Pending |
-| GQ-03 | 목표가 늘어도 목표 진행 계산의 조회 수는 늘지 않는다 | 기록이 있는 사용자. 목표 1개인 경우와 기간이 섞인 목표 5개인 경우 | `build_goal_progress_rows`를 `CaptureQueriesContext`로 감싸 호출 | 두 경우의 쿼리 수가 같다 | contract | 승인된 쿼리 예산 계약(AGENTS.md Result-Oriented Verification) | `test_goal_progress_query_count_does_not_grow_with_goal_count` | 목표 5개가 1개보다 쿼리 4개 많음 | Pending |
+| GQ-01 | 같은 기간의 두 목표는 각자 자기 태그 기록만 더한다 | 일간 목표 2개(태그 다름), 두 태그 모두 선택일에 기록(시간 다름) | `build_goal_progress_rows` | 두 행의 `current_hours`가 각자 태그의 기록 시간 | domain | 한 번 읽은 목록을 여러 목표가 나눠 쓰면 태그 필터가 새기 쉽다 | `test_two_goals_in_the_same_period_sum_their_own_tags_independently` | 처음부터 Green. 돌연변이 검사: 태그 필터 제거 시 실패 | Green |
+| GQ-02 | 기간이 다른 목표는 각자 자기 기간 기록만 더한다 | 선택일 `SUNDAY`(주는 7/27~8/2로 지난달에 걸침). 같은 태그로 7/28 2시간, 8/1 1시간, 8/2 0.5시간 기록. 일간·주간·월간 목표 각 1개 | 같음 | 일간 0.5, 주간 3.5, 월간 1.5시간 | domain | 합집합 범위가 주의 지난달 부분을 빠뜨리거나 월간 목표가 지난달 기록을 더하면 틀린다 | `test_goals_of_different_periods_each_sum_only_their_own_period` | 처음부터 Green. 돌연변이 검사: 합집합을 월 범위로만 잡거나 목표별 기간 필터를 빼면 실패 | Green |
+| GQ-03 | 목표가 늘어도 목표 진행 계산의 조회 수는 늘지 않는다 | 기록이 있는 사용자. 목표 1개인 경우와 기간이 섞인 목표 5개인 경우 | `build_goal_progress_rows`를 `CaptureQueriesContext`로 감싸 호출 | 두 경우의 쿼리 수가 같다 | contract | 승인된 쿼리 예산 계약(AGENTS.md Result-Oriented Verification) | `test_goal_progress_query_count_does_not_grow_with_goal_count` | 목표 5개가 1개보다 쿼리 4개 많음 | Green |
 
 기존 테스트 영향:
 

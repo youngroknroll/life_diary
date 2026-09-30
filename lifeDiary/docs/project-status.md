@@ -17,6 +17,28 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-09-30 — 통계 쿼리 통합 1단계: 목표별 조회 제거 (사용자 지시)
+
+통계 목표 진행 바가 목표마다 기록을 따로 조회하던 것을 없앴다. 이제 모든 목표 기간을 덮는 범위를 한 번 읽고 목표별로 나눈다. 결과 값, 공개 함수 시그니처, 캐시 키(`:v2`)는 그대로다. B-6 개선의 1단계다.
+
+- 로컬 `get_stats_context` 쿼리 수: 목표 0/6/12개일 때 18/25/31개에서 18/20/20개가 됐다. 운영 계정(29개)은 20개가 될 것으로 예상한다.
+- 계획: `docs/plans/2026-09-30-stats-query-consolidation-plan.md`
+- 실행 로그: `docs/refactoring/2026-09-30-stats-query-consolidation.md`
+- 테스트:
+  - GQ-01, GQ-02: 안전망. 처음부터 Green이었고, 돌연변이 검사로 효력을 확인했다.
+  - GQ-03: 목표 수와 관계없이 조회 수가 같아야 한다. Red `6 == 2`에서 Green이 됐다.
+- 검증:
+  - 전체 회귀 620 passed, 0 failed(경고 221건은 모두 WhiteNoise)
+  - `manage.py check` 이슈 0건, 마이그레이션 변경 없음
+  - prod deploy check exit 0(기존 W009 1건)
+- 스위치: 사용자가 `STATS_SERVER_TIMING_ENABLED`를 계속 켜 두기로 했다(A-8). 유지 조건은 실행 로그에 있다.
+- 다음:
+  1. PR 머지(사용자)
+  2. 배포 PR 머지(사용자)
+  3. 한 번도 열지 않은 과거 날짜 5개 이상으로 miss를 측정해 2026-09-30 기준값과 비교
+  4. 2단계(기록 13번 조회 통합) 진행 여부 결정
+- Deferred: 2단계, 목표 조회 합치기, hit 경로 쿼리 3개, 리전 확인, A-7.
+
 ## 2026-09-30 — 통계 페이지 Server-Timing 헤더 (사용자 지시)
 
 `GET /stats/` 응답에 `Server-Timing` 헤더를 붙였다. 헤더는 운영 스위치가 켜져 있고 로그인한 사용자의 정상 응답일 때만 붙는다. 담는 값은 다음 네 가지다.
@@ -757,7 +779,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
-| A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`)를 측정 뒤에도 켜 둘 경우의 보존 검토. 트리거: 켜 두기로 할 때. 보안과 운영 검토를 다시 한다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
+| A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -765,10 +787,10 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 |---|---|---|---|
 | B-1 | **mypage 목표 편집 백엔드 고아화.** `views.py`의 mypage POST 분기, `mypage_goals_partial`, 그 URL이 6단계 이후 UI에서 도달 불가. 삭제 시 주의: `goals.js`는 `usergoal_form.html`이 계속 쓰므로 삭제 금지, `GetMyPageUseCase`의 goals 반환은 개수 표시에 필요. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | `apps/users/urls.py:76`, `apps/users/views.py:599` 잔존 확인 |
 | B-2 | `category_guide`의 `@login_required` 제거(+ 같은 뷰 breadcrumb의 로그인 가드). 시안대로 비로그인에게 링크를 보이려면 필요. 트리거: 공개 콘텐츠 페이지 단계. 보안 검토 동반. | 같은 로그 | — |
-| B-3 | 목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토. 기록량이 아니라 **목표 개수**에 비례한다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
+| B-3 | ~~목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토.~~ **2026-09-30 해소**: 목표 진행이 목표 수와 관계없이 기록을 한 번만 조회한다(GQ-03). 상한 18은 그대로다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 후보(미결정): 쿼리 수 줄이기(B-3과 관련), 왕복 지연 확인. 개선 트랙을 정할 때 사용자 결정과 계획 승인을 거친다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중(2026-09-30 사용자 결정): 1단계로 목표별 조회를 없앴다(로컬 목표 12개 기준 31→20 쿼리). 운영 측정은 배포 뒤에 한다. 2단계(기록 조회 통합)와 왕복 지연 확인이 남았다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
