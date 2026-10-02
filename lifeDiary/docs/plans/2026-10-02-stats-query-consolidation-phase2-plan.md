@@ -132,21 +132,21 @@
 
 | ID | 동작 | Given | When | Then | 경계 | 테스트 | 예상 Red | 상태 |
 |---|---|---|---|---|---|---|---|---|
-| WQ-01 | 창으로 꺼낸 구간은 직접 조회와 같은 기록을 같은 순서로 준다 | 공통 fixture, 창 = 선택일 기준 전체 범위 | `blocks_between`으로 여러 하위 구간(하루, 주, 달 경계 주, 전달, 12주 전 끝) 조회 | 각 구간의 (날짜, 칸, 태그 id) 목록이 `find_by_date_range`와 같다 | domain | `test_window_returns_the_same_blocks_in_the_same_order_as_direct_reads` | `TypeError`(window 인자 없음) | Pending |
-| WQ-02 | 창 안의 구간을 여러 번 꺼내도 기록 조회는 한 번이다 | 같음 | 하위 구간 여러 개 조회 | 쿼리 1개 | contract | `test_window_reads_blocks_once_for_any_number_of_ranges` | WQ-01 최소 구현이 매번 조회하면 쿼리 여러 개 | Pending |
-| WQ-03 | 창 밖 구간도 빠짐없이 돌려준다 | 같음, 창보다 이른 날짜 기록 | 창 밖 구간 조회 | 직접 조회와 같다 | domain | `test_ranges_outside_the_window_still_return_every_block` | WQ-02 구현이 창 안에서만 찾으면 빈 목록 | Pending |
-| WQ-04 | 카테고리 목록은 요청당 한 번만 읽는다 | 계산기 | `categories()` 두 번 | 쿼리 1개, 같은 목록 | contract | `test_categories_are_read_once_per_calculator` | `AttributeError` | Pending |
-| WQ-05 | 창으로 만든 통계는 직접 조회로 만든 통계와 같다 | 공통 fixture | 집계를 창 있는 계산기로 한 번, 창 없이 한 번 | 결과가 같다 | domain(parametrize: 집계 × {과거, 달 경계 주, 오늘}) | `test_stats_from_one_read_match_direct_reads[<집계>-<경우>]` | 인자 없는 집계는 `TypeError`, 이미 계산기를 받는 일간·주간·월간은 처음부터 Green(안전망, 돌연변이 검사) | Pending |
-| WQ-06 | 창이 있으면 일간 통계는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_daily_stats_data` | `dashboard_timeblock` 조회 0 | contract | `test_daily_stats_reuse_the_window` | `find_by_date` 1회 | Pending |
-| WQ-07 | 주간 통계는 기록과 카테고리를 다시 읽지 않는다 | 창과 카테고리를 미리 읽은 계산기 | `get_weekly_stats_data` | 쿼리 0 | contract | `test_weekly_stats_reuse_the_window` | 기록 1, 카테고리 1 | Pending |
-| WQ-08 | 월간 통계와 태그 분석은 기록·날짜별 개수·카테고리를 다시 읽지 않는다 | 같음 | `get_monthly_stats_data`, `get_tag_analysis_data` | 쿼리 0 | contract | `test_monthly_stats_reuse_the_window` | 기록 1, 개수 1, 카테고리 1 | Pending |
-| WQ-08b | 날짜별 기록 개수는 미분류 칸까지 DB 집계와 같게 센다(구현 중 발견) | 공통 fixture(미분류 칸 포함) | `get_monthly_daily_counts` | `find_daily_counts`와 같다 | domain | `test_monthly_daily_counts_include_untagged_blocks_like_the_database_count` | 처음부터 Green(안전망). 돌연변이 검사: 태그 있는 칸만 세면 실패. WQ-05는 창 유무와 관계없이 같은 계산을 쓰므로 이 결함을 잡지 못했다 | Pending |
-| WQ-09 | 기간 비교는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_period_delta` 일(추세 포함)·월 | `dashboard_timeblock` 조회 0 | contract | `test_period_comparison_reuses_the_window` | 일 4회, 월 2회 | Pending |
-| WQ-10 | 밀도 격자는 기록을 다시 읽지 않는다 | 같음 | `get_density_grid` | 0 | contract | `test_density_grid_reuses_the_window` | 1회 | Pending |
-| WQ-11 | 태그별 7일 평균 대비는 기록을 다시 읽지 않는다 | 같음 | `get_tag_deltas_vs_week` | 0 | contract | `test_tag_deltas_reuse_the_window` | 1회 | Pending |
-| WQ-12 | 요약은 기록을 다시 읽지 않는다 | 같음, 목표 있음 | `build_summary` | `dashboard_timeblock` 조회 0(목표 조회 1은 남음) | contract | `test_summary_reuses_the_window` | 기간 비교·밀도·최근 7일·목표 달성일 | Pending |
-| WQ-13 | 목표 진행은 기록을 다시 읽지 않는다 | 같음, 목표 있음 | `build_goal_progress_rows` | `dashboard_timeblock` 조회 0 | contract | `test_goal_progress_reuses_the_window` | 1회 | Pending |
-| WQ-14 | 통계 화면 데이터는 쿼리 5개 이하로 만든다 | 목표 없는 기존 fixture / 목표 있는 사용자, 선택일 3가지(달 중간 2026-04-15, 주가 전달에 걸치는 2026-08-02, 주가 다음 달에 걸치는 2026-06-30) | `get_stats_context` | 각각 5개 이하 | contract | 기존 `test_get_stats_context_query_count_within_target`(상한 18→5) + `test_stats_context_query_count_stays_within_target_with_goals[mid_month, week_into_last_month, week_into_next_month]` | 18개, 20개 | Pending |
+| WQ-01 | 창으로 꺼낸 구간은 직접 조회와 같은 기록을 같은 순서로 준다 | 공통 fixture, 창 = 선택일 기준 전체 범위 | `blocks_between`으로 여러 하위 구간(하루, 주, 달 경계 주, 전달, 12주 전 끝) 조회 | 각 구간의 (날짜, 칸, 태그 id) 목록이 `find_by_date_range`와 같다 | domain | `test_window_returns_the_same_blocks_in_the_same_order_as_direct_reads` | `TypeError`(window 인자 없음) | Green |
+| WQ-02 | 창 안의 구간을 여러 번 꺼내도 기록 조회는 한 번이다 | 같음 | 하위 구간 여러 개 조회 | 쿼리 1개 | contract | `test_window_reads_blocks_once_for_any_number_of_ranges` | WQ-01 최소 구현이 매번 조회하면 쿼리 여러 개 | Green |
+| WQ-03 | 창 밖 구간도 빠짐없이 돌려준다 | 같음, 창보다 이른 날짜 기록 | 창 밖 구간 조회 | 직접 조회와 같다 | domain | `test_ranges_outside_the_window_still_return_every_block` | WQ-02 구현이 창 안에서만 찾으면 빈 목록 | Green |
+| WQ-04 | 카테고리 목록은 요청당 한 번만 읽는다 | 계산기 | `categories()` 두 번 | 쿼리 1개, 같은 목록 | contract | `test_categories_are_read_once_per_calculator` | `AttributeError` | Green |
+| WQ-05 | 창으로 만든 통계는 직접 조회로 만든 통계와 같다 | 공통 fixture | 집계를 창 있는 계산기로 한 번, 창 없이 한 번 | 결과가 같다 | domain(parametrize: 집계 × {과거, 달 경계 주, 오늘}) | `test_stats_from_one_read_match_direct_reads[<집계>-<경우>]` | 인자 없는 집계는 `TypeError`, 이미 계산기를 받는 일간·주간·월간은 처음부터 Green(안전망, 돌연변이 검사) | Green |
+| WQ-06 | 창이 있으면 일간 통계는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_daily_stats_data` | `dashboard_timeblock` 조회 0 | contract | `test_daily_stats_reuse_the_window` | `find_by_date` 1회 | Green |
+| WQ-07 | 주간 통계는 기록과 카테고리를 다시 읽지 않는다 | 창과 카테고리를 미리 읽은 계산기 | `get_weekly_stats_data` | 쿼리 0 | contract | `test_weekly_stats_reuse_the_window` | 기록 1, 카테고리 1 | Green |
+| WQ-08 | 월간 통계와 태그 분석은 기록·날짜별 개수·카테고리를 다시 읽지 않는다 | 같음 | `get_monthly_stats_data`, `get_tag_analysis_data` | 쿼리 0 | contract | `test_monthly_stats_reuse_the_window` | 기록 1, 개수 1, 카테고리 1 | Green |
+| WQ-08b | 날짜별 기록 개수는 미분류 칸까지 DB 집계와 같게 센다(구현 중 발견) | 공통 fixture(미분류 칸 포함) | `get_monthly_daily_counts` | `find_daily_counts`와 같다 | domain | `test_monthly_daily_counts_include_untagged_blocks_like_the_database_count` | 처음부터 Green(안전망). 돌연변이 검사: 태그 있는 칸만 세면 실패. WQ-05는 창 유무와 관계없이 같은 계산을 쓰므로 이 결함을 잡지 못했다 | Green |
+| WQ-09 | 기간 비교는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_period_delta` 일(추세 포함)·월 | `dashboard_timeblock` 조회 0 | contract | `test_period_comparison_reuses_the_window` | 일 4회, 월 2회 | Green |
+| WQ-10 | 밀도 격자는 기록을 다시 읽지 않는다 | 같음 | `get_density_grid` | 0 | contract | `test_density_grid_reuses_the_window` | 1회 | Green |
+| WQ-11 | 태그별 7일 평균 대비는 기록을 다시 읽지 않는다 | 같음 | `get_tag_deltas_vs_week` | 0 | contract | `test_tag_deltas_reuse_the_window` | 1회 | Green |
+| WQ-12 | 요약은 기록을 다시 읽지 않는다 | 같음, 목표 있음 | `build_summary` | `dashboard_timeblock` 조회 0(목표 조회 1은 남음) | contract | `test_summary_reuses_the_window` | 기간 비교·밀도·최근 7일·목표 달성일 | Green |
+| WQ-13 | 목표 진행은 기록을 다시 읽지 않는다 | 같음, 목표 있음 | `build_goal_progress_rows` | `dashboard_timeblock` 조회 0 | contract | `test_goal_progress_reuses_the_window` | 1회 | Green |
+| WQ-14 | 통계 화면 데이터는 쿼리 5개 이하로 만든다 | 목표 없는 기존 fixture / 목표 있는 사용자, 선택일 3가지(달 중간 2026-04-15, 주가 전달에 걸치는 2026-08-02, 주가 다음 달에 걸치는 2026-06-30) | `get_stats_context` | 각각 5개 이하 | contract | 기존 `test_get_stats_context_query_count_within_target`(상한 18→5) + `test_stats_context_query_count_stays_within_target_with_goals[mid_month, week_into_last_month, week_into_next_month]` | 18개, 20개 | Green |
 
 검토 반영 (2026-10-02):
 

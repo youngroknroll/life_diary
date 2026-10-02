@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-09-30
+Last updated: 2026-10-02
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,43 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-10-02 — 통계 쿼리 통합 2단계: 요청당 기록 1회 조회 (사용자 지시)
+
+통계 화면 데이터는 같은 사용자의 기록을 기간만 바꿔 15번 읽었다. 이제 한 번만 읽는다.
+
+- `get_stats_context`가 모든 집계의 기간을 덮는 창을 계산한다. 창은 D의 주 시작 12주 전부터 주 끝과 달 끝 중 늦은 날까지다.
+- `StatsCalculator`가 창을 한 번 읽고, 각 집계는 자기 기간만 꺼낸다.
+- 카테고리도 한 번만 읽는다.
+- 결과 값과 캐시 키(`:v2`)는 그대로다.
+
+결과와 근거:
+
+- 로컬 `get_stats_context` 쿼리 수: 목표 0/6/12개 모두 5개다. 1단계 뒤에는 18/20/20개였다.
+- 남은 5개는 기록 1, 카테고리 1, 목표 2, 메모 1이다.
+- 운영 기대는 쿼리 20개에서 5개, TTFB 약 1.3초 감소다(추정).
+- 계획: `docs/plans/2026-10-02-stats-query-consolidation-phase2-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-02-stats-query-consolidation-phase2.md`
+
+테스트:
+
+- WQ-01~WQ-14와 구현 중 발견한 WQ-08b.
+- 집계 10개를 창으로 계산한 결과가 직접 조회한 결과와 같은지 확인했다. 비교는 과거 날짜, 전달에 걸친 주, 오늘 세 경우다.
+- 공통 fixture에는 같은 날짜에 기록한 다른 사용자, 미분류 칸, 목표가 들어 있다.
+- 쿼리 상한은 18에서 5로 낮췄다.
+
+검증:
+
+- 전체 회귀 671 passed, 0 failed(경고 221건은 모두 WhiteNoise).
+- `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0(기존 W009 1건).
+- Backend TDD Coach는 Green으로 판정했고, Domain Architecture Reviewer는 계획을 승인했다.
+
+다음:
+
+1. PR 머지와 배포 PR 머지(사용자).
+2. 처음 여는 과거 날짜 5개 이상으로 miss를 측정해 1단계 결과(2,291ms, 20개)와 비교한다.
+
+Deferred: `calculator=None` 두 경로 정리, `find_daily_counts`(운영 호출 없음, 테스트 기준으로만 사용), `_stats_window`의 `min()` 재검증(상수 변경 시), 목표 조회 합치기, hit 경로 쿼리 3개, A-9, A-10, B-10.
 
 ## 2026-09-30 — 통계 쿼리 통합 1단계: 목표별 조회 제거 (사용자 지시)
 
@@ -41,7 +78,7 @@ Status values are based on the repository documents available at the update time
   - 쿼리당 시간은 84.5ms로 그대로다.
 - 리전: Render는 싱가포르, Supabase는 도쿄다(사용자 확인). 두 리전 사이 왕복은 약 70ms다. 이전은 보류했다(A-10).
 - INP(2026-10-01, 실험실): `/stats/`는 데스크톱과 모바일 조건 모두 32ms 이하, `/dashboard/`는 36회 16~40ms다. 기준 200ms 이내다.
-- 다음: 2단계(기록 조회 통합)를 진행한다(사용자 결정 2026-10-02).
+- 다음: 2단계(기록 조회 통합)를 구현했다(위 2026-10-02 절).
 - Deferred: 목표 조회 합치기, hit 경로 쿼리 3개, A-7, A-9, A-10, B-10, C-12, C-13.
 
 ## 2026-09-30 — 통계 페이지 Server-Timing 헤더 (사용자 지시)
@@ -797,7 +834,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | ~~목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토.~~ **2026-09-30 해소**: 목표 진행이 목표 수와 관계없이 기록을 한 번만 조회한다(GQ-03). 상한 18은 그대로다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(기록 조회 통합)를 진행 중이다. 리전 일치는 A-10. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(요청당 기록 1회 조회)를 구현했다(로컬 쿼리 5개, 배포·운영 측정 대기). 구글 TTFB 기준(0.8초)을 miss에서도 맞추려면 리전 일치(A-10)가 필요할 가능성이 크다(추정). | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
