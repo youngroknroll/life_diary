@@ -47,10 +47,13 @@ Status values are based on the repository documents available at the update time
 - `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0(기존 W009 1건).
 - Backend TDD Coach는 Green으로 판정했고, Domain Architecture Reviewer는 계획을 승인했다.
 
-다음:
+배포와 운영 측정 (2026-10-02, PR #80 → 배포 PR #81):
 
-1. PR 머지와 배포 PR 머지(사용자).
-2. 처음 여는 과거 날짜 5개 이상으로 miss를 측정해 1단계 결과(2,291ms, 20개)와 비교한다.
+- 처음 여는 과거 날짜 5개가 모두 miss, 쿼리 5개였다.
+- TTFB 중앙값은 1,144ms다. 1단계 뒤 2,291ms보다 −50%, 09-30 기준 3,294ms보다 −65%다.
+- db는 569ms, hit는 446ms다.
+- 구글 기준으로 miss는 "개선 필요"(0.8~1.8초) 구간, hit는 "좋음"이다.
+- 남은 시간은 DB 약 50%, 요청당 쿼리 3개가 든 유스케이스 밖 약 40%다. 0.8초 아래로 내리려면 리전 일치(A-10)나 쿼리를 더 줄이는 작업이 필요하다.
 
 Deferred: `calculator=None` 두 경로 정리, `find_daily_counts`(운영 호출 없음, 테스트 기준으로만 사용), `_stats_window`의 `min()` 재검증(상수 변경 시), 목표 조회 합치기, hit 경로 쿼리 3개, A-9, A-10, B-10.
 
@@ -834,7 +837,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | ~~목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토.~~ **2026-09-30 해소**: 목표 진행이 목표 수와 관계없이 기록을 한 번만 조회한다(GQ-03). 상한 18은 그대로다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(요청당 기록 1회 조회)를 구현했다(로컬 쿼리 5개, 배포·운영 측정 대기). 구글 TTFB 기준(0.8초)을 miss에서도 맞추려면 리전 일치(A-10)가 필요할 가능성이 크다(추정). | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(요청당 기록 1회 조회)를 배포했다. 운영 miss TTFB 중앙값 1,144ms, 쿼리 5개(2026-10-02). 구글 TTFB 기준(0.8초)을 miss에서도 맞추려면 리전 일치(A-10)나 쿼리를 더 줄이는 작업이 필요하다(추정). | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
