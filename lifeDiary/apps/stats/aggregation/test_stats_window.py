@@ -1,6 +1,6 @@
 """통계 집계가 요청당 기록을 한 번만 읽어도 결과가 같은지."""
 
-from datetime import date, timedelta
+from datetime import date, time, timedelta
 
 import pytest
 from django.db import connection
@@ -13,6 +13,7 @@ from apps.stats.aggregation.comparison import get_period_delta
 from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.daily import get_daily_stats_data
 from apps.stats.aggregation.daily_baseline import get_tag_deltas_vs_week
+from apps.stats.aggregation.goal_progress import build_goal_progress_rows
 from apps.stats.aggregation.density import get_density_grid
 from apps.stats.aggregation.monthly import get_monthly_stats_data
 from apps.stats.aggregation.summary import build_summary
@@ -29,6 +30,7 @@ MID_MONTH_WINDOW = (date(2026, 1, 19), date(2026, 4, 30))
 # 어느 집계의 기간이든 덮는다. 창 범위 공식은 get_stats_context 의 쿼리 예산이 검증한다.
 FULL_WINDOW = (RECORDS_START, RECORDS_END)
 LATER = date(2026, 10, 1)
+NOON = time(hour=12)
 
 # (선택일, 오늘). "today" 는 선택일을 오늘로 넘겨 진행 중인 기간을 만든다.
 SCENARIOS = {
@@ -65,6 +67,9 @@ AGGREGATIONS = {
     ),
     "summary": lambda user, selected, today, calculator: build_summary(
         user, selected, today=today, calculator=calculator
+    ),
+    "goal_progress": lambda user, selected, today, calculator: build_goal_progress_rows(
+        user, selected, today=today, now=NOON, calculator=calculator
     ),
 }
 
@@ -281,5 +286,16 @@ def test_summary_reuses_the_window(recorded):
 
     with CaptureQueriesContext(connection) as queries:
         build_summary(recorded, MID_MONTH, today=LATER, calculator=calculator)
+
+    assert _timeblock_queries(queries) == []
+
+
+@pytest.mark.django_db
+def test_goal_progress_reuses_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+
+    with CaptureQueriesContext(connection) as queries:
+        build_goal_progress_rows(recorded, MID_MONTH, today=LATER, now=NOON, calculator=calculator)
 
     assert _timeblock_queries(queries) == []
