@@ -7,20 +7,18 @@
 from datetime import timedelta
 
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
-from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.calculator import read_blocks
 
 WINDOW_DAYS = 7
 
-_time_block_repo = TimeBlockRepository()
 
-
-def get_tag_deltas_vs_week(user, selected_date):
+def get_tag_deltas_vs_week(user, selected_date, calculator=None):
     """{태그명: 기준일 시간 − 7일 하루 평균} 을 돌려준다.
 
     미기록 구간은 태그가 없으므로 빠진다. 이 열은 태그가 붙은 시간만 다룬다.
     """
     window_start = selected_date - timedelta(days=WINDOW_DAYS - 1)
-    blocks = _time_block_repo.find_by_date_range(user, window_start, selected_date)
+    blocks = read_blocks(user, window_start, selected_date, calculator)
 
     window_minutes = {}
     today_minutes = {}
