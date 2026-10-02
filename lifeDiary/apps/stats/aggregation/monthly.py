@@ -1,9 +1,6 @@
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import minutes_to_hours
-from apps.tags.repositories import CategoryRepository
-
-_category_repo = CategoryRepository()
 
 
 def get_monthly_stats_data(user, selected_date, calculator):
@@ -18,7 +15,7 @@ def get_monthly_stats_data(user, selected_date, calculator):
             "name": category.display_name,
             "daily_minutes": [0] * total_days,
         }
-        for category in _category_repo.find_all()
+        for category in calculator.categories()
     }
 
     def process_block(block, tag_info):

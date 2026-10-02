@@ -3,16 +3,15 @@ from datetime import date, timedelta
 from django.utils.translation import gettext
 
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
-from apps.dashboard.repositories import TimeBlockRepository
 from apps.users.repositories import GoalRepository
 
+from .calculator import read_blocks
 from .comparison import get_period_delta
 from .density import get_density_grid, get_gap_pattern
 from .goal_progress import goal_hit_dates
 
 
 _goal_repo = GoalRepository()
-_time_block_repo = TimeBlockRepository()
 
 ROLLING_DAYS = 7
 MAX_OBSERVATIONS = 4
@@ -22,14 +21,16 @@ MIN_DAYS_FOR_TREND = 7
 NEUTRAL_COLOR = "#8A9A91"
 
 
-def build_summary(user, selected_date, today=None):
-    day = get_period_delta(user, "day", selected_date, today=today)
-    month = get_period_delta(user, "month", selected_date, today=today, with_trend=False)
+def build_summary(user, selected_date, today=None, calculator=None):
+    day = get_period_delta(user, "day", selected_date, today=today, calculator=calculator)
+    month = get_period_delta(
+        user, "month", selected_date, today=today, with_trend=False, calculator=calculator
+    )
 
-    grid = get_density_grid(user, selected_date, days=ROLLING_DAYS)
-    rolling_week = _rolling_week(user, selected_date, grid)
+    grid = get_density_grid(user, selected_date, days=ROLLING_DAYS, calculator=calculator)
+    rolling_week = _rolling_week(user, selected_date, grid, calculator)
     pattern = get_gap_pattern(grid)
-    goal = _goal_tile(user, selected_date, today or date.today())
+    goal = _goal_tile(user, selected_date, today or date.today(), calculator)
 
     return {
         "today": _with_hours(day["current"]),
@@ -92,7 +93,7 @@ def _density_rows(grid, end_date):
     ]
 
 
-def _rolling_week(user, selected_date, grid):
+def _rolling_week(user, selected_date, grid, calculator=None):
     """달력 주와 나란히 놓기 위해 지난 7일은 롤링으로 둔다.
 
     태그 합과 카테고리 합을 한 번의 조회에서 함께 낸다.
@@ -102,7 +103,7 @@ def _rolling_week(user, selected_date, grid):
     tag_colors = {}
     category_minutes = {}
 
-    for block in _time_block_repo.find_by_date_range(user, start, selected_date):
+    for block in read_blocks(user, start, selected_date, calculator):
         if not (block.tag and block.tag.name):
             continue
         tag_minutes[block.tag.name] = (
@@ -134,13 +135,13 @@ def _rolling_week(user, selected_date, grid):
     }
 
 
-def _goal_tile(user, selected_date, today):
+def _goal_tile(user, selected_date, today, calculator=None):
     goal = _goal_repo.find_by_user(user).first()
     if goal is None:
         return None
 
     start = selected_date - timedelta(days=ROLLING_DAYS - 1)
-    hit_dates = goal_hit_dates(user, start, selected_date, goal)
+    hit_dates = goal_hit_dates(user, start, selected_date, goal, calculator=calculator)
 
     return {
         "tag_name": goal.tag.name,

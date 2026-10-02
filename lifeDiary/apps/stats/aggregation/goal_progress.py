@@ -6,19 +6,18 @@ from apps.core.utils import (
     get_month_date_range,
     get_week_date_range,
 )
-from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.calculator import read_blocks
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG, CATEGORY_LINE_COLOR
 from apps.users.repositories import GoalRepository
 
 
-_time_block_repo = TimeBlockRepository()
 _goal_repo = GoalRepository()
 
 DAYS_PER_PERIOD = {"daily": 1, "weekly": 7, "monthly": 30}
 MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR
 
 
-def goal_hit_dates(user, start, end, goal) -> set:
+def goal_hit_dates(user, start, end, goal, calculator=None) -> set:
     """기간 안에서 목표 시간을 채운 날들.
 
     주간·월간 목표도 하루치로 환산해 센다. 달성일은 "그날 목표만큼 했나"를
@@ -27,7 +26,7 @@ def goal_hit_dates(user, start, end, goal) -> set:
     target_minutes = _daily_target_minutes(goal)
     minutes_by_date = {}
 
-    for block in _time_block_repo.find_by_date_range(user, start, end):
+    for block in read_blocks(user, start, end, calculator):
         if block.tag_id != goal.tag_id:
             continue
         minutes_by_date[block.date] = (
@@ -113,7 +112,7 @@ def _goal_progress_row(blocks, goal, selected_date, today, now):
     }
 
 
-def build_goal_progress_rows(user, selected_date, today=None, now=None):
+def build_goal_progress_rows(user, selected_date, today=None, now=None, calculator=None):
     """요약 탭 목표 진행 바 행. 일간 → 주간 → 월간 순, 조회일(selected_date)
     기준 그 기간의 누적 진행률이다.
 
@@ -134,8 +133,11 @@ def build_goal_progress_rows(user, selected_date, today=None, now=None):
     # 범위를 한 번 읽고 목표별로 나눈다.
     bounds = [_period_bounds(goal.period, selected_date) for goal in goals]
     blocks = list(
-        _time_block_repo.find_by_date_range(
-            user, min(start for start, _ in bounds), max(end for _, end in bounds)
+        read_blocks(
+            user,
+            min(start for start, _ in bounds),
+            max(end for _, end in bounds),
+            calculator,
         )
     )
     return [
