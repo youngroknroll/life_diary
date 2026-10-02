@@ -22,13 +22,17 @@ _time_block_repo = TimeBlockRepository()
 
 
 class StatsCalculator:
-    def __init__(self, user, selected_date):
+    def __init__(self, user, selected_date, window=None):
         self.user = user
         self.selected_date = selected_date
         self.start_of_month, self.end_of_month = get_month_date_range(selected_date)
         self.start_of_week, self.end_of_week = get_week_date_range(selected_date)
+        self._window = window
         self._monthly_blocks = None
         self._monthly_daily_counts = None
+
+    def blocks_between(self, start, end):
+        return list(_time_block_repo.find_by_date_range(self.user, start, end))
 
     def get_monthly_blocks(self):
         """월간 TimeBlock을 1회 fetch 후 캐시. monthly + analysis가 공유."""
