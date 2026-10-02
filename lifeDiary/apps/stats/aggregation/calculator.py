@@ -17,8 +17,10 @@ from apps.stats.services import (
     build_unclassified_monthly_entry,
     build_unclassified_weekly_entry,
 )
+from apps.tags.repositories import CategoryRepository
 
 _time_block_repo = TimeBlockRepository()
+_category_repo = CategoryRepository()
 
 
 class StatsCalculator:
@@ -29,6 +31,7 @@ class StatsCalculator:
         self.start_of_week, self.end_of_week = get_week_date_range(selected_date)
         self._window = window
         self._blocks_by_date = None
+        self._categories = None
         self._monthly_blocks = None
         self._monthly_daily_counts = None
 
@@ -45,6 +48,11 @@ class StatsCalculator:
             for offset in range((end - start).days + 1)
             for block in self._blocks_by_date.get(start + timedelta(days=offset), [])
         ]
+
+    def categories(self):
+        if self._categories is None:
+            self._categories = list(_category_repo.find_all())
+        return self._categories
 
     def get_monthly_blocks(self):
         """월간 TimeBlock을 1회 fetch 후 캐시. monthly + analysis가 공유."""

@@ -113,3 +113,15 @@ def test_ranges_outside_the_window_still_return_every_block(recorded):
 
     direct = TimeBlockRepository().find_by_date_range(recorded, *before_window)
     assert _block_ids(blocks) == _block_ids(direct)
+
+
+@pytest.mark.django_db
+def test_categories_are_read_once_per_calculator(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH)
+
+    with CaptureQueriesContext(connection) as queries:
+        first = calculator.categories()
+        second = calculator.categories()
+
+    assert len(queries.captured_queries) == 1
+    assert [category.slug for category in first] == [category.slug for category in second]
