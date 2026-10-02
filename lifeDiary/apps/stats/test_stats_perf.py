@@ -179,7 +179,8 @@ def test_full_stats_request_reports_measured_cost(
     assert sample.sql_execute_ms > 0
     assert 0 <= sample.before_render_ms <= sample.elapsed_ms
     assert 0 <= sample.render_ms <= sample.elapsed_ms
-    # 튜닝한 임계값이 아니다. 렌더 전 구간은 쿼리 21개와 모델 생성을 담아 렌더보다 수십 배 길다.
+    # 튜닝한 임계값이 아니다. 렌더 전 구간은 쿼리와 모델 생성을 담아 렌더보다 여러 배 길다
+    # (2026-10-02 로컬, 요청 전체 쿼리 8개에서 약 8~15배).
     assert sample.before_render_ms > sample.render_ms
     assert sample.database_vendor == connection.vendor
 
