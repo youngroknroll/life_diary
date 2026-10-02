@@ -18,6 +18,8 @@ from apps.stats.aggregation.density import get_density_grid
 from apps.stats.aggregation.monthly import get_monthly_stats_data
 from apps.stats.aggregation.summary import build_summary
 from apps.stats.aggregation.weekly import get_weekly_stats_data
+from apps.stats.logic import get_stats_context
+from apps.stats.test_stats_perf import TARGET_MAX_QUERIES
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
@@ -299,3 +301,18 @@ def test_goal_progress_reuses_the_window(recorded):
         build_goal_progress_rows(recorded, MID_MONTH, today=LATER, now=NOON, calculator=calculator)
 
     assert _timeblock_queries(queries) == []
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "selected",
+    [MID_MONTH, date(2026, 8, 2), date(2026, 6, 30)],
+    ids=["mid_month", "week_into_last_month", "week_into_next_month"],
+)
+def test_stats_context_query_count_stays_within_target_with_goals(recorded, selected):
+    get_stats_context(recorded, selected)
+
+    with CaptureQueriesContext(connection) as queries:
+        get_stats_context(recorded, selected)
+
+    assert len(queries.captured_queries) <= TARGET_MAX_QUERIES
