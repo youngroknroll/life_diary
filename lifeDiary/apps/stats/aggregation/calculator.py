@@ -1,3 +1,4 @@
+from collections import Counter
 from datetime import timedelta
 
 from apps.core.utils import (
@@ -57,16 +58,14 @@ class StatsCalculator:
     def get_monthly_blocks(self):
         """월간 TimeBlock을 1회 fetch 후 캐시. monthly + analysis가 공유."""
         if self._monthly_blocks is None:
-            self._monthly_blocks = list(
-                _time_block_repo.find_by_month(self.user, self.start_of_month, self.end_of_month)
-            )
+            self._monthly_blocks = self.blocks_between(self.start_of_month, self.end_of_month)
         return self._monthly_blocks
 
     def get_monthly_daily_counts(self):
         """월간 날짜별 블록 개수를 1회 fetch 후 캐시. monthly + analysis가 공유."""
         if self._monthly_daily_counts is None:
-            self._monthly_daily_counts = _time_block_repo.find_daily_counts(
-                self.user, self.start_of_month, self.end_of_month
+            self._monthly_daily_counts = Counter(
+                block.date for block in self.get_monthly_blocks()
             )
         return self._monthly_daily_counts
 

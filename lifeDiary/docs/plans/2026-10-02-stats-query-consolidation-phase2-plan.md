@@ -140,6 +140,7 @@
 | WQ-06 | 창이 있으면 일간 통계는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_daily_stats_data` | `dashboard_timeblock` 조회 0 | contract | `test_daily_stats_reuse_the_window` | `find_by_date` 1회 | Pending |
 | WQ-07 | 주간 통계는 기록과 카테고리를 다시 읽지 않는다 | 창과 카테고리를 미리 읽은 계산기 | `get_weekly_stats_data` | 쿼리 0 | contract | `test_weekly_stats_reuse_the_window` | 기록 1, 카테고리 1 | Pending |
 | WQ-08 | 월간 통계와 태그 분석은 기록·날짜별 개수·카테고리를 다시 읽지 않는다 | 같음 | `get_monthly_stats_data`, `get_tag_analysis_data` | 쿼리 0 | contract | `test_monthly_stats_reuse_the_window` | 기록 1, 개수 1, 카테고리 1 | Pending |
+| WQ-08b | 날짜별 기록 개수는 미분류 칸까지 DB 집계와 같게 센다(구현 중 발견) | 공통 fixture(미분류 칸 포함) | `get_monthly_daily_counts` | `find_daily_counts`와 같다 | domain | `test_monthly_daily_counts_include_untagged_blocks_like_the_database_count` | 처음부터 Green(안전망). 돌연변이 검사: 태그 있는 칸만 세면 실패. WQ-05는 창 유무와 관계없이 같은 계산을 쓰므로 이 결함을 잡지 못했다 | Pending |
 | WQ-09 | 기간 비교는 기록을 다시 읽지 않는다 | 창을 미리 읽은 계산기 | `get_period_delta` 일(추세 포함)·월 | `dashboard_timeblock` 조회 0 | contract | `test_period_comparison_reuses_the_window` | 일 4회, 월 2회 | Pending |
 | WQ-10 | 밀도 격자는 기록을 다시 읽지 않는다 | 같음 | `get_density_grid` | 0 | contract | `test_density_grid_reuses_the_window` | 1회 | Pending |
 | WQ-11 | 태그별 7일 평균 대비는 기록을 다시 읽지 않는다 | 같음 | `get_tag_deltas_vs_week` | 0 | contract | `test_tag_deltas_reuse_the_window` | 1회 | Pending |

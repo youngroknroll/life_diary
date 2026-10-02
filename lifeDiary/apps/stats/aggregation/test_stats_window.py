@@ -9,7 +9,9 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.calculator import StatsCalculator
+from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.daily import get_daily_stats_data
+from apps.stats.aggregation.monthly import get_monthly_stats_data
 from apps.stats.aggregation.weekly import get_weekly_stats_data
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
@@ -37,6 +39,12 @@ AGGREGATIONS = {
         user, selected, calculator or StatsCalculator(user, selected)
     ),
     "weekly": lambda user, selected, today, calculator: get_weekly_stats_data(
+        user, selected, calculator or StatsCalculator(user, selected)
+    ),
+    "monthly": lambda user, selected, today, calculator: get_monthly_stats_data(
+        user, selected, calculator or StatsCalculator(user, selected)
+    ),
+    "tag_analysis": lambda user, selected, today, calculator: get_tag_analysis_data(
         user, selected, calculator or StatsCalculator(user, selected)
     ),
 }
@@ -185,3 +193,27 @@ def test_weekly_stats_reuse_the_window(recorded):
         get_weekly_stats_data(recorded, MID_MONTH, calculator)
 
     assert [query["sql"] for query in queries.captured_queries] == []
+
+
+@pytest.mark.django_db
+def test_monthly_stats_reuse_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+    calculator.categories()
+
+    with CaptureQueriesContext(connection) as queries:
+        get_monthly_stats_data(recorded, MID_MONTH, calculator)
+        get_tag_analysis_data(recorded, MID_MONTH, calculator)
+
+    assert [query["sql"] for query in queries.captured_queries] == []
+
+
+@pytest.mark.django_db
+def test_monthly_daily_counts_include_untagged_blocks_like_the_database_count(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+
+    counts = calculator.get_monthly_daily_counts()
+
+    assert dict(counts) == TimeBlockRepository().find_daily_counts(
+        recorded, calculator.start_of_month, calculator.end_of_month
+    )
