@@ -24,6 +24,12 @@ _time_block_repo = TimeBlockRepository()
 _category_repo = CategoryRepository()
 
 
+def read_blocks(user, start, end, calculator=None):
+    if calculator is None:
+        return _time_block_repo.find_by_date_range(user, start, end)
+    return calculator.blocks_between(start, end)
+
+
 class StatsCalculator:
     def __init__(self, user, selected_date, window=None):
         self.user = user

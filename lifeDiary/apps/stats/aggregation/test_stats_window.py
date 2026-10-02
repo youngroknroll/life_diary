@@ -9,6 +9,7 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.calculator import StatsCalculator
+from apps.stats.aggregation.comparison import get_period_delta
 from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.daily import get_daily_stats_data
 from apps.stats.aggregation.monthly import get_monthly_stats_data
@@ -46,6 +47,12 @@ AGGREGATIONS = {
     ),
     "tag_analysis": lambda user, selected, today, calculator: get_tag_analysis_data(
         user, selected, calculator or StatsCalculator(user, selected)
+    ),
+    "period_delta_day": lambda user, selected, today, calculator: get_period_delta(
+        user, "day", selected, today=today, calculator=calculator
+    ),
+    "period_delta_month": lambda user, selected, today, calculator: get_period_delta(
+        user, "month", selected, today=today, with_trend=False, calculator=calculator
     ),
 }
 
@@ -217,3 +224,17 @@ def test_monthly_daily_counts_include_untagged_blocks_like_the_database_count(re
     assert dict(counts) == TimeBlockRepository().find_daily_counts(
         recorded, calculator.start_of_month, calculator.end_of_month
     )
+
+
+@pytest.mark.django_db
+def test_period_comparison_reuses_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+
+    with CaptureQueriesContext(connection) as queries:
+        get_period_delta(recorded, "day", MID_MONTH, today=LATER, calculator=calculator)
+        get_period_delta(
+            recorded, "month", MID_MONTH, today=LATER, with_trend=False, calculator=calculator
+        )
+
+    assert _timeblock_queries(queries) == []
