@@ -28,11 +28,21 @@ class StatsCalculator:
         self.start_of_month, self.end_of_month = get_month_date_range(selected_date)
         self.start_of_week, self.end_of_week = get_week_date_range(selected_date)
         self._window = window
+        self._blocks_by_date = None
         self._monthly_blocks = None
         self._monthly_daily_counts = None
 
     def blocks_between(self, start, end):
-        return list(_time_block_repo.find_by_date_range(self.user, start, end))
+        if self._blocks_by_date is None:
+            window_start, window_end = self._window
+            self._blocks_by_date = {}
+            for block in _time_block_repo.find_by_date_range(self.user, window_start, window_end):
+                self._blocks_by_date.setdefault(block.date, []).append(block)
+        return [
+            block
+            for offset in range((end - start).days + 1)
+            for block in self._blocks_by_date.get(start + timedelta(days=offset), [])
+        ]
 
     def get_monthly_blocks(self):
         """월간 TimeBlock을 1회 fetch 후 캐시. monthly + analysis가 공유."""

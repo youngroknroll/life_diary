@@ -3,6 +3,8 @@
 from datetime import date, timedelta
 
 import pytest
+from django.db import connection
+from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
@@ -88,3 +90,15 @@ def test_window_returns_the_same_blocks_in_the_same_order_as_direct_reads(
 
     direct = TimeBlockRepository().find_by_date_range(recorded, start, end)
     assert _block_ids(blocks) == _block_ids(direct)
+
+
+@pytest.mark.django_db
+def test_window_reads_blocks_once_for_any_number_of_ranges(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=MID_MONTH_WINDOW)
+
+    with CaptureQueriesContext(connection) as queries:
+        calculator.blocks_between(MID_MONTH, MID_MONTH)
+        calculator.blocks_between(date(2026, 4, 13), date(2026, 4, 19))
+        calculator.blocks_between(date(2026, 1, 19), date(2026, 4, 12))
+
+    assert len(queries.captured_queries) == 1
