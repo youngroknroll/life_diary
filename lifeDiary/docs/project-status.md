@@ -32,12 +32,17 @@ Status values are based on the repository documents available at the update time
   - `manage.py check` 이슈 0건, 마이그레이션 변경 없음
   - prod deploy check exit 0(기존 W009 1건)
 - 스위치: 사용자가 `STATS_SERVER_TIMING_ENABLED`를 계속 켜 두기로 했다(A-8). 유지 조건은 실행 로그에 있다.
-- 다음:
-  1. PR 머지(사용자)
-  2. 배포 PR 머지(사용자)
-  3. 한 번도 열지 않은 과거 날짜 5개 이상으로 miss를 측정해 2026-09-30 기준값과 비교
-  4. 2단계(기록 13번 조회 통합) 진행 여부 결정
-- Deferred: 2단계, 목표 조회 합치기, hit 경로 쿼리 3개, 리전 확인, A-7.
+- 배포: PR #77, #78 머지 뒤 배포 PR #79로 운영에 반영됐다(production `b1f5948`, 2026-10-01).
+- 운영 측정 (2026-10-01, 처음 여는 과거 날짜 5개, 모두 miss):
+  - 쿼리는 29개에서 20개로 줄었다.
+  - TTFB 중앙값은 3,294ms에서 2,291ms로 줄었다(−30%).
+  - db는 2,363ms에서 1,691ms로, 파이썬 계산은 370ms에서 143ms로 줄었다.
+  - hit TTFB는 476ms다.
+  - 쿼리당 시간은 84.5ms로 그대로다.
+- 리전: Render는 싱가포르, Supabase는 도쿄다(사용자 확인). 두 리전 사이 왕복은 약 70ms다. 이전은 보류했다(A-10).
+- INP(2026-10-01, 실험실): `/stats/`는 데스크톱과 모바일 조건 모두 32ms 이하, `/dashboard/`는 36회 16~40ms다. 기준 200ms 이내다.
+- 다음: 2단계(기록 조회 통합)를 진행한다(사용자 결정 2026-10-02).
+- Deferred: 목표 조회 합치기, hit 경로 쿼리 3개, A-7, A-9, A-10, B-10, C-12, C-13.
 
 ## 2026-09-30 — 통계 페이지 Server-Timing 헤더 (사용자 지시)
 
@@ -780,6 +785,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
 | A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
+| A-9 | **DB 연결 재수립 비용 확인.** 2026-10-01 측정의 첫 요청에서만 유스케이스 밖 시간이 약 670ms 길었다. `CONN_MAX_AGE=60`이 지난 뒤 도쿄 풀러로 새로 연결한 비용일 수 있다(1회 관찰). 사실이면 앱을 한동안 쓰지 않다가 처음 열 때마다 더해진다. 트리거: 연결 비용을 몇 번 더 재서 확인할 때. 운영 검토를 동반한다. | `docs/refactoring/2026-09-30-stats-query-consolidation.md` | 1회 관찰 (2026-10-01) |
+| A-10 | **서버·DB 리전 일치.** Render는 싱가포르, Supabase는 도쿄(왕복 약 70ms)라 쿼리 하나에 81~85ms가 든다. 무료 요금제에서도 싱가포르에 새 프로젝트를 만들어 `public` 스키마를 덤프·복원하면 옮길 수 있다. 사용자가 보류했다(2026-10-01). 구글 TTFB 기준(0.8초)을 캐시 미스에서 맞추려면 필요할 가능성이 크다(추정). 계획, 운영·보안 검토, 리허설이 필요하다. | 같은 로그 | 사용자 확인 (2026-10-01) |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -790,10 +797,11 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | ~~목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토.~~ **2026-09-30 해소**: 목표 진행이 목표 수와 관계없이 기록을 한 번만 조회한다(GQ-03). 상한 18은 그대로다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중(2026-09-30 사용자 결정): 1단계로 목표별 조회를 없앴다(로컬 목표 12개 기준 31→20 쿼리). 운영 측정은 배포 뒤에 한다. 2단계(기록 조회 통합)와 왕복 지연 확인이 남았다. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(기록 조회 통합)를 진행 중이다. 리전 일치는 A-10. | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |
+| B-10 | **기록 저장 API가 느림.** `POST /api/time-blocks/` TTFB는 7회 1,092~1,679ms(중앙값 1,178ms), 되돌리기는 약 1.2~1.3초였다. 저장 API에는 Server-Timing이 없어 쿼리 수와 DB 시간을 모른다. 같은 원인(쿼리당 왕복)일 가능성이 크다(추정). 트리거: 저장 체감 속도 개선을 시작할 때. | 같은 로그 | 운영 측정 (2026-10-01) |
 
 ### C. 프런트엔드·정적 자산 정리
 
@@ -810,6 +818,8 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | C-9 | `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지우는 선존재 결함(갱신 행이 늘어 더 자주 드러남, 새로고침하면 복구). | `docs/frontend/2026-08-14-grid-label-and-hour-axis.md` | — |
 | C-10 | 시안 1a의 라이트 모드 work 라인 아래 `opacity:.07` 영역 채우기. 장식적 요소로 판단해 두 번 연속 보류함. | 1·3단계 로그 | — |
 | C-11 | `apps/stats/aggregation/summary.py`의 `NEUTRAL_COLOR = "#8A9A91"`이 파스텔 개편 이전 sleep 색과 같다. 관찰 문구의 중립 점 색이라 카테고리 색은 아니지만, 의도적 중립인지 옛 팔레트의 복사 잔재인지 확인되지 않았다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `summary.py:22` 값 일치 확인, 카테고리 매핑에는 미사용 |
+| C-12 | 대시보드 저장 응답이 도착한 직후 139~351ms짜리 긴 프레임이 생긴다(데스크톱, 스크립트 귀속 없음). 이때 조작이 겹치면 INP가 커질 수 있다. 모바일 CPU 조건에서는 재지 않았다. | `docs/refactoring/2026-09-30-stats-query-consolidation.md` | 운영 측정 (2026-10-01) |
+| C-13 | 저장 응답이 오면 `clearSelection()`이 실행되므로, 응답을 기다리는 약 1.2초 동안 사용자가 새로 고른 칸 선택이 지워질 수 있다(코드에서 본 가능성, 브라우저 확인 안 함). | `apps/dashboard/static/dashboard/js/dashboard.js` 저장 흐름 | — |
 
 ### D. 테스트 정리
 
