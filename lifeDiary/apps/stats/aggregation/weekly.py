@@ -8,19 +8,14 @@ from apps.core.utils import (
     TOTAL_SLOTS_PER_DAY,
     UNCLASSIFIED_TAG_NAME,
 )
-from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import minutes_to_hours
-from apps.tags.repositories import CategoryRepository
-
-_time_block_repo = TimeBlockRepository()
-_category_repo = CategoryRepository()
 
 
 def get_weekly_stats_data(user, selected_date, calculator):
     week_dates = [calculator.start_of_week + timedelta(days=i) for i in range(DAYS_PER_WEEK)]
 
-    all_blocks = _time_block_repo.find_by_date_range(user, calculator.start_of_week, week_dates[-1])
+    all_blocks = calculator.blocks_between(calculator.start_of_week, week_dates[-1])
     blocks_by_date = {}
     for block in all_blocks:
         blocks_by_date.setdefault(block.date, []).append(block)
@@ -35,7 +30,7 @@ def get_weekly_stats_data(user, selected_date, calculator):
             "name": category.display_name,
             "daily_minutes": [0] * DAYS_PER_WEEK,
         }
-        for category in _category_repo.find_all()
+        for category in calculator.categories()
     }
 
     for date_item in week_dates:

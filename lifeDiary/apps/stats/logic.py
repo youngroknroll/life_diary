@@ -2,16 +2,20 @@
 stats/logic.py — 얇은 오케스트레이터.
 집계 로직은 aggregation/ 패키지에 위치한다.
 """
+from datetime import timedelta
+
+from apps.core.utils import get_month_date_range, get_week_date_range
 from apps.users.repositories import GoalRepository, NoteRepository
 
 from .aggregation.calculator import StatsCalculator
+from .aggregation.comparison import BASELINE_MAX_WEEKS
 from .aggregation.daily import get_daily_stats_data
 from .aggregation.weekly import get_weekly_stats_data
 from .aggregation.monthly import get_monthly_stats_data
 from .aggregation.analysis import get_tag_analysis_data
 from .aggregation.daily_baseline import get_tag_deltas_vs_week
 from .aggregation.weekly_summary import build_weekly_summary
-from .aggregation.summary import build_summary
+from .aggregation.summary import ROLLING_DAYS, build_summary
 from .aggregation.goal_progress import build_goal_progress_rows
 
 __all__ = [
@@ -30,15 +34,28 @@ _goal_repo = GoalRepository()
 _note_repo = NoteRepository()
 
 
+def _stats_window(selected_date):
+    """화면의 모든 집계가 읽는 기간을 덮는다. 가장 이른 것은 기간 비교의 12주 기준선이다."""
+    week_start, week_end = get_week_date_range(selected_date)
+    month_start, month_end = get_month_date_range(selected_date)
+    previous_month_start = (month_start - timedelta(days=1)).replace(day=1)
+    start = min(
+        week_start - timedelta(weeks=BASELINE_MAX_WEEKS),
+        previous_month_start,
+        selected_date - timedelta(days=ROLLING_DAYS - 1),
+    )
+    return start, max(week_end, month_end)
+
+
 def get_stats_context(user, selected_date):
-    calculator = StatsCalculator(user, selected_date)
+    calculator = StatsCalculator(user, selected_date, window=_stats_window(selected_date))
     daily_stats = get_daily_stats_data(user, selected_date, calculator)
     weekly_stats = get_weekly_stats_data(user, selected_date, calculator)
     monthly_stats = get_monthly_stats_data(user, selected_date, calculator)
     tag_analysis = get_tag_analysis_data(user, selected_date, calculator)
-    summary = build_summary(user, selected_date)
-    goal_progress_rows = build_goal_progress_rows(user, selected_date)
-    tag_deltas = get_tag_deltas_vs_week(user, selected_date)
+    summary = build_summary(user, selected_date, calculator=calculator)
+    goal_progress_rows = build_goal_progress_rows(user, selected_date, calculator=calculator)
+    tag_deltas = get_tag_deltas_vs_week(user, selected_date, calculator=calculator)
     weekly_summary = build_weekly_summary(monthly_stats, today=selected_date)
     for tag in daily_stats["tag_stats"]:
         tag["delta_vs_week"] = tag_deltas.get(tag["name"])
