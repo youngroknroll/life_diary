@@ -33,6 +33,8 @@ class StatsCalculator:
         self._monthly_daily_counts = None
 
     def blocks_between(self, start, end):
+        if self._window is None or not (self._window[0] <= start and end <= self._window[1]):
+            return list(_time_block_repo.find_by_date_range(self.user, start, end))
         if self._blocks_by_date is None:
             window_start, window_end = self._window
             self._blocks_by_date = {}

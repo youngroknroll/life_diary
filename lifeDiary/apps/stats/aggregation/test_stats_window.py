@@ -102,3 +102,14 @@ def test_window_reads_blocks_once_for_any_number_of_ranges(recorded):
         calculator.blocks_between(date(2026, 1, 19), date(2026, 4, 12))
 
     assert len(queries.captured_queries) == 1
+
+
+@pytest.mark.django_db
+def test_ranges_outside_the_window_still_return_every_block(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=MID_MONTH_WINDOW)
+    before_window = (date(2026, 1, 5), date(2026, 1, 25))
+
+    blocks = calculator.blocks_between(*before_window)
+
+    direct = TimeBlockRepository().find_by_date_range(recorded, *before_window)
+    assert _block_ids(blocks) == _block_ids(direct)
