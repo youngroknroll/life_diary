@@ -9,6 +9,7 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.calculator import StatsCalculator
+from apps.stats.aggregation.daily import get_daily_stats_data
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
@@ -18,6 +19,23 @@ RECORDS_END = date(2026, 8, 31)
 MID_MONTH = date(2026, 4, 15)
 # 4/13(4/15 의 주 시작) 12주 전부터 4월 끝까지.
 MID_MONTH_WINDOW = (date(2026, 1, 19), date(2026, 4, 30))
+# 어느 집계의 기간이든 덮는다. 창 범위 공식은 get_stats_context 의 쿼리 예산이 검증한다.
+FULL_WINDOW = (RECORDS_START, RECORDS_END)
+LATER = date(2026, 10, 1)
+
+# (선택일, 오늘). "today" 는 선택일을 오늘로 넘겨 진행 중인 기간을 만든다.
+SCENARIOS = {
+    "past": (MID_MONTH, LATER),
+    "week_into_last_month": (date(2026, 8, 2), LATER),
+    "today": (MID_MONTH, MID_MONTH),
+}
+
+# calculator 가 None 이면 창 없이 직접 읽는다.
+AGGREGATIONS = {
+    "daily": lambda user, selected, today, calculator: get_daily_stats_data(
+        user, selected, calculator or StatsCalculator(user, selected)
+    ),
+}
 
 
 @pytest.fixture
@@ -125,3 +143,29 @@ def test_categories_are_read_once_per_calculator(recorded):
 
     assert len(queries.captured_queries) == 1
     assert [category.slug for category in first] == [category.slug for category in second]
+
+
+def _timeblock_queries(queries):
+    return [query["sql"] for query in queries.captured_queries if "dashboard_timeblock" in query["sql"]]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("scenario", SCENARIOS)
+@pytest.mark.parametrize("aggregation", AGGREGATIONS)
+def test_stats_from_one_read_match_direct_reads(recorded, aggregation, scenario):
+    selected, today = SCENARIOS[scenario]
+    build = AGGREGATIONS[aggregation]
+    windowed = StatsCalculator(recorded, selected, window=FULL_WINDOW)
+
+    assert build(recorded, selected, today, windowed) == build(recorded, selected, today, None)
+
+
+@pytest.mark.django_db
+def test_daily_stats_reuse_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+
+    with CaptureQueriesContext(connection) as queries:
+        get_daily_stats_data(recorded, MID_MONTH, calculator)
+
+    assert _timeblock_queries(queries) == []

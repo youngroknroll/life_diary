@@ -5,14 +5,11 @@ from apps.core.utils import (
     TOTAL_SLOTS_PER_DAY,
     UNCLASSIFIED_TAG_NAME,
 )
-from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.services import minutes_to_hours
-
-_time_block_repo = TimeBlockRepository()
 
 
 def get_daily_stats_data(user, selected_date, calculator):
-    time_blocks = _time_block_repo.find_by_date(user, selected_date)
+    time_blocks = calculator.blocks_between(selected_date, selected_date)
     tag_stats = {}
     hourly_stats = [{} for _ in range(HOURS_PER_DAY)]
     active_blocks_count = 0
