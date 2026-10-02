@@ -10,6 +10,7 @@ from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.aggregation.daily import get_daily_stats_data
+from apps.stats.aggregation.weekly import get_weekly_stats_data
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
@@ -33,6 +34,9 @@ SCENARIOS = {
 # calculator 가 None 이면 창 없이 직접 읽는다.
 AGGREGATIONS = {
     "daily": lambda user, selected, today, calculator: get_daily_stats_data(
+        user, selected, calculator or StatsCalculator(user, selected)
+    ),
+    "weekly": lambda user, selected, today, calculator: get_weekly_stats_data(
         user, selected, calculator or StatsCalculator(user, selected)
     ),
 }
@@ -169,3 +173,15 @@ def test_daily_stats_reuse_the_window(recorded):
         get_daily_stats_data(recorded, MID_MONTH, calculator)
 
     assert _timeblock_queries(queries) == []
+
+
+@pytest.mark.django_db
+def test_weekly_stats_reuse_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+    calculator.categories()
+
+    with CaptureQueriesContext(connection) as queries:
+        get_weekly_stats_data(recorded, MID_MONTH, calculator)
+
+    assert [query["sql"] for query in queries.captured_queries] == []
