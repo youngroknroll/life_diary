@@ -12,6 +12,7 @@ from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.aggregation.comparison import get_period_delta
 from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.daily import get_daily_stats_data
+from apps.stats.aggregation.density import get_density_grid
 from apps.stats.aggregation.monthly import get_monthly_stats_data
 from apps.stats.aggregation.weekly import get_weekly_stats_data
 from apps.tags.models import Category, Tag
@@ -53,6 +54,9 @@ AGGREGATIONS = {
     ),
     "period_delta_month": lambda user, selected, today, calculator: get_period_delta(
         user, "month", selected, today=today, with_trend=False, calculator=calculator
+    ),
+    "density": lambda user, selected, today, calculator: get_density_grid(
+        user, selected, days=7, calculator=calculator
     ),
 }
 
@@ -236,5 +240,16 @@ def test_period_comparison_reuses_the_window(recorded):
         get_period_delta(
             recorded, "month", MID_MONTH, today=LATER, with_trend=False, calculator=calculator
         )
+
+    assert _timeblock_queries(queries) == []
+
+
+@pytest.mark.django_db
+def test_density_grid_reuses_the_window(recorded):
+    calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
+    calculator.blocks_between(*FULL_WINDOW)
+
+    with CaptureQueriesContext(connection) as queries:
+        get_density_grid(recorded, MID_MONTH, days=7, calculator=calculator)
 
     assert _timeblock_queries(queries) == []

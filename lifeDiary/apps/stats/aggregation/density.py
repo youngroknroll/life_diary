@@ -6,20 +6,18 @@ from apps.core.utils import (
     MINUTES_PER_SLOT,
     SLOTS_PER_HOUR,
 )
-from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.calculator import read_blocks
 
-
-_time_block_repo = TimeBlockRepository()
 
 PATTERN_WINDOW_HOURS = 2
 
 
-def get_density_grid(user, end_date, days=7):
+def get_density_grid(user, end_date, days=7, calculator=None):
     """[일][시간] = 그 시간에 기록된 분. 오래된 날이 앞에 온다."""
     start_date = end_date - timedelta(days=days - 1)
     grid = [[0] * HOURS_PER_DAY for _ in range(days)]
 
-    for block in _time_block_repo.find_by_date_range(user, start_date, end_date):
+    for block in read_blocks(user, start_date, end_date, calculator):
         day_index = (block.date - start_date).days
         if 0 <= day_index < days:
             grid[day_index][block.slot_index // SLOTS_PER_HOUR] += MINUTES_PER_SLOT
