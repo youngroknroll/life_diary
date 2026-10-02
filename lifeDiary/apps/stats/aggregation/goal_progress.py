@@ -7,6 +7,7 @@ from apps.core.utils import (
     get_week_date_range,
 )
 from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.calculator import read_blocks
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG, CATEGORY_LINE_COLOR
 from apps.users.repositories import GoalRepository
 
@@ -18,7 +19,7 @@ DAYS_PER_PERIOD = {"daily": 1, "weekly": 7, "monthly": 30}
 MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR
 
 
-def goal_hit_dates(user, start, end, goal) -> set:
+def goal_hit_dates(user, start, end, goal, calculator=None) -> set:
     """기간 안에서 목표 시간을 채운 날들.
 
     주간·월간 목표도 하루치로 환산해 센다. 달성일은 "그날 목표만큼 했나"를
@@ -27,7 +28,7 @@ def goal_hit_dates(user, start, end, goal) -> set:
     target_minutes = _daily_target_minutes(goal)
     minutes_by_date = {}
 
-    for block in _time_block_repo.find_by_date_range(user, start, end):
+    for block in read_blocks(user, start, end, calculator):
         if block.tag_id != goal.tag_id:
             continue
         minutes_by_date[block.date] = (
