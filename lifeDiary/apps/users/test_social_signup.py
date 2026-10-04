@@ -4,9 +4,13 @@ from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount, SocialLogin
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
 
+from apps.tags.models import Tag
+from apps.tags.seed_tags import SEED_TAGS
 from apps.users.email_verification import is_email_verified
 from apps.users.social_forms import SocialSignupForm
 
@@ -20,6 +24,14 @@ def make_social_login(email="jiwoo@example.com"):
         account=SocialAccount(provider="google", uid="google-uid-1"),
         provider=provider,
     )
+
+
+def social_signup_request(rf):
+    request = rf.post("/accounts/google/signup/")
+    request.user = AnonymousUser()
+    SessionMiddleware(lambda req: None).process_request(request)
+    request.session.save()
+    return request
 
 
 def test_auto_signup_is_off_so_consent_is_always_asked():
@@ -54,6 +66,21 @@ class TestSocialSignupForm:
         )
 
         assert form.is_valid(), form.errors
+
+    def test_signup_gives_the_account_the_same_seed_tags_as_local_signup(self, rf):
+        form = SocialSignupForm(
+            sociallogin=make_social_login(),
+            data={
+                "username": "jiwoo",
+                "email": "jiwoo@example.com",
+                "consent": "on",
+            },
+        )
+        assert form.is_valid(), form.errors
+
+        user = form.save(social_signup_request(rf))
+
+        assert Tag.objects.filter(user=user).count() == len(SEED_TAGS)
 
     def test_taken_email_is_reported_before_the_visitor_picks_a_username(
         self, make_user

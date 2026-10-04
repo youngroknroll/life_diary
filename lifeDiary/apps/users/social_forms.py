@@ -9,6 +9,8 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
+from apps.tags.seed_tags import create_seed_tags
+
 from .email_verification import mark_email_verified
 
 
@@ -37,6 +39,7 @@ class SocialSignupForm(AllauthSocialSignupForm):
 
     def save(self, request):
         user = super().save(request)
+        create_seed_tags(user)
         # 구글이 이미 확인한 주소다. 코드를 한 번 더 받게 하지 않는다.
         mark_email_verified(user)
         return user
