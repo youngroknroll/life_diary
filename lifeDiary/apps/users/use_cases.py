@@ -9,6 +9,13 @@ from apps.tags.ports import TagReader
 from apps.tags.repositories import TagRepository
 from .models import UserGoal, UserNote
 from .repositories import GoalRepository, NoteRepository
+from .signals import goals_changed
+
+
+def _notify_goals_changed(sender, user_id: int) -> None:
+    transaction.on_commit(
+        lambda user_id=user_id: goals_changed.send(sender=sender, user_id=user_id)
+    )
 
 
 @dataclass(frozen=True)
@@ -58,6 +65,7 @@ class SaveGoalUseCase:
         goal.target_hours = data.target_hours
         goal.full_clean()
         goal.save()
+        _notify_goals_changed(SaveGoalUseCase, user.id)
         return goal
 
 
@@ -66,6 +74,7 @@ class DeleteGoalUseCase:
     def execute(self, user, goal_id: int) -> None:
         goal = _goal_repo.get_or_404(goal_id, user)
         goal.delete()
+        _notify_goals_changed(DeleteGoalUseCase, user.id)
 
 
 class SaveNoteUseCase:
