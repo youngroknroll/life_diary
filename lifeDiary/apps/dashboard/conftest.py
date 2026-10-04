@@ -7,7 +7,7 @@ from apps.dashboard.models import TimeBlock
 
 @pytest.fixture
 def time_block_factory(db):
-    def _make(user, tag=None, slot_index=0, on_date=None, memo="", **kwargs):
+    def _make(user, tag, slot_index=0, on_date=None, memo="", **kwargs):
         return TimeBlock.objects.create(
             user=user,
             date=on_date or _date.today(),
