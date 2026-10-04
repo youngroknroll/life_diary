@@ -44,10 +44,16 @@ class SocialSignupForm(AllauthSocialSignupForm):
         taken = get_user_model().objects.filter(email__iexact=email).exists()
         return email if taken else ""
 
+    def _provider_verified(self, email):
+        return any(
+            address.verified and address.email.lower() == email.lower()
+            for address in self.sociallogin.email_addresses
+        )
+
     def save(self, request):
         with transaction.atomic():
             user = super().save(request)
             create_seed_tags(user)
-            # 구글이 이미 확인한 주소다. 코드를 한 번 더 받게 하지 않는다.
-            mark_email_verified(user)
+            if self._provider_verified(user.email):
+                mark_email_verified(user)
         return user

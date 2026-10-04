@@ -23,11 +23,14 @@ from apps.users.social_forms import SocialSignupForm
 User = get_user_model()
 
 
-def make_social_login(email="jiwoo@example.com"):
+def make_social_login(email="jiwoo@example.com", email_verified=True):
     provider = get_adapter().get_provider(RequestFactory().get("/"), "google")
     return SocialLogin(
         user=User(username="", email=email),
         account=SocialAccount(provider="google", uid="google-uid-1"),
+        email_addresses=[
+            EmailAddress(email=email, verified=email_verified, primary=True)
+        ],
         provider=provider,
     )
 
@@ -144,9 +147,11 @@ class TestSocialScreens:
         assert response.url == reverse("users:login")
 
 
-def start_pending_signup(client, email="jiwoo@example.com"):
+def start_pending_signup(client, email="jiwoo@example.com", email_verified=True):
     session = client.session
-    session["socialaccount_sociallogin"] = make_social_login(email).serialize()
+    session["socialaccount_sociallogin"] = make_social_login(
+        email, email_verified
+    ).serialize()
     session.save()
 
 
@@ -206,6 +211,19 @@ class TestPendingSocialSignup:
         assert not User.objects.filter(
             email="victim@example.com", email_verification__verified_at__isnull=False
         ).exists()
+
+    def test_an_email_the_provider_did_not_verify_does_not_verify_the_account(
+        self, client
+    ):
+        start_pending_signup(client, email_verified=False)
+
+        client.post(
+            reverse("socialaccount_signup"),
+            {"username": "jiwoo", "email": "jiwoo@example.com", "consent": "on"},
+        )
+
+        user = User.objects.get(username="jiwoo")
+        assert not is_email_verified(user)
 
     def test_taken_email_shows_the_conflict_screen(self, client, make_user):
         make_user(username="existing", email="jiwoo@example.com")
