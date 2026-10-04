@@ -82,6 +82,27 @@ class TestSocialSignupForm:
 
         assert Tag.objects.filter(user=user).count() == len(SEED_TAGS)
 
+    def test_failed_seed_tags_leave_no_account_behind(self, rf, monkeypatch):
+        def failing_seed(user):
+            raise RuntimeError("seed failure")
+
+        monkeypatch.setattr("apps.users.social_forms.create_seed_tags", failing_seed)
+        form = SocialSignupForm(
+            sociallogin=make_social_login(),
+            data={
+                "username": "jiwoo",
+                "email": "jiwoo@example.com",
+                "consent": "on",
+            },
+        )
+        assert form.is_valid(), form.errors
+
+        with pytest.raises(RuntimeError):
+            form.save(social_signup_request(rf))
+
+        assert not User.objects.filter(username="jiwoo").exists()
+        assert not SocialAccount.objects.exists()
+
     def test_taken_email_is_reported_before_the_visitor_picks_a_username(
         self, make_user
     ):

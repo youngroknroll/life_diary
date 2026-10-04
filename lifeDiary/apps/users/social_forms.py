@@ -7,6 +7,7 @@ allauth 가 설치되지 않은 데스크톱 설정에서 import 되지 않도�
 from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 from apps.tags.seed_tags import create_seed_tags
@@ -38,8 +39,9 @@ class SocialSignupForm(AllauthSocialSignupForm):
         return email if taken else ""
 
     def save(self, request):
-        user = super().save(request)
-        create_seed_tags(user)
-        # 구글이 이미 확인한 주소다. 코드를 한 번 더 받게 하지 않는다.
-        mark_email_verified(user)
+        with transaction.atomic():
+            user = super().save(request)
+            create_seed_tags(user)
+            # 구글이 이미 확인한 주소다. 코드를 한 번 더 받게 하지 않는다.
+            mark_email_verified(user)
         return user
