@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import secrets
 from dataclasses import dataclass
 from datetime import date
 
@@ -17,9 +18,30 @@ _PAST_TTL = 60 * 60 * 24   # 과거 날짜: 24시간
 _TODAY_TTL = 60 * 5         # 오늘: 5분
 
 
+def _generation_key(user_id: int) -> str:
+    return f"stats-generation:{user_id}"
+
+
+def get_stats_generation(user_id: int) -> str:
+    """eviction 뒤에도 새 token이 만들어져 옛 세대 key가 되살아나지 않는다.
+
+    FileBasedCache의 incr()가 원자적이지 않아 숫자 증가 대신 무작위 값을 쓴다.
+    """
+    token = cache.get(_generation_key(user_id))
+    if token is None:
+        token = secrets.token_urlsafe(12)
+        cache.set(_generation_key(user_id), token, timeout=None)
+    return token
+
+
+def rotate_stats_generation(user_id: int) -> None:
+    cache.set(_generation_key(user_id), secrets.token_urlsafe(12), timeout=None)
+
+
 def _cache_key(user_id: int, target_date: date, language: str | None = None) -> str:
     lang = language or get_language() or "default"
-    return f"stats:{user_id}:{target_date.isoformat()}:{lang}:v2"
+    generation = get_stats_generation(user_id)
+    return f"stats:{user_id}:{generation}:{target_date.isoformat()}:{lang}:v3"
 
 
 class ExportMonthlyWorkbookUseCase:
@@ -56,8 +78,3 @@ class GetStatsContextUseCase:
         ttl = _PAST_TTL if target_date < date.today() else _TODAY_TTL
         cache.set(key, context, ttl)
         return StatsContextResult(context=context, cache_hit=False)
-
-
-def invalidate_stats_cache(user_id: int, target_date: date) -> None:
-    for lang in ("ko", "en", "default"):
-        cache.delete(_cache_key(user_id, target_date, language=lang))

@@ -4,12 +4,13 @@ from apps.core.utils import (
     DAYS_PER_WEEK,
     MINUTES_PER_HOUR,
     MINUTES_PER_SLOT,
-    SLEEP_TAG_NAME,
     TOTAL_SLOTS_PER_DAY,
     UNCLASSIFIED_TAG_NAME,
 )
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import minutes_to_hours
+
+SLEEP_CATEGORY_KEY = CATEGORY_KEY_BY_SLUG["sleep"]
 
 
 def get_weekly_stats_data(user, selected_date, calculator):
@@ -22,7 +23,6 @@ def get_weekly_stats_data(user, selected_date, calculator):
 
     weekly_data = []
     tag_weekly_stats = {}
-    excluded_tags = {SLEEP_TAG_NAME, UNCLASSIFIED_TAG_NAME}
 
     category_weekly_minutes = {
         CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug): {
@@ -44,7 +44,7 @@ def get_weekly_stats_data(user, selected_date, calculator):
             tag_name = tag_info["name"]
             tag_color = tag_info["color"]
             daily_tag_stats[tag_name] = daily_tag_stats.get(tag_name, 0) + MINUTES_PER_SLOT
-            if tag_name not in excluded_tags:
+            if tag_name != UNCLASSIFIED_TAG_NAME and tag_info["category_key"] != SLEEP_CATEGORY_KEY:
                 active_blocks_count += 1
                 active_minutes += MINUTES_PER_SLOT
             if tag_name not in tag_weekly_stats:

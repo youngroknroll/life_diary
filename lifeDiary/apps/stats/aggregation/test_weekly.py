@@ -120,3 +120,30 @@ def test_week_start_is_always_monday(user, work_tag):
 
     assert stats["week_start"] == MONDAY
     assert stats["week_start"].weekday() == 0
+
+
+@pytest.mark.django_db
+class TestWeeklyActiveTime:
+    def test_sleep_category_tag_is_excluded_whatever_its_name(self, user, work_tag):
+        english_sleep = Tag.objects.create(
+            user=user, name="Sleep", category=Category.objects.get(slug="sleep")
+        )
+        record(user, work_tag, MONDAY, slots=2, first_slot=0)
+        record(user, english_sleep, MONDAY, slots=3, first_slot=2)
+
+        calculator = StatsCalculator(user, MONDAY)
+        stats = get_weekly_stats_data(user, MONDAY, calculator)
+
+        monday = stats["weekly_data"][0]
+        assert monday["total_blocks"] == 2
+        assert monday["total_minutes"] == 20
+
+    def test_non_sleep_tag_counts_as_active_time(self, user, work_tag):
+        record(user, work_tag, MONDAY, slots=4)
+
+        calculator = StatsCalculator(user, MONDAY)
+        stats = get_weekly_stats_data(user, MONDAY, calculator)
+
+        monday = stats["weekly_data"][0]
+        assert monday["total_blocks"] == 4
+        assert monday["total_minutes"] == 40
