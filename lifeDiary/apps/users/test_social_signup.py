@@ -1,4 +1,6 @@
 """구글 소셜 가입 — 약관 동의, 이메일 충돌, 이메일 인증 상태."""
+from datetime import timedelta
+
 import pytest
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount, SocialLogin
@@ -8,6 +10,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import RequestFactory
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.tags.models import Tag
 from apps.tags.seed_tags import SEED_TAGS
@@ -207,3 +210,15 @@ class TestGoogleLoginDuringDeletionGrace:
         user.refresh_from_db()
         assert user.is_active
         assert AccountDeletionRequest.objects.get(user=user).cancelled_at is not None
+
+    def test_login_after_the_grace_period_leaves_the_account_inactive(
+        self, rf, make_user
+    ):
+        user, sociallogin = linked_google_login(make_user)
+        request_account_deletion(user, now=timezone.now() - timedelta(days=16))
+
+        get_adapter().pre_social_login(rf.get("/"), sociallogin)
+
+        user.refresh_from_db()
+        assert not user.is_active
+        assert AccountDeletionRequest.objects.get(user=user).cancelled_at is None
