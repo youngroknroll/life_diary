@@ -2,6 +2,7 @@ from datetime import date
 
 import pytest
 from django.core.cache import cache
+from django.db import transaction
 
 from apps.dashboard.commands import UpsertTimeBlocksCommand
 from apps.dashboard.models import TimeBlock
@@ -12,6 +13,10 @@ from apps.tags.models import Category, Tag
 from apps.tags.repositories import TagRepository
 from apps.tags.use_cases import UpdateTagUseCase
 from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase, SaveNoteUseCase
+
+class ForcedRollback(Exception):
+    pass
+
 
 SELECTED_DATE = date(2026, 8, 15)
 OTHER_DATE_IN_SELECTED_WEEK = date(2026, 8, 13)
@@ -125,3 +130,29 @@ def test_committed_tag_change_refreshes_cached_statistics(
     names_after = [e["name"] for e in after.context["daily_stats"]["tag_stats"]]
     assert "몰입" in names_after
     assert "집중" not in names_after
+
+
+def test_rolled_back_slot_change_keeps_serving_cached_statistics(
+    stats_cache, owner, focus_tag, django_capture_on_commit_callbacks
+):
+    use_case = GetStatsContextUseCase()
+    use_case.execute(owner, SELECTED_DATE)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        with pytest.raises(ForcedRollback):
+            with transaction.atomic():
+                UpsertTimeBlocksUseCase(
+                    writer=TimeBlockRepository(), tags=TagRepository()
+                ).execute(
+                    UpsertTimeBlocksCommand(
+                        user_id=owner.id,
+                        target_date=OTHER_DATE_IN_SELECTED_WEEK,
+                        slot_indexes=[0],
+                        tag_id=focus_tag.id,
+                        memo="",
+                    ),
+                    owner,
+                )
+                raise ForcedRollback()
+
+    assert use_case.execute(owner, SELECTED_DATE).cache_hit is True
