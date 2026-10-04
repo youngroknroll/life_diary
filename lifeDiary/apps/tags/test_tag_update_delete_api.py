@@ -85,3 +85,25 @@ class TestTagDeleteAPI:
         block.refresh_from_db()
         assert block.tag_id == destination.id
         assert not Tag.objects.filter(id=source.id).exists()
+
+    def test_deleting_with_malformed_body_is_refused_and_keeps_records(self, auth_client):
+        tag = _make_tag(auth_client.user)
+        block = TimeBlock.objects.create(
+            user=auth_client.user, date=date(2026, 8, 1), slot_index=0, tag=tag,
+        )
+        resp = auth_client.delete(
+            f"/api/tags/{tag.id}/", data="{bad", content_type="application/json",
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"] == "VALIDATION_ERROR"
+        assert Tag.objects.filter(id=tag.id).exists()
+        assert TimeBlock.objects.filter(id=block.id, tag=tag).exists()
+
+    def test_deleting_with_non_object_json_body_is_refused_and_keeps_tag(self, auth_client):
+        tag = _make_tag(auth_client.user)
+        resp = auth_client.delete(
+            f"/api/tags/{tag.id}/", data="[1]", content_type="application/json",
+        )
+        assert resp.status_code == 400
+        assert resp.json()["error"] == "VALIDATION_ERROR"
+        assert Tag.objects.filter(id=tag.id).exists()
