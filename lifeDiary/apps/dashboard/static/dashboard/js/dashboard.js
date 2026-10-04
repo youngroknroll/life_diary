@@ -867,7 +867,11 @@ function paintSelectedSlots(color) {
     });
 }
 
+let isDeleting = false;
+
 const deleteSlot = async () => {
+    if (isDeleting) return;
+
     if (selectedSlots.size === 0) {
         showNotification(gettext('삭제할 슬롯을 선택해주세요.'), 'warning');
         return;
@@ -894,19 +898,27 @@ const deleteSlot = async () => {
         return;
     }
 
-    const affectedRows = snapshotRows(filledSlots);
-
+    isDeleting = true;
+    let result;
     try {
         const date = document.getElementById('dateSelector').value;
 
-        const result = await apiCall('/api/time-blocks/', {
+        result = await apiCall('/api/time-blocks/', {
             method: 'DELETE',
             data: {
                 slot_indexes: filledSlots,
                 date: date
             }
         });
+    } catch (error) {
+        showNotification(interpolate(gettext('삭제 실패: %s'), [error.message]), 'error');
+        console.error('Delete error:', error);
+        return;
+    } finally {
+        isDeleting = false;
+    }
 
+    try {
         renderRows(result.runs);
         renderDayStats(result.stats);
         // 닫기를 선택 해제보다 먼저 한다. closeQuickInputSheet 는 남아 있는
@@ -916,17 +928,13 @@ const deleteSlot = async () => {
         clearSelection();
         updateButtons();
         showUndoSnackbar(result.message, result.undo_token);
-
-        // 이 그리드를 빌려 쓰는 화면이 저장 성공을 알아야 다음으로 넘어갈지
-        // 판단할 수 있다. 실패는 catch 로 가므로 여기까지 오면 저장된 것이다.
-        document.dispatchEvent(new CustomEvent('time-blocks-saved', {
-            detail: { date: date, slotIndexes: slotIndexes },
-        }));
-
     } catch (error) {
-        restoreRows(affectedRows);
-        showNotification(interpolate(gettext('삭제 실패: %s'), [error.message]), 'error');
-        console.error('Delete error:', error);
+        console.error('Delete render error:', error);
+        showNotification(
+            gettext('삭제되었지만 화면을 새로고침하지 못했습니다. 페이지를 새로고침해주세요.'),
+            'warning',
+            8000
+        );
     }
 };
 
