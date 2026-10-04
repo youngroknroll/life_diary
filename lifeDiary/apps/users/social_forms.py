@@ -30,6 +30,12 @@ class SocialSignupForm(AllauthSocialSignupForm):
         super().__init__(*args, **kwargs)
         self.conflicting_email = self._conflicting_email()
 
+    def clean_email(self):
+        provider_email = self.initial.get("email")
+        if provider_email:
+            self.cleaned_data["email"] = provider_email
+        return super().clean_email()
+
     def _conflicting_email(self):
         """이미 쓰는 주소면 아이디를 고르게 두지 않고 먼저 알린다."""
         email = self.initial.get("email") or ""

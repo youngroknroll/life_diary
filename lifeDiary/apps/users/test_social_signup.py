@@ -179,6 +179,18 @@ class TestPendingSocialSignup:
         user = User.objects.get(username="jiwoo")
         assert is_email_verified(user)
 
+    def test_signup_ignores_a_posted_email_the_provider_did_not_supply(self, client):
+        start_pending_signup(client, email="jiwoo@example.com")
+
+        client.post(
+            reverse("socialaccount_signup"),
+            {"username": "jiwoo", "email": "victim@example.com", "consent": "on"},
+        )
+
+        user = User.objects.get(username="jiwoo")
+        assert user.email == "jiwoo@example.com"
+        assert not User.objects.filter(email="victim@example.com").exists()
+
     def test_taken_email_shows_the_conflict_screen(self, client, make_user):
         make_user(username="existing", email="jiwoo@example.com")
         start_pending_signup(client)
