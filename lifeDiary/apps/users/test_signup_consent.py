@@ -42,3 +42,17 @@ class TestSignupConsent:
         response = client.post(reverse("users:signup"), payload)
 
         assert response.context["form"].errors.get("consent")
+
+
+@pytest.mark.django_db
+class TestSignupSeedTagFailure:
+    def test_failed_seed_tags_leave_no_account_behind(self, client, monkeypatch):
+        def failing_seed(user):
+            raise RuntimeError("seed failure")
+
+        monkeypatch.setattr("apps.users.views.create_seed_tags", failing_seed)
+
+        with pytest.raises(RuntimeError):
+            client.post(reverse("users:signup"), signup_payload())
+
+        assert not User.objects.filter(username="newcomer").exists()
