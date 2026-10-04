@@ -11,7 +11,9 @@ from django.urls import reverse
 
 from apps.tags.models import Tag
 from apps.tags.seed_tags import SEED_TAGS
+from apps.users.account_deletion import request_account_deletion
 from apps.users.email_verification import is_email_verified
+from apps.users.models import AccountDeletionRequest
 from apps.users.social_forms import SocialSignupForm
 
 User = get_user_model()
@@ -182,3 +184,26 @@ class TestPendingSocialSignup:
 
         assert response.status_code == 200
         assert response.context["form"].conflicting_email == "jiwoo@example.com"
+
+
+def linked_google_login(make_user):
+    user = make_user(username="linked", email="linked@example.com")
+    account = SocialAccount.objects.create(
+        user=user, provider="google", uid="google-uid-linked"
+    )
+    return user, SocialLogin(user=user, account=account)
+
+
+@pytest.mark.django_db
+class TestGoogleLoginDuringDeletionGrace:
+    def test_login_within_the_grace_period_cancels_the_deletion(
+        self, rf, make_user
+    ):
+        user, sociallogin = linked_google_login(make_user)
+        request_account_deletion(user)
+
+        get_adapter().pre_social_login(rf.get("/"), sociallogin)
+
+        user.refresh_from_db()
+        assert user.is_active
+        assert AccountDeletionRequest.objects.get(user=user).cancelled_at is not None
