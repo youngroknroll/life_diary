@@ -9,6 +9,7 @@ from django.utils.translation import gettext
 
 from .domain_services import _tag_policy_service
 from .repositories import CategoryRepository, TagRepository
+from .signals import tags_changed
 from apps.dashboard.repositories import TimeBlockRepository
 
 _tag_repo = TagRepository()
@@ -79,7 +80,14 @@ class ListFrequentTagsUseCase:
         return bool(_time_block_repo.count_blocks_by_tag(user))
 
 
+def _notify_tags_changed(sender, user_id: int) -> None:
+    transaction.on_commit(
+        lambda user_id=user_id: tags_changed.send(sender=sender, user_id=user_id)
+    )
+
+
 class CreateTagUseCase:
+    @transaction.atomic
     def execute(self, user, name: str, color: str, category_id) -> dict:
         if not name or not color:
             raise ValueError(gettext("태그명과 색상을 입력해주세요."))
@@ -95,11 +103,13 @@ class CreateTagUseCase:
             raise ValueError(gettext("이미 같은 이름의 태그가 존재합니다."))
 
         tag = _tag_repo.create(user, name, color, category=category)
+        _notify_tags_changed(CreateTagUseCase, user.id)
         return {"id": tag.id, "name": tag.name, "color": tag.color,
                 "category_id": tag.category_id}
 
 
 class UpdateTagUseCase:
+    @transaction.atomic
     def execute(self, user, tag_id: int, name: str, color: str, category_id) -> dict:
         tag = _tag_repo.get_for_owner_or_404(tag_id, user)
 
@@ -118,6 +128,7 @@ class UpdateTagUseCase:
         tag.name = name
         tag.color = color
         _tag_repo.save(tag)
+        _notify_tags_changed(UpdateTagUseCase, user.id)
         return {"id": tag.id, "name": tag.name, "color": tag.color,
                 "category_id": tag.category_id}
 
@@ -139,6 +150,7 @@ class DeleteTagUseCase:
 
         tag_name = tag.name
         _tag_repo.delete(tag)
+        _notify_tags_changed(DeleteTagUseCase, user.id)
         return tag_name
 
     def _destination(self, user, tag, move_to_id: int):

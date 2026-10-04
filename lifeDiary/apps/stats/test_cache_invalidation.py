@@ -4,11 +4,13 @@ import pytest
 from django.core.cache import cache
 
 from apps.dashboard.commands import UpsertTimeBlocksCommand
+from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.dashboard.use_cases import UpsertTimeBlocksUseCase
 from apps.stats.use_cases import GetStatsContextUseCase
 from apps.tags.models import Category, Tag
 from apps.tags.repositories import TagRepository
+from apps.tags.use_cases import UpdateTagUseCase
 from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase, SaveNoteUseCase
 
 SELECTED_DATE = date(2026, 8, 15)
@@ -97,3 +99,29 @@ def test_committed_note_change_refreshes_cached_statistics(
     after = use_case.execute(owner, SELECTED_DATE)
     assert after.cache_hit is False
     assert after.context["user_note"].note == "새 메모"
+
+
+def test_committed_tag_change_refreshes_cached_statistics(
+    stats_cache, owner, focus_tag, django_capture_on_commit_callbacks
+):
+    TimeBlock.objects.create(
+        user=owner, date=SELECTED_DATE, slot_index=0, tag=focus_tag
+    )
+    use_case = GetStatsContextUseCase()
+    before = use_case.execute(owner, SELECTED_DATE)
+    assert "집중" in [e["name"] for e in before.context["daily_stats"]["tag_stats"]]
+
+    with django_capture_on_commit_callbacks(execute=True):
+        UpdateTagUseCase().execute(
+            owner,
+            focus_tag.id,
+            name="몰입",
+            color=focus_tag.color,
+            category_id=focus_tag.category_id,
+        )
+
+    after = use_case.execute(owner, SELECTED_DATE)
+    assert after.cache_hit is False
+    names_after = [e["name"] for e in after.context["daily_stats"]["tag_stats"]]
+    assert "몰입" in names_after
+    assert "집중" not in names_after
