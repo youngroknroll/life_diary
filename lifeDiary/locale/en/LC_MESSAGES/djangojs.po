@@ -184,6 +184,10 @@ msgstr[1] "Delete %s logged slots?"
 msgid "삭제 실패: %s"
 msgstr "Delete failed: %s"
 
+#: apps/dashboard/static/dashboard/js/dashboard.js:934
+msgid "삭제되었지만 화면을 새로고침하지 못했습니다. 페이지를 새로고침해주세요."
+msgstr "Deleted, but the screen could not be updated. Please refresh the page."
+
 #: apps/dashboard/static/dashboard/js/dashboard.js:941
 msgid "태그 로드 중 오류가 발생했습니다."
 msgstr "An error occurred while loading tags."
