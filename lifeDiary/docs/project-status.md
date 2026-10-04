@@ -24,14 +24,14 @@ Status values are based on the repository documents available at the update time
 - 그대로 옮김: 옮길 곳 없는 태그 삭제가 기록·메모를 지움, 탈퇴 취소 뒤 재요청(`IntegrityError` 수정), `purge_deleted_accounts --check`.
 - 재구현: 가입 트랜잭션, Google 가입자 기본 태그와 유예기간 내 Google 로그인의 탈퇴 취소, 통계 캐시 세대 교체(키 `:v3`), 주간 활동 시간의 수면 제외를 카테고리로 판정.
 - 프런트: 기록 삭제 성공 뒤 "삭제 실패"를 띄우고 행을 되살리던 버그(`deleteSlot`의 미선언 변수, 2026-08-12부터) 수정.
-- 추가: 태그 삭제 API가 깨진 본문을 400으로 거절한다.
+- 추가: 태그 삭제 API가 깨진 본문을 400으로 거절한다. Google 가입 이메일은 제출된 값이 아니라 제공자가 준 주소로 저장하고, 제공자가 인증한 주소일 때만 인증 표시한다.
 - 계획: `docs/plans/2026-10-03-critical-remediation-salvage-plan.md`
 - 실행 로그: `docs/refactoring/2026-10-03-critical-remediation-salvage.md`
 - 원본 설계·계획·로그 4개를 복원했다(`docs/plans/2026-08-15_critical-remediation-*.md` 등).
 
 검증:
 
-- 전체 회귀 688 passed, 0 failed. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0.
+- 전체 회귀 691 passed, 0 failed. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0.
 - 삭제 흐름은 브라우저에서 성공, 요청 실패, 화면 갱신 실패, 연속 호출을 확인했다(데스크톱 폭).
 - 미검증: 실제 Google OAuth 왕복, 모바일 폭, 스크린리더, 운영 캐시 적중률 변화.
 
@@ -40,7 +40,7 @@ Status values are based on the repository documents available at the update time
 1. PR 머지와 배포 PR 머지(사용자).
 2. 마이그레이션 0007(태그 없는 기록 삭제, 비가역)과 purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
 
-Deferred: Google 가입 이메일 조작(기존 결함, 중간), 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
+Deferred: Google 미인증 주소 가입 허용, 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
 
 ## 2026-10-02 — 통계 쿼리 통합 2단계: 요청당 기록 1회 조회 (사용자 지시)
 
