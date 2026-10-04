@@ -9,7 +9,7 @@ from apps.dashboard.use_cases import UpsertTimeBlocksUseCase
 from apps.stats.use_cases import GetStatsContextUseCase
 from apps.tags.models import Category, Tag
 from apps.tags.repositories import TagRepository
-from apps.users.use_cases import GoalData, SaveGoalUseCase
+from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase, SaveNoteUseCase
 
 SELECTED_DATE = date(2026, 8, 15)
 OTHER_DATE_IN_SELECTED_WEEK = date(2026, 8, 13)
@@ -81,3 +81,19 @@ def test_committed_goal_change_refreshes_cached_statistics(
     after = use_case.execute(owner, SELECTED_DATE)
     assert after.cache_hit is False
     assert [row["tag_name"] for row in after.context["goal_progress_rows"]] == ["집중"]
+
+
+def test_committed_note_change_refreshes_cached_statistics(
+    stats_cache, owner, django_capture_on_commit_callbacks
+):
+    SaveNoteUseCase().execute(NoteData(note="옛 메모"), owner)
+    use_case = GetStatsContextUseCase()
+    before = use_case.execute(owner, SELECTED_DATE)
+    assert before.context["user_note"].note == "옛 메모"
+
+    with django_capture_on_commit_callbacks(execute=True):
+        SaveNoteUseCase().execute(NoteData(note="새 메모"), owner)
+
+    after = use_case.execute(owner, SELECTED_DATE)
+    assert after.cache_hit is False
+    assert after.context["user_note"].note == "새 메모"
