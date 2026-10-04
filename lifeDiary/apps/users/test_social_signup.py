@@ -2,6 +2,7 @@
 from datetime import timedelta
 
 import pytest
+from allauth.account.models import EmailAddress
 from allauth.socialaccount.adapter import get_adapter
 from allauth.socialaccount.models import SocialAccount, SocialLogin
 from django.conf import settings
@@ -190,6 +191,21 @@ class TestPendingSocialSignup:
         user = User.objects.get(username="jiwoo")
         assert user.email == "jiwoo@example.com"
         assert not User.objects.filter(email="victim@example.com").exists()
+
+    def test_a_posted_email_the_provider_did_not_supply_is_never_verified(
+        self, client
+    ):
+        start_pending_signup(client, email="jiwoo@example.com")
+
+        client.post(
+            reverse("socialaccount_signup"),
+            {"username": "jiwoo", "email": "victim@example.com", "consent": "on"},
+        )
+
+        assert not EmailAddress.objects.filter(email="victim@example.com").exists()
+        assert not User.objects.filter(
+            email="victim@example.com", email_verification__verified_at__isnull=False
+        ).exists()
 
     def test_taken_email_shows_the_conflict_screen(self, client, make_user):
         make_user(username="existing", email="jiwoo@example.com")
