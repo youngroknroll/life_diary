@@ -3,7 +3,8 @@
 - 원본 커밋: 로컬 브랜치 `feat/grid-label-and-hour-axis`의 `cd01609`..`328e025` (13개, 2026-08-15~16)
 - 원본 설계·계획·로그(그 브랜치에만 있음): `docs/plans/2026-08-15_critical-remediation-design.md`, `docs/plans/2026-08-15_critical-remediation-plan.md`, `docs/refactoring/2026-08-15_critical-backend-remediation.md`, `docs/frontend/2026-08-15-dashboard-security-interaction.md`
 - 브랜치: `fix/critical-remediation-salvage`
-- 상태: 사용자 승인 대기
+- 상태: 1~3단계 사용자 승인(2026-10-04), 구현 완료. 4a·4b는 결정 대기
+- 실행 로그: `docs/refactoring/2026-10-03-critical-remediation-salvage.md`
 
 ## 배경
 
@@ -44,7 +45,9 @@
 
 ### 3단계 — 프런트엔드 (Frontend Work Policy)
 
-`deleteSlot`의 성공 뒤 경로를 고친다. 이벤트에는 실제로 지운 `filledSlots`를 싣는다. HTTP 실패일 때만 스냅샷을 복원하고 "삭제 실패"를 띄운다. 서버가 삭제를 확정한 뒤의 화면 갱신 오류는 복원하지 않는다.
+`deleteSlot`의 성공 뒤 경로를 고친다. HTTP 실패일 때만 "삭제 실패"를 띄운다. 서버가 삭제를 확정한 뒤의 화면 갱신 오류는 실패로 알리지 않는다.
+
+2026-10-04 사전 검토 반영: 삭제 때는 `time-blocks-saved`를 보내지 않는다. 온보딩이 이 이벤트를 저장으로 받아 다음 단계로 넘어가기 때문이다. 삭제 경로의 스냅샷 복원도 뺀다.
 
 ### 4단계 — 운영 게이트가 있는 항목 (PR 분리)
 

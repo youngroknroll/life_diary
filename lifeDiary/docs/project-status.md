@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-10-02
+Last updated: 2026-10-04
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,31 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-10-04 — Critical Remediation 미반영 커밋 선별 재적용 (사용자 지시)
+
+2026-08-15~16의 Critical Remediation 커밋 13개가 로컬 브랜치 `feat/grid-label-and-hour-axis`에만 있고 push되지 않았다. 커밋별로 현재 `main`과 대조해 필요한 것만 다시 적용했다.
+
+- 그대로 옮김: 옮길 곳 없는 태그 삭제가 기록·메모를 지움, 탈퇴 취소 뒤 재요청(`IntegrityError` 수정), `purge_deleted_accounts --check`.
+- 재구현: 가입 트랜잭션, Google 가입자 기본 태그와 유예기간 내 Google 로그인의 탈퇴 취소, 통계 캐시 세대 교체(키 `:v3`), 주간 활동 시간의 수면 제외를 카테고리로 판정.
+- 프런트: 기록 삭제 성공 뒤 "삭제 실패"를 띄우고 행을 되살리던 버그(`deleteSlot`의 미선언 변수, 2026-08-12부터) 수정.
+- 추가: 태그 삭제 API가 깨진 본문을 400으로 거절한다.
+- 계획: `docs/plans/2026-10-03-critical-remediation-salvage-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-03-critical-remediation-salvage.md`
+- 원본 설계·계획·로그 4개를 복원했다(`docs/plans/2026-08-15_critical-remediation-*.md` 등).
+
+검증:
+
+- 전체 회귀 688 passed, 0 failed. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0.
+- 삭제 흐름은 브라우저에서 성공, 요청 실패, 화면 갱신 실패, 연속 호출을 확인했다(데스크톱 폭).
+- 미검증: 실제 Google OAuth 왕복, 모바일 폭, 스크린리더, 운영 캐시 적중률 변화.
+
+다음:
+
+1. PR 머지와 배포 PR 머지(사용자).
+2. 마이그레이션 0007(태그 없는 기록 삭제, 비가역)과 purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
+
+Deferred: Google 가입 이메일 조작(기존 결함, 중간), 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
 
 ## 2026-10-02 — 통계 쿼리 통합 2단계: 요청당 기록 1회 조회 (사용자 지시)
 
@@ -818,7 +843,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-2 | 보안 잔여: CSP, 쿠키/보안 플래그 강화, production debug 재점검, 로그인 실패 알림. | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | — |
 | A-3 | `SECURE_PROXY_SSL_HEADER`, 배포된 `Set-Cookie` 헤더 실측. `ALLOWED_HOSTS`는 2026-08-12에 갱신·확인됨. `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요. | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | — |
 | A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
-| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
+| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. 2026-10-04: `--check` 옵션은 추가됐다. 스케줄 워크플로는 로컬 커밋 `2317031`에 있고 GitHub 시크릿 등록과 사용자 결정을 기다린다. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
 | A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
