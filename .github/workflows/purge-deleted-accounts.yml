@@ -1,0 +1,64 @@
+--- # 탈퇴 유예기간(15일)이 지난 계정의 자동 영구 삭제.
+#
+# purge 는 매 실행마다 밀린 요청 전부를 처리하므로 놓친 날은 다음 실행이
+# 따라잡는다. 예약 실행은 기본 브랜치의 이 파일에서 트리거되고, 코드는
+# 배포 중인 production 브랜치를 체크아웃한다.
+#
+# secrets 최소권한: 진짜 값은 DB_NAME/DB_USER/DB_PASSWORD/DB_HOST 뿐이다.
+# DJANGO_SECRET_KEY 는 웹 서비스 키를 복사하지 말고 이 워크플로 전용
+# 무작위 값을 새로 만들어 넣는다(purge 는 세션·토큰 서명을 하지 않는다).
+# 메일도 보내지 않으므로 RESEND 관련 값은 더미다.
+name: purge deleted accounts
+
+on:
+  schedule:
+    - cron: '47 18 * * *' # UTC 18:47 = KST 03:47, 매일 1회
+  workflow_dispatch: # missed-run 수동 복구용
+
+concurrency:
+  group: purge-deleted-accounts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  DJANGO_SETTINGS_MODULE: lifeDiary.settings.prod
+  DJANGO_SECRET_KEY: ${{ secrets.PURGE_DJANGO_SECRET_KEY }}
+  DB_NAME: ${{ secrets.DB_NAME }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  DB_HOST: ${{ secrets.DB_HOST }}
+  DB_PORT: '6543'
+  RESEND_API_KEY: re_dummy_purge_job_sends_no_mail
+  DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
+
+jobs:
+  purge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: lifeDiary
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: production
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: pip
+          cache-dependency-path: lifeDiary/requirements.txt
+
+      - name: 의존성 설치
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: 기한 지난 계정 영구 삭제
+        run: python manage.py purge_deleted_accounts
+
+      # purge 직후 잔량이 남아 있으면 실패로 끝나 GitHub 실패 알림이 간다.
+      - name: overdue 잔량 점검
+        run: python manage.py purge_deleted_accounts --check
