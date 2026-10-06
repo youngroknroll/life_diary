@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from apps.tags.models import Category, Tag
+from apps.users.goal_deadline import DeadlineState
 from apps.users.models import UserGoal
 
 
@@ -403,3 +404,34 @@ class TestGoalDueDate:
         )
 
         assert UserGoal.objects.get(user=owner).due_date == yesterday
+
+    def test_the_progress_card_shows_each_goals_deadline(self, client, owner, study):
+        UserGoal.objects.create(
+            user=owner,
+            tag=study,
+            period="daily",
+            target_hours=4.0,
+            due_date=days_from_today(2),
+        )
+        client.force_login(owner)
+
+        response = client.get(reverse("users:usergoal_list"))
+
+        rows = response.context["goal_progress_rows"]
+        assert rows[0]["deadline"] == DeadlineState("upcoming", 2)
+
+    def test_the_goal_table_pairs_each_goal_with_its_deadline(
+        self, client, owner, study
+    ):
+        goal = UserGoal.objects.create(
+            user=owner,
+            tag=study,
+            period="daily",
+            target_hours=4.0,
+            due_date=days_from_today(-1),
+        )
+        client.force_login(owner)
+
+        response = client.get(reverse("users:usergoal_list"))
+
+        assert response.context["goal_items"] == [(goal, DeadlineState("overdue", 1))]

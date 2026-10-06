@@ -32,6 +32,7 @@ from .forms import (
     UsernameRecoveryForm,
     VerificationCodeForm,
 )
+from .goal_deadline import deadline_state
 from .models import UserGoal
 from .account_deletion import cancel_account_deletion, request_account_deletion
 from . import verification_policy
@@ -59,7 +60,10 @@ from apps.tags.seed_tags import create_seed_tags
 from apps.dashboard.day_window import annotate_future, current_slot_index
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.dashboard.services import build_slot_rows, build_time_headers
-from apps.stats.aggregation.goal_progress import build_goal_progress_rows
+from apps.stats.aggregation.goal_progress import (
+    build_goal_progress_rows,
+    with_deadline_states,
+)
 from .use_cases import (
     DeleteGoalUseCase,
     DeleteNoteUseCase,
@@ -795,10 +799,13 @@ def _goal_page_context(
     request, add_error="", row_error="", error_goal_id=None, keep_values=False
 ):
     submitted = _submitted_goal_values(request) if keep_values else None
+    today = timezone.localdate()
+    goals = _goal_repo.find_by_user(request.user)
     return {
-        "goals": _goal_repo.find_by_user(request.user),
-        "goal_progress_rows": build_goal_progress_rows(
-            request.user, timezone.localdate()
+        "goals": goals,
+        "goal_items": [(goal, deadline_state(goal.due_date, today)) for goal in goals],
+        "goal_progress_rows": with_deadline_states(
+            build_goal_progress_rows(request.user, today), today
         ),
         "assignable_tags": _get_user_tag_queryset(request.user),
         "period_choices": UserGoal.PERIOD_CHOICES,
