@@ -33,7 +33,8 @@ Status values are based on the repository documents available at the update time
 
 - 전체 회귀 691 passed, 0 failed. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0.
 - 삭제 흐름은 브라우저에서 성공, 요청 실패, 화면 갱신 실패, 연속 호출을 확인했다(데스크톱 폭).
-- 미검증: 실제 Google OAuth 왕복, 모바일 폭, 스크린리더, 운영 캐시 적중률 변화.
+- 운영 측정(2026-10-06): 미스 TTFB 중앙값 969ms(쿼리 5개), 적중 485ms. 다른 날짜의 기록을 다시 저장하면 적중이던 날짜가 미스로 바뀌는 것을 확인했다.
+- 미검증: 실제 Google OAuth 왕복, 모바일 폭, 스크린리더, 운영의 실제 캐시 적중률.
 
 다음:
 
