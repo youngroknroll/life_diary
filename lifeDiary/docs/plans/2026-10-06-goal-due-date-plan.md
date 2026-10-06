@@ -1,7 +1,7 @@
 # 목표 기한(due date) 계획 (2026-10-06)
 
 - 브랜치: `feat/goal-due-date`
-- 상태: 승인 (2026-10-06), 구현 중
+- 상태: 구현 완료 (2026-10-06), PR 대기
 
 ## 배경
 
@@ -232,9 +232,10 @@ E. 배너 대상 (`apps/users/test_use_cases.py`, 대시보드는 context 데이
 
 ### 구현 후 판정
 
-- Web Experience Designer: (구현 후 기록)
-- Browser Interaction Reviewer: (구현 후 기록)
-- Quality Verification Lead: (구현 후 기록)
+- Web Experience Designer: Conforms (편차 6건 수용, 근거는 작업 로그)
+- Browser Interaction Reviewer: Conforms, 신규 결함 없음
+- Quality Verification Lead: Complete with residual risk. 수락 기준 12개 Verified. 잔존 위험은 설정 화면 POST 경로의 직접 테스트 부재와 캐시 키 `:v4` 전환의 테스트 부재
+- 상세: `docs/refactoring/2026-10-06-goal-due-date.md`
 
 ## 검증 명령
 

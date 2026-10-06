@@ -17,6 +17,32 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-10-06 — 목표 기한과 D-day 알림 (사용자 지시)
+
+목표에 선택 기한을 정할 수 있다. 남은 일수를 배지로 보여주고, 기한이 가까운 목표를 대시보드에서 상기시킨다.
+
+- 입력: 목표 표의 날짜 칸 + "기한 없음" 체크박스. 체크가 날짜보다 우선한다. 체크를 풀고 날짜를 비우면 거부한다. 과거 날짜는 새로 정하거나 바꿀 때만 거부한다.
+- 배지: D-4 이상 중립, D-3~D-day 경고, 지나면 "기한 지남". 목표 표, 목표 페이지 진행률 카드, 통계 탭 진행 행.
+- 대시보드 배너: 지난 지 3일 ~ 7일 뒤 목표 중 가장 급한 1건 + "그 외 N건". 이메일·푸시는 없다.
+- 기한이 지나도 목표·진행률은 그대로다.
+- 통계 캐시에는 `due_date`만 담고 상태는 요청한 날 기준으로 붙인다. 캐시 키 `:v3` → `:v4`.
+- 계획: `docs/plans/2026-10-06-goal-due-date-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-06-goal-due-date.md`
+- 브랜치: `feat/goal-due-date`
+
+검증:
+
+- 전체 회귀 721 passed, 0 failed(기준선 692). `manage.py check` 이슈 0건, 마이그레이션 누락 없음(`users/0005_usergoal_due_date` 추가), prod deploy check exit 0, `msgfmt --check-format` 통과, `node --check` 통과.
+- 브라우저(격리 DB): 375·820·992·1280px, 다크·라이트, ko·en. 저장·토글·거부·삭제 되돌리기·추가·배너·통계 캐시 적중 경로. 콘솔 오류 0건.
+- 프런트 사후 판정: Web Experience Designer Conforms, Browser Interaction Reviewer Conforms.
+- 미검증: 실제 모바일 기기, 스크린리더, 운영 배포 뒤 캐시 키 교체.
+
+다음:
+
+1. PR 머지와 배포 PR 머지(사용자).
+
+Deferred: 목표 저장 뒤 포커스 복원과 오류 칸 `aria-invalid`, 오류 행의 시간 칸 강조(필드 단위 오류 표시), 쌓기 레이아웃의 기간·시간 탭 순서(768~991px로 범위가 넓어짐).
+
 ## 2026-10-04 — Critical Remediation 미반영 커밋 선별 재적용 (사용자 지시)
 
 2026-08-15~16의 Critical Remediation 커밋 13개가 로컬 브랜치 `feat/grid-label-and-hour-axis`에만 있고 push되지 않았다. 커밋별로 현재 `main`과 대조해 필요한 것만 다시 적용했다.
