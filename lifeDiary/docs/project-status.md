@@ -38,7 +38,8 @@ Status values are based on the repository documents available at the update time
 다음:
 
 1. PR 머지와 배포 PR 머지(사용자).
-2. 마이그레이션 0007(태그 없는 기록 삭제, 비가역)과 purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
+2. 마이그레이션 0007(태그 없는 기록 190건 삭제, 태그 필수)은 사용자 승인 뒤 브랜치 `fix/require-timeblock-tag`에서 진행했다. 전체 회귀 692 passed. 운영 적용은 배포 때 실행된다. 190건은 사용자가 CSV로 받아 두었다.
+3. purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
 
 Deferred: Google 미인증 주소 가입 허용, 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
 
@@ -852,6 +853,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
 | A-9 | **DB 연결 재수립 비용 확인.** 2026-10-01 측정의 첫 요청에서만 유스케이스 밖 시간이 약 670ms 길었다. `CONN_MAX_AGE=60`이 지난 뒤 도쿄 풀러로 새로 연결한 비용일 수 있다(1회 관찰). 사실이면 앱을 한동안 쓰지 않다가 처음 열 때마다 더해진다. 트리거: 연결 비용을 몇 번 더 재서 확인할 때. 운영 검토를 동반한다. | `docs/refactoring/2026-09-30-stats-query-consolidation.md` | 1회 관찰 (2026-10-01) |
 | A-10 | **서버·DB 리전 일치.** Render는 싱가포르, Supabase는 도쿄(왕복 약 70ms)라 쿼리 하나에 81~85ms가 든다. 무료 요금제에서도 싱가포르에 새 프로젝트를 만들어 `public` 스키마를 덤프·복원하면 옮길 수 있다. 사용자가 보류했다(2026-10-01). 구글 TTFB 기준(0.8초)을 캐시 미스에서 맞추려면 필요할 가능성이 크다(추정). 계획, 운영·보안 검토, 리허설이 필요하다. | 같은 로그 | 사용자 확인 (2026-10-01) |
+| A-11 | **Supabase RLS 재발 방지.** 2026-10-04 Security Advisor가 `public`의 14개 테이블(allauth, axes, 이메일 인증, 탈퇴)에 RLS가 꺼져 있다고 경고했다. 사용자가 SQL로 전 테이블에 RLS를 켜 해소했다. 앱은 Data API를 쓰지 않는다. 마이그레이션으로 새 테이블이 생기면 다시 꺼진 채로 만들어진다. 후보: Data API 끄기, 또는 `post_migrate`에서 Postgres일 때 RLS 켜기. | 사용자 보고 (2026-10-04) | 저장소에 RLS 코드 없음 확인 |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 

@@ -3,7 +3,7 @@
 - 계획: `docs/plans/2026-10-03-critical-remediation-salvage-plan.md`
 - 원본 설계·계획·로그(이번에 복원): `docs/plans/2026-08-15_critical-remediation-design.md`, `docs/plans/2026-08-15_critical-remediation-plan.md`, `docs/refactoring/2026-08-15_critical-backend-remediation.md`, `docs/frontend/2026-08-15-dashboard-security-interaction.md`
 - 브랜치: `fix/critical-remediation-salvage`
-- 범위: 1~3단계. 4a(마이그레이션 0007)와 4b(purge 스케줄)는 사용자 결정 대기라 하지 않았다.
+- 범위: 1~3단계(PR #83, 2026-10-04 머지). 4a(마이그레이션 0007)는 사용자 승인 뒤 브랜치 `fix/require-timeblock-tag`에서 진행했다(아래 "4a"). 4b(purge 스케줄)는 결정 대기다.
 
 복원한 원본 문서 4개는 2026-08-15~16 시점 기록이다. 거기 적힌 identity key 전환, DOM 노드 조립, 마이그레이션 0007, purge 스케줄은 `main`에 없다.
 
@@ -72,9 +72,19 @@
 - FileBasedCache에서의 세대 교체. 테스트는 LocMemCache를 쓴다.
 - 운영 캐시 적중률 변화. 변경이 있을 때마다 그 사용자의 모든 날짜가 다음 요청에서 미스가 된다(2026-10-02 측정: 미스 1,144ms, 적중 446ms).
 
+## 4a — 태그 없는 기록 삭제와 태그 필수 (2026-10-04)
+
+- 원본 커밋 `4978886`을 `cherry-pick -x`로 옮겼다. 마이그레이션 `dashboard/0007`이 `tag_id IS NULL` 행을 지우고 `TimeBlock.tag`를 필수 FK(`CASCADE`)로 바꾼다.
+- 운영 DB 확인(사용자, Supabase SQL Editor): 태그 없는 행 190건. 사용자 3번 108건(전부 메모 있음), 1번 82건(메모 5건), 모두 2026-04-12 하루다. 태그 삭제의 잔재라는 전제와 맞지 않아 원인은 확인하지 못했다. 사용자가 삭제해도 된다고 판단했고 190건을 CSV로 받아 두었다.
+- 되돌리기는 코드가 아니라 그 CSV(또는 덤프) 복원이다.
+- 옮긴 직후 전체 회귀는 `641 passed, 51 errors`였다. 오류는 모두 `apps/stats/aggregation/test_stats_window.py`의 공통 fixture가 태그 없는 기록을 만들어서 났다(2단계 때 추가된 테스트라 원본 커밋이 몰랐다). fixture의 그 한 행에 태그를 주고, `test_monthly_daily_counts_include_untagged_blocks_like_the_database_count`를 `test_monthly_daily_counts_match_the_database_count`로 이름만 바꿨다. 삭제한 테스트는 없다. `apps/dashboard/conftest.py`의 `time_block_factory`는 `tag`를 필수 인자로 바꿨다.
+- 검증: 전체 회귀 `692 passed in 515.31s`(테스트 정리 커밋 시점, 서브에이전트 워크트리). 통합 브랜치에서 `test_stats_window.py`, `test_required_tag_migration.py`, `test_tag_migration.py` 60 passed, 마이그레이션 drift 없음, prod deploy check exit 0.
+- 미검증: 운영 DB에서의 마이그레이션 실행(배포 때 실행된다).
+- Deferred: 태그가 필수가 되어 도달하지 않는 가드 정리. `daily_baseline.py:26`, `summary.py:107`, `calculator.py:79-89`(`process_blocks_without_tag`와 호출처 4곳), `comparison.py:94`, `export.py:91`(`category_id` 부분은 별개일 수 있음), `dashboard/repositories.py:112`.
+
 ## Deferred
 
-- 4a 마이그레이션 0007, 4b purge 스케줄: 사용자 결정 대기.
+- 4b purge 스케줄: 사용자 결정 대기(GitHub 시크릿 등록 필요).
 - Google이 미인증이라고 알려 준 주소로도 가입과 로그인은 된다(인증 표시만 빠진다). 그 주소의 실제 주인은 "이미 사용 중"에 막힌다. 트리거: 보안 트랙. 완화안은 `clean_email`에서 거절하거나 6자리 코드 인증을 거치게 하는 것.
 - Google이 이메일을 주지 않으면 제출된 값이 그대로 쓰인다(인증 표시는 안 된다). 가입 화면은 재표시 때 제출된 값을 보여 준다(표시만, 저장에는 안 쓰임).
 - 캐시 쓰기 실패 시 커밋된 변경이 500으로 응답될 수 있다(`on_commit` 수신기). 트리거: 캐시 백엔드 장애 대응을 다룰 때.
