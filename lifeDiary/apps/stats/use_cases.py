@@ -41,7 +41,7 @@ def rotate_stats_generation(user_id: int) -> None:
 def _cache_key(user_id: int, target_date: date, language: str | None = None) -> str:
     lang = language or get_language() or "default"
     generation = get_stats_generation(user_id)
-    return f"stats:{user_id}:{generation}:{target_date.isoformat()}:{lang}:v3"
+    return f"stats:{user_id}:{generation}:{target_date.isoformat()}:{lang}:v4"
 
 
 class ExportMonthlyWorkbookUseCase:

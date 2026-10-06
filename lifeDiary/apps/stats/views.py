@@ -10,10 +10,12 @@ from django.contrib.auth.decorators import login_required
 from django.db import connection
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.utils.translation import gettext
 from django.views.decorators.http import require_GET
 
 from apps.core.utils import safe_date_parse
+from .aggregation.goal_progress import with_deadline_states
 from .use_cases import ExportMonthlyWorkbookUseCase, GetStatsContextUseCase
 
 _get_stats_context = GetStatsContextUseCase()
@@ -51,6 +53,9 @@ def index(request):
     selected_date = safe_date_parse(request.GET.get("date"))
     result, timing = _timed_stats_context(request.user, selected_date)
     context = result.context
+    context["goal_progress_rows"] = with_deadline_states(
+        context["goal_progress_rows"], timezone.localdate()
+    )
     # 날짜로 넘겨야 템플릿이 YEAR_MONTH_FORMAT 으로 지역화할 수 있다.
     context["export_months"] = [
         date(year, month, 1)
