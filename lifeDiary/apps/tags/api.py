@@ -244,7 +244,9 @@ def _parse_move_to(request):
     try:
         payload = json.loads(request.body or b"{}")
     except json.JSONDecodeError:
-        return None
+        raise ValueError(gettext("올바른 JSON 형식이 아닙니다."))
+    if not isinstance(payload, dict):
+        raise ValueError(gettext("요청이 올바르지 않습니다."))
 
     raw = payload.get("move_to_id")
     if raw in (None, ""):

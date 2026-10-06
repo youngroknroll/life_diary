@@ -14,6 +14,7 @@ from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.core.cache import cache
 from django.core.mail import send_mail
+from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -220,8 +221,9 @@ def signup_view(request):
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            create_seed_tags(user)
+            with transaction.atomic():
+                user = form.save()
+                create_seed_tags(user)
             return _start_signup_verification(request, user)
     else:
         form = SignupForm()

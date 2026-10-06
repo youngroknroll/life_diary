@@ -88,6 +88,7 @@ SOCIALACCOUNT_AUTO_SIGNUP = False
 # 중복이고, account URL 을 닫은 뒤로는 보낼 수도 없다.
 ACCOUNT_EMAIL_VERIFICATION = "none"
 SOCIALACCOUNT_FORMS = {"signup": "apps.users.social_forms.SocialSignupForm"}
+SOCIALACCOUNT_ADAPTER = "apps.users.adapters.LifeDiarySocialAccountAdapter"
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID", "")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET", "")
 SOCIALACCOUNT_PROVIDERS = {

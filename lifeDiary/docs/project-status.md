@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-10-02
+Last updated: 2026-10-04
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,32 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-10-04 — Critical Remediation 미반영 커밋 선별 재적용 (사용자 지시)
+
+2026-08-15~16의 Critical Remediation 커밋 13개가 로컬 브랜치 `feat/grid-label-and-hour-axis`에만 있고 push되지 않았다. 커밋별로 현재 `main`과 대조해 필요한 것만 다시 적용했다.
+
+- 그대로 옮김: 옮길 곳 없는 태그 삭제가 기록·메모를 지움, 탈퇴 취소 뒤 재요청(`IntegrityError` 수정), `purge_deleted_accounts --check`.
+- 재구현: 가입 트랜잭션, Google 가입자 기본 태그와 유예기간 내 Google 로그인의 탈퇴 취소, 통계 캐시 세대 교체(키 `:v3`), 주간 활동 시간의 수면 제외를 카테고리로 판정.
+- 프런트: 기록 삭제 성공 뒤 "삭제 실패"를 띄우고 행을 되살리던 버그(`deleteSlot`의 미선언 변수, 2026-08-12부터) 수정.
+- 추가: 태그 삭제 API가 깨진 본문을 400으로 거절한다. Google 가입 이메일은 제출된 값이 아니라 제공자가 준 주소로 저장하고, 제공자가 인증한 주소일 때만 인증 표시한다.
+- 계획: `docs/plans/2026-10-03-critical-remediation-salvage-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-03-critical-remediation-salvage.md`
+- 원본 설계·계획·로그 4개를 복원했다(`docs/plans/2026-08-15_critical-remediation-*.md` 등).
+
+검증:
+
+- 전체 회귀 691 passed, 0 failed. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0.
+- 삭제 흐름은 브라우저에서 성공, 요청 실패, 화면 갱신 실패, 연속 호출을 확인했다(데스크톱 폭).
+- 미검증: 실제 Google OAuth 왕복, 모바일 폭, 스크린리더, 운영 캐시 적중률 변화.
+
+다음:
+
+1. PR 머지와 배포 PR 머지(사용자).
+2. 마이그레이션 0007(태그 없는 기록 190건 삭제, 태그 필수)은 사용자 승인 뒤 브랜치 `fix/require-timeblock-tag`에서 진행했다. 전체 회귀 692 passed. 운영 적용은 배포 때 실행된다. 190건은 사용자가 CSV로 받아 두었다.
+3. purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
+
+Deferred: Google 미인증 주소 가입 허용, 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
 
 ## 2026-10-02 — 통계 쿼리 통합 2단계: 요청당 기록 1회 조회 (사용자 지시)
 
@@ -47,10 +73,13 @@ Status values are based on the repository documents available at the update time
 - `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0(기존 W009 1건).
 - Backend TDD Coach는 Green으로 판정했고, Domain Architecture Reviewer는 계획을 승인했다.
 
-다음:
+배포와 운영 측정 (2026-10-02, PR #80 → 배포 PR #81):
 
-1. PR 머지와 배포 PR 머지(사용자).
-2. 처음 여는 과거 날짜 5개 이상으로 miss를 측정해 1단계 결과(2,291ms, 20개)와 비교한다.
+- 처음 여는 과거 날짜 5개가 모두 miss, 쿼리 5개였다.
+- TTFB 중앙값은 1,144ms다. 1단계 뒤 2,291ms보다 −50%, 09-30 기준 3,294ms보다 −65%다.
+- db는 569ms, hit는 446ms다.
+- 구글 기준으로 miss는 "개선 필요"(0.8~1.8초) 구간, hit는 "좋음"이다.
+- 남은 시간은 DB 약 50%, 요청당 쿼리 3개가 든 유스케이스 밖 약 40%다. 0.8초 아래로 내리려면 리전 일치(A-10)나 쿼리를 더 줄이는 작업이 필요하다.
 
 Deferred: `calculator=None` 두 경로 정리, `find_daily_counts`(운영 호출 없음, 테스트 기준으로만 사용), `_stats_window`의 `min()` 재검증(상수 변경 시), 목표 조회 합치기, hit 경로 쿼리 3개, A-9, A-10, B-10.
 
@@ -818,12 +847,13 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-2 | 보안 잔여: CSP, 쿠키/보안 플래그 강화, production debug 재점검, 로그인 실패 알림. | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | — |
 | A-3 | `SECURE_PROXY_SSL_HEADER`, 배포된 `Set-Cookie` 헤더 실측. `ALLOWED_HOSTS`는 2026-08-12에 갱신·확인됨. `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요. | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | — |
 | A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
-| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
+| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. 2026-10-04: `--check` 옵션은 추가됐다. 스케줄 워크플로는 로컬 커밋 `2317031`에 있고 GitHub 시크릿 등록과 사용자 결정을 기다린다. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
 | A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
 | A-9 | **DB 연결 재수립 비용 확인.** 2026-10-01 측정의 첫 요청에서만 유스케이스 밖 시간이 약 670ms 길었다. `CONN_MAX_AGE=60`이 지난 뒤 도쿄 풀러로 새로 연결한 비용일 수 있다(1회 관찰). 사실이면 앱을 한동안 쓰지 않다가 처음 열 때마다 더해진다. 트리거: 연결 비용을 몇 번 더 재서 확인할 때. 운영 검토를 동반한다. | `docs/refactoring/2026-09-30-stats-query-consolidation.md` | 1회 관찰 (2026-10-01) |
 | A-10 | **서버·DB 리전 일치.** Render는 싱가포르, Supabase는 도쿄(왕복 약 70ms)라 쿼리 하나에 81~85ms가 든다. 무료 요금제에서도 싱가포르에 새 프로젝트를 만들어 `public` 스키마를 덤프·복원하면 옮길 수 있다. 사용자가 보류했다(2026-10-01). 구글 TTFB 기준(0.8초)을 캐시 미스에서 맞추려면 필요할 가능성이 크다(추정). 계획, 운영·보안 검토, 리허설이 필요하다. | 같은 로그 | 사용자 확인 (2026-10-01) |
+| A-11 | **Supabase RLS 재발 방지.** 2026-10-04 Security Advisor가 `public`의 14개 테이블(allauth, axes, 이메일 인증, 탈퇴)에 RLS가 꺼져 있다고 경고했다. 사용자가 SQL로 전 테이블에 RLS를 켜 해소했다. 앱은 Data API를 쓰지 않는다. 마이그레이션으로 새 테이블이 생기면 다시 꺼진 채로 만들어진다. 후보: Data API 끄기, 또는 `post_migrate`에서 Postgres일 때 RLS 켜기. | 사용자 보고 (2026-10-04) | 저장소에 RLS 코드 없음 확인 |
 
 ### B. 백엔드 (Backend TDD 사이클 필요)
 
@@ -834,7 +864,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | B-3 | ~~목표 개수에 비례하는 `UserGoal` 조회로 `TARGET_MAX_QUERIES`(현재 18) 산정 방식 재검토.~~ **2026-09-30 해소**: 목표 진행이 목표 수와 관계없이 기록을 한 번만 조회한다(GQ-03). 상한 18은 그대로다. | `docs/frontend/2026-08-17_p0-v2-phase4-...md` | — |
 | B-4 | `Tag.color` 컬럼 드롭 여부 결정. 현재 `Tag.save()`가 `category.color`를 복사한다(`apps/tags/models.py:128`). | `docs/refactoring/2026-08-01_p0-sian-redesign.md` | 컬럼·복사 로직 잔존 확인 |
 | B-5 | 온보딩 칩의 3번째 상태(추천-흐림). 뷰/모델에 "추천" 신호가 없어 백엔드 변경이 선행돼야 한다. | `docs/frontend/2026-08-17_p0-v2-phase6-...md` | — |
-| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(요청당 기록 1회 조회)를 구현했다(로컬 쿼리 5개, 배포·운영 측정 대기). 구글 TTFB 기준(0.8초)을 miss에서도 맞추려면 리전 일치(A-10)가 필요할 가능성이 크다(추정). | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
+| B-6 | **운영 통계 캐시 미스 비용 줄이기.** 분해는 끝났다(2026-09-30 Server-Timing). 미스 TTFB 중앙값 3,294ms 가운데 DB execute가 2,363ms(약 72%)이고, 쿼리 29개가 쿼리당 81~85ms로 고르다. 파이썬 계산은 370ms(약 11%)다. 쿼리당 시간이 Render→Supabase 풀러 왕복 지연 때문이라는 것은 가설이고, 왕복 지연과 리전은 재지 않았다. 개선 진행 중: 1단계(목표별 조회 제거)를 운영에 배포해 miss TTFB가 3,294ms에서 2,291ms로, 쿼리는 29개에서 20개로 줄었다(2026-10-01). 2단계(요청당 기록 1회 조회)를 배포했다. 운영 miss TTFB 중앙값 1,144ms, 쿼리 5개(2026-10-02). 구글 TTFB 기준(0.8초)을 miss에서도 맞추려면 리전 일치(A-10)나 쿼리를 더 줄이는 작업이 필요하다(추정). | `docs/refactoring/2026-09-29-stats-performance-measurement.md`, `docs/refactoring/2026-09-30-stats-server-timing.md` | 운영 `serverTiming` 실측: miss 5회 모두 `cache=miss`, `db-count` 29. hit 5회 모두 `cache=hit`, TTFB 중앙값 465ms (2026-09-30) |
 | B-7 | 측정 헬퍼(`apps/stats/conftest.py`)의 `apps/core` 일반화. 트리거: 통계 외의 앱이 같은 cold/warm 측정 테스트를 필요로 할 때. | 같은 로그 | — |
 | B-8 | 통계 뷰 Server-Timing 헤더 부착에 명시적 `status_code == 200` 확인 추가. 지금은 헤더가 뷰 끝의 `render()` 응답에만 붙는다는 구조로 보장한다. Security & Resilience Reviewer가 비차단으로 권고했다. 트리거: 통계 뷰에 두 번째 응답 분기가 생길 때. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/views.py:60-63` 확인 |
 | B-9 | 운영용 DB 측정 래퍼(`apps/stats/views.py`의 `_QueryTimer`)를 `apps/core`로 추출. 트리거: 두 번째 운영 화면이 같은 헤더를 필요로 할 때. | 같은 로그 | — |

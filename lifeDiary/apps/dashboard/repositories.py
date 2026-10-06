@@ -118,5 +118,9 @@ class TimeBlockRepository:
     def move_blocks_to_tag(self, source_tag, destination_tag) -> int:
         return TimeBlock.objects.filter(tag=source_tag).update(tag=destination_tag)
 
+    def delete_blocks_for_tag(self, tag) -> int:
+        deleted, _ = TimeBlock.objects.filter(tag=tag).delete()
+        return deleted
+
     def is_tag_in_use(self, tag):
         return TimeBlock.objects.filter(tag=tag).exists()

@@ -21,7 +21,7 @@ from django.test.utils import CaptureQueriesContext
 from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.logic import get_stats_context
-from apps.stats.use_cases import invalidate_stats_cache
+from apps.stats.use_cases import rotate_stats_generation
 from apps.tags.models import Category, Tag
 
 # 베이스라인(2026-04-26) 10 → Phase 1 8 → A1 (UserGoal 통합) 6
@@ -211,7 +211,7 @@ def test_stats_page_render_boundary_starts_at_page_template(
 def test_stats_request_benchmark_reports_cold_and_warm_samples(
     client, seeded_user, settings, measure_request, summarize_samples
 ):
-    user, today = seeded_user
+    user, _ = seeded_user
     settings.CACHES = {
         "default": {
             "BACKEND": LOCMEM_CACHE_BACKEND,
@@ -226,7 +226,7 @@ def test_stats_request_benchmark_reports_cold_and_warm_samples(
         warmup = measure_request(client, STATS_REQUEST_PATH)
         cold, warm = [], []
         for _ in range(BENCHMARK_CYCLES):
-            invalidate_stats_cache(user.id, today)
+            rotate_stats_generation(user.id)
             cold.append(measure_request(client, STATS_REQUEST_PATH))
             warm.append(measure_request(client, STATS_REQUEST_PATH))
     finally:

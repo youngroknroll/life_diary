@@ -83,7 +83,7 @@ def owner(make_user):
 
 @pytest.fixture
 def recorded(owner, make_user):
-    """두 사용자가 같은 날짜에 기록한다. 주인의 기록에는 미분류 칸과 빈 날이 섞인다."""
+    """두 사용자가 같은 날짜에 기록한다. 주인의 기록에는 비어 있는 칸(미분류)과 빈 날이 섞인다."""
     focus = Tag.objects.create(
         user=owner, name="집중", color="#4E8F63",
         category=Category.objects.get(slug="investment"),
@@ -104,7 +104,7 @@ def recorded(owner, make_user):
         seed = day.toordinal()
         if seed % 9:
             for n in range(seed % 7 + 3):
-                tag = None if n == 0 else (focus if n % 2 else chores)
+                tag = focus if n % 2 else chores
                 blocks.append(
                     TimeBlock(user=owner, date=day, slot_index=(seed * 5 + n * 11) % 144, tag=tag)
                 )
@@ -235,7 +235,7 @@ def test_monthly_stats_reuse_the_window(recorded):
 
 
 @pytest.mark.django_db
-def test_monthly_daily_counts_include_untagged_blocks_like_the_database_count(recorded):
+def test_monthly_daily_counts_match_the_database_count(recorded):
     calculator = StatsCalculator(recorded, MID_MONTH, window=FULL_WINDOW)
 
     counts = calculator.get_monthly_daily_counts()
