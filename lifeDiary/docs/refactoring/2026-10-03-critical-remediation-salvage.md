@@ -82,9 +82,17 @@
 - 미검증: 운영 DB에서의 마이그레이션 실행(배포 때 실행된다).
 - Deferred: 태그가 필수가 되어 도달하지 않는 가드 정리. `daily_baseline.py:26`, `summary.py:107`, `calculator.py:79-89`(`process_blocks_without_tag`와 호출처 4곳), `comparison.py:94`, `export.py:91`(`category_id` 부분은 별개일 수 있음), `dashboard/repositories.py:112`.
 
+## 4b — purge 스케줄 (2026-10-06)
+
+- 원본 커밋 `2317031`을 `cherry-pick -x`로 옮겼다. `.github/workflows/purge-deleted-accounts.yml`이 매일 UTC 18:47(KST 03:47)에 `production` 브랜치를 체크아웃해 `purge_deleted_accounts`와 `purge_deleted_accounts --check`를 실행한다. 수동 실행(`workflow_dispatch`)도 된다.
+- 사용자가 저장소 시크릿 5개를 등록했다: `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`, `PURGE_DJANGO_SECRET_KEY`. `gh secret list`로 이름을 확인했다.
+- 워크플로가 넘기는 환경변수는 현재 `lifeDiary/settings/prod.py`가 읽는 이름과 맞는다. `RESEND_API_KEY`는 더 이상 읽지 않지만 남겨도 영향이 없다.
+- 검증: YAML 파싱, `production`의 명령에 `--check`가 있음을 확인했다.
+- 미검증: 실제 실행. 머지 뒤 Actions에서 수동으로 한 번 돌려 확인한다.
+- 주의: 첫 실행에서 그동안 쌓인 기한 지난 탈퇴 요청이 한꺼번에 영구 삭제된다. GitHub는 저장소에 60일간 활동이 없으면 예약 워크플로를 끈다.
+
 ## Deferred
 
-- 4b purge 스케줄: 사용자 결정 대기(GitHub 시크릿 등록 필요).
 - Google이 미인증이라고 알려 준 주소로도 가입과 로그인은 된다(인증 표시만 빠진다). 그 주소의 실제 주인은 "이미 사용 중"에 막힌다. 트리거: 보안 트랙. 완화안은 `clean_email`에서 거절하거나 6자리 코드 인증을 거치게 하는 것.
 - Google이 이메일을 주지 않으면 제출된 값이 그대로 쓰인다(인증 표시는 안 된다). 가입 화면은 재표시 때 제출된 값을 보여 준다(표시만, 저장에는 안 쓰임).
 - 캐시 쓰기 실패 시 커밋된 변경이 500으로 응답될 수 있다(`on_commit` 수신기). 트리거: 캐시 백엔드 장애 대응을 다룰 때.

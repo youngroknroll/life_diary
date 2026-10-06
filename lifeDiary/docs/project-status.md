@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-10-04
+Last updated: 2026-10-06
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -39,7 +39,7 @@ Status values are based on the repository documents available at the update time
 
 1. PR 머지와 배포 PR 머지(사용자).
 2. 마이그레이션 0007(태그 없는 기록 190건 삭제, 태그 필수)은 사용자 승인 뒤 브랜치 `fix/require-timeblock-tag`에서 진행했다. 전체 회귀 692 passed. 운영 적용은 배포 때 실행된다. 190건은 사용자가 CSV로 받아 두었다.
-3. purge 스케줄(GitHub 시크릿 필요)을 진행할지 결정(사용자).
+3. purge 스케줄은 사용자가 시크릿 5개를 등록한 뒤 `.github/workflows/purge-deleted-accounts.yml`로 추가했다(2026-10-06). 머지 뒤 Actions에서 수동 실행으로 확인한다.
 
 Deferred: Google 미인증 주소 가입 허용, 캐시 쓰기 실패 시 500, 관리자 화면 편집의 캐시 미교체, purge 때 캐시 잔존. 전체 목록은 실행 로그에 있다.
 
@@ -847,7 +847,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | A-2 | 보안 잔여: CSP, 쿠키/보안 플래그 강화, production debug 재점검, 로그인 실패 알림. | `docs/security/2026-04-21_xss-bruteforce-sri-remediation.md` | — |
 | A-3 | `SECURE_PROXY_SSL_HEADER`, 배포된 `Set-Cookie` 헤더 실측. `ALLOWED_HOSTS`는 2026-08-12에 갱신·확인됨. `CSRF_TRUSTED_ORIGINS`는 이 구성에서 불필요. | `docs/refactoring/2026-05-19_auth-cookie-login-security.md` | — |
 | A-4 | 복구 메일 실발송: 발신 도메인 구매·DNS·Resend 검증 완료 전까지 보류. 실발송 검증 이력 없음. | `docs/refactoring/2026-05-15_production-deploy-email-readiness.md` | — |
-| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. 2026-10-04: `--check` 옵션은 추가됐다. 스케줄 워크플로는 로컬 커밋 `2317031`에 있고 GitHub 시크릿 등록과 사용자 결정을 기다린다. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
+| A-5 | 계정 삭제 스케줄링(ACC-OPS-01) — `purge_deleted_accounts`의 운영 스케줄과 텔레메트리. 2026-10-06: `--check` 옵션과 GitHub Actions 일일 스케줄(KST 03:47)을 추가했다. 실패하면 GitHub 알림이 간다. 남은 것은 첫 수동 실행 확인이다. | `docs/plans/2026-08-10_comprehensive-review-follow-up-plan.md` | — |
 | A-6 | **캐시에 남는 옛 목표 진행 바 색.** `CATEGORY_LINE_COLOR`를 고쳤지만 `GetStatsContextUseCase`가 `category_line_color`까지 담아 캐시한다(과거 날짜 TTL 24시간). 배포 시 `.cache/`를 비우지 않으면 만료까지 옛 회색으로 보인다. A-1과 같은 뿌리(캐시 키 버전 부여로 근본 해결). 차트 선 색은 정적 파일이라 영향 없다. | `docs/frontend/2026-08-17_stats-category-color-and-legend-fixes.md` | `use_cases.py:19` 캐시 키에 스키마 버전 없음 확인 |
 | A-7 | 로그인 후 화면 응답에 명시적 `Cache-Control: private, no-store` 부여. 지금은 Cloudflare 엣지가 `/stats/`를 `cf-cache-status: DYNAMIC`(`Vary: Cookie`)으로 캐시하지 않지만, 응답에 `Cache-Control`이 없다. 트리거: 엣지 캐시 규칙 변경, CDN 도입, 또는 보안 강화 트랙. 보안 검토 동반. | `docs/refactoring/2026-09-29-stats-performance-measurement.md` | 운영 응답 헤더 실측 (2026-09-30) |
 | A-8 | 통계 Server-Timing 스위치(`STATS_SERVER_TIMING_ENABLED`) 유지 검토. 2026-09-30 사용자가 계속 켜 두기로 했다. Security & Resilience Reviewer는 지금 바꿀 것이 없다고 판단했다. 유지 조건 4가지는 `docs/refactoring/2026-09-30-stats-query-consolidation.md`에 적었다. 엣지 캐시 정책이 바뀌면 A-7과 함께 다시 본다. 같은 트랙의 Deferred로, 백로그 A-1과 A-6 문구도 다시 확인한다. 두 항목은 캐시 키에 버전이 없다고 적었지만, 현재 키에는 `:v2`가 있다. | `docs/refactoring/2026-09-30-stats-server-timing.md` | `apps/stats/use_cases.py:21`의 `:v2` 확인 (2026-09-30) |
