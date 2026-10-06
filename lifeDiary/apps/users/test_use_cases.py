@@ -4,12 +4,17 @@ SaveGoalUseCase/SaveNoteUseCase가 ModelForm이 아닌 순수 DTO를 받는지 �
 """
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 
 from apps.tags.models import Category, Tag
-from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase
+from apps.users.use_cases import (
+    GoalData,
+    ListDueSoonGoalsUseCase,
+    NoteData,
+    SaveGoalUseCase,
+)
 
 
 class TestGoalDataDTO:
@@ -113,3 +118,61 @@ class TestSaveGoalUseCaseDueDate:
 
         goal.refresh_from_db()
         assert goal.due_date is None
+
+
+TODAY = date(2026, 10, 6)
+
+
+def deadlines_of(items):
+    return [(item.deadline.state, item.deadline.days) for item in items]
+
+
+@pytest.mark.django_db
+class TestListDueSoonGoals:
+    def test_lists_goals_from_three_days_overdue_to_a_week_ahead(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        for offset in (-4, -3, 0, 7, 8):
+            goal_factory(goal_owner, owned_tag, due_date=TODAY + timedelta(days=offset))
+
+        items = ListDueSoonGoalsUseCase().execute(goal_owner, TODAY)
+
+        assert sorted(deadlines_of(items)) == [
+            ("due_today", 0),
+            ("overdue", 3),
+            ("upcoming", 7),
+        ]
+
+    def test_goals_without_a_due_date_are_not_listed(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        goal_factory(goal_owner, owned_tag, due_date=None)
+
+        assert ListDueSoonGoalsUseCase().execute(goal_owner, TODAY) == []
+
+    def test_another_users_goals_are_not_listed(
+        self, goal_owner, owned_tag, goal_factory, make_user
+    ):
+        stranger = make_user(username="duestranger")
+        stranger_tag = Tag.objects.create(
+            user=stranger,
+            name="공부",
+            category=Category.objects.get(slug="investment"),
+        )
+        goal_factory(stranger, stranger_tag, due_date=TODAY)
+
+        assert ListDueSoonGoalsUseCase().execute(goal_owner, TODAY) == []
+
+    def test_the_earliest_due_date_comes_first(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        for offset in (5, -2, 0):
+            goal_factory(goal_owner, owned_tag, due_date=TODAY + timedelta(days=offset))
+
+        items = ListDueSoonGoalsUseCase().execute(goal_owner, TODAY)
+
+        assert deadlines_of(items) == [
+            ("overdue", 2),
+            ("due_today", 0),
+            ("upcoming", 5),
+        ]
