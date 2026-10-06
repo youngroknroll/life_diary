@@ -27,6 +27,18 @@
     {% include "shared/_date_selector.html" with ds_mypage_label=add_goal_label %}
 </div>
 
+{% if goals_due_soon %}
+{% with first=goals_due_soon.0 others=goals_due_soon|length|add:"-1" %}
+<a class="deadline-banner mb-3" href="{% url 'users:usergoal_list' %}">
+    {% include "users/_deadline_badge.html" with deadline=first.deadline %}
+    <span class="deadline-banner__text">
+        {% if first.deadline.state == "overdue" %}{% blocktrans with t=first.tag_name %}{{ t }} 목표 기한이 지났습니다{% endblocktrans %}{% elif first.deadline.state == "due_today" %}{% blocktrans with t=first.tag_name %}{{ t }} 목표 기한이 오늘입니다{% endblocktrans %}{% else %}{% blocktrans with t=first.tag_name count n=first.deadline.days %}{{ t }} 목표 기한이 {{ n }}일 남았습니다{% plural %}{{ t }} 목표 기한이 {{ n }}일 남았습니다{% endblocktrans %}{% endif %}{% if others > 0 %}<span class="deadline-banner__more"> · {% blocktrans count n=others %}그 외 {{ n }}건{% plural %}그 외 {{ n }}건{% endblocktrans %}</span>{% endif %}
+    </span>
+    <span class="deadline-banner__go" aria-hidden="true">›</span>
+</a>
+{% endwith %}
+{% endif %}
+
 {% if filled_slots == 0 %}
 <div class="empty-nudge mb-4">
     <div>

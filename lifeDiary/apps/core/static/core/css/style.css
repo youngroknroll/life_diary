@@ -1911,6 +1911,71 @@ label.segmented__item {
     text-decoration: underline;
 }
 
+.deadline-badge {
+    display: inline-flex;
+    align-items: center;
+    flex: none;
+    padding: 2px 6px;
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+}
+
+.deadline-badge.is-soon {
+    border-color: var(--color-note-border);
+    background: var(--color-note-bg);
+    color: var(--color-note-text);
+}
+
+.deadline-badge.is-overdue {
+    border-color: var(--color-danger-text);
+    background: var(--color-danger-soft);
+    color: var(--color-danger-text);
+}
+
+.deadline-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 9px 14px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    font-size: 13px;
+    color: var(--color-text);
+    text-decoration: none;
+}
+
+.deadline-banner:hover {
+    border-color: var(--color-primary-border);
+    color: var(--color-text);
+}
+
+.deadline-banner:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.deadline-banner__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.deadline-banner__more {
+    color: var(--color-text-muted);
+}
+
+.deadline-banner__go {
+    font-size: 16px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
 .settings-row {
     border-top: 1px solid var(--color-border-muted);
 }
@@ -4013,7 +4078,7 @@ footer {
    ========================================================= */
 
 .settings-panel--wide {
-    max-width: 720px;
+    max-width: 920px;
 }
 
 /* page-head 가 접히면 개수만 남은 줄이 생긴다 — 접혀도 오른쪽에 붙여둔다. */
@@ -4050,7 +4115,7 @@ footer {
 }
 
 .goal-manager {
-    --goal-grid: minmax(0, 1fr) 104px 116px minmax(96px, auto);
+    --goal-grid: minmax(0, 1fr) 104px 116px 296px minmax(96px, auto);
     border: 1px solid var(--color-border);
     border-radius: 10px;
     background: var(--color-surface);
@@ -4151,6 +4216,63 @@ footer {
 .goal-row__unit {
     font-size: 12px;
     color: var(--color-text-meta);
+}
+
+.goal-row__due {
+    gap: 8px;
+}
+
+.goal-row__no-due {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 38px;
+    margin: 0;
+    font-size: 12px;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.goal-row__no-due input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+}
+
+.goal-row__date {
+    width: 132px;
+    height: 38px;
+    padding: 0 8px;
+    border: 1px solid var(--color-border);
+    border-radius: 7px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: 500 12.5px/1 var(--font-mono);
+}
+
+.goal-row__date:disabled {
+    background: var(--color-surface-soft);
+    color: var(--color-text-disabled);
+    cursor: not-allowed;
+}
+
+.goal-row__date:focus-visible,
+.goal-row__no-due input:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 1px;
+}
+
+.goal-row.is-dirty .goal-row__date:enabled {
+    border-color: var(--color-primary);
+}
+
+.goal-row.has-error .goal-row__date,
+.goal-add.has-error .goal-row__date {
+    border-color: var(--color-danger-text);
+    background: var(--color-danger-soft);
 }
 
 .goal-row__action {
@@ -4257,7 +4379,8 @@ footer {
 }
 
 .goal-add .goal-row__select,
-.goal-add .goal-row__input {
+.goal-add .goal-row__input,
+.goal-add .goal-row__date {
     height: 40px;
 }
 
@@ -4396,8 +4519,8 @@ footer {
     cursor: pointer;
 }
 
-/* 360px 에서는 4열이 들어가지 않는다 — 표를 풀어 행 목록으로 바꾼다(시안 5c). */
-@media (max-width: 767.98px) {
+/* 992px 아래에서는 5열이 들어가지 않는다 — 표를 풀어 행 목록으로 바꾼다(시안 5c). */
+@media (max-width: 991.98px) {
     .goal-manager__head {
         display: none;
     }
@@ -4434,16 +4557,33 @@ footer {
         grid-row: 1;
     }
 
+    .goal-row__due {
+        grid-column: 1;
+        grid-row: 3;
+        flex-wrap: wrap;
+    }
+
     .goal-row__action {
         grid-column: 2;
-        grid-row: 2;
+        grid-row: 3;
+    }
+
+    .goal-add__grid > .goal-row__due {
+        grid-column: 1 / -1;
     }
 
     .goal-row__input,
     .goal-row__select,
+    .goal-row__date,
     .goal-add .goal-row__input,
-    .goal-add .goal-row__select {
+    .goal-add .goal-row__select,
+    .goal-add .goal-row__date {
         height: 44px;
+    }
+
+    .goal-row__no-due {
+        min-height: 44px;
+        padding-right: 6px;
     }
 
     .goal-row__save,

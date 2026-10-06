@@ -23,6 +23,7 @@
                                 {% else %}{% trans "월간" %}{% endif %}
                             </span>
                         </span>
+                        {% include "users/_deadline_badge.html" with deadline=row.deadline %}
                     </span>
                     <span class="goal-progress__value num{% if row.is_behind_pace %} is-under{% endif %}">
                         {{ row.current_hours|floatformat:"-1" }}<span class="goal-progress__sep">/ {{ row.target_hours|floatformat:"-1" }}h · {{ row.percentage }}%</span>
@@ -47,10 +48,11 @@
         <span>{% trans "태그" %}</span>
         <span>{% trans "기간" %}</span>
         <span class="is-num">{% trans "목표" %}</span>
+        <span>{% trans "기한" %}</span>
         <span></span>
     </div>
 
-    {% for goal in goals %}
+    {% for goal, deadline in goal_items %}
         {% comment %}
         한 행이 곧 하나의 usergoal_update POST 폼이다. 삭제는 같은 폼 안에서
         formaction 으로 갈라 보내므로 폼을 겹치지 않는다.
@@ -89,6 +91,19 @@
                        type="number" step="0.5" min="0"
                        value="{% if error_goal_id == goal.pk and row_values %}{{ row_values.target_hours }}{% else %}{{ goal.target_hours|floatformat:'-1' }}{% endif %}">
                 <span class="goal-row__unit num" aria-hidden="true">h</span>
+            </span>
+
+            <span class="goal-row__cell goal-row__due">
+                <label class="goal-row__no-due">
+                    <input type="checkbox" name="no_due_date" data-no-due-date
+                           {% if error_goal_id == goal.pk and row_values %}{% if row_values.no_due_date %}checked{% endif %}{% elif not goal.due_date %}checked{% endif %}>
+                    <span class="visually-hidden">{% blocktrans with t=goal.tag.name %}{{ t }} 목표{% endblocktrans %}</span>
+                    <span>{% trans "기한 없음" %}</span>
+                </label>
+                <label class="visually-hidden" for="goalDue{{ goal.pk }}">{% blocktrans with t=goal.tag.name %}{{ t }} 목표 기한{% endblocktrans %}</label>
+                <input class="goal-row__date num" id="goalDue{{ goal.pk }}" name="due_date" type="date"
+                       value="{% if error_goal_id == goal.pk and row_values %}{{ row_values.due_date }}{% else %}{{ goal.due_date|date:'Y-m-d' }}{% endif %}">
+                {% include "users/_deadline_badge.html" %}
             </span>
 
             <span class="goal-row__cell goal-row__action">
@@ -138,6 +153,17 @@
                        type="number" step="0.5" min="0" placeholder="0" required
                        value="{% if add_values %}{{ add_values.target_hours }}{% endif %}">
                 <span class="goal-row__unit num" aria-hidden="true">h</span>
+            </span>
+
+            <span class="goal-row__cell goal-row__due">
+                <label class="goal-row__no-due">
+                    <input type="checkbox" name="no_due_date" data-no-due-date
+                           {% if not add_values or add_values.no_due_date %}checked{% endif %}>
+                    <span>{% trans "기한 없음" %}</span>
+                </label>
+                <label class="visually-hidden" for="goalAddDue">{% trans "추가할 목표 기한" %}</label>
+                <input class="goal-row__date num" id="goalAddDue" name="due_date" type="date"
+                       value="{% if add_values %}{{ add_values.due_date }}{% endif %}">
             </span>
 
             <span class="goal-row__cell goal-row__action">

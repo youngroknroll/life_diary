@@ -63,6 +63,8 @@
         undoForm.querySelector('[name="tag"]').value = restore.tag;
         undoForm.querySelector('[name="period"]').value = restore.period;
         undoForm.querySelector('[name="target_hours"]').value = restore.hours;
+        undoForm.querySelector('[name="due_date"]').value = restore.dueDate;
+        undoForm.querySelector('[name="no_due_date"]').disabled = Boolean(restore.dueDate);
         snackbar.hidden = false;
         clearTimeout(snackbarTimer);
         snackbarTimer = setTimeout(hideSnackbar, 8000);
@@ -127,7 +129,18 @@
             form.elements.tag.value,
             form.elements.period.value,
             String(form.elements.target_hours.value).trim(),
+            form.elements.due_date.value,
+            form.elements.no_due_date.checked ? '1' : '0',
         ].join('|');
+    }
+
+    function syncDueDate(form) {
+        form.elements.due_date.disabled = form.elements.no_due_date.checked;
+    }
+
+    function toggleDueDate(form) {
+        syncDueDate(form);
+        if (!form.elements.no_due_date.checked) form.elements.due_date.focus();
     }
 
     function paintSwatch(form) {
@@ -162,6 +175,7 @@
         form.addEventListener('change', function (event) {
             if (event.target === form.elements.tag) paintSwatch(form);
             if (event.target === form.elements.period) applyPeriodMax(form);
+            if (event.target === form.elements.no_due_date) toggleDueDate(form);
             refreshDirty();
         });
 
@@ -171,6 +185,7 @@
         });
 
         applyPeriodMax(form);
+        syncDueDate(form);
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();
@@ -226,6 +241,7 @@
             tag: form.elements.tag.value,
             period: form.elements.period.value,
             hours: form.elements.target_hours.value,
+            dueDate: form.elements.no_due_date.checked ? '' : form.elements.due_date.value,
         };
         const deletedLabel = form.dataset.goalDeletedLabel;
 
@@ -244,9 +260,11 @@
         form.addEventListener('change', function (event) {
             if (event.target === form.elements.tag) paintSwatch(form);
             if (event.target === form.elements.period) applyPeriodMax(form);
+            if (event.target === form.elements.no_due_date) toggleDueDate(form);
         });
 
         applyPeriodMax(form);
+        syncDueDate(form);
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();

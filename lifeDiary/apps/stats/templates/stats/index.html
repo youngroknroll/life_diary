@@ -87,6 +87,7 @@
                                                 {% elif row.period == 'weekly' %}{% trans "매주" %}
                                                 {% else %}{% trans "매달" %}{% endif %}
                                             </span>
+                                            {% include "users/_deadline_badge.html" with deadline=row.deadline %}
                                         </span>
                                         <span class="goal-progress__value num{% if row.is_behind_pace %} is-under{% endif %}">
                                             {{ row.current_hours|floatformat:"-1" }}<span class="goal-progress__sep">/ {{ row.target_hours|floatformat:"-1" }}h ·
