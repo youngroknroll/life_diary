@@ -197,6 +197,7 @@ def _goal_data_from_form(form: UserGoalForm) -> GoalData:
         tag_id=cleaned["tag"].id,
         period=cleaned["period"],
         target_hours=cleaned["target_hours"],
+        due_date=cleaned["due_date"],
     )
 
 
@@ -785,6 +786,8 @@ def _submitted_goal_values(request):
         "tag": request.POST.get("tag", ""),
         "period": request.POST.get("period", ""),
         "target_hours": request.POST.get("target_hours", ""),
+        "due_date": request.POST.get("due_date", ""),
+        "no_due_date": "no_due_date" in request.POST,
     }
 
 

@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from .models import UserGoal, UserNote
 
@@ -102,13 +103,17 @@ class UsernameRecoveryForm(forms.Form):
 
 
 class UserGoalForm(forms.ModelForm):
+    no_due_date = forms.BooleanField(required=False, label=_("기한 없음"))
+    restore = forms.BooleanField(required=False, widget=forms.HiddenInput)
+
     class Meta:
         model = UserGoal
-        fields = ["tag", "period", "target_hours"]
+        fields = ["tag", "period", "target_hours", "due_date"]
         labels = {
             "tag": _("태그"),
             "period": _("기간"),
             "target_hours": _("목표 시간"),
+            "due_date": _("기한"),
         }
         widgets = {
             "tag": forms.Select(attrs={"class": "form-select", "style": "width: 50%"}),
@@ -117,6 +122,7 @@ class UserGoalForm(forms.ModelForm):
                 attrs={"class": "form-select", "style": "width: 50%"},
             ),
             "target_hours": forms.NumberInput(attrs={"step": 0.5, "min": 0, "class": "form-control"}),
+            "due_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         }
         help_texts = {
             "target_hours": _("주간/월간은 해당 기간의 총 목표 시간입니다."),
@@ -130,6 +136,7 @@ class UserGoalForm(forms.ModelForm):
         """같은 태그·기간 목표는 하나만 둔다. 둘이면 어느 쪽이 진행률에
         반영되는지 사용자가 알 수 없다."""
         cleaned = super().clean()
+        self._clean_due_date(cleaned)
         tag = cleaned.get("tag")
         period = cleaned.get("period")
         if not (self._user and tag and period):
@@ -144,6 +151,22 @@ class UserGoalForm(forms.ModelForm):
                 % {"tag": tag.name, "period": dict(UserGoal.PERIOD_CHOICES)[period]}
             )
         return cleaned
+
+    def _clean_due_date(self, cleaned):
+        """과거 날짜는 새로 정할 때만 막는다. 이미 지난 기한까지 막으면 그 목표의
+        다른 칸을 고칠 수 없고, 지운 목표를 되돌릴 때(restore) 기한을 잃는다."""
+        due_date = cleaned.get("due_date")
+        if cleaned.get("no_due_date"):
+            cleaned["due_date"] = None
+        elif "due_date" in self.data and due_date is None:
+            self.add_error("due_date", _("기한을 정하거나 '기한 없음'을 선택하세요."))
+        elif (
+            due_date
+            and due_date != self.instance.due_date
+            and not cleaned.get("restore")
+            and due_date < timezone.localdate()
+        ):
+            self.add_error("due_date", _("기한은 오늘이나 그 이후 날짜로 정하세요."))
 
 
 class UserNoteForm(forms.ModelForm):

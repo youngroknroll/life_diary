@@ -4,8 +4,11 @@ SaveGoalUseCase/SaveNoteUseCase가 ModelForm이 아닌 순수 DTO를 받는지 �
 """
 from __future__ import annotations
 
+from datetime import date
+
 import pytest
 
+from apps.tags.models import Category, Tag
 from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase
 
 
@@ -20,6 +23,11 @@ class TestGoalDataDTO:
         assert data.tag_id == 5
         assert data.period == "weekly"
         assert data.target_hours == 10.0
+
+    def test_a_goal_has_no_due_date_unless_one_is_given(self):
+        data = GoalData(tag_id=5, period="weekly", target_hours=10.0)
+
+        assert data.due_date is None
 
 
 class TestNoteDataDTO:
@@ -61,3 +69,47 @@ class TestSaveGoalUseCaseAuthz:
         # 메시지는 active locale에 따라 한/영 다름 → 예외 종류만 검증
         with pytest.raises(LookupError):
             use_case.execute(data, user=object())
+
+
+@pytest.fixture
+def goal_owner(make_user):
+    return make_user(username="dueowner")
+
+
+@pytest.fixture
+def owned_tag(goal_owner):
+    return Tag.objects.create(
+        user=goal_owner,
+        name="공부",
+        category=Category.objects.get(slug="investment"),
+    )
+
+
+@pytest.mark.django_db
+class TestSaveGoalUseCaseDueDate:
+    def test_saving_a_goal_keeps_its_due_date(self, goal_owner, owned_tag):
+        due = date(2026, 12, 31)
+
+        goal = SaveGoalUseCase().execute(
+            GoalData(
+                tag_id=owned_tag.id, period="daily", target_hours=2.0, due_date=due
+            ),
+            goal_owner,
+        )
+
+        goal.refresh_from_db()
+        assert goal.due_date == due
+
+    def test_saving_without_a_due_date_clears_the_old_one(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        goal = goal_factory(goal_owner, owned_tag, due_date=date(2026, 12, 31))
+
+        SaveGoalUseCase().execute(
+            GoalData(tag_id=owned_tag.id, period="daily", target_hours=2.0),
+            goal_owner,
+            goal_id=goal.id,
+        )
+
+        goal.refresh_from_db()
+        assert goal.due_date is None

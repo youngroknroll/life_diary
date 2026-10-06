@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
 from django.db import transaction
 from django.utils.translation import gettext
@@ -29,6 +30,7 @@ class GoalData:
     tag_id: int
     period: str
     target_hours: float
+    due_date: date | None = None
 
 
 @dataclass(frozen=True)
@@ -69,6 +71,7 @@ class SaveGoalUseCase:
         goal.tag_id = data.tag_id
         goal.period = data.period
         goal.target_hours = data.target_hours
+        goal.due_date = data.due_date
         goal.full_clean()
         goal.save()
         _notify_goals_changed(SaveGoalUseCase, user.id)
