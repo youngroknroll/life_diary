@@ -4199,8 +4199,9 @@ footer {
     border-color: var(--color-primary);
 }
 
-.goal-row.has-error .goal-row__input,
-.goal-add.has-error .goal-row__input {
+.goal-row__select[aria-invalid="true"],
+.goal-row__input[aria-invalid="true"],
+.goal-row__date[aria-invalid="true"] {
     border-color: var(--color-danger-text);
     background: var(--color-danger-soft);
 }
@@ -4267,12 +4268,6 @@ footer {
 
 .goal-row.is-dirty .goal-row__date:enabled {
     border-color: var(--color-primary);
-}
-
-.goal-row.has-error .goal-row__date,
-.goal-add.has-error .goal-row__date {
-    border-color: var(--color-danger-text);
-    background: var(--color-danger-soft);
 }
 
 .goal-row__action {
@@ -4537,7 +4532,8 @@ footer {
     }
 
     .goal-row__tag {
-        grid-column: 1;
+        grid-column: 1 / -1;
+        grid-row: 1;
     }
 
     /* 기간은 값이 두 글자뿐이라, 태그 이름 칸만큼 늘리면 행이 어긋나 보인다. */
@@ -4554,7 +4550,7 @@ footer {
 
     .goal-row__hours {
         grid-column: 2;
-        grid-row: 1;
+        grid-row: 2;
     }
 
     .goal-row__due {
