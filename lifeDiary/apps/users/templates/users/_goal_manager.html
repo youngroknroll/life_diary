@@ -184,9 +184,8 @@
 
         {% if add_error %}
             <p class="goal-row__error" id="goalAddError">{{ add_error }}</p>
-        {% else %}
-            <p class="goal-add__hint">{% trans "일간 최대 24h · 주간 100h · 월간 300h" %}</p>
         {% endif %}
+        <p class="goal-add__hint"{% if add_error %} hidden{% endif %}>{% trans "일간 최대 24h · 주간 100h · 월간 300h" %}</p>
     </form>
 
     <div class="goal-tag-nudge">
