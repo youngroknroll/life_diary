@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-10-06
+Last updated: 2026-10-07
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,26 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-10-07 — 목표 표 포커스·오류 칸·탭 순서 (사용자 지시)
+
+목표 기한 작업에서 미룬 기존 결함 세 건을 고쳤다.
+
+- 포커스: 목표 표를 다시 그린 뒤 경로마다 포커스를 옮긴다. 저장 → 같은 행의 제출 직전 칸(저장 버튼이면 태그 칸), 거부 → 첫 오류 칸, 추가 → 추가 폼 태그 칸, 삭제 → 되돌리기 버튼, 되돌리기 → 복원된 행. 스낵바 자동 숨김과 네트워크 실패도 포커스를 잃지 않는다.
+- 오류 칸: 뷰가 `error_field`를 넘기고 그 칸에만 `aria-invalid`·`aria-describedby`와 오류색을 붙인다. 중복 태그·기간은 두 칸.
+- 탭 순서: 992px 미만에서 1행 태그, 2행 기간·시간, 3행 기한·저장/삭제로 바꿔 화면 순서와 DOM 순서를 맞췄다.
+- 계획: `docs/plans/2026-10-07-goal-form-focus-and-field-errors-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-form-focus-and-field-errors.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721개 통과, 실패 0, exit 0. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0, `node --check` 통과.
+- 브라우저(격리 DB): 포커스 12개 경로, 오류 원인 4종(과거 기한, 빈 기한, 시간 초과, 중복), 375·820·991·992·1280px, 다크·라이트, ko·en. 콘솔 JS 오류 0건.
+- 프런트 사후 판정: Web Experience Designer Conforms, Browser Interaction Reviewer Conforms. 품질 검증 Complete with residual risk.
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: 고친 칸에 남는 오류 표시(재제출 전까지 `aria-invalid` 유지), 스낵바 8초 타이머와 되돌리기 요청 경합, 스낵바 라이브 리전 부재, `busy` 플래그가 다른 행 저장을 조용히 무시함, `dashboard.js` 포커스 복원.
 
 ## 2026-10-06 — 목표 기한과 D-day 알림 (사용자 지시)
 
@@ -41,7 +61,7 @@ Status values are based on the repository documents available at the update time
 
 1. PR 머지와 배포 PR 머지(사용자).
 
-Deferred: 목표 저장 뒤 포커스 복원과 오류 칸 `aria-invalid`, 오류 행의 시간 칸 강조(필드 단위 오류 표시), 쌓기 레이아웃의 기간·시간 탭 순서(768~991px로 범위가 넓어짐).
+Deferred: 목표 저장 뒤 포커스 복원과 오류 칸 `aria-invalid`, 오류 행의 시간 칸 강조(필드 단위 오류 표시), 쌓기 레이아웃의 기간·시간 탭 순서(768~991px로 범위가 넓어짐). → 2026-10-07 해결.
 
 ## 2026-10-04 — Critical Remediation 미반영 커밋 선별 재적용 (사용자 지시)
 

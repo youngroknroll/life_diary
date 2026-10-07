@@ -1,7 +1,7 @@
 # 목표 표 포커스·오류 칸·탭 순서 계획 (2026-10-07)
 
 - 브랜치: `feat/goal-due-date` (PR #89에 이어 붙인다)
-- 상태: 승인 (2026-10-07)
+- 상태: 구현 완료 (2026-10-07), PR #89에 포함
 
 ## 배경
 
@@ -142,9 +142,10 @@
 
 ### 구현 후 판정
 
-- Web Experience Designer: 미정
-- Browser Interaction Reviewer: 미정
-- Quality Verification Lead: 미정
+- Web Experience Designer: Conforms
+- Browser Interaction Reviewer: Conforms (잔여 위험: 고친 칸에 남는 오류 표시, 스낵바 타이머와 되돌리기 요청 경합)
+- Quality Verification Lead: Complete with residual risk. 수락 기준 9개 중 위반 0건. 잔여 위험은 TDD 4번이 새 테스트 대신 기존 테스트에 단언을 더한 점, 고친 칸에 남는 오류 표시, 스낵바 타이머 경합
+- 상세: `docs/refactoring/2026-10-07-goal-form-focus-and-field-errors.md`
 
 ## 검증 명령
 
