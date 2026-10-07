@@ -87,6 +87,7 @@ class TestGoalMutationsOverAjax:
 
         assert response.status_code == 422
         assert not UserGoal.objects.filter(user=owner).exists()
+        assert response.context["error_field"] == "target_hours"
 
     def test_ajax_delete_returns_the_refreshed_body(self, client, owner, study):
         goal = UserGoal.objects.create(
@@ -121,6 +122,7 @@ class TestDuplicateGoals:
 
         assert response.status_code == 200
         assert UserGoal.objects.filter(user=owner).count() == 1
+        assert response.context["error_field"] == "__all__"
 
     def test_a_rejected_add_keeps_what_the_user_typed(self, client, owner, study):
         UserGoal.objects.create(
@@ -297,7 +299,8 @@ class TestGoalDueDate:
         )
 
         assert not UserGoal.objects.filter(user=owner).exists()
-        assert response.context["add_error"]
+        assert response.context["add_error"] == "기한을 정하거나 '기한 없음'을 선택하세요."
+        assert response.context["error_field"] == "due_date"
 
     def test_a_new_goal_cannot_start_with_a_past_due_date(self, client, owner, study):
         client.force_login(owner)
@@ -335,6 +338,7 @@ class TestGoalDueDate:
         goal.refresh_from_db()
         assert goal.due_date == tomorrow
         assert response.context["row_error"]
+        assert response.context["error_field"] == "due_date"
 
     def test_a_goal_already_past_its_due_date_can_still_be_edited(
         self, client, owner, study

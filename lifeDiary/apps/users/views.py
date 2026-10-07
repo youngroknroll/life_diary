@@ -796,7 +796,12 @@ def _submitted_goal_values(request):
 
 
 def _goal_page_context(
-    request, add_error="", row_error="", error_goal_id=None, keep_values=False
+    request,
+    add_error="",
+    row_error="",
+    error_goal_id=None,
+    error_field="",
+    keep_values=False,
 ):
     submitted = _submitted_goal_values(request) if keep_values else None
     today = timezone.localdate()
@@ -812,6 +817,7 @@ def _goal_page_context(
         "add_error": add_error,
         "row_error": row_error,
         "error_goal_id": error_goal_id,
+        "error_field": error_field,
         "add_values": submitted if add_error else None,
         "row_values": submitted if row_error else None,
     }
@@ -847,12 +853,13 @@ def _goal_mutation_failed(request, **errors):
     )
 
 
-def _first_form_error(form) -> str:
-    """행 안에 한 줄로 보여줄 오류. 세 필드뿐이라 첫 오류면 충분하다."""
-    for errors in form.errors.values():
+def _first_form_error(form) -> tuple[str, str]:
+    """행 안에 한 줄로 보여줄 오류와 그 필드 이름. 둘을 한 번에 꺼내야
+    화면이 표시하는 칸과 문구가 어긋나지 않는다."""
+    for field, errors in form.errors.items():
         if errors:
-            return errors[0]
-    return ""
+            return field, errors[0]
+    return "", ""
 
 
 @login_required
@@ -870,7 +877,8 @@ def usergoal_create(request):
     if form.is_valid():
         _save_goal.execute(_goal_data_from_form(form), request.user)
         return _goal_mutation_done(request)
-    return _goal_mutation_failed(request, add_error=_first_form_error(form))
+    error_field, message = _first_form_error(form)
+    return _goal_mutation_failed(request, add_error=message, error_field=error_field)
 
 
 @login_required
@@ -884,8 +892,9 @@ def usergoal_update(request, pk):
     if form.is_valid():
         _save_goal.execute(_goal_data_from_form(form), request.user, goal_id=pk)
         return _goal_mutation_done(request)
+    error_field, message = _first_form_error(form)
     return _goal_mutation_failed(
-        request, row_error=_first_form_error(form), error_goal_id=pk
+        request, row_error=message, error_goal_id=pk, error_field=error_field
     )
 
 
