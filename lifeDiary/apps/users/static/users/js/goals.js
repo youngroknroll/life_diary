@@ -52,9 +52,45 @@
         };
     }
 
+    function focusAddTag() {
+        const select = block.querySelector('#goalAddTag');
+        if (select) select.focus();
+    }
+
+    function focusInvalid() {
+        const invalid = block.querySelector('[aria-invalid="true"]');
+        if (invalid) invalid.focus();
+    }
+
+    function focusRow(goalId, name) {
+        const row = block.querySelector('.goal-row[data-goal-id="' + goalId + '"]');
+        if (!row) return;
+        const control = name ? row.elements[name] : null;
+        if (control && !control.disabled) {
+            control.focus();
+            return;
+        }
+        row.elements.tag.focus();
+    }
+
+    function focusRestoredRow() {
+        const tag = undoForm.elements.tag.value;
+        const period = undoForm.elements.period.value;
+        const row = Array.from(block.querySelectorAll('.goal-row')).find(function (form) {
+            return form.elements.tag.value === tag && form.elements.period.value === period;
+        });
+        if (row) {
+            row.elements.tag.focus();
+            return;
+        }
+        focusAddTag();
+    }
+
     function hideSnackbar() {
         clearTimeout(snackbarTimer);
-        if (snackbar) snackbar.hidden = true;
+        if (!snackbar) return;
+        if (snackbar.contains(document.activeElement)) focusAddTag();
+        snackbar.hidden = true;
     }
 
     function showSnackbar(text, restore) {
@@ -110,6 +146,7 @@
                 // 서버가 오류 문구를 심은 본문을 그대로 돌려준다.
                 swapBody(html);
                 setStatus('', 'error');
+                focusInvalid();
                 return;
             }
             throw new Error('HTTP ' + response.status);
@@ -121,6 +158,9 @@
         } finally {
             busy = false;
             unlock();
+            if (document.activeElement === document.body && button && button.isConnected) {
+                button.focus();
+            }
         }
     }
 
@@ -194,8 +234,15 @@
                 confirmDeleteRow(form, submitter);
                 return;
             }
+            const goalId = form.dataset.goalId;
+            const focusedName = form.contains(document.activeElement)
+                ? document.activeElement.name || ''
+                : '';
             submitForm(form, save, {
                 successMessage: gettext('목표를 저장했습니다'),
+                onSuccess: function () {
+                    focusRow(goalId, focusedName);
+                },
             });
         });
     }
@@ -250,6 +297,7 @@
             successMessage: '',
             onSuccess: function () {
                 showSnackbar(deletedLabel, restore);
+                undoForm.querySelector('.goal-snackbar__undo').focus();
             },
         });
     }
@@ -271,6 +319,7 @@
             if (!form.reportValidity()) return;
             submitForm(form, submit, {
                 successMessage: gettext('목표를 추가했습니다'),
+                onSuccess: focusAddTag,
             });
         });
     }
@@ -286,7 +335,10 @@
             event.preventDefault();
             submitForm(undoForm, undoForm.querySelector('.goal-snackbar__undo'), {
                 successMessage: gettext('삭제를 되돌렸습니다'),
-                onSuccess: hideSnackbar,
+                onSuccess: function () {
+                    focusRestoredRow();
+                    hideSnackbar();
+                },
             });
         });
     }
