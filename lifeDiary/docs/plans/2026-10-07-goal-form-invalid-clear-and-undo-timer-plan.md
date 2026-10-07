@@ -1,7 +1,7 @@
 # 목표 표 오류 표시 해제·되돌리기 타이머 계획 (2026-10-07)
 
 - 브랜치: `feat/goal-due-date` (PR #89에 이어 붙인다)
-- 상태: 승인 (2026-10-07)
+- 상태: 구현 완료 (2026-10-07), PR #89에 포함
 
 ## 배경
 
@@ -118,9 +118,10 @@
 
 ### 구현 후 판정
 
-- Web Experience Designer: 미정
-- Browser Interaction Reviewer: 미정
-- Quality Verification Lead: 미정
+- Web Experience Designer: Conforms (선택 사항: 추가 폼 오류 문구↔힌트 전환 시 4px 높이 차이)
+- Browser Interaction Reviewer: Conforms, 결함 없음
+- Quality Verification Lead: Complete with residual risk (화면 폭·테마·언어 조합 일부만 확인, 실기기 미확인)
+- 상세: `docs/refactoring/2026-10-07-goal-form-invalid-clear-and-undo-timer.md`
 
 ## 검증 명령
 

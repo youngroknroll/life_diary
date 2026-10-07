@@ -17,6 +17,25 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-10-07 — 목표 표 오류 표시 해제·되돌리기 타이머 (사용자 지시)
+
+바로 아래 작업에서 남긴 잔여 위험 두 건을 고쳤다.
+
+- 거부된 칸을 고치면 그 칸이 속한 묶음의 `aria-invalid`·오류 색을 바로 지운다(기한 ← 날짜·기한 없음, 시간 ← 시간·기간, 중복 ← 태그·기간). 남은 표시가 없으면 오류 문구를 지우고 추가 폼은 힌트를 되돌린다. 무관한 칸을 고치면 표시를 남긴다.
+- 되돌리기 요청이 실제로 나가면 스낵바 자동 숨김 타이머를 멈추고, 실패하면 스낵바를 남긴 채 8초를 다시 센다. 다른 요청이 진행 중이라 되돌리기가 나가지 않으면 타이머를 건드리지 않는다.
+- 계획: `docs/plans/2026-10-07-goal-form-invalid-clear-and-undo-timer-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-form-invalid-clear-and-undo-timer.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721 passed, exit 0. `manage.py check` 이슈 0건, `node --check` 통과.
+- 브라우저(격리 DB, fetch 지연·실패 흉내): 표시 해제 8가지, 되돌리기 타이머 4가지(8초 넘는 요청, 422, 오프라인 재시도, 다른 요청 중). 1280px 다크 ko, 375px 라이트 en. 콘솔 JS 오류 0건.
+- 프런트 사후 판정 둘 다 Conforms. 품질 검증 Complete with residual risk.
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: 스낵바 라이브 리전 부재, 전역 `busy` 플래그(다른 요청 중 저장·되돌리기를 조용히 무시함).
+
 ## 2026-10-07 — 목표 표 포커스·오류 칸·탭 순서 (사용자 지시)
 
 목표 기한 작업에서 미룬 기존 결함 세 건을 고쳤다.
@@ -35,7 +54,7 @@ Status values are based on the repository documents available at the update time
 - 프런트 사후 판정: Web Experience Designer Conforms, Browser Interaction Reviewer Conforms. 품질 검증 Complete with residual risk.
 - 미검증: 실제 스크린리더, 실제 모바일 기기.
 
-Deferred: 고친 칸에 남는 오류 표시(재제출 전까지 `aria-invalid` 유지), 스낵바 8초 타이머와 되돌리기 요청 경합, 스낵바 라이브 리전 부재, `busy` 플래그가 다른 행 저장을 조용히 무시함, `dashboard.js` 포커스 복원.
+Deferred: 고친 칸에 남는 오류 표시(재제출 전까지 `aria-invalid` 유지)와 스낵바 8초 타이머와 되돌리기 요청 경합은 2026-10-07 해결(위 항목). 남은 것: 스낵바 라이브 리전 부재, `busy` 플래그가 다른 행 저장을 조용히 무시함, `dashboard.js` 포커스 복원.
 
 ## 2026-10-06 — 목표 기한과 D-day 알림 (사용자 지시)
 
