@@ -17,6 +17,28 @@ Status values are based on the repository documents available at the update time
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
 
+## 2026-10-07 — 목표 표 삭제 알림 전달·요청 중 상태 표시 (사용자 지시)
+
+바로 아래 작업에서 범위 밖으로 미룬 두 건과, 검토·구현 중 드러난 연관 문제를 고쳤다.
+
+- 삭제 뒤 포커스가 가는 "되돌리기" 버튼에 `aria-describedby`로 삭제 문구를 붙여 스크린리더가 이름과 함께 읽는다. 스낵바를 라이브 리전으로 만들지는 않았다.
+- 요청이 진행되는 동안 다른 제출 버튼(행 저장·추가·확인 줄 "삭제"·되돌리기)을 `disabled`로 잠그고 흐리게 보인다. 누른 버튼은 `aria-disabled`로 잠가 포커스가 `<body>`로 떨어지지 않는다. "처리 중..." 문구는 요청이 끝날 때까지 남는다.
+- 응답이 본문을 갈아끼울 때 다른 행·추가 폼의 편집 값과 열려 있던 삭제 확인 줄을 되돌려 넣는다.
+- 다른 요청 중에는 8초 자동 숨김을 보류했다가 요청이 끝나면 8초를 다시 센다.
+- 375px에서 스낵바가 하단 탭바와 겹치고 되돌리기 버튼이 30px 폭으로 줄바꿈되던 기존 결함을 고쳤다(탭바 위 26px, 버튼 67×44px).
+- 계획: `docs/plans/2026-10-07-goal-snackbar-announce-and-busy-state-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-snackbar-announce-and-busy-state.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721 passed in 535.20s, exit 0. `manage.py check` 이슈 0건, `node --check` 통과.
+- 브라우저(격리 DB, fetch 지연 12~25초·실패 흉내, 페이지 안 기록기): 요청 중 잠금·포커스·암묵 제출 차단, 초안·확인 줄 복원, 되돌리기 뒤 초안 유지, 422·오프라인, 타이머 보류(12.5초 응답 → 20.5초 숨김), 375px 스낵바 배치. 1280px 라이트 en, 375px 다크 ko. 콘솔 JS 오류 0건.
+- 프런트 사후 판정 둘 다 Conforms. 품질 검증 Complete with residual risk(실기기 스크린리더·모바일, Safari 클릭-비포커스 경로 미확인).
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: `dashboard.js` `#undoSnackbar`의 라이브 리전 부재와 다시 그리기 포커스 복원(다른 화면). 행 단위 동시 요청과 여러 단계 되돌리기는 하지 않는다.
+
 ## 2026-10-07 — 목표 표 오류 표시 해제·되돌리기 타이머 (사용자 지시)
 
 바로 아래 작업에서 남긴 잔여 위험 두 건을 고쳤다.
@@ -34,7 +56,7 @@ Status values are based on the repository documents available at the update time
 - 프런트 사후 판정 둘 다 Conforms. 품질 검증 Complete with residual risk.
 - 미검증: 실제 스크린리더, 실제 모바일 기기.
 
-Deferred: 스낵바 라이브 리전 부재, 전역 `busy` 플래그(다른 요청 중 저장·되돌리기를 조용히 무시함).
+Deferred: 스낵바 라이브 리전 부재, 전역 `busy` 플래그(다른 요청 중 저장·되돌리기를 조용히 무시함) → 2026-10-07 해결(위 항목).
 
 ## 2026-10-07 — 목표 표 포커스·오류 칸·탭 순서 (사용자 지시)
 

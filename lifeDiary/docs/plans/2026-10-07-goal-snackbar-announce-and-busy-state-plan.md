@@ -1,7 +1,7 @@
 # 목표 표 삭제 알림 전달·요청 중 상태 표시 계획 (2026-10-07)
 
 - 브랜치: `feat/goal-due-date` (PR #89에 이어 붙인다)
-- 상태: 사용자 승인 (2026-10-07), 구현 중
+- 상태: 구현 완료 (2026-10-07), PR #89에 포함
 
 ## 배경
 
@@ -96,7 +96,7 @@
 |---|---|
 | `apps/users/templates/users/goals.html` | 되돌리기 버튼 `aria-describedby="goalSnackbarText"` |
 | `apps/users/static/users/js/goals.js` | B1 누른 버튼 `aria-disabled`, 다른 제출 버튼 잠금·재질의 해제, 확인 줄 "삭제" 잠금·확인 줄 재등장, B2 편집 값 모으기·되돌리기와 dirty 기준(행: 바인딩 값, 추가 폼: 빈 폼), `refreshDirty`·기준값을 모듈 수준으로, B3 요청 중 자동 숨김 보류 |
-| `apps/core/static/core/css/style.css` | 잠긴 제출 버튼 모양 한 규칙 |
+| `apps/core/static/core/css/style.css` | 잠긴 제출 버튼 모양 한 규칙. 구현 중 추가 명세: 375px 스낵바(탭바 위 배치, 되돌리기 44px, 줄바꿈 금지) |
 
 ## Frontend Review Evidence
 
@@ -131,7 +131,10 @@
 
 ### 구현 후 판정
 
-(구현 후 채움)
+- Web Experience Designer: Conforms, 위반 0건 (375px 스낵바 추가 명세 포함)
+- Browser Interaction Reviewer: Conforms, 차단 결함 0건
+- Quality Verification Lead: 실행 로그 "품질 검증 판정" 참조
+- 상세: `docs/refactoring/2026-10-07-goal-snackbar-announce-and-busy-state.md`
 
 ## 검증 명령
 
