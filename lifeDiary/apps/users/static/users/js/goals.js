@@ -109,6 +109,10 @@
         undoForm.querySelector('[name="due_date"]').value = restore.dueDate;
         undoForm.querySelector('[name="no_due_date"]').disabled = Boolean(restore.dueDate);
         snackbar.hidden = false;
+        scheduleSnackbarHide();
+    }
+
+    function scheduleSnackbarHide() {
         clearTimeout(snackbarTimer);
         snackbarTimer = setTimeout(hideSnackbar, 8000);
     }
@@ -360,15 +364,18 @@
     }
 
     if (undoForm) {
-        undoForm.addEventListener('submit', function (event) {
+        undoForm.addEventListener('submit', async function (event) {
             event.preventDefault();
-            submitForm(undoForm, undoForm.querySelector('.goal-snackbar__undo'), {
+            if (busy) return;
+            clearTimeout(snackbarTimer);
+            await submitForm(undoForm, undoForm.querySelector('.goal-snackbar__undo'), {
                 successMessage: gettext('삭제를 되돌렸습니다'),
                 onSuccess: function () {
                     focusRestoredRow();
                     hideSnackbar();
                 },
             });
+            if (!snackbar.hidden) scheduleSnackbarHide();
         });
     }
 
