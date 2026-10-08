@@ -29,7 +29,7 @@ concurrency:
 
 env:
   # 배포 트리에서 뺄 경로. 런타임이 읽지 않는 문서·거버넌스 파일이다.
-  EXCLUDE_RE: '^(lifeDiary/docs/|\.claude/|README\.md$|lifeDiary/(prompt_plan|AGENTS|CLAUDE)\.md$)'
+  EXCLUDE_RE: '^(lifeDiary/docs/|(lifeDiary/)?\.claude/|README\.md$|lifeDiary/(prompt_plan|AGENTS|CLAUDE)\.md$)'
 
 jobs:
   deploy:

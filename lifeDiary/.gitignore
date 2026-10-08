@@ -1,5 +1,9 @@
 .venv/
-.claude
+.claude/*
+!.claude/agents/
+!.claude/hooks/
+!.claude/rules/
+!.claude/settings.json
 __pycache__/
 *.pyc
 .pytest_cache/

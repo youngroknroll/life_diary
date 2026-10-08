@@ -311,7 +311,7 @@ logs
 
 cert.*
 
-.claude
+/.claude/
 
 lifeDiary/lifeDiary/staticfiles/
 
