@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, timedelta
 
 import pytest
 from django.core.cache import cache
@@ -12,6 +12,7 @@ from apps.stats.use_cases import GetStatsContextUseCase
 from apps.tags.models import Category, Tag
 from apps.tags.repositories import TagRepository
 from apps.tags.use_cases import UpdateTagUseCase
+from apps.users.models import UserGoal
 from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase, SaveNoteUseCase
 
 class ForcedRollback(Exception):
@@ -156,3 +157,21 @@ def test_rolled_back_slot_change_keeps_serving_cached_statistics(
                 raise ForcedRollback()
 
     assert use_case.execute(owner, SELECTED_DATE).cache_hit is True
+
+
+def test_cached_goal_rows_keep_the_due_date_but_not_its_daily_state(
+    stats_cache, owner, focus_tag
+):
+    due = SELECTED_DATE + timedelta(days=3)
+    UserGoal.objects.create(
+        user=owner, tag=focus_tag, period="daily", target_hours=1.0, due_date=due
+    )
+    use_case = GetStatsContextUseCase()
+    use_case.execute(owner, SELECTED_DATE)
+
+    cached = use_case.execute(owner, SELECTED_DATE)
+
+    assert cached.cache_hit
+    row = cached.context["goal_progress_rows"][0]
+    assert row["due_date"] == due
+    assert "deadline" not in row

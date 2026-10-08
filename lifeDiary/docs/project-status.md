@@ -1,6 +1,6 @@
 # Project Status
 
-Last updated: 2026-10-06
+Last updated: 2026-10-07
 
 This document is the single status index for LifeDiary planning, execution, and follow-up documents. It does not replace the detailed documents linked below, and no existing plan or refactoring document should be deleted only because it is listed here.
 
@@ -16,6 +16,93 @@ Status values are based on the repository documents available at the update time
 | Superseded | Older planning context replaced by a newer execution log or status document. |
 | Reference | Architecture, analysis, or guidance document, not a task backlog item. |
 | Unknown | Status cannot be determined from documents alone. |
+
+## 2026-10-07 — 목표 표 삭제 알림 전달·요청 중 상태 표시 (사용자 지시)
+
+바로 아래 작업에서 범위 밖으로 미룬 두 건과, 검토·구현 중 드러난 연관 문제를 고쳤다.
+
+- 삭제 뒤 포커스가 가는 "되돌리기" 버튼에 `aria-describedby`로 삭제 문구를 붙여 스크린리더가 이름과 함께 읽는다. 스낵바를 라이브 리전으로 만들지는 않았다.
+- 요청이 진행되는 동안 다른 제출 버튼(행 저장·추가·확인 줄 "삭제"·되돌리기)을 `disabled`로 잠그고 흐리게 보인다. 누른 버튼은 `aria-disabled`로 잠가 포커스가 `<body>`로 떨어지지 않는다. "처리 중..." 문구는 요청이 끝날 때까지 남는다.
+- 응답이 본문을 갈아끼울 때 다른 행·추가 폼의 편집 값과 열려 있던 삭제 확인 줄을 되돌려 넣는다.
+- 다른 요청 중에는 8초 자동 숨김을 보류했다가 요청이 끝나면 8초를 다시 센다.
+- 375px에서 스낵바가 하단 탭바와 겹치고 되돌리기 버튼이 30px 폭으로 줄바꿈되던 기존 결함을 고쳤다(탭바 위 26px, 버튼 67×44px).
+- 계획: `docs/plans/2026-10-07-goal-snackbar-announce-and-busy-state-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-snackbar-announce-and-busy-state.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721 passed in 535.20s, exit 0. `manage.py check` 이슈 0건, `node --check` 통과.
+- 브라우저(격리 DB, fetch 지연 12~25초·실패 흉내, 페이지 안 기록기): 요청 중 잠금·포커스·암묵 제출 차단, 초안·확인 줄 복원, 되돌리기 뒤 초안 유지, 422·오프라인, 타이머 보류(12.5초 응답 → 20.5초 숨김), 375px 스낵바 배치. 1280px 라이트 en, 375px 다크 ko. 콘솔 JS 오류 0건.
+- 프런트 사후 판정 둘 다 Conforms. 품질 검증 Complete with residual risk(실기기 스크린리더·모바일, Safari 클릭-비포커스 경로 미확인).
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: `dashboard.js` `#undoSnackbar`의 라이브 리전 부재와 다시 그리기 포커스 복원(다른 화면). 행 단위 동시 요청과 여러 단계 되돌리기는 하지 않는다.
+
+## 2026-10-07 — 목표 표 오류 표시 해제·되돌리기 타이머 (사용자 지시)
+
+바로 아래 작업에서 남긴 잔여 위험 두 건을 고쳤다.
+
+- 거부된 칸을 고치면 그 칸이 속한 묶음의 `aria-invalid`·오류 색을 바로 지운다(기한 ← 날짜·기한 없음, 시간 ← 시간·기간, 중복 ← 태그·기간). 남은 표시가 없으면 오류 문구를 지우고 추가 폼은 힌트를 되돌린다. 무관한 칸을 고치면 표시를 남긴다.
+- 되돌리기 요청이 실제로 나가면 스낵바 자동 숨김 타이머를 멈추고, 실패하면 스낵바를 남긴 채 8초를 다시 센다. 다른 요청이 진행 중이라 되돌리기가 나가지 않으면 타이머를 건드리지 않는다.
+- 계획: `docs/plans/2026-10-07-goal-form-invalid-clear-and-undo-timer-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-form-invalid-clear-and-undo-timer.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721 passed, exit 0. `manage.py check` 이슈 0건, `node --check` 통과.
+- 브라우저(격리 DB, fetch 지연·실패 흉내): 표시 해제 8가지, 되돌리기 타이머 4가지(8초 넘는 요청, 422, 오프라인 재시도, 다른 요청 중). 1280px 다크 ko, 375px 라이트 en. 콘솔 JS 오류 0건.
+- 프런트 사후 판정 둘 다 Conforms. 품질 검증 Complete with residual risk.
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: 스낵바 라이브 리전 부재, 전역 `busy` 플래그(다른 요청 중 저장·되돌리기를 조용히 무시함) → 2026-10-07 해결(위 항목).
+
+## 2026-10-07 — 목표 표 포커스·오류 칸·탭 순서 (사용자 지시)
+
+목표 기한 작업에서 미룬 기존 결함 세 건을 고쳤다.
+
+- 포커스: 목표 표를 다시 그린 뒤 경로마다 포커스를 옮긴다. 저장 → 같은 행의 제출 직전 칸(저장 버튼이면 태그 칸), 거부 → 첫 오류 칸, 추가 → 추가 폼 태그 칸, 삭제 → 되돌리기 버튼, 되돌리기 → 복원된 행. 스낵바 자동 숨김과 네트워크 실패도 포커스를 잃지 않는다.
+- 오류 칸: 뷰가 `error_field`를 넘기고 그 칸에만 `aria-invalid`·`aria-describedby`와 오류색을 붙인다. 중복 태그·기간은 두 칸.
+- 탭 순서: 992px 미만에서 1행 태그, 2행 기간·시간, 3행 기한·저장/삭제로 바꿔 화면 순서와 DOM 순서를 맞췄다.
+- 계획: `docs/plans/2026-10-07-goal-form-focus-and-field-errors-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-07-goal-form-focus-and-field-errors.md`
+- 브랜치: `feat/goal-due-date` (PR #89)
+
+검증:
+
+- 전체 회귀 721개 통과, 실패 0, exit 0. `manage.py check` 이슈 0건, 마이그레이션 변경 없음, prod deploy check exit 0, `node --check` 통과.
+- 브라우저(격리 DB): 포커스 12개 경로, 오류 원인 4종(과거 기한, 빈 기한, 시간 초과, 중복), 375·820·991·992·1280px, 다크·라이트, ko·en. 콘솔 JS 오류 0건.
+- 프런트 사후 판정: Web Experience Designer Conforms, Browser Interaction Reviewer Conforms. 품질 검증 Complete with residual risk.
+- 미검증: 실제 스크린리더, 실제 모바일 기기.
+
+Deferred: 고친 칸에 남는 오류 표시(재제출 전까지 `aria-invalid` 유지)와 스낵바 8초 타이머와 되돌리기 요청 경합은 2026-10-07 해결(위 항목). 남은 것: 스낵바 라이브 리전 부재, `busy` 플래그가 다른 행 저장을 조용히 무시함, `dashboard.js` 포커스 복원.
+
+## 2026-10-06 — 목표 기한과 D-day 알림 (사용자 지시)
+
+목표에 선택 기한을 정할 수 있다. 남은 일수를 배지로 보여주고, 기한이 가까운 목표를 대시보드에서 상기시킨다.
+
+- 입력: 목표 표의 날짜 칸 + "기한 없음" 체크박스. 체크가 날짜보다 우선한다. 체크를 풀고 날짜를 비우면 거부한다. 과거 날짜는 새로 정하거나 바꿀 때만 거부한다.
+- 배지: D-4 이상 중립, D-3~D-day 경고, 지나면 "기한 지남". 목표 표, 목표 페이지 진행률 카드, 통계 탭 진행 행.
+- 대시보드 배너: 지난 지 3일 ~ 7일 뒤 목표 중 가장 급한 1건 + "그 외 N건". 이메일·푸시는 없다.
+- 기한이 지나도 목표·진행률은 그대로다.
+- 통계 캐시에는 `due_date`만 담고 상태는 요청한 날 기준으로 붙인다. 캐시 키 `:v3` → `:v4`.
+- 계획: `docs/plans/2026-10-06-goal-due-date-plan.md`
+- 실행 로그: `docs/refactoring/2026-10-06-goal-due-date.md`
+- 브랜치: `feat/goal-due-date`
+
+검증:
+
+- 전체 회귀 721 passed, 0 failed(기준선 692). `manage.py check` 이슈 0건, 마이그레이션 누락 없음(`users/0005_usergoal_due_date` 추가), prod deploy check exit 0, `msgfmt --check-format` 통과, `node --check` 통과.
+- 브라우저(격리 DB): 375·820·992·1280px, 다크·라이트, ko·en. 저장·토글·거부·삭제 되돌리기·추가·배너·통계 캐시 적중 경로. 콘솔 오류 0건.
+- 프런트 사후 판정: Web Experience Designer Conforms, Browser Interaction Reviewer Conforms.
+- 미검증: 실제 모바일 기기, 스크린리더, 운영 배포 뒤 캐시 키 교체.
+
+다음:
+
+1. PR 머지와 배포 PR 머지(사용자).
+
+Deferred: 목표 저장 뒤 포커스 복원과 오류 칸 `aria-invalid`, 오류 행의 시간 칸 강조(필드 단위 오류 표시), 쌓기 레이아웃의 기간·시간 탭 순서(768~991px로 범위가 넓어짐). → 2026-10-07 해결.
 
 ## 2026-10-04 — Critical Remediation 미반영 커밋 선별 재적용 (사용자 지시)
 
@@ -824,7 +911,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Document | Purpose |
 |---|---|
 | `AGENTS.md` | Operating guide for agent roles, project file flow, TDD rules, review gates, and completion reporting. |
-| `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md` | Product and architecture guide for LifeDiary's business flow, domain model, and app responsibilities. |
+| `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md` | Product and architecture guide for LifeDiary's business flow, domain model, and app responsibilities. 2026-10-08에 현재 코드 기준으로 갱신(개인 소유 태그, 코드 인증, 삭제 유예·purge, 관찰, 캐시 세대, 목표 기한). |
 | `docs/refactoring/2026-04-08_code-review.md` | Original 2026-04-08 review findings and action items. |
 | `docs/refactoring/2026-04-09_business-logic-analysis.md` | Early business logic analysis and service-layer refactoring direction. |
 | `docs/refactoring/2026-04-20_backend-flow-and-improvements.md` | Backend flow and improvement snapshot before later phase completion. |

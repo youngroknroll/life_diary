@@ -7,8 +7,13 @@ from django.db import connection
 from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
-from apps.stats.aggregation.goal_progress import build_goal_progress_rows, goal_hit_days
+from apps.stats.aggregation.goal_progress import (
+    build_goal_progress_rows,
+    goal_hit_days,
+    with_deadline_states,
+)
 from apps.tags.models import Category, Tag
+from apps.users.goal_deadline import DeadlineState
 from apps.users.models import UserGoal
 
 
@@ -123,6 +128,16 @@ class TestGoalProgressRows:
         assert rows[0]["target_hours"] == 4.0
         assert rows[0]["percentage"] == 75
         assert rows[0]["pace_percentage"] == 50
+
+    def test_a_row_carries_the_goals_due_date(self, user, focus):
+        due = MONDAY + timedelta(days=10)
+        UserGoal.objects.create(
+            user=user, tag=focus, period="daily", target_hours=4.0, due_date=due
+        )
+
+        rows = build_goal_progress_rows(user, MONDAY, today=MONDAY)
+
+        assert rows[0]["due_date"] == due
 
     def test_weekly_goal_sums_the_whole_week_and_reports_pace(self, user, focus):
         UserGoal.objects.create(user=user, tag=focus, period="weekly", target_hours=10.0)
@@ -280,3 +295,14 @@ class TestGoalProgressRows:
             build_goal_progress_rows(user, MONDAY, today=MONDAY)
 
         assert len(five_goals.captured_queries) == len(one_goal.captured_queries)
+
+
+class TestDeadlineStates:
+    def test_rows_get_their_deadline_as_of_the_given_day(self):
+        rows = [{"tag_name": "집중", "due_date": MONDAY + timedelta(days=2)}]
+
+        result = with_deadline_states(rows, MONDAY)
+
+        assert result[0]["deadline"] == DeadlineState("upcoming", 2)
+        assert result[0]["tag_name"] == "집중"
+        assert "deadline" not in rows[0]

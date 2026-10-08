@@ -53,6 +53,13 @@ class GoalRepository:
                 grouped[goal.period].append(goal)
         return grouped
 
+    def find_due_between(self, user, start, end):
+        return (
+            UserGoal.objects.filter(user=user, due_date__range=(start, end))
+            .select_related("tag")
+            .order_by("due_date", "id")
+        )
+
     def get_or_404(self, pk, user):
         return get_object_or_404(UserGoal, pk=pk, user=user)
 

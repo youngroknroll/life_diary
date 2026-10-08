@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 import pytest
-from django.utils import translation
+from django.urls import reverse
+from django.utils import timezone, translation
 
 from apps.core.utils import UNCLASSIFIED_TAG_COLOR, UNCLASSIFIED_TAG_NAME
 from apps.stats.services import (
@@ -9,6 +12,9 @@ from apps.stats.services import (
     build_unclassified_weekly_entry,
     minutes_to_hours,
 )
+from apps.tags.models import Category, Tag
+from apps.users.goal_deadline import DeadlineState
+from apps.users.models import UserGoal
 
 
 class TestStatsServices:
@@ -98,3 +104,25 @@ class TestStatsIndexDatePreservesTab:
         content = resp.content.decode()
         assert 'id="dateSelector"' in content
         assert "window.location.hash" in content
+
+
+@pytest.mark.django_db
+class TestStatsGoalDeadline:
+    def test_goal_rows_show_the_deadline_as_of_today(self, client, make_user):
+        user = make_user(username="statsdue")
+        tag = Tag.objects.create(
+            user=user, name="집중", category=Category.objects.get(slug="investment")
+        )
+        UserGoal.objects.create(
+            user=user,
+            tag=tag,
+            period="daily",
+            target_hours=1.0,
+            due_date=timezone.localdate() + timedelta(days=3),
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("stats:index"))
+
+        rows = response.context["goal_progress_rows"]
+        assert rows[0]["deadline"] == DeadlineState("upcoming", 3)

@@ -1,9 +1,13 @@
 """목표 관리 페이지 — 껍데기, 진행률, CRUD 리다이렉트, 중복 거절."""
 
+from datetime import timedelta
+
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from apps.tags.models import Category, Tag
+from apps.users.goal_deadline import DeadlineState
 from apps.users.models import UserGoal
 
 
@@ -83,6 +87,7 @@ class TestGoalMutationsOverAjax:
 
         assert response.status_code == 422
         assert not UserGoal.objects.filter(user=owner).exists()
+        assert response.context["error_field"] == "target_hours"
 
     def test_ajax_delete_returns_the_refreshed_body(self, client, owner, study):
         goal = UserGoal.objects.create(
@@ -117,6 +122,7 @@ class TestDuplicateGoals:
 
         assert response.status_code == 200
         assert UserGoal.objects.filter(user=owner).count() == 1
+        assert response.context["error_field"] == "__all__"
 
     def test_a_rejected_add_keeps_what_the_user_typed(self, client, owner, study):
         UserGoal.objects.create(
@@ -133,6 +139,8 @@ class TestDuplicateGoals:
             "tag": str(study.id),
             "period": "daily",
             "target_hours": "9.5",
+            "due_date": "",
+            "no_due_date": False,
         }
 
     def test_keeping_a_goals_own_tag_and_period_is_not_a_duplicate(
@@ -237,3 +245,197 @@ class TestGoalMutationsReturnToTheGoalPage:
 
         assert response["Location"] == reverse("users:usergoal_list")
         assert not UserGoal.objects.filter(pk=goal.pk).exists()
+
+
+def days_from_today(days):
+    return timezone.localdate() + timedelta(days=days)
+
+
+@pytest.mark.django_db
+class TestGoalDueDate:
+    def test_a_goal_added_with_a_due_date_keeps_it(self, client, owner, study):
+        client.force_login(owner)
+        due = days_from_today(10)
+
+        client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": due.isoformat(),
+            },
+        )
+
+        assert UserGoal.objects.get(user=owner).due_date == due
+
+    def test_checking_no_due_date_wins_over_a_typed_date(self, client, owner, study):
+        client.force_login(owner)
+
+        client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": days_from_today(10).isoformat(),
+                "no_due_date": "on",
+            },
+        )
+
+        assert UserGoal.objects.get(user=owner).due_date is None
+
+    def test_an_empty_date_without_no_due_date_is_rejected(self, client, owner, study):
+        client.force_login(owner)
+
+        response = client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": "",
+            },
+        )
+
+        assert not UserGoal.objects.filter(user=owner).exists()
+        assert response.context["add_error"] == "기한을 정하거나 '기한 없음'을 선택하세요."
+        assert response.context["error_field"] == "due_date"
+
+    def test_a_new_goal_cannot_start_with_a_past_due_date(self, client, owner, study):
+        client.force_login(owner)
+
+        response = client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": days_from_today(-1).isoformat(),
+            },
+        )
+
+        assert not UserGoal.objects.filter(user=owner).exists()
+        assert response.context["add_error"]
+
+    def test_moving_a_due_date_into_the_past_is_rejected(self, client, owner, study):
+        tomorrow = days_from_today(1)
+        goal = UserGoal.objects.create(
+            user=owner, tag=study, period="daily", target_hours=4.0, due_date=tomorrow
+        )
+        client.force_login(owner)
+
+        response = client.post(
+            reverse("users:usergoal_update", args=[goal.pk]),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": days_from_today(-1).isoformat(),
+            },
+        )
+
+        goal.refresh_from_db()
+        assert goal.due_date == tomorrow
+        assert response.context["row_error"]
+        assert response.context["error_field"] == "due_date"
+
+    def test_a_goal_already_past_its_due_date_can_still_be_edited(
+        self, client, owner, study
+    ):
+        yesterday = days_from_today(-1)
+        goal = UserGoal.objects.create(
+            user=owner, tag=study, period="daily", target_hours=4.0, due_date=yesterday
+        )
+        client.force_login(owner)
+
+        client.post(
+            reverse("users:usergoal_update", args=[goal.pk]),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 6.0,
+                "due_date": yesterday.isoformat(),
+            },
+        )
+
+        goal.refresh_from_db()
+        assert goal.target_hours == 6.0
+        assert goal.due_date == yesterday
+
+    def test_a_rejected_add_keeps_the_typed_due_date(self, client, owner, study):
+        client.force_login(owner)
+        past = days_from_today(-1).isoformat()
+
+        response = client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": past,
+            },
+        )
+
+        assert response.context["add_values"]["due_date"] == past
+        assert response.context["add_values"]["no_due_date"] is False
+
+    def test_a_form_without_a_deadline_field_adds_a_goal_without_one(
+        self, client, owner, study
+    ):
+        client.force_login(owner)
+
+        client.post(
+            reverse("users:usergoal_create"),
+            data={"tag": study.id, "period": "daily", "target_hours": 4.0},
+        )
+
+        assert UserGoal.objects.get(user=owner).due_date is None
+
+    def test_undoing_a_delete_restores_a_past_due_date(self, client, owner, study):
+        client.force_login(owner)
+        yesterday = days_from_today(-1)
+
+        client.post(
+            reverse("users:usergoal_create"),
+            data={
+                "tag": study.id,
+                "period": "daily",
+                "target_hours": 4.0,
+                "due_date": yesterday.isoformat(),
+                "restore": "1",
+            },
+        )
+
+        assert UserGoal.objects.get(user=owner).due_date == yesterday
+
+    def test_the_progress_card_shows_each_goals_deadline(self, client, owner, study):
+        UserGoal.objects.create(
+            user=owner,
+            tag=study,
+            period="daily",
+            target_hours=4.0,
+            due_date=days_from_today(2),
+        )
+        client.force_login(owner)
+
+        response = client.get(reverse("users:usergoal_list"))
+
+        rows = response.context["goal_progress_rows"]
+        assert rows[0]["deadline"] == DeadlineState("upcoming", 2)
+
+    def test_the_goal_table_pairs_each_goal_with_its_deadline(
+        self, client, owner, study
+    ):
+        goal = UserGoal.objects.create(
+            user=owner,
+            tag=study,
+            period="daily",
+            target_hours=4.0,
+            due_date=days_from_today(-1),
+        )
+        client.force_login(owner)
+
+        response = client.get(reverse("users:usergoal_list"))
+
+        assert response.context["goal_items"] == [(goal, DeadlineState("overdue", 1))]

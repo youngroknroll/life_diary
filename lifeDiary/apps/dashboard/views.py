@@ -11,6 +11,7 @@ from apps.core.utils import (
 )
 from apps.tags.repositories import TagRepository
 from apps.tags.use_cases import ListFrequentTagsUseCase
+from apps.users.use_cases import ListDueSoonGoalsUseCase
 
 from .day_window import annotate_future, current_slot_index
 from .repositories import TimeBlockRepository
@@ -19,6 +20,7 @@ from .services import build_slot_rows, build_time_headers
 _time_block_repo = TimeBlockRepository()
 _tag_repo = TagRepository()
 _list_frequent_tags = ListFrequentTagsUseCase()
+_list_due_soon_goals = ListDueSoonGoalsUseCase()
 
 
 @login_required
@@ -53,6 +55,9 @@ def dashboard_view(request):
         "now_time": now,
         "frequent_tags": _list_frequent_tags.execute(request.user),
         "has_tag_usage": _list_frequent_tags.has_usage(request.user),
+        "goals_due_soon": _list_due_soon_goals.execute(
+            request.user, timezone.localdate()
+        ),
         "user_tags": user_tags,
         "total_slots": TOTAL_SLOTS_PER_DAY,
         "filled_slots": len(slot_data),

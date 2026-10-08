@@ -8,6 +8,7 @@ from apps.core.utils import (
 )
 from apps.stats.aggregation.calculator import read_blocks
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG, CATEGORY_LINE_COLOR
+from apps.users.goal_deadline import deadline_state
 from apps.users.repositories import GoalRepository
 
 
@@ -109,6 +110,7 @@ def _goal_progress_row(blocks, goal, selected_date, today, now):
         "pace_percentage": pace_percentage,
         "is_behind_pace": percentage < pace_percentage,
         "is_under_target": is_under_target,
+        "due_date": goal.due_date,
     }
 
 
@@ -143,4 +145,11 @@ def build_goal_progress_rows(user, selected_date, today=None, now=None, calculat
     return [
         _goal_progress_row(blocks, goal, selected_date, today, now)
         for goal in goals
+    ]
+
+
+def with_deadline_states(rows, today):
+    """기한 상태는 오늘에 따라 바뀌므로 캐시에 넣지 않고 보여줄 때 붙인다."""
+    return [
+        {**row, "deadline": deadline_state(row["due_date"], today)} for row in rows
     ]
