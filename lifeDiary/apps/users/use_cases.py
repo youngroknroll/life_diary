@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date, timedelta
 
 from django.db import transaction
 from django.utils.translation import gettext
 
 from apps.tags.ports import TagReader
 from apps.tags.repositories import TagRepository
+from .goal_deadline import DeadlineState, deadline_state
 from .models import UserGoal, UserNote
 from .repositories import GoalRepository, NoteRepository
 from .signals import goals_changed, notes_changed
@@ -29,6 +31,7 @@ class GoalData:
     tag_id: int
     period: str
     target_hours: float
+    due_date: date | None = None
 
 
 @dataclass(frozen=True)
@@ -52,6 +55,31 @@ class GetMyPageUseCase:
         }
 
 
+@dataclass(frozen=True)
+class DueSoonGoal:
+    tag_name: str
+    deadline: DeadlineState
+
+
+class ListDueSoonGoalsUseCase:
+    """대시보드 상기 배너에 올릴 목표. 지난 기한은 사흘까지만 올린다 —
+    그 뒤로는 목표 페이지 배지로 충분하고, 배너가 매일 같은 말을 반복한다."""
+
+    DAYS_AHEAD = 7
+    DAYS_OVERDUE = 3
+
+    def execute(self, user, today: date) -> list[DueSoonGoal]:
+        goals = _goal_repo.find_due_between(
+            user,
+            today - timedelta(days=self.DAYS_OVERDUE),
+            today + timedelta(days=self.DAYS_AHEAD),
+        )
+        return [
+            DueSoonGoal(goal.tag.name, deadline_state(goal.due_date, today))
+            for goal in goals
+        ]
+
+
 class SaveGoalUseCase:
     """UserGoal 생성/수정 — 순수 DTO 기반, 프레임워크 독립."""
 
@@ -69,6 +97,7 @@ class SaveGoalUseCase:
         goal.tag_id = data.tag_id
         goal.period = data.period
         goal.target_hours = data.target_hours
+        goal.due_date = data.due_date
         goal.full_clean()
         goal.save()
         _notify_goals_changed(SaveGoalUseCase, user.id)

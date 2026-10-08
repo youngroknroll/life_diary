@@ -1,11 +1,17 @@
+from datetime import timedelta
 from html.parser import HTMLParser
 import re
 
 import pytest
 from django.conf import settings
+from django.urls import reverse
+from django.utils import timezone
 
 from apps.dashboard.services import build_time_headers, validate_slot_indexes
 from apps.tags.models import Category, Tag
+from apps.users.goal_deadline import DeadlineState
+from apps.users.models import UserGoal
+from apps.users.use_cases import DueSoonGoal
 
 
 class TestDashboardServices:
@@ -249,3 +255,28 @@ class TestDashboardJavaScriptAssets:
         assert ".navbar-utility-controls" in source
         assert "user-select: none;" in source
         assert "-webkit-user-select: none;" in source
+
+
+@pytest.mark.django_db
+class TestDashboardDueSoonGoals:
+    def test_the_dashboard_carries_goals_whose_deadline_is_near(
+        self, client, make_user
+    ):
+        user = make_user(username="dashdue")
+        tag = Tag.objects.create(
+            user=user, name="운동", category=Category.objects.get(slug="investment")
+        )
+        UserGoal.objects.create(
+            user=user,
+            tag=tag,
+            period="weekly",
+            target_hours=3.0,
+            due_date=timezone.localdate() + timedelta(days=2),
+        )
+        client.force_login(user)
+
+        response = client.get(reverse("dashboard:index"))
+
+        assert response.context["goals_due_soon"] == [
+            DueSoonGoal("운동", DeadlineState("upcoming", 2))
+        ]

@@ -4,9 +4,17 @@ SaveGoalUseCase/SaveNoteUseCase가 ModelForm이 아닌 순수 DTO를 받는지 �
 """
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 import pytest
 
-from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase
+from apps.tags.models import Category, Tag
+from apps.users.use_cases import (
+    GoalData,
+    ListDueSoonGoalsUseCase,
+    NoteData,
+    SaveGoalUseCase,
+)
 
 
 class TestGoalDataDTO:
@@ -20,6 +28,11 @@ class TestGoalDataDTO:
         assert data.tag_id == 5
         assert data.period == "weekly"
         assert data.target_hours == 10.0
+
+    def test_a_goal_has_no_due_date_unless_one_is_given(self):
+        data = GoalData(tag_id=5, period="weekly", target_hours=10.0)
+
+        assert data.due_date is None
 
 
 class TestNoteDataDTO:
@@ -61,3 +74,105 @@ class TestSaveGoalUseCaseAuthz:
         # 메시지는 active locale에 따라 한/영 다름 → 예외 종류만 검증
         with pytest.raises(LookupError):
             use_case.execute(data, user=object())
+
+
+@pytest.fixture
+def goal_owner(make_user):
+    return make_user(username="dueowner")
+
+
+@pytest.fixture
+def owned_tag(goal_owner):
+    return Tag.objects.create(
+        user=goal_owner,
+        name="공부",
+        category=Category.objects.get(slug="investment"),
+    )
+
+
+@pytest.mark.django_db
+class TestSaveGoalUseCaseDueDate:
+    def test_saving_a_goal_keeps_its_due_date(self, goal_owner, owned_tag):
+        due = date(2026, 12, 31)
+
+        goal = SaveGoalUseCase().execute(
+            GoalData(
+                tag_id=owned_tag.id, period="daily", target_hours=2.0, due_date=due
+            ),
+            goal_owner,
+        )
+
+        goal.refresh_from_db()
+        assert goal.due_date == due
+
+    def test_saving_without_a_due_date_clears_the_old_one(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        goal = goal_factory(goal_owner, owned_tag, due_date=date(2026, 12, 31))
+
+        SaveGoalUseCase().execute(
+            GoalData(tag_id=owned_tag.id, period="daily", target_hours=2.0),
+            goal_owner,
+            goal_id=goal.id,
+        )
+
+        goal.refresh_from_db()
+        assert goal.due_date is None
+
+
+TODAY = date(2026, 10, 6)
+
+
+def deadlines_of(items):
+    return [(item.deadline.state, item.deadline.days) for item in items]
+
+
+@pytest.mark.django_db
+class TestListDueSoonGoals:
+    def test_lists_goals_from_three_days_overdue_to_a_week_ahead(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        for offset in (-4, -3, 0, 7, 8):
+            goal_factory(goal_owner, owned_tag, due_date=TODAY + timedelta(days=offset))
+
+        items = ListDueSoonGoalsUseCase().execute(goal_owner, TODAY)
+
+        assert sorted(deadlines_of(items)) == [
+            ("due_today", 0),
+            ("overdue", 3),
+            ("upcoming", 7),
+        ]
+
+    def test_goals_without_a_due_date_are_not_listed(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        goal_factory(goal_owner, owned_tag, due_date=None)
+
+        assert ListDueSoonGoalsUseCase().execute(goal_owner, TODAY) == []
+
+    def test_another_users_goals_are_not_listed(
+        self, goal_owner, owned_tag, goal_factory, make_user
+    ):
+        stranger = make_user(username="duestranger")
+        stranger_tag = Tag.objects.create(
+            user=stranger,
+            name="공부",
+            category=Category.objects.get(slug="investment"),
+        )
+        goal_factory(stranger, stranger_tag, due_date=TODAY)
+
+        assert ListDueSoonGoalsUseCase().execute(goal_owner, TODAY) == []
+
+    def test_the_earliest_due_date_comes_first(
+        self, goal_owner, owned_tag, goal_factory
+    ):
+        for offset in (5, -2, 0):
+            goal_factory(goal_owner, owned_tag, due_date=TODAY + timedelta(days=offset))
+
+        items = ListDueSoonGoalsUseCase().execute(goal_owner, TODAY)
+
+        assert deadlines_of(items) == [
+            ("overdue", 2),
+            ("due_today", 0),
+            ("upcoming", 5),
+        ]

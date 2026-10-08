@@ -40,10 +40,13 @@ Priority:
 ## Context Loading
 - Do not preload every plan, report, or governance document.
 - Before planning, role routing, or editing, read `AGENTS.md`.
-- Read only the current plan, relevant status section, code, and domain sources.
-- Treat `docs/project-status.md` as continuity context, not current source code.
+- Read only the plan approved in chat, the latest `docs/CHANGELOG.md` entries
+  that touch the same area, code, and domain sources.
+- Treat `docs/CHANGELOG.md` as continuity context, not current source code.
 - Verify repository facts from code and configuration before relying on prose.
-- Local role adapters live in `.claude/agents/` and load only when activated.
+- Role adapters live in `.claude/agents/` (tracked) and load only when
+  activated. Path-scoped rules in `.claude/rules/` load by themselves when a
+  matching test, template, stylesheet, or browser script is read or edited.
 - Do not duplicate detailed role contracts or import all of `AGENTS.md` here.
 
 ## Project Map
@@ -57,7 +60,10 @@ Priority:
 - `desktop/`: pywebview launcher for the desktop build
 - `templates/`, `locale/`, `scripts/`: shared web UI, translations, local
   tooling
-- `docs/`: plans, refactoring logs, status index, security, architecture
+- `docs/`: change log and backlog (`CHANGELOG.md`), roadmap plans, security,
+  architecture
+- `.claude/`: role adapters (`agents/`), path-scoped rules (`rules/`), hook
+  scripts (`hooks/`), and `settings.json` registering them; all tracked
 
 ## Stable Entry Paths
 - Runtime: `manage.py`, `pytest.ini`, `conftest.py`, `lifeDiary/settings/`,
@@ -76,8 +82,10 @@ Priority:
   `apps/*/static/`
 - Desktop: `desktop/launcher.py`, `lifeDiary/settings/desktop.py`,
   `requirements-desktop.txt`
-- Tests and docs: `apps/*/tests.py`, `apps/*/test_*.py`, `docs/plans/`,
-  `docs/refactoring/`, `docs/project-status.md`
+- Tests and docs: `apps/*/tests.py`, `apps/*/test_*.py`, `docs/CHANGELOG.md`,
+  `docs/plans/` (roadmap documents only)
+- Harness: `.claude/settings.json`, `.claude/hooks/`, `.claude/rules/`,
+  `../.github/workflows/pr-checks.yml`
 
 Start with these stable paths. Use `rg` when the exact location is still
 unknown or the task requires a repository-wide repeated-pattern check.
@@ -99,13 +107,38 @@ targeted test before broad regression.
 1. Inspect `git status` and preserve existing user changes.
 2. Read `AGENTS.md` before planning, task classification, or role routing.
 3. Classify task shape and risk, then activate the smallest sufficient role set.
-4. Read the approved plan before editing.
+4. Present the plan in chat and get the user's approval before editing.
 5. Backend behavior follows the Backend TDD Coach's one-test-at-a-time Kent
    Beck Red-Green-Refactor contract.
 6. Frontend changes require both frontend reviewers' pre-implementation outputs
    and post-implementation verdicts; listing the roles alone is not evidence.
-7. Implement only approved scope; record larger ideas as deferred work.
+7. Implement only approved scope; record larger ideas as deferred work. A
+   defect found during the task is fixed in the task; deferring one needs the
+   user's explicit approval, recorded as `(사용자 승인 YYYY-MM-DD)`.
 8. Run fresh verification and read complete output before claiming completion.
+
+## Enforced Mechanically
+Hooks registered in `.claude/settings.json` (loaded only when Claude Code
+starts in `lifeDiary/`) deny these actions; see `AGENTS.md` Enforced By The
+Harness for the full table:
+- `git commit`, `push`, or `merge` on `main`, pushing to `main`, `gh pr merge`,
+  and tag creation (`bash_guard.py`)
+- `pytest`, `manage.py`, `pip install`, `.venv`, or `uv` outside
+  `conda run -n knou-life-diary` (`bash_guard.py`)
+- a new comment in a template, stylesheet, or browser script
+  (`frontend_comment_guard.py`)
+- a defect-like `미해결` entry without `(사용자 승인 YYYY-MM-DD)`, or editing
+  `docs/CHANGELOG.md` through Bash (`changelog_defer_guard.py`)
+- a final report that defers a found defect (`defect_deferral_guard.py`, Stop)
+
+A denial is not an obstacle to route around: fix the cause, or ask the user
+with an explicit question and carry the approval marker on the allowed line.
+
+## Communication
+- Answer the user in Korean. Lead with the conclusion, then the evidence.
+- Explain with facts and numbers, not analogies (user instruction
+  2026-09-30; it overrides the global analogy rule for this project).
+- Keep code out of prose; commands, snippets, and errors go in code blocks.
 
 ## Engineering Guardrails
 - Prefer current repository patterns and framework-native Django APIs.
@@ -127,13 +160,17 @@ targeted test before broad regression.
 ## Instruction Placement
 - `CLAUDE.md`: facts and gates needed in almost every session
 - `AGENTS.md`: detailed product constraints, workflow, roles, and review gates
-- `.claude/agents/`: local role adapters
-- `docs/plans/`, `docs/refactoring/`: task boundaries and completion evidence
-- Deterministic restrictions belong in settings or hooks, not advisory prose.
+- `.claude/agents/`: one tracked adapter per role, thin by design
+- `.claude/rules/`: policy that matters only while matching files are open
+  (`backend-tests.md`, `frontend.md`), loaded by path
+- `.claude/hooks/` and `.claude/settings.json`: deterministic guards; a rule
+  that can be checked mechanically lives here, not only in prose
+- `docs/CHANGELOG.md`: one entry per finished task with verification evidence,
+  plus the `미해결` backlog; `docs/plans/` holds only roadmap documents
 - Repeated procedures become skills or path-scoped rules only after
   demonstrated need.
 
 ## Session Continuity
 After an implementation task changes files, its owning implementation role
-updates the required work log and `docs/project-status.md`.
-Recover a fresh session from the plan, Git diff, status, and verification logs.
+adds an entry to `docs/CHANGELOG.md` (and moves deferred work to `미해결`).
+Recover a fresh session from the CHANGELOG, Git diff, and verification output.

@@ -1,0 +1,51 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/bash_guard.py\"",
+            "timeout": 10,
+            "statusMessage": "git·conda 규칙 검사"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/frontend_comment_guard.py\"",
+            "timeout": 10,
+            "statusMessage": "프런트엔드 주석 검사"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/changelog_defer_guard.py\"",
+            "timeout": 10,
+            "statusMessage": "CHANGELOG 미해결 검사"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/defect_deferral_guard.py\"",
+            "timeout": 10,
+            "statusMessage": "결함 미루기 검사"
+          }
+        ]
+      }
+    ]
+  }
+}

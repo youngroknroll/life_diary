@@ -22,6 +22,7 @@ class UserGoal(models.Model):
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
     period = models.CharField(max_length=10, choices=PERIOD_CHOICES)
     target_hours = models.FloatField(validators=[MinValueValidator(0)])
+    due_date = models.DateField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
