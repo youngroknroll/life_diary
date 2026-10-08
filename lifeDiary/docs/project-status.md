@@ -911,7 +911,7 @@ The current codebase direction is conservative: keep the Django monolith, mainta
 | Document | Purpose |
 |---|---|
 | `AGENTS.md` | Operating guide for agent roles, project file flow, TDD rules, review gates, and completion reporting. |
-| `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md` | Product and architecture guide for LifeDiary's business flow, domain model, and app responsibilities. |
+| `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md` | Product and architecture guide for LifeDiary's business flow, domain model, and app responsibilities. 2026-10-08에 현재 코드 기준으로 갱신(개인 소유 태그, 코드 인증, 삭제 유예·purge, 관찰, 캐시 세대, 목표 기한). |
 | `docs/refactoring/2026-04-08_code-review.md` | Original 2026-04-08 review findings and action items. |
 | `docs/refactoring/2026-04-09_business-logic-analysis.md` | Early business logic analysis and service-layer refactoring direction. |
 | `docs/refactoring/2026-04-20_backend-flow-and-improvements.md` | Backend flow and improvement snapshot before later phase completion. |
