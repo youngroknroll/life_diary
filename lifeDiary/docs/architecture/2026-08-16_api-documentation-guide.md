@@ -1,7 +1,7 @@
 # API 문서(OpenAPI/Swagger) 안내
 
 - 날짜: 2026-08-16
-- 관련 계획: `docs/plans/2026-08-16_api-openapi-django-ninja-plan.md`
+- 관련 기록: `docs/CHANGELOG.md`의 2026-08-16 항목
 
 ## 보는 곳
 

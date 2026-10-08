@@ -3,8 +3,6 @@
 This guide is the single source of truth for agent work in the LifeDiary
 project.
 
-Project root: `/Users/yeongroksong/Desktop/study/project/knou/lifeDiary`
-
 ## Product Direction
 
 LifeDiary is a Django-based life logging service.
@@ -23,21 +21,24 @@ phase, not the product destination.
 
 Primary project documents:
 
-- Current status index: `docs/project-status.md`
-- Implementation plans: `docs/plans/`
-- Refactoring and work logs: `docs/refactoring/`
-- Frontend work logs: `docs/frontend/`
+- Change log and backlog: `docs/CHANGELOG.md` (newest first; one entry per
+  completed task; the `미해결` section is the only backlog)
+- Roadmap plans kept as documents: `docs/plans/` (desktop single-user auth,
+  desktop packaging, distribution and monetization, ad revenue strategy only)
 - Architecture guide: `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md`
 - Security remediation record: `docs/security/`
 - Historical i18n record: `prompt_plan.md` (superseded; never overwrite)
+- Harness configuration: `.claude/agents/` (role adapters), `.claude/rules/`
+  (path-scoped policy), `.claude/hooks/` with `.claude/settings.json`
+  (deterministic guards)
 
 Do not reuse paths, product names, settings modules, or workflow assumptions
 from other projects.
 
 ## Binding Product Decisions
 
-The following decisions summarize the current approved direction. The linked
-plans and status index remain the detailed sources. These are target
+The following decisions summarize the current approved direction. The roadmap
+plans and `docs/CHANGELOG.md` remain the detailed sources. These are target
 contracts, not claims that the current application already implements them.
 
 ### Core User Loop
@@ -122,8 +123,7 @@ views -> use_cases -> repositories/domain_services -> models
    (`docs/plans/2026-05-07_desktop-auth-single-user-plan.md`).
 3. Desktop packaging completion: PyInstaller spec, desktop README, release
    workflow (`docs/plans/2026-05-03_desktop-app-packaging-plan.md`).
-4. Remaining mobile stats/dashboard UX items and stats chart lazy render.
-5. Distribution and monetization phases
+4. Distribution and monetization phases
    (`docs/plans/2026-05-06_distribution-and-monetization-plan.md`,
    `docs/plans/2026-05-28-ad-revenue-marketing-strategy.md`); every phase
    requires explicit approval before implementation.
@@ -134,14 +134,44 @@ views -> use_cases -> repositories/domain_services -> models
   gates, TDD policy, frontend exceptions, reporting, and commit conventions.
 - `CLAUDE.md` is a concise, always-loaded bootstrap that summarizes this guide
   and provides stable entry paths. It does not own or override shared policy.
-- `.claude/agents/*.md` files are thin runtime adapters. They own only role
-  identity, activation boundaries, role-specific checks, output contracts, and
-  handoffs.
-- When `CLAUDE.md` or a role adapter conflicts with this guide, this guide
-  wins.
+- `.claude/agents/*.md` files (tracked) are thin runtime adapters. They own
+  only role identity, activation boundaries, role-specific checks, output
+  contracts, and handoffs. The eleven LifeDiary roles have exactly one
+  adapter each, here; no copy lives elsewhere in the repository.
+- `.claude/rules/*.md` files hold the policy sections of this guide that
+  matter only while matching files are open (`backend-tests.md`,
+  `frontend.md`). They load by path and carry this guide's authority.
+- `.claude/settings.json` and `.claude/hooks/` hold the deterministic guards
+  listed under Enforced By The Harness. A rule that can be checked
+  mechanically lives there as well as here.
+- When `CLAUDE.md`, a rule file, or a role adapter conflicts with this guide,
+  this guide wins.
 - Runtime model selection belongs only to each adapter's `model` frontmatter.
   Do not duplicate model names or versions here.
 - Shared policy must not be copied into every adapter. Update this file once.
+
+## Enforced By The Harness
+
+Prose does not hold on its own; each rule below is also checked mechanically,
+and each guard exists because the rule was broken before. When a guard denies
+an action, fix the cause or ask the user with an explicit question. Do not
+route around it. An approved exception carries `(사용자 승인 YYYY-MM-DD)` on
+the line it allows.
+
+| Guard | Where | What it stops |
+|---|---|---|
+| PR checks | `.github/workflows/pr-checks.yml` | failing pytest, `manage.py check`, migration drift, prod deploy check, broken browser JS syntax, fuzzy translation entries |
+| Domain boundary test | `apps/dashboard/test_domain_boundaries.py` | `dashboard` importing `stats` |
+| Adapter tool limits | `tools:` in `.claude/agents/*.md` | decision and review roles editing files |
+| `bash_guard.py` | PreToolUse Bash | `commit`, `push`, `merge` on `main`; pushing to `main`; `gh pr merge`; tag creation; `pytest`, `manage.py`, `pip install`, `.venv`, `uv` outside `conda run -n knou-life-diary` |
+| `frontend_comment_guard.py` | PreToolUse Edit, Write, MultiEdit | a new comment in a template, stylesheet, or browser script |
+| `changelog_defer_guard.py` | PreToolUse Edit, Write, MultiEdit, Bash | a defect-like `미해결` entry without the approval marker; editing `docs/CHANGELOG.md` through Bash |
+| `defect_deferral_guard.py` | Stop | a final report that defers a found defect without user approval |
+
+The hooks are registered in `.claude/settings.json`, which Claude Code reads
+only when started in this directory (`lifeDiary/`). Path-scoped rules in
+`.claude/rules/` load the matching policy section when a test, template,
+stylesheet, or browser script is read or edited.
 
 ## Prime Directives
 
@@ -177,15 +207,16 @@ views -> use_cases -> repositories/domain_services -> models
    - Agents may not classify a task as too small, obvious, or urgent to bypass
      this guide.
    - Required workflow may be skipped only after explicit user approval.
-   - Chat agreement does not replace a required project document unless the
-     user explicitly waives that document.
+   - The plan is agreed in chat. The user's explicit approval of that plan is
+     the gate; no plan file is written unless the user asks for one.
 
-6. **External Git actions belong to the user.**
-   - Do not commit, push, merge, or open a pull request. The user executes
-     Git actions directly.
-   - Prepare copy-ready commands and commit messages for the user instead.
-   - Approval for implementation or verification does not imply approval for
-     an external Git action.
+6. **Git actions stay on the agent's branch.**
+   - The agent commits in small verified units on a feature branch, pushes
+     it, and opens or updates the pull request for that track.
+   - Merging, release tagging, and any commit or push on `main` belong to
+     the user. `bash_guard.py` denies those commands.
+   - Approval for implementation or verification does not imply approval
+     for a merge.
 
 ## Role Catalog
 
@@ -422,7 +453,8 @@ is separately approved.
 ## Operating Workflow
 
 1. **Classify and activate**
-   - Read this guide, current plans, status, and relevant code.
+   - Read this guide, the plan approved in chat, the latest `docs/CHANGELOG.md`
+     entries for the same area, and relevant code.
    - Start from the stable entry paths in `CLAUDE.md`; use `rg` when the exact
      location remains unknown or a repository-wide pattern check is required.
    - Identify the task shape and risk triggers.
@@ -438,9 +470,11 @@ is separately approved.
      required.
    - The user approves scope and any workflow exception.
 
-4. **Write the integrated plan**
-   - A plan document under `docs/plans/` is required before file edits unless
-     the user explicitly waives it.
+4. **Present the integrated plan in chat and get approval**
+   - The plan is presented in the conversation and the user approves it
+     before any file edit (for example through a question with options).
+     No file under `docs/plans/` is written for a task; plan files are only
+     for multi-phase roadmaps the user asks to keep.
    - The plan is the implementation boundary and must include:
      - approved scope and explicit exclusions
      - acceptance criteria
@@ -469,25 +503,36 @@ is separately approved.
    - The Quality Verification Lead maps evidence back to acceptance criteria.
    - Do not claim completion beyond observed evidence.
 
-8. **Document post-work state for file-changing implementation**
+8. **Record the finished task in `docs/CHANGELOG.md`**
    - When an implementation task changes files, the implementation role that
-     owns those files writes the required refactoring or change log under
-     `docs/refactoring/` or `docs/frontend/`.
-   - That implementation role updates `docs/project-status.md` with status,
-     evidence, deferred work, and links to the plan and work log.
+     owns those files adds one entry at the top of `docs/CHANGELOG.md`: date,
+     title, type, what changed and why, changed areas, fresh verification
+     evidence (commands and results, browser evidence, reviewer verdicts),
+     PR, and residual risk.
+   - Deferred work goes into the `미해결` section of the same file; resolved
+     backlog items are removed from it.
+   - A defect found while working (by the implementer, a reviewer, or a
+     browser check) is fixed inside the same task, not deferred. Only the
+     user may defer a defect: ask with an explicit question, and record an
+     approved deferral in `미해결` with the suffix `(사용자 승인 YYYY-MM-DD)`.
+     `.claude/hooks/` guards block a final report that defers a defect and
+     a `미해결` entry that lacks that suffix.
    - Review-only tasks do not edit files. They report findings in chat or in a
      separately approved review artifact.
 
 ## Test Authoring Policy
 
-This policy binds every backend test.
+The full policy lives in `.claude/rules/backend-tests.md` and loads by itself
+whenever a backend test file is read or edited. It binds every backend test:
+Given-When-Then as a meaning rule, DAMP over DRY, result-oriented
+verification, behavior-centered names, the lowest proving boundary (`unit`,
+`domain`, `web`, `contract`, `slow`, `e2e`), and dev-settings isolation. The
+plan-level contract stays here.
 
-### Test List Is The Starting Point
-
-A backend behavior change starts from a `Test List` in the approved
-implementation plan, not from a test or production function. The Test List
-breaks a requirement into executable examples; it is not a fully designed test
-suite written up front. Each entry carries at least these fields:
+A backend behavior change starts from a `Test List` in the plan approved in
+chat, not from a test or production function. The Test List breaks a
+requirement into executable examples; it is not a fully designed test suite
+written up front. Each entry carries at least these fields:
 
 | Field | Meaning |
 |---|---|
@@ -500,126 +545,12 @@ suite written up front. Each entry carries at least these fields:
 | Boundary rationale | Why a higher-cost boundary is required, or why a lower boundary suffices |
 | Test name | The actual pytest function name or parametrized case ID |
 | Status | `Pending`, `Red`, `Green`, `Refactored`, `Deferred` |
-| Evidence | Red/Green commands and key results, or a pointer to the work log |
+| Evidence | Red/Green commands and key results, or a pointer to the CHANGELOG entry |
 
-The default relationship is one scenario to one test. Only these exceptions
-are allowed:
-
-1. Same-rule data variations may be expressed as one parametrized test with
-   case `ids`.
-2. If one scenario must be verified at more than one layer, list each test's
-   owned contract as a separate Test List entry.
-3. Split the scenario when it has a distinct core `When` or an independent
-   observable result.
-
-Before renaming, moving, merging, or deleting an existing test, first restore
-the behavior it currently protects into a domain Test List entry (Scenario ID
-mapped to the existing pytest node ID). Do not attach a scenario after the
-fact just to make an existing test look compliant with this policy.
-
-### Given-When-Then Is A Meaning Rule
-
-Given-When-Then describes how a scenario and its test connect meaning, not a
-mandatory comment format.
-
-- **Given** holds only the state needed to understand the core behavior; do
-  not hide an important precondition inside a fixture default or helper.
-- **When** holds exactly one business behavior per test; the core behavior
-  must not run implicitly inside a helper.
-- **Then** holds observable results — return values, public responses,
-  persisted state, or an allowed side effect; do not hide the core assertion
-  inside a helper.
-- Multiple assertions are allowed only when they describe one result state;
-  independent results get separate scenarios.
-- Exception and rejection tests still express `When` as the attempted
-  behavior and `Then` as the observed failure contract.
-- Do not force `# Given` / `# When` / `# Then` comments on short,
-  self-evident tests. Use them when setup is long or the boundary call spans
-  multiple lines and the three parts would otherwise be unclear.
-
-### DAMP Over DRY
-
-- Prefer duplication that reveals meaning over abstraction that hides it.
-- Keep the core precondition, user behavior, and observed result directly in
-  the test body.
-- Extract only meaningless setup noise (object creation, login, catalog
-  compilation) into fixtures or factories.
-- Never hide the behavior under test or its core assertion inside a helper.
-- A shared fixture's default value must never hide an important business
-  precondition.
-- One test describes one business behavior; multiple assertions are allowed
-  only for one result state.
-
-### Result-Oriented Verification
-
-- Verify return values, responses, persisted state, and allowed side effects
-  over internal function calls.
-- Do not pin internal function names, call order, private APIs, or ORM
-  authoring style as an external contract in an ordinary behavior test.
-- Use mocks to cut external boundaries, inject failures, or control
-  time/network — not to assert that an implementation function was called.
-
-The following remain legitimate to verify directly, because the interaction
-itself is the contract. Mark these `contract` rather than treating them as
-ordinary behavior tests:
-
-- domain dependency direction and forbidden imports;
-- transactions, atomicity, and idempotency;
-- prevention of personal-data leakage;
-- blocking outbound network calls;
-- approved query counts or performance budgets (as in
-  `apps/stats/test_stats_perf.py`);
-- settings, migration, and deployment contracts (as in
-  `lifeDiary/test_prod_settings.py`).
-
-### Behavior-Centered Naming
-
-- Test names describe user-observable behavior in domain language (user, time
-  slot, tag, category, goal, note, statistics, account
-  deletion).
-- Base shape: situation, behavior, then observable result — for example
-  `test_login_within_grace_period_cancels_deletion_request`.
-- Do not use implementation-centered names such as `test_returns_200`,
-  `test_calls_service`, or `test_uses_query`.
-- Include an HTTP status code in the name only when it is essential to
-  distinguish a public protocol contract.
-- Parametrized `ids` are also behavior-centered case names.
-- File names stay ASCII `test_*.py` (or `tests.py`) for pytest discovery.
-
-### Verification Boundaries
-
-Prove a behavior at the lowest, fastest boundary that can prove it.
-
-| Layer | Owns | Default resources |
-|---|---|---|
-| `unit` | Pure functions, parsing, value rules | No DB or HTTP |
-| `domain` | Model/service/use-case business behavior and invariants | DB as needed |
-| `web` | HTTP request/response, auth, permission, and error translation | Django test client |
-| `contract` | Architecture, settings, migration, and performance | Minimum resources per contract |
-| `slow` | Security lockouts, catalog compilation, abnormal-recovery scenarios | Explicit opt-in |
-| `e2e` | Browser user flows | Manual browser evidence today; automated e2e only if separately approved |
-
-Do not repeat the same business rule across layers:
-
-- domain tests prove the rule itself;
-- web tests add only the HTTP translation of auth, input, and domain errors;
-- browser evidence covers only what is observable exclusively in the browser
-  (wiring, focus, layout, recovery).
-
-A lower layer's happy path may be re-confirmed at a higher layer, but do not
-repeat every boundary value and exception at every layer above it.
-
-### Speed And Isolation
-
-- Tests run under `lifeDiary.settings.dev` per `pytest.ini` with `--reuse-db`;
-  do not point tests at production settings for convenience.
-- Production settings behavior is covered by dedicated contract tests
-  (`lifeDiary/test_prod_settings.py`, `apps/users/test_prod_settings.py`).
-- A global autouse fixture must never promote every test to DB access; DB
-  dependencies are declared explicitly (`pytest.mark.django_db`, or the `db`
-  or `transactional_db` fixture).
-- Verification scripts and ad-hoc checks must never create permanent objects
-  in the dev database; use pytest or roll changes back.
+One scenario maps to one test except where the rule file allows a
+parametrized variation, a second layer, or a split. Before renaming, moving,
+merging, or deleting an existing test, first restore the behavior it protects
+into a Test List entry.
 
 ## Backend TDD Cycle
 
@@ -658,87 +589,32 @@ Backend test rules:
 
 ## Frontend Work Policy
 
-Django templates, CSS, browser JavaScript, SSR binding, and fetch wiring are
-exempt from the backend TDD cycle.
+The full policy and the Frontend Dual Review Gate live in
+`.claude/rules/frontend.md` and load by themselves whenever a template,
+stylesheet, or browser JavaScript file is read or edited. The binding points:
 
-- Do not create automated tests for purely presentational layout, spacing,
-  sizing, visual state, transition, animation, or markup rearrangement.
-- Do not assert on rendered markup strings, CSS rule text, or JavaScript source
-  text. Such tests track the implementation, not the contract, and break on
-  every rewrite while proving nothing. Delete them when the code they mirror is
-  replaced.
-- Verify frontend work with HTTP render checks, browser screenshots at agreed
-  viewports, interaction click-through, console inspection, `node --check` on
-  changed JS, and accessibility checks appropriate to scope.
-- An automated browser regression is allowed only for a concrete measurable
-  acceptance gate such as an overflow budget, minimum touch-target size,
-  line-clamp height, or post-interaction focus target.
+- Templates, CSS, browser JavaScript, SSR binding, and fetch wiring are exempt
+  from the backend TDD cycle and carry no automated tests that assert markup
+  strings, CSS rule text, or JavaScript source text. An automated browser
+  regression is allowed only for a concrete measurable gate.
+- Frontend work is verified in the browser: HTTP render checks, screenshots
+  at agreed viewports, interaction click-through, console inspection,
+  `node --check` on changed JS, and accessibility checks appropriate to scope.
+- Every frontend review and implementation activates both the Web Experience
+  Designer and the Browser Interaction Reviewer. Each produces its output
+  before editing and a `Conforms`, `Deviates`, or `Unverified` verdict after
+  browser verification, at a stated review depth (`Light`, `Standard`,
+  `High`). Role names alone are not review evidence. The Quality Verification
+  Lead completes the task only on two `Conforms` verdicts or an explicit user
+  acceptance of the stated residual risk.
 - Any backend endpoint, validation, persistence, or business rule introduced
   for frontend work still follows the Backend TDD Cycle.
-- Every frontend review includes both the Web Experience Designer and Browser
-  Interaction Reviewer.
-- Frontend implementation requires an approved plan under `docs/plans/` and a
-  completed work log under `docs/frontend/` or `docs/refactoring/` unless the
-  user explicitly approves different document locations.
-- Do not comment frontend code. Django templates, CSS, and browser JavaScript
-  carry no comments unless the user approves a specific one. A template comment
-  that leaks reaches the user as visible page text: `{# #}` is single-line only,
-  so a comment wrapped across two lines renders literally in the browser.
-
-### Frontend Dual Review Gate
-
-Every frontend implementation requires actual output from both the Web
-Experience Designer and Browser Interaction Reviewer before and after editing.
-Listing a role under `Activated Roles` is routing evidence, not review
-evidence.
-
-Before implementation:
-
-1. The integrated plan selects a review depth and explains why.
-2. The Web Experience Designer provides an implementation-ready experience
-   specification.
-3. The Browser Interaction Reviewer provides interaction and accessibility
-   criteria.
-4. The Frontend Implementation Engineer must not edit until both outputs
-   exist.
-
-After implementation and the planned browser verification:
-
-1. The Web Experience Designer reviews the implementation against the
-   approved experience specification.
-2. The Browser Interaction Reviewer reviews the implementation against the
-   approved interaction criteria.
-3. Each reviewer returns `Conforms`, `Deviates`, or `Unverified` with the
-   evidence reviewed.
-4. The Quality Verification Lead must not mark the frontend task complete
-   unless both verdicts are `Conforms`, or the user explicitly accepts the
-   stated residual risk for a `Deviates` or `Unverified` verdict.
-
-Review depth is proportional to risk, but neither reviewer nor either verdict
-may be skipped:
-
-- `Light`: copy, isolated color, or similarly narrow changes. A concise
-  no-impact or conformance statement is sufficient.
-- `Standard`: component, form, layout, or responsive changes. Review relevant
-  viewports, static accessibility, focus and keyboard implications, and
-  recovery.
-- `High`: navigation, information architecture, async state, modal, sticky
-  geometry, drag interaction, or cross-page pattern changes. Review
-  repository-wide patterns and full browser evidence appropriate to the risk.
-
-Every frontend implementation plan includes a `Frontend Review Evidence`
-section containing:
-
-- review depth and rationale;
-- Web Experience Designer pre-implementation specification;
-- Browser Interaction Reviewer pre-implementation criteria;
-- planned browser evidence;
-- both post-implementation verdicts and their evidence;
-- Quality Verification Lead completion decision.
-
-For frontend review-only tasks, both reviewers must each deliver their normal
-review output. No implementation-phase fields are required, but role names
-alone still do not count as review evidence.
+- Frontend code carries no comments unless the user approves a specific one;
+  `frontend_comment_guard.py` denies new ones. A `{# #}` comment wrapped
+  across two lines renders as page text.
+- The plan presented in chat includes a `Frontend Review Evidence` section;
+  both verdicts and the completion decision are recorded in the task's
+  `docs/CHANGELOG.md` entry.
 
 ## Package And Command Policy (conda)
 
@@ -841,6 +717,9 @@ Before the next task, confirm:
 - Fresh verification output and exit status support every completion claim.
 
 ## Deferred Refactoring Note
+
+Deferred work is written into the `미해결` section of `docs/CHANGELOG.md` in
+this shape:
 
 ```text
 Deferred Refactoring Note
