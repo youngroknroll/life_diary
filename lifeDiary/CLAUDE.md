@@ -106,7 +106,9 @@ targeted test before broad regression.
    Beck Red-Green-Refactor contract.
 6. Frontend changes require both frontend reviewers' pre-implementation outputs
    and post-implementation verdicts; listing the roles alone is not evidence.
-7. Implement only approved scope; record larger ideas as deferred work.
+7. Implement only approved scope; record larger ideas as deferred work. A
+   defect found during the task is fixed in the task; deferring one needs the
+   user's explicit approval, recorded as `(사용자 승인 YYYY-MM-DD)`.
 8. Run fresh verification and read complete output before claiming completion.
 
 ## Engineering Guardrails

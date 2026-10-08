@@ -479,6 +479,12 @@ is separately approved.
      PR, and residual risk.
    - Deferred work goes into the `미해결` section of the same file; resolved
      backlog items are removed from it.
+   - A defect found while working (by the implementer, a reviewer, or a
+     browser check) is fixed inside the same task, not deferred. Only the
+     user may defer a defect: ask with an explicit question, and record an
+     approved deferral in `미해결` with the suffix `(사용자 승인 YYYY-MM-DD)`.
+     Hooks in the user's environment block a final report that defers a
+     defect and block a `미해결` entry that lacks that suffix.
    - Review-only tasks do not edit files. They report findings in chat or in a
      separately approved review artifact.
 
