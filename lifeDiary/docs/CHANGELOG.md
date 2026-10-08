@@ -10,9 +10,18 @@
 
 ## 2026-10
 
+### 2026-10-08 — 하네스 정비: 어댑터 한 벌, 프로젝트 훅 4종, 경로 한정 규칙 [docs]
+- 어댑터를 `lifeDiary/.claude/agents/` 11개 한 벌로 합쳐 추적한다. git 루트 `.claude/agents/`의 구판 12개(8월 14일판. `prompt_plan.md`, `.docs/frontend-integration-changelog.md`, "work logs and project status", DRF를 참조했고 구현 역할 3개는 그 구판이 활성이었다)와 범용 `project-planner-pm.md`를 지웠다. `lifeDiary/.gitignore`는 `.claude/*` 중 agents·hooks·rules·settings.json만 추적한다.
+- 훅을 전역 `~/.claude`에서 프로젝트 `.claude/settings.json`으로 옮기고 둘을 더했다. `bash_guard.py`: main에서 commit·push·merge, main으로 push, `gh pr merge`, 태그 생성, `conda run -n knou-life-diary` 밖의 pytest·manage.py·pip·.venv·uv 거부. `frontend_comment_guard.py`: 템플릿·CSS·JS에 새 주석 거부(`(사용자 승인 YYYY-MM-DD)` 표기는 통과). `changelog_defer_guard.py`, `defect_deferral_guard.py`는 옮기면서 Bash 검사를 명령 조각 단위로 바꿨다(다른 파일의 `sed -i`와 CHANGELOG `git add`가 한 명령에 있으면 거부하던 오탐을 이 작업에서 고쳤다).
+- `AGENTS.md`: Prime Directive 6(에이전트 git 금지)이 커밋 규칙과 모순되던 것을 "에이전트가 커밋·push·PR, 머지·태그·main은 사용자"로 고쳤다. Test Authoring Policy는 `.claude/rules/backend-tests.md`, Frontend Work Policy·Dual Review Gate는 `.claude/rules/frontend.md`로 옮겨 해당 파일을 읽거나 고칠 때 자동으로 실리고, 본문에는 요약과 Test List 표만 남겼다(928→791줄). 절대 경로와 "status index" 참조를 지우고 "Enforced By The Harness" 표를 더했다. 실행 순서 4항(모바일 통계 UX·차트 지연 렌더)은 미해결 C-14로 옮겼다.
+- `CLAUDE.md`(176줄): `.claude/` 구성, "Enforced Mechanically", "Communication"(한국어·결론 먼저·비유 없이) 절을 더했다.
+- `deploy.yml` 제외 규칙에 `lifeDiary/.claude/`를 더했다.
+- 검증: 훅 파이프 테스트 78건 통과(bash·주석 50, CHANGELOG 16+조각 단위 7, Stop 5), `python3 -m py_compile` 4개, `jq -e` 등록 4개, 어댑터 frontmatter 11개 파싱, 지워진 경로 참조 grep 0건, 제외 규칙 grep 확인. 세션 내 실증: 프로젝트 훅이 `pytest --version`, CSS 주석 Write, 미해결 결함 줄 Edit을 거부했다. Stop 훅은 턴이 끝날 때만 돌아 파이프 테스트로만 확인했다.
+- PR #90.
+
 ### 2026-10-08 — 문서 정리: 작업별 계획·로그를 이 파일 하나로 [docs]
 - `docs/plans` 67개, `docs/refactoring` 59개, `docs/frontend` 20개, `docs/project-status.md`를 지우고 이 변경 기록으로 합쳤다. 로드맵 계획 4개(데스크톱 인증·패키징, 배포·수익화, 광고 전략)는 남겼다.
-- 작업 규칙을 바꿨다. 계획 문서 대신 채팅에서 계획을 승인받고, 끝나면 여기에 항목을 더한다(`AGENTS.md`, `CLAUDE.md`. 로컬 어댑터 `.claude/agents`는 저장소에 없고 같은 내용으로 맞췄다).
+- 작업 규칙을 바꿨다. 계획 문서 대신 채팅에서 계획을 승인받고, 끝나면 여기에 항목을 더한다(`AGENTS.md`, `CLAUDE.md`. 로컬 어댑터 `lifeDiary/.claude/agents`는 그때 gitignore 상태라 로컬에서만 맞췄고, 같은 날 하네스 정비 항목에서 한 벌로 합쳐 추적했다).
 - 결함 미루기 금지 규칙을 더했다. 진행 중 발견한 결함은 그 작업 안에서 고치고, 미루는 것은 사용자가 승인한 항목만 "(사용자 승인 날짜)" 표기로 미해결에 적는다. 사용자 환경의 훅 두 개(Stop: 응답의 결함 미루기 문장 감지, PreToolUse: 미해결 절 결함 추가·Bash 우회 편집 거부)가 강제한다.
 - README와 `docs/architecture` 가이드를 2026-10-08 코드 기준으로 갱신했다(커밋 31374af, dbcb051).
 - PR #90 (#89 위에 쌓음).
@@ -261,6 +270,7 @@
 - C-9 `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지움(새로고침하면 복구).
 - C-10 시안 1a 라이트 모드 work 라인 아래 영역(장식, 두 번 보류). C-11 `NEUTRAL_COLOR = "#8A9A91"`의 출처 확인.
 - C-12 저장 응답 직후 139~351ms 긴 프레임. C-13 응답 대기 중 새로 고른 칸 선택이 `clearSelection()`으로 지워질 가능성.
+- C-14 모바일 통계·대시보드 UX 잔여 항목과 통계 차트 지연 렌더(`AGENTS.md` 실행 순서 4항에서 옮김, 2026-10-08).
 - `dashboard.js` `#undoSnackbar`: 숨김→표시 때 문구 전달 장치 없음, 다시 그리기 뒤 포커스 복원 없음.
 - 목표 표: 되돌리기 한 단계(8초 안 연쇄 삭제의 첫 목표는 복원 불가). 자동 숨김으로 포커스가 추가 폼으로 갈 때 이유를 알리지 않음. 오류 문구를 칸마다 따로 두는 구조.
 - 실기기 스크린리더(NVDA·VoiceOver)·실제 모바일 기기·Safari 클릭-비포커스 경로는 어느 작업에서도 확인하지 않았다(접근성 트리·에뮬레이션으로 대신).
