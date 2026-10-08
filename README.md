@@ -62,7 +62,7 @@ lifeDiary/
 │  └─ settings/    # dev · prod · desktop
 ├─ locale/         # ko · en 메시지 카탈로그
 ├─ desktop/        # pywebview 데스크톱 런처
-├─ docs/           # 설계·계획·실행 로그·상태 인덱스
+├─ docs/           # 변경 기록(CHANGELOG)·로드맵 계획·아키텍처·보안 기록
 └─ Procfile
 ```
 
