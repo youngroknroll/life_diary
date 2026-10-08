@@ -23,10 +23,10 @@ phase, not the product destination.
 
 Primary project documents:
 
-- Current status index: `docs/project-status.md`
-- Implementation plans: `docs/plans/`
-- Refactoring and work logs: `docs/refactoring/`
-- Frontend work logs: `docs/frontend/`
+- Change log and backlog: `docs/CHANGELOG.md` (newest first; one entry per
+  completed task; the `미해결` section is the only backlog)
+- Roadmap plans kept as documents: `docs/plans/` (desktop single-user auth,
+  desktop packaging, distribution and monetization, ad revenue strategy only)
 - Architecture guide: `docs/architecture/2026-04-21_business-logic-and-architecture-guide.md`
 - Security remediation record: `docs/security/`
 - Historical i18n record: `prompt_plan.md` (superseded; never overwrite)
@@ -177,8 +177,8 @@ views -> use_cases -> repositories/domain_services -> models
    - Agents may not classify a task as too small, obvious, or urgent to bypass
      this guide.
    - Required workflow may be skipped only after explicit user approval.
-   - Chat agreement does not replace a required project document unless the
-     user explicitly waives that document.
+   - The plan is agreed in chat. The user's explicit approval of that plan is
+     the gate; no plan file is written unless the user asks for one.
 
 6. **External Git actions belong to the user.**
    - Do not commit, push, merge, or open a pull request. The user executes
@@ -438,9 +438,11 @@ is separately approved.
      required.
    - The user approves scope and any workflow exception.
 
-4. **Write the integrated plan**
-   - A plan document under `docs/plans/` is required before file edits unless
-     the user explicitly waives it.
+4. **Present the integrated plan in chat and get approval**
+   - The plan is presented in the conversation and the user approves it
+     before any file edit (for example through a question with options).
+     No file under `docs/plans/` is written for a task; plan files are only
+     for multi-phase roadmaps the user asks to keep.
    - The plan is the implementation boundary and must include:
      - approved scope and explicit exclusions
      - acceptance criteria
@@ -469,12 +471,14 @@ is separately approved.
    - The Quality Verification Lead maps evidence back to acceptance criteria.
    - Do not claim completion beyond observed evidence.
 
-8. **Document post-work state for file-changing implementation**
+8. **Record the finished task in `docs/CHANGELOG.md`**
    - When an implementation task changes files, the implementation role that
-     owns those files writes the required refactoring or change log under
-     `docs/refactoring/` or `docs/frontend/`.
-   - That implementation role updates `docs/project-status.md` with status,
-     evidence, deferred work, and links to the plan and work log.
+     owns those files adds one entry at the top of `docs/CHANGELOG.md`: date,
+     title, type, what changed and why, changed areas, fresh verification
+     evidence (commands and results, browser evidence, reviewer verdicts),
+     PR, and residual risk.
+   - Deferred work goes into the `미해결` section of the same file; resolved
+     backlog items are removed from it.
    - Review-only tasks do not edit files. They report findings in chat or in a
      separately approved review artifact.
 
@@ -500,7 +504,7 @@ suite written up front. Each entry carries at least these fields:
 | Boundary rationale | Why a higher-cost boundary is required, or why a lower boundary suffices |
 | Test name | The actual pytest function name or parametrized case ID |
 | Status | `Pending`, `Red`, `Green`, `Refactored`, `Deferred` |
-| Evidence | Red/Green commands and key results, or a pointer to the work log |
+| Evidence | Red/Green commands and key results, or a pointer to the CHANGELOG entry |
 
 The default relationship is one scenario to one test. Only these exceptions
 are allowed:
@@ -677,9 +681,9 @@ exempt from the backend TDD cycle.
   for frontend work still follows the Backend TDD Cycle.
 - Every frontend review includes both the Web Experience Designer and Browser
   Interaction Reviewer.
-- Frontend implementation requires an approved plan under `docs/plans/` and a
-  completed work log under `docs/frontend/` or `docs/refactoring/` unless the
-  user explicitly approves different document locations.
+- Frontend implementation requires a plan approved in chat and, on
+  completion, an entry in `docs/CHANGELOG.md` that carries the browser
+  evidence and both reviewer verdicts.
 - Do not comment frontend code. Django templates, CSS, and browser JavaScript
   carry no comments unless the user approves a specific one. A template comment
   that leaks reaches the user as visible page text: `{# #}` is single-line only,
@@ -726,8 +730,8 @@ may be skipped:
   geometry, drag interaction, or cross-page pattern changes. Review
   repository-wide patterns and full browser evidence appropriate to the risk.
 
-Every frontend implementation plan includes a `Frontend Review Evidence`
-section containing:
+Every frontend implementation plan (presented in chat) includes a
+`Frontend Review Evidence` section containing:
 
 - review depth and rationale;
 - Web Experience Designer pre-implementation specification;
@@ -735,6 +739,9 @@ section containing:
 - planned browser evidence;
 - both post-implementation verdicts and their evidence;
 - Quality Verification Lead completion decision.
+
+The post-implementation verdicts and the completion decision are recorded in
+the task's `docs/CHANGELOG.md` entry.
 
 For frontend review-only tasks, both reviewers must each deliver their normal
 review output. No implementation-phase fields are required, but role names
@@ -841,6 +848,9 @@ Before the next task, confirm:
 - Fresh verification output and exit status support every completion claim.
 
 ## Deferred Refactoring Note
+
+Deferred work is written into the `미해결` section of `docs/CHANGELOG.md` in
+this shape:
 
 ```text
 Deferred Refactoring Note
