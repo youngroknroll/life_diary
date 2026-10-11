@@ -54,7 +54,7 @@ class TestUsernameRecovery:
         def raise_disconnect(*args, **kwargs):
             raise SMTPServerDisconnected("please run connect() first")
 
-        monkeypatch.setattr("apps.users.views.send_mail", raise_disconnect)
+        monkeypatch.setattr("apps.users.views.recovery.send_mail", raise_disconnect)
 
         response = client.post(
             reverse("users:username_recovery"), {"email": "alice@example.com"}

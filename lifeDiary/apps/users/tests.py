@@ -134,7 +134,7 @@ class TestLoginRecaptchaChallenge:
         for _ in range(5):
             self._login(client, "wrong-password")
 
-        with patch("apps.users.views._verify_recaptcha", return_value=True):
+        with patch("apps.users.login_protection.verify_recaptcha", return_value=True):
             response = self._login(client, "pw123456!!", token="valid-token")
 
         assert response.status_code == 302
