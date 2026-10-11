@@ -28,7 +28,7 @@
 - C-15: `.quick-input-sheet`·backdrop 트랜지션을 reduced-motion에서 없앴다.
 - prod: `ERROR_REPORT_EMAIL`이 없으면 `EMAIL_HOST_USER`(발신 계정)로 500 트레이스백을 보낸다. 환경변수 없이 배포 즉시 켜진다. 계약 테스트 3건.
 - 2차 검증: 변경 전 FA 치수(테마 13×13, 탭바 15px)와 변경 후 동일. 깨진 `<use>` 0, cdnjs 요청 0, 콘솔 오류 0. 테마 다크 전환 시 moon 아이콘·라벨·스와치 none 확인. 390 재조사 결과 남은 44 미만은 예외 항목뿐(세그먼트 89×44, 삭제 링크 45×44, 잊으셨나요 112×44, 시트 닫기 44×44·"사용법"과 간격 12). 드문 음절 '뷁' 삽입 시에만 rare 파일 요청, `document.fonts.check` true. 전체 pytest 716 passed, `ruff check .` 0건, `node --check` 통과, prod 매니페스트 CSS 12·폰트 2.
-- 2차 검토: 웹 경험 설계 Conforms with notes(그리드 헤더 아이콘·범례 배지 36px·데스크톱 내비 예외·rare `optional` 모두 수용, 범례 배지만 시각 크기를 키운 점은 참고). 브라우저 상호작용은 Deviates로 결함 2건을 찾았고 같은 작업에서 고쳤다: (1) reduced-motion 규칙이 모바일 `@media` 블록보다 앞에 있어 캐스케이드에서 졌다 → 파일 끝으로 옮기고 CSSOM 순서(39 > 38)로 확인. (2) 목표 행 "삭제" 링크의 `::before`가 편집 중 나타나는 "저장" 버튼(간격 10px)과 2px 겹쳤다 → `inset: 0 -16px 0 -8px`로 바꾸고 편집 모드에서 저장 버튼 오른쪽 1px 안은 저장, 간격 1px는 셀, 3px는 삭제에 명중하는 것을 확인. 고친 뒤 전체 pytest 716 passed, ruff 0건, `node --check` 통과.
+- 2차 검토: 웹 경험 설계 Conforms with notes(그리드 헤더 아이콘·범례 배지 36px·데스크톱 내비 예외·rare `optional` 모두 수용, 범례 배지만 시각 크기를 키운 점은 참고). 브라우저 상호작용은 Deviates로 결함 2건을 찾았고 같은 작업에서 고쳤다: (1) reduced-motion 규칙이 모바일 `@media` 블록보다 앞에 있어 캐스케이드에서 졌다 → 파일 끝으로 옮기고 CSSOM 순서(39 > 38)로 확인. (2) 목표 행 "삭제" 링크의 `::before`가 편집 중 나타나는 "저장" 버튼(간격 10px)과 2px 겹쳤다 → `inset: 0 -16px 0 -8px`로 바꾸고 편집 모드에서 저장 버튼 오른쪽 1px 안은 저장, 간격 1px는 셀, 3px는 삭제에 명중하는 것을 확인. 고친 뒤 전체 pytest 716 passed, ruff 0건, `node --check` 통과. 수정분 재검토: 웹 경험 설계 Conforms, 브라우저 상호작용 Conforms.
 - PR #95 (#94 위에 쌓음).
 
 ### 2026-10-11 — 검토 후속 3: users 뷰 분리, 설정 base 분리 [refactor]
