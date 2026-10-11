@@ -21,6 +21,14 @@
 - 검증(격리 SQLite 서버, Chrome DevTools, 변경 전·후 전체 페이지 스크린샷 픽셀 비교): 390px(DPR 2) login·mypage·goals·stats·dashboard 변경 픽셀 0(goals는 진행 막대의 현재 시각 표식만 이동). 1280px(DPR 1) 9개 화면은 0.3~0.7%의 글자 안티앨리어싱 차이만 — 폰트를 원본으로 되돌려도 같고, 가지치기 CSS를 단일 파일로 서빙하면 0이며, 분할·단일 상태의 계산 스타일 전체 해시(요소 9종 656~685속성, body 하위 400요소 글꼴·색)가 동일해 캐스케이드는 같다. 콘솔 오류 0(preload 미사용 경고 1건은 변경 전에도 동일). CSS 12개 200, 폰트 604,664바이트 전송. 대시보드 1280: 슬롯 선택 → 태그 → 저장(POST 201 1회, 스낵바 `role=status`) → 되돌리기(POST 200), ArrowRight 선택 이동. 390: 슬롯 탭으로 시트 열림(aria-hidden=false, 포커스 첫 태그 버튼, 포커스 가능 16, 헤더 sticky, 높이 675px), Escape로 닫히고 포커스 복귀. 전체 pytest 715 passed, `ruff check .` 0건, prod collectstatic 매니페스트에 CSS 12·JS 4·폰트 해시 생성, prod deploy check exit 0.
 - 실측하지 않은 것: 스와이프 닫기, Shift/Ctrl 추가 선택, "지금 채우기", 저장 실패 복구, reduced motion. 분할은 바이트 동일 연결이라 로직 변화가 없다는 근거로 대신한다. 2차 정리 뒤 stats 1280·390 재캡처는 진행 막대의 시각 표식 외 변경 픽셀 0.
 - 검토: 웹 경험 설계 Conforms with notes(남은 `#statsTabs` 규칙 → 이 작업에서 삭제, KS X 1001 밖 음절 폴백은 제품 결정 사항으로 기록), 브라우저 상호작용 Conforms with notes(스크립트 순서·@media 경계·preload 경로·sticky 규칙 직접 확인, `.quick-input-sheet` reduced-motion 분기는 원본에도 없던 것이라 미해결 C-15로).
+- 2차(같은 PR): 폰트 폴백을 없앴다. `PretendardVariable-rare.woff2`(나머지 8,822 음절, 1,349,632바이트)를 `unicode-range: U+AC00-D7A3; font-display: optional`로 먼저 선언하고 메인 파일을 정확한 범위(KS X 1001 1,613구간 + 기호 블록, 14KB)로 뒤에 선언해 드문 음절이 있는 화면에서만 두 번째 파일을 내려받는다. 스크립트는 두 파일과 범위 문자열을 만들고 timestamp를 고정해 재현 가능.
+- C-3 FontAwesome 제거: Bootstrap Icons(MIT) 17개를 `templates/shared/_icons.svg` 인라인 스프라이트로 넣고 사용처 11개 파일을 `<svg class="icon"><use href="#icon-…"/></svg>`로 바꿨다. 런타임 교체 4곳(테마 아이콘 href, `showOverlay`의 심볼 이름 인자와 `[^a-z0-9-]` 정제, `setButtonLoading` 스피너 `icon--spin`, `tag_list.js` createElementNS). 로딩 오버레이와 새 스피너 모두 reduced-motion에서 animation none. FA CDN 링크와 prod CSP의 cdnjs 출처를 뺐다(스타일시트 15→14, 외부 요청 19KB+157KB 감소). 그리드 헤더의 `fa-th`는 이전부터 렌더되지 않고 있어 이제 아이콘이 보인다. 테마 토글의 aria-label이 현재 선택을 붙인다("테마 선택 (다크)"). 홈 뷰의 죽은 `features` 컨텍스트 삭제.
+- C-4 터치 타깃: 390px에서 interactive 요소 전수 조사(대시보드·통계·설정·목표·태그·로그인). 세그먼트 탭 `::before` 세로 확장, 모바일 시트 닫기 44×44, 모바일 내비 설정 버튼 44×44, 아바타·브랜드·범례 배지(36px + 확장, 행 피치 44)·"목표 관리"·목표 행 "삭제"·"비밀번호를 잊으셨나요?" 링크에 `::before` 확장. 남긴 예외: 24px 밀집 그리드 칸, 인라인 텍스트 링크, 44px 라벨로 감싸인 체크박스, 데스크톱 내비 36px.
+- C-5 스와치: `.chip__swatch`·`.category-picker__swatch`에 `inset 0 0 0 1px var(--color-text-muted)`(#6C7A70, 흰 배경 4.51:1), 다크는 none.
+- C-15: `.quick-input-sheet`·backdrop 트랜지션을 reduced-motion에서 없앴다.
+- prod: `ERROR_REPORT_EMAIL`이 없으면 `EMAIL_HOST_USER`(발신 계정)로 500 트레이스백을 보낸다. 환경변수 없이 배포 즉시 켜진다. 계약 테스트 3건.
+- 2차 검증: 변경 전 FA 치수(테마 13×13, 탭바 15px)와 변경 후 동일. 깨진 `<use>` 0, cdnjs 요청 0, 콘솔 오류 0. 테마 다크 전환 시 moon 아이콘·라벨·스와치 none 확인. 390 재조사 결과 남은 44 미만은 예외 항목뿐(세그먼트 89×44, 삭제 링크 45×44, 잊으셨나요 112×44, 시트 닫기 44×44·"사용법"과 간격 12). 드문 음절 '뷁' 삽입 시에만 rare 파일 요청, `document.fonts.check` true. 전체 pytest 716 passed, `ruff check .` 0건, `node --check` 통과, prod 매니페스트 CSS 12·폰트 2.
+- 2차 검토: 웹 경험 설계 Conforms with notes(그리드 헤더 아이콘·범례 배지 36px·데스크톱 내비 예외·rare `optional` 모두 수용, 범례 배지만 시각 크기를 키운 점은 참고). 브라우저 상호작용은 Deviates로 결함 2건을 찾았고 같은 작업에서 고쳤다: (1) reduced-motion 규칙이 모바일 `@media` 블록보다 앞에 있어 캐스케이드에서 졌다 → 파일 끝으로 옮기고 CSSOM 순서(39 > 38)로 확인. (2) 목표 행 "삭제" 링크의 `::before`가 편집 중 나타나는 "저장" 버튼(간격 10px)과 2px 겹쳤다 → `inset: 0 -16px 0 -8px`로 바꾸고 편집 모드에서 저장 버튼 오른쪽 1px 안은 저장, 간격 1px는 셀, 3px는 삭제에 명중하는 것을 확인. 고친 뒤 전체 pytest 716 passed, ruff 0건, `node --check` 통과.
 - PR #95 (#94 위에 쌓음).
 
 ### 2026-10-11 — 검토 후속 3: users 뷰 분리, 설정 base 분리 [refactor]
@@ -303,15 +311,11 @@
 - 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
 
 ### 프런트엔드·정적 자산
-- C-3 FontAwesome 전역 제거(템플릿 7개, `showOverlay` 아이콘).
-- C-4 44px 터치 타깃 전역 재확인(`.segmented__item` 약 28px, 시트 닫기 32px 등).
-- C-5 `.chip__swatch`·`.category-picker__swatch` 라이트 대비(1.44~2.15), 공용 테두리 규칙.
 - C-7 확인 모달 없는 태그 삭제의 이중 제출 가드. C-8 sessionStorage 차단 시 온보딩 STEP3 안내.
 - C-9 `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지움(새로고침하면 복구).
 - C-10 시안 1a 라이트 모드 work 라인 아래 영역(장식, 두 번 보류). C-11 `NEUTRAL_COLOR = "#8A9A91"`의 출처 확인.
 - C-12 저장 응답 직후 139~351ms 긴 프레임. C-13 응답 대기 중 새로 고른 칸 선택이 `clearSelection()`으로 지워질 가능성.
 - C-14 모바일 통계·대시보드 UX 잔여 항목과 통계 차트 지연 렌더(`AGENTS.md` 실행 순서 4항에서 옮김, 2026-10-08).
-- C-15 `.quick-input-sheet` 열림 트랜지션(translateY)에 `prefers-reduced-motion` 분기 추가. 되돌리기 스낵바와 목표 표에는 이미 있다(2026-10-11 검토자 제안, 원본 `style.css`도 같은 상태).
 - `dashboard.js` `#undoSnackbar`: 숨김→표시 때 문구 전달 장치 없음, 다시 그리기 뒤 포커스 복원 없음.
 - 목표 표: 되돌리기 한 단계(8초 안 연쇄 삭제의 첫 목표는 복원 불가). 자동 숨김으로 포커스가 추가 폼으로 갈 때 이유를 알리지 않음. 오류 문구를 칸마다 따로 두는 구조.
 - 실기기 스크린리더(NVDA·VoiceOver)·실제 모바일 기기·Safari 클릭-비포커스 경로는 어느 작업에서도 확인하지 않았다(접근성 트리·에뮬레이션으로 대신).
