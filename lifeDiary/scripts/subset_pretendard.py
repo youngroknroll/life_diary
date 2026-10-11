@@ -4,7 +4,11 @@
 KS X 1001 한글 2,350자 + 라틴·구두점·기호 블록만 남긴다. 2,350자 밖의 드문
 음절은 시스템 글꼴로 폴백한다. 가변 wght 축과 OpenType 레이아웃은 유지한다.
 
-실행: python scripts/subset_pretendard.py <원본.woff2> <출력.woff2>
+두 파일을 만든다. 메인 파일은 위 집합, rare 파일은 나머지 한글 음절 8,822자다.
+tokens.css 의 @font-face 가 unicode-range 로 둘을 가르므로 드문 음절이 화면에
+있을 때만 rare 파일을 내려받는다. 메인 파일의 unicode-range 문자열도 함께 찍는다.
+
+실행: python scripts/subset_pretendard.py <원본.woff2> <메인 출력.woff2> <rare 출력.woff2>
 fonttools 와 brotli 가 필요하다(개발 도구이며 requirements 에는 넣지 않는다).
 """
 
@@ -59,7 +63,24 @@ def build_unicodes():
     return sorted(unicodes)
 
 
-def main(source, target):
+def rare_unicodes():
+    return sorted(set(range(0xAC00, 0xD7A4)) - set(ksx1001_hangul_syllables()))
+
+
+def css_unicode_range(codepoints):
+    """연속 구간을 묶은 CSS unicode-range 값."""
+    runs = []
+    start = prev = codepoints[0]
+    for cp in codepoints[1:]:
+        if cp != prev + 1:
+            runs.append((start, prev))
+            start = cp
+        prev = cp
+    runs.append((start, prev))
+    return ",".join(f"U+{a:X}" if a == b else f"U+{a:X}-{b:X}" for a, b in runs)
+
+
+def write_subset(source, target, unicodes):
     options = subset.Options()
     options.flavor = "woff2"
     options.layout_features = ["*"]
@@ -70,9 +91,9 @@ def main(source, target):
     options.drop_tables += ["DSIG"]
 
     font = TTFont(source)
-    before = len(font.getBestCmap())
+    font.recalcTimestamp = False
     subsetter = subset.Subsetter(options=options)
-    subsetter.populate(unicodes=build_unicodes())
+    subsetter.populate(unicodes=unicodes)
     subsetter.subset(font)
     font.flavor = "woff2"
     font.save(target)
@@ -81,10 +102,17 @@ def main(source, target):
     cmap = result.getBestCmap()
     hangul = sum(1 for c in cmap if 0xAC00 <= c <= 0xD7A3)
     axes = [(a.axisTag, a.minValue, a.maxValue) for a in result["fvar"].axes]
-    print(f"codepoints {before} -> {len(cmap)} (hangul {hangul}), axes {axes}")
+    print(f"{target}: codepoints {len(cmap)} (hangul {hangul}), axes {axes}")
+
+
+def main(source, main_target, rare_target):
+    write_subset(source, main_target, build_unicodes())
+    write_subset(source, rare_target, rare_unicodes())
+    print("main unicode-range:")
+    print(css_unicode_range(build_unicodes()))
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 4:
         raise SystemExit(__doc__)
-    main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2], sys.argv[3])
