@@ -37,6 +37,16 @@ pg_dump "$SUPABASE_SESSION_URL" \
 
 secrets 가 없으면 워크플로는 경고만 남기고 성공으로 끝난다. 켠 뒤 첫 실행은 Actions 탭에서 `database backup` 을 수동 실행(workflow_dispatch)해 아티팩트 크기를 확인한다.
 
+`age` 는 SSH ed25519 공개키도 수신자로 받으므로 `age-keygen` 없이 `ssh-keygen` 으로 만들 수 있다. 로컬 `.env` 의 `DATABASE_URL` 이 이미 session pooler(5432) 주소라 그대로 쓴다. 아래 세 줄을 저장소 루트(`lifeDiary/`)에서 실행하면 값이 화면에 찍히지 않고 등록된다.
+
+```bash
+ssh-keygen -q -t ed25519 -N "" -C "lifediary-db-backup" -f ~/.ssh/lifediary_backup_ed25519
+cut -d' ' -f1,2 ~/.ssh/lifediary_backup_ed25519.pub | gh secret set BACKUP_AGE_RECIPIENT
+grep -E '^DATABASE_URL=' .env | cut -d= -f2- | tr -d '"' | gh secret set BACKUP_DATABASE_URL
+```
+
+`~/.ssh/lifediary_backup_ed25519`(비밀키)는 암호 관리자에 복사해 둔다. 이 파일이 없으면 아티팩트를 풀 수 없다. 복호화는 `age -d -i ~/.ssh/lifediary_backup_ed25519 <파일>.dump.age > restore.dump`.
+
 복호화: 아티팩트를 내려받아 `age -d -i lifediary-backup.key lifediary-YYYYMMDD-HHMM.dump.age > restore.dump`. 그 뒤는 아래 복구 리허설과 같다.
 
 ## 복구 리허설 (분기 1회, 또는 마이그레이션이 테이블을 지우기 전)

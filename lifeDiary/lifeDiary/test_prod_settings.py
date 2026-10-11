@@ -108,7 +108,6 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
     # 현재 템플릿이 실제로 사용하는 CDN·reCAPTCHA·GA 출처만 허용한다.
     for host in (
         "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
         "https://unpkg.com",
         "https://www.google.com",
         "https://www.gstatic.com",
@@ -118,6 +117,7 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
         "https://*.googletagmanager.com",
     ):
         assert host in policy
+    assert "cdnjs.cloudflare.com" not in policy
     assert (
         "apps.core.middleware.ContentSecurityPolicyMiddleware"
         in prod_settings.MIDDLEWARE
@@ -208,12 +208,20 @@ def test_prod_settings_keep_security_counters_out_of_the_file_cache(monkeypatch)
 
 
 @pytest.mark.parametrize(
-    ("env_value", "expected_admins"),
-    [(None, []), ("ops@example.com", [("LifeDiary", "ops@example.com")])],
-    ids=["no_address_sends_nothing", "address_receives_500_reports"],
+    ("env_value", "host_user", "expected_admins"),
+    [
+        (None, "", []),
+        (None, "ops@example.com", [("LifeDiary", "ops@example.com")]),
+        ("alerts@example.com", "ops@example.com", [("LifeDiary", "alerts@example.com")]),
+    ],
+    ids=[
+        "nothing_configured_sends_nothing",
+        "falls_back_to_the_sending_account",
+        "explicit_address_wins",
+    ],
 )
 def test_prod_settings_mail_server_errors_to_the_configured_address(
-    monkeypatch, env_value, expected_admins
+    monkeypatch, env_value, host_user, expected_admins
 ):
     monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
     monkeypatch.setenv("DB_NAME", "test_db")
@@ -221,6 +229,7 @@ def test_prod_settings_mail_server_errors_to_the_configured_address(
     monkeypatch.setenv("DB_PASSWORD", "test_password")
     monkeypatch.setenv("DB_HOST", "localhost")
     monkeypatch.setenv("DB_PORT", "6543")
+    monkeypatch.setenv("EMAIL_HOST_USER", host_user)
     if env_value is None:
         monkeypatch.delenv("ERROR_REPORT_EMAIL", raising=False)
     else:

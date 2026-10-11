@@ -50,12 +50,12 @@ CONTENT_SECURITY_POLICY = "; ".join(
     [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com"
+        " https://cdn.jsdelivr.net https://unpkg.com"
         " https://www.google.com https://www.gstatic.com"
         " https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline'"
-        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-        "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+        " https://cdn.jsdelivr.net",
+        "font-src 'self' data: https://cdn.jsdelivr.net",
         "img-src 'self' data:"
         " https://*.google-analytics.com https://*.googletagmanager.com",
         "connect-src 'self'"
@@ -127,9 +127,9 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
 # 500 응답의 트레이스백을 메일로 받는다. 외부 추적 서비스 없이 Gmail SMTP 를
-# 그대로 쓴다. 주소가 비어 있으면 ADMINS 가 비어 AdminEmailHandler 는 아무것도
-# 보내지 않고 콘솔 로그만 남는다.
-ERROR_REPORT_EMAIL = os.getenv("ERROR_REPORT_EMAIL", "")
+# 그대로 쓴다. 따로 주소를 주지 않으면 발신 계정 자신(운영 문의 메일함)으로
+# 보낸다. 둘 다 비어 있으면 ADMINS 가 비어 콘솔 로그만 남는다.
+ERROR_REPORT_EMAIL = os.getenv("ERROR_REPORT_EMAIL", EMAIL_HOST_USER)
 ADMINS = [("LifeDiary", ERROR_REPORT_EMAIL)] if ERROR_REPORT_EMAIL else []
 
 # Production error visibility: keep DEBUG=False, but send server-side errors
