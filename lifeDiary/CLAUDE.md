@@ -74,7 +74,9 @@ Priority:
 - Tags: `apps/tags/models.py`, `apps/tags/use_cases.py`,
   `apps/tags/domain_services.py`, `apps/tags/repositories.py`
 - Users: `apps/users/models.py`, `apps/users/use_cases.py`,
-  `apps/users/forms.py`, `apps/users/views.py`,
+  `apps/users/forms.py`, `apps/users/views/` (auth, verification, recovery,
+  validation, password_reset, onboarding, goals, notes, account),
+  `apps/users/login_protection.py` (failure counters, throttles, reCAPTCHA),
   `apps/users/account_deletion.py`, `apps/users/repositories.py`
 - Stats: `apps/stats/logic.py`, `apps/stats/use_cases.py`,
   `apps/stats/aggregation/`
