@@ -64,7 +64,6 @@ INSTALLED_APPS = [
     "apps.tags",
     "apps.users",
     "apps.core",
-    "axes",
 ]
 
 MIDDLEWARE = [
@@ -140,7 +139,14 @@ USE_I18N = True
 USE_TZ = True
 
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 STATIC_URL = "static/"
 
@@ -158,7 +164,12 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": str(USER_DATA_DIR / ".cache"),
         "OPTIONS": {"MAX_ENTRIES": 500},
-    }
+    },
+    "security": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": str(USER_DATA_DIR / ".cache" / "security"),
+        "OPTIONS": {"MAX_ENTRIES": 10000},
+    },
 }
 
 
