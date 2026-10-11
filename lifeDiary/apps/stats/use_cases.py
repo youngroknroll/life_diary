@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from django.core.cache import cache
+from django.utils import timezone
 from django.utils.translation import get_language, gettext
 
 from apps.dashboard.repositories import TimeBlockRepository
@@ -75,6 +76,6 @@ class GetStatsContextUseCase:
             return StatsContextResult(context=cached, cache_hit=True)
 
         context = get_stats_context(user, target_date)
-        ttl = _PAST_TTL if target_date < date.today() else _TODAY_TTL
+        ttl = _PAST_TTL if target_date < timezone.localdate() else _TODAY_TTL
         cache.set(key, context, ttl)
         return StatsContextResult(context=context, cache_hit=False)
