@@ -1,0 +1,173 @@
+/* =========================================================
+   Self-hosted fonts — base.html이 PretendardVariable.woff2를
+   preload한다. CSP font-src가 gstatic 등 외부 폰트 CDN을 막으므로
+   반드시 self-host 한다.
+   ========================================================= */
+@font-face {
+    font-family: 'Pretendard Variable';
+    src: url('../fonts/PretendardVariable.woff2') format('woff2-variations');
+    font-weight: 45 920;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-Medium.woff2') format('woff2');
+    font-weight: 500;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'IBM Plex Mono';
+    src: url('../fonts/IBMPlexMono-SemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-display: swap;
+}
+
+/* =========================================================
+   Design Tokens — 단일 팔레트 출처
+   ========================================================= */
+:root {
+    /* Brand palette (녹색 테마) */
+    --color-primary: #2C6E4A;
+    --color-primary-hover: #235B3C;
+    --color-primary-press: #1C462F;
+    --color-primary-soft: #EDF3EE;
+    --color-primary-border: #98c7aa;
+    --ink-on-primary: #ffffff;
+
+    /* Text — 시안은 네 단계를 쓴다. 두 단계로 줄이면 위계가 뭉갠다. */
+    --color-text: #14211A;
+    --color-text-body: #4C5B52;
+    --color-text-muted: #6C7A70;
+    --color-text-meta: #8B968D;
+    --color-text-disabled: #C4CCC6;
+    --color-danger-text: #B4471F;
+    --color-danger-soft: #FDF6F3;
+
+    /* Surface */
+    --color-surface: #ffffff;
+    --color-surface-soft: #F5F6F4;
+    --color-track: #F1F3F0;
+    --color-border: #E3E6E1;
+    --color-border-soft: #EDEFEB;
+    --color-border-muted: #F2F4F1;
+
+    /* 소비시간 5분류. 회색은 미분류 전용이라 어느 카테고리에도 쓰지 않는다. */
+    --color-accent-work: #7CD9A0;   /* 투자시간 */
+    --color-accent-move: #7DCFE8;   /* 주도적 사용시간 */
+    --color-accent-care: #FFA98C;   /* 수동적 소비시간 */
+    --color-accent-rest: #FFD166;   /* 기초 생활시간 */
+    --color-accent-sleep: #B8A6F0;  /* 수면시간 */
+    --color-accent-muted: #D5DBD7;  /* 미분류 */
+
+    /* 시안의 #14211A 는 투자·주도적 색에서 4.5:1에 못 미쳐 한 단계 낮췄다 */
+    --ink-on-accent: #0F1A14;
+    /* 라이트의 danger 는 어두워 흰 글자가 5.40:1 */
+    --ink-on-danger: #FFFFFF;
+
+    /* Note (노란 강조 박스) */
+    --color-note-bg: #fff7df;
+    --color-note-border: #efd98c;
+    --color-note-text: #5d4a15;
+
+    /* Bootstrap 호환 alias */
+    --primary-color: var(--color-primary);
+    --success-color: #198754;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    /* 부트스트랩 기본 #0dcaf0 은 흰 배경에서 1.96:1 이라 본문에 못 쓴다 */
+    --info-color: #0a7c92;
+    --light-color: var(--color-surface-soft);
+    --dark-color: var(--color-text);
+
+    /* Bootstrap 5 CSS 변수 오버라이드 — btn-outline-primary, text-primary 등 자동 적용 */
+    --bs-primary: #2C6E4A;
+    --bs-primary-rgb: 44, 110, 74;
+    --bs-info: #0a7c92;
+    --bs-info-rgb: 10, 124, 146;
+
+    /* Radius */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+
+    /* Responsive heights — clamp(min, viewport, max).
+       모든 차트·스크롤 패널 공용. 한 곳에서만 조정. */
+    --panel-h-sm: clamp(160px, 25vh, 220px);
+    --panel-h-md: clamp(180px, 35vh, 320px);
+    --panel-h-lg: clamp(220px, 45vh, 420px);
+    --chart-cap-sm: clamp(180px, 30vh, 280px);
+    --chart-cap-md: clamp(220px, 35vh, 320px);
+    --chart-cap-lg: clamp(260px, 45vh, 420px);
+
+    /* Typography — self-host (위 @font-face), CDN 미사용 */
+    --font-body: 'Pretendard Variable', Pretendard, 'Noto Sans KR',
+        system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo,
+        Consolas, monospace;
+}
+
+/* =========================================================
+   Dark Theme Tokens
+   ========================================================= */
+[data-theme="dark"] {
+    --color-primary: #4aa66d;
+    --color-primary-hover: #5cb87e;
+    --color-primary-press: #75C392;
+    --color-primary-soft: #1a2e22;
+    --color-primary-border: #3a6b4a;
+    /* 다크 초록은 라이트보다 훨씬 밝다. 흰 글자로는 2.44:1 밖에 안 나온다. */
+    --ink-on-primary: var(--ink-on-accent);
+
+    --color-text: #E4EBE6;
+    --color-text-body: #B9C6BD;
+    --color-text-muted: #9AAB9F;
+    --color-text-meta: #7F8F85;
+    --color-text-disabled: #5A6860;
+    --color-danger-text: #E8927A;
+    --color-danger-soft: #2E1D18;
+
+    --color-surface: #1a1f1c;
+    --color-surface-soft: #232a26;
+    --color-track: #2A322D;
+    --color-border: #3a4a3e;
+    --color-border-soft: #2e3a32;
+    --color-border-muted: #2a3630;
+
+    --color-accent-work: #7CD9A0;
+    --color-accent-move: #7DCFE8;
+    --color-accent-care: #FFA98C;
+    --color-accent-rest: #FFD166;
+    --color-accent-sleep: #B8A6F0;
+    --color-accent-muted: #4A554E;
+
+    --ink-on-accent: #0F1A14;
+    /* 다크의 danger 는 밝아 흰 글자로는 대비가 안 나온다 — 어두운 잉크로 7.33:1 */
+    --ink-on-danger: var(--ink-on-accent);
+
+    --color-note-bg: #2a2615;
+    --color-note-border: #5d4a15;
+    --color-note-text: #efd98c;
+
+    --primary-color: var(--color-primary);
+    --success-color: #22a45c;
+    --warning-color: #e6ac00;
+    --danger-color: #e05555;
+    /* 다크 표면에서는 밝은 쪽이 대비를 얻는다 */
+    --info-color: #4FC3D9;
+    --light-color: var(--color-surface-soft);
+    --dark-color: var(--color-text);
+
+    --bs-primary: #4aa66d;
+    --bs-primary-rgb: 74, 166, 109;
+    --bs-info: #4FC3D9;
+    --bs-info-rgb: 79, 195, 217;
+
+    color-scheme: dark;
+}
+

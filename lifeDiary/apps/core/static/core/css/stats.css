@@ -1,0 +1,289 @@
+/* =========================================================
+   Shared UI Utilities
+   ========================================================= */
+
+/* Date input (stats + dashboard 공용) */
+.date-input-sm {
+    width: 150px;
+    /* 옆의 .btn-sian 이 44px 이다. 부트스트랩 form-control-sm 은 약 31px 이라
+       한 줄에서 높이가 어긋나고 손가락도 닿지 않는다. */
+    min-height: 44px;
+}
+
+/* =========================================================
+   Stats — 차트 / 스크롤 패널 공통 (반응형)
+   토큰: --chart-cap-{sm,md,lg}, --panel-h-{sm,md,lg}
+   ========================================================= */
+
+/* 내부 스크롤 패널을 두지 않는다. 키보드로는 캡 너머를 볼 방법이 없고,
+   터치에서는 페이지 스크롤과 겹친다. 목록은 서버에서 잘라 내려준다. */
+
+/* 스크롤 패널 변형 */
+
+/* 상세 분석 테이블 — 컴팩트 셀 + sticky 헤더 */
+
+
+/* Google's reCAPTCHA iframe is a fixed ~304px and overflows the auth card at
+   360px. Scale it down rather than letting the page scroll sideways. */
+@media (max-width: 400px) {
+    .auth-card .g-recaptcha {
+        transform: scale(0.9);
+        transform-origin: 0 0;
+        height: 70px;
+    }
+}
+
+/* 증감은 색만으로 말하지 않는다 — 부호를 항상 함께 둔다 */
+.data-table .is-delta-up { color: var(--color-primary); }
+.data-table .is-delta-down { color: var(--color-danger-text); }
+.data-table .is-primary { font-weight: 600; }
+.data-table .text-meta { color: var(--color-text-meta); }
+
+/* 시안 4b 의 하루 구성은 3열을 유지한다. 슬롯·7일 평균 대비는 좁은 화면에서 뺀다 */
+@media (max-width: 575.98px) {
+    .data-table .is-wide-only {
+        display: none;
+    }
+}
+
+/* 읽기 전용 예시다 — 클릭 핸들러도 tabindex 도 붙이지 않는다 */
+.category-guide__examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.category-guide__examples .chip {
+    min-height: 26px;
+    font-size: 11.5px;
+}
+
+/* 월 탭 태그 합계 — 시안 3d 는 데스크톱에서 이 패널을 유지한다 */
+.tag-totals {
+    margin-top: 22px;
+}
+
+.tag-totals__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tag-totals__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--color-border-soft);
+    font-size: 11.5px;
+    color: var(--color-text-body);
+}
+
+.tag-totals__name {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.tag-totals__row--sum {
+    border-bottom: 0;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.is-narrow-only {
+    display: none;
+}
+
+@media (max-width: 575.98px) {
+    .is-wide-only-block {
+        display: none;
+    }
+
+    .is-narrow-only {
+        display: inline;
+        color: var(--color-text-meta);
+    }
+
+    /* 시안 4d 의 주차별 요약은 표가 아니라 두 줄짜리 스택 행이다 */
+    .weekly-summary,
+    .weekly-summary tbody,
+    .weekly-summary tr,
+    .weekly-summary td {
+        display: block;
+        width: 100%;
+    }
+
+    .weekly-summary thead {
+        display: none;
+    }
+
+    .weekly-summary tr {
+        padding: 9px 0;
+        border-bottom: 1px solid var(--color-border-soft);
+    }
+
+    .weekly-summary td {
+        padding: 0;
+        text-align: left;
+    }
+
+    .weekly-summary td:first-child {
+        font-size: 11.5px;
+        color: var(--color-text-muted);
+        margin-bottom: 3px;
+    }
+
+    .weekly-summary td.is-primary {
+        display: inline-block;
+        width: auto;
+        font-size: 13px;
+        margin-right: 10px;
+    }
+
+    .weekly-summary td.is-focus-cell {
+        display: inline-block;
+        width: auto;
+        font-size: 12px;
+        color: var(--color-text-body);
+    }
+}
+
+/* 새 태그 모달 (시안 7b · 440px) */
+.tag-modal {
+    max-width: 440px;
+}
+
+.tag-modal__title {
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--color-text);
+    margin: 0 0 3px;
+}
+
+.tag-modal__lead {
+    font-size: 12px;
+    color: var(--color-text-muted);
+    margin: 0 0 18px;
+}
+
+.category-picker {
+    border: 0;
+    padding: 0;
+    margin: 0 0 1rem;
+}
+
+.category-picker__required {
+    margin-left: 5px;
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--color-danger-text);
+}
+
+.category-picker__list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.category-picker__option {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+.category-picker__option:not(:has(.category-picker__radio:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
+}
+
+/* 라디오는 화면에서 감추되 접근성 트리에는 남긴다. display:none 이면
+   키보드로도 못 고른다. */
+.category-picker__radio {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.category-picker__swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    flex: none;
+}
+
+.category-picker__name {
+    font-size: 13px;
+    color: var(--color-text);
+}
+
+.category-picker__hint {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--color-text-meta);
+}
+
+/* 고른 것 */
+.category-picker__option:has(.category-picker__radio:checked) {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    box-shadow: 0 0 0 1.5px var(--color-primary) inset;
+}
+
+.category-picker__option:has(.category-picker__radio:checked) .category-picker__name {
+    font-weight: 600;
+}
+
+/* 지금 포커스가 닿은 것 — 고른 것과 구별되어야 키보드로 움직이는 게 보인다 */
+.category-picker__option:has(.category-picker__radio:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.tag-color-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.tag-color-preview__text {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    flex: 1 1 180px;
+}
+
+.goal-add {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border-soft);
+}
+
+.settings-danger {
+    color: var(--color-danger-text);
+}
+
+/* 로그아웃은 데스크톱 상단바에 이미 있다. 좁은 화면에서만 설정에 노출한다. */
+.is-narrow-only-row {
+    display: none;
+}
+
+@media (max-width: 767.98px) {
+    .is-narrow-only-row {
+        display: flex;
+    }
+}
+

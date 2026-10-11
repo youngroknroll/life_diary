@@ -1,0 +1,118 @@
+/* =========================================================
+   Dark Mode — Bootstrap & Component Overrides
+   ========================================================= */
+[data-theme="dark"] .navbar {
+    border-bottom: 1px solid var(--color-border);
+    box-shadow: none !important;
+}
+
+[data-theme="dark"] .navbar .nav-link {
+    color: var(--color-text-muted) !important;
+    transition: color .15s ease;
+}
+
+[data-theme="dark"] .navbar .nav-link:hover {
+    color: var(--color-text) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .card-body {
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .table {
+    --bs-table-bg: var(--color-surface);
+    --bs-table-color: var(--color-text);
+    --bs-table-border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .table-bordered > :not(caption) > * > * {
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] footer {
+    border-color: var(--color-border) !important;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] .form-select:focus {
+    background-color: var(--color-surface);
+    border-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: 0 0 0 0.2rem rgba(74, 166, 109, 0.25);
+}
+
+/* signup 실시간 검증: password 인풋은 토글 버튼과 시각 충돌 방지를 위해
+   Bootstrap is-valid/is-invalid background 아이콘 숨김. 색 테두리는 유지. */
+.auth-card .password-field input.is-valid,
+.auth-card .password-field input.is-invalid {
+    background-image: none;
+    padding-right: 44px;
+}
+
+/* 실시간 피드백이 표시되면 같은 행의 정적 form-text 도움말 숨김 (시각 정리) */
+.mb-3:has(.realtime-feedback.d-block) > .form-text {
+    display: none;
+}
+
+/* Auth-card extras: dark theme overrides for password toggle, caps lock, strength meter */
+[data-theme="dark"] .auth-card .password-toggle {
+    color: var(--color-text-muted);
+}
+[data-theme="dark"] .auth-card .password-toggle:hover,
+[data-theme="dark"] .auth-card .password-toggle:focus-visible {
+    color: var(--color-primary);
+    background: rgba(74, 166, 109, 0.15);
+}
+[data-theme="dark"] .auth-card .password-strength__bar {
+    background: rgba(255, 255, 255, 0.1);
+}
+[data-theme="dark"] .auth-card .password-strength__label {
+    color: var(--color-text-muted);
+}
+
+
+[data-theme="dark"] .modal-content {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .dropdown-menu {
+    background-color: var(--color-surface);
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .dropdown-item {
+    color: var(--color-text);
+    transition: background-color .15s ease;
+}
+
+[data-theme="dark"] .dropdown-item:hover {
+    background-color: var(--color-surface-soft);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .alert-info {
+    background-color: rgba(23, 162, 184, 0.15);
+    border-color: rgba(23, 162, 184, 0.3);
+    color: #5bc0de;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--color-text-muted) !important;
+}
+

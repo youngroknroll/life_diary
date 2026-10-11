@@ -1,0 +1,518 @@
+/* 온보딩 3스텝 — 읽는 화면이 아니라 고르는 화면이다 */
+/* 파괴적 동작 — 단순 confirm 대신 옮길 경로를 기본값으로 둔다 */
+.danger-panel__title {
+    font-weight: 700;
+    font-size: 14px;
+    color: #8A3A18;
+    margin: 0 0 6px;
+}
+
+.danger-panel__text {
+    font-size: 12px;
+    line-height: 1.6;
+    color: #6B4030;
+    margin: 0 0 14px;
+}
+
+.danger-panel__link {
+    border: 0;
+    background: transparent;
+    font-size: 12px;
+    color: #6B4030;
+    text-decoration: underline;
+    padding: 6px;
+}
+
+#tagDeleteModal .modal-content {
+    border: 1px solid #E8CFC6;
+    background: #FDF6F3;
+    border-radius: var(--radius-md);
+}
+
+#tagDeleteModal .modal-body {
+    padding: 18px 20px 20px;
+}
+
+[data-theme="dark"] #tagDeleteModal .modal-content {
+    border-color: #5A3A2C;
+    background: #2A1D18;
+}
+
+[data-theme="dark"] .danger-panel__title { color: #E8927A; }
+[data-theme="dark"] .danger-panel__text,
+[data-theme="dark"] .danger-panel__link { color: #D3B2A5; }
+
+.onboarding {
+    max-width: 420px;
+    margin: 0 auto;
+    padding: 8px 4px 32px;
+}
+
+.onboarding__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.onboarding__progress {
+    display: flex;
+    gap: 5px;
+}
+
+.onboarding__tick {
+    width: 22px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-border);
+}
+
+.onboarding__tick.is-done {
+    background: var(--color-primary);
+}
+
+.onboarding__skip {
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.onboarding__step {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--color-primary);
+    margin: 0 0 8px;
+}
+
+.onboarding__title {
+    font-weight: 700;
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--color-text);
+    margin: 0 0 8px;
+}
+
+.onboarding__lead {
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--color-text-body);
+    margin: 0 0 16px;
+}
+
+.onboarding__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 20px;
+}
+
+/* STEP1 의 태그 고르기. 네이티브 체크박스를 칩 모양으로 입힌다 —
+   카테고리 라디오와 같은 이유로, 체크 상태를 브라우저가 들게 한다. */
+.onboarding__group {
+    border: 0;
+    padding: 0;
+    margin: 0 0 14px;
+}
+
+.onboarding__group-title {
+    float: none;
+    width: auto;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.chip--pick {
+    cursor: pointer;
+    min-height: 44px;
+    padding: 0 14px;
+    user-select: none;
+    transition: background-color .15s ease, border-color .15s ease;
+}
+
+/* `:has(.chip__check)` 로 한정하는 이유: .chip--pick 은 두 상태 모델을 쓴다 —
+   온보딩은 숨은 체크박스, 기록 화면 시트는 .active 클래스다. 이 한정이 없으면
+   체크박스가 없는 시트 칩에서 `:not(:has(:checked))` 가 항상 참이 되어
+   선택된 칩까지 흐려진다. */
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)):hover {
+    border-color: var(--color-primary-border);
+    background-color: var(--color-surface-soft);
+}
+
+.chip__check {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.chip--pick:has(.chip__check:checked) {
+    background: var(--color-primary-soft);
+    border-color: transparent;
+    font-weight: 600;
+}
+
+.chip--pick:has(.chip__check:focus-visible) {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.chip--pick:has(.chip__check):not(:has(.chip__check:checked)) .chip__swatch {
+    opacity: 0.35;
+}
+
+.onboarding__picks-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 4px 0 16px;
+}
+
+.onboarding__count {
+    font-size: 12px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__guide {
+    margin: -8px 0 16px;
+    font-size: 11.5px;
+    color: var(--color-text-meta);
+}
+
+.onboarding__guide a {
+    color: var(--color-text-muted);
+    text-decoration: underline;
+}
+
+/* STEP2 는 기록 화면의 그리드를 그대로 얹는다. 온보딩 열은 420px 이라
+   시각 라벨 폭을 줄여야 여섯 칸이 눌릴 만큼 남는다. */
+.onboarding__grid {
+    margin-bottom: 12px;
+}
+
+.onboarding__grid .day-row {
+    grid-template-columns: 38px 1fr;
+    gap: 6px;
+}
+
+.onboarding__selection {
+    min-height: 20px;
+    margin-bottom: 8px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.onboarding__foot-link {
+    display: block;
+    margin-top: 10px;
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+/* 목표 시간 스테퍼. 숫자 입력을 그대로 두고 버튼을 양옆에 붙인다 —
+   방향키 증감과 값 낭독을 브라우저가 이미 해 준다. */
+.stepper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.stepper__btn {
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    font-size: 18px;
+    line-height: 1;
+    color: var(--color-text);
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+
+.stepper__btn:where(:not(:disabled)):hover {
+    background-color: var(--color-surface-soft);
+    border-color: var(--color-primary-border);
+    color: var(--color-primary);
+}
+
+.stepper__btn:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.stepper__btn:where(:not(:disabled)):active {
+    background-color: var(--color-primary-soft);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.stepper__value {
+    flex: 1;
+    min-width: 0;
+    height: 44px;
+    padding: 0 10px;
+    border: 1px solid var(--color-border);
+    border-radius: 10px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    text-align: center;
+    font-size: 15px;
+}
+
+.onboarding__stepper {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 14px;
+}
+
+.onboarding__period {
+    border: 0;
+    padding: 0;
+    margin: 0 0 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.onboarding__period-option {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    cursor: pointer;
+}
+
+.onboarding__preview {
+    margin-bottom: 16px;
+}
+
+.onboarding__preview-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--color-text-muted);
+}
+
+.onboarding__preview-caption {
+    margin: 6px 0 0;
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo {
+    margin-bottom: 12px;
+}
+
+.onboarding__undo-note {
+    margin: 0 0 6px;
+    font-size: 12.5px;
+    color: var(--color-text-muted);
+}
+
+.onboarding__undo-btn {
+    min-height: 44px;
+    padding: 0 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 9px;
+    background: var(--color-surface);
+    font-size: 12.5px;
+    color: var(--color-text-body);
+}
+
+.onboarding__next {
+    width: 100%;
+    min-height: 50px;
+    font-size: 15px;
+}
+
+.onboarding__goal {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.onboarding__field {
+    display: block;
+}
+
+.onboarding__field-label {
+    display: block;
+    font-weight: 500;
+    font-size: 11.5px;
+    color: var(--color-text-body);
+    margin-bottom: 5px;
+}
+
+.onboarding__foot {
+    font-size: 11.5px;
+    color: var(--color-text-muted);
+    text-align: center;
+    margin: 10px 0 0;
+}
+
+.trend-wait {
+    padding: 22px 18px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface-soft);
+    text-align: center;
+}
+
+.trend-wait__title {
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--color-text);
+    margin-bottom: 6px;
+}
+
+.trend-wait__text {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-body);
+    max-width: 34em;
+    margin: 0 auto 12px;
+}
+
+.category-guide {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.category-guide__row {
+    display: grid;
+    grid-template-columns: minmax(160px, 172px) 1fr minmax(180px, 210px);
+    gap: 16px;
+    align-items: start;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding: 13px 15px;
+}
+
+.category-guide__head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.category-guide__swatch {
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    flex: none;
+}
+
+.category-guide__name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--color-text);
+}
+
+.category-guide__hex {
+    font-size: 10.5px;
+    color: var(--color-text-meta);
+}
+
+.category-guide__desc {
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text-body);
+    margin: 0;
+}
+
+.category-guide__foot {
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+    margin: 12px 0 0;
+    padding-top: 11px;
+    border-top: 1px solid var(--color-border-muted);
+}
+
+@media (max-width: 575.98px) {
+    .category-guide__row {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+.tag-color-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 9px;
+    background: var(--color-surface-soft);
+}
+
+.tag-color-preview__text {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-text-muted);
+}
+
+.auth-panel {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.auth-panel__brand {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--color-primary);
+    margin-bottom: 22px;
+}
+
+.auth-panel__title {
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--color-text);
+    margin: 0 0 6px;
+}
+
+.auth-panel__lead {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin: 0 0 22px;
+}
+
+.auth-card .form-label {
+    display: block;
+    font-weight: 500;
+    font-size: 11.5px;
+    color: var(--color-text-body);
+    margin-bottom: 5px;
+}
+
+.auth-panel__forgot {
+    display: flex;
+    justify-content: flex-end;
+    margin: -2px 0 12px;
+    font-size: 12px;
+}
+
+.auth-panel__forgot a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+}
+
+.auth-panel__forgot a:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
