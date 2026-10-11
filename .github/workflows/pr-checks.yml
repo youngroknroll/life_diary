@@ -4,11 +4,11 @@
 # 깨진 뒤에 알려 주는 구조여서, 병합 전에 도는 검사를 따로 둔다.
 #
 # production 브랜치는 건드리지 않는다. 이 파일은 pull_request 에서만 돈다.
+# base 브랜치를 가리지 않는다. 다른 PR 위에 쌓은 PR 도 머지 전에 검사받는다.
 name: PR checks
 
 on:
   pull_request:
-    branches: [main, production]
 
 concurrency:
   group: pr-checks-${{ github.head_ref || github.ref }}
