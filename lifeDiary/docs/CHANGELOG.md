@@ -10,6 +10,14 @@
 
 ## 2026-10
 
+### 2026-10-11 — 검토 후속 3: users 뷰 분리, 설정 base 분리 [refactor]
+- `apps/users/views.py`(1,000줄)를 `apps/users/views/` 패키지로 나눴다: `auth`(144줄), `verification`(150), `recovery`(74), `validation`(70), `password_reset`(174), `onboarding`(54), `goals`(154), `notes`(57), `account`(68). `__init__.py`가 URL이 쓰는 뷰 함수만 다시 내보내 `urls.py`는 그대로다.
+- 로그인 실패 카운터·레이트리밋·reCAPTCHA 검증은 `apps/users/login_protection.py`(103줄)로 뺐다. 뷰는 모듈 속성으로 불러 테스트의 패치가 서비스 모듈에서 걸린다. 테스트는 패치 대상 경로 3곳만 바꿨다.
+- `lifeDiary/settings/base.py`에 공유 값을 두고 `dev.py`(DEBUG, 호스트, SQLite, 파일 캐시, 콘솔 메일, axes 끔)와 `prod.py`(기존 오버라이드, `import os` 명시)가 각각 상속한다. `desktop.py`는 전처럼 독립.
+- 검증: 전체 pytest 713 passed in 30.55s, `ruff check .` 0건, `manage.py check` dev·desktop 0건, prod deploy check exit 0, `makemigrations --check` 변경 없음. 유효 설정은 `diffsettings --all --output unified`를 분리 전·후 모듈에 돌려 비교했고 dev·prod 모두 `SETTINGS_MODULE` 이름과 axes lazy 객체 주소 외 차이 없음(비밀값 마스킹).
+- `CLAUDE.md` Users 경로와 `docs/architecture` 가이드의 views 문장을 갱신했다.
+- PR #94 (#93 위에 쌓음).
+
 ### 2026-10-11 — 검토 후속 2: 의존성 패치, 데스크톱 설정 복구, 보안 카운터 캐시 분리 [security]
 - 의존성: Django 5.2.4→5.2.18, cryptography 46.0.3→48.0.1(개발 환경 x86_64 macOS용 휠이 있는 최신. 50.x는 소스 빌드만 제공), django-allauth 65.19.7, django-axes 8.3.1(8.0 호환성 변경은 `axes.helpers`의 DB 함수 이동뿐, 이 저장소는 미사용), django-ninja 1.7.1, gunicorn 26.2.0, psycopg 3.3.6, PyJWT 2.15.1, pytest 9.1.1, pytest-django 4.14.0. `pydantic>=2.7`과 데스크톱 의존성 3개를 `==`로 고정.
 - 데스크톱: 루트 `urls.py`가 allauth를 무조건 import해 `--settings=desktop`에서 `RuntimeError`로 죽던 것(PR #53 이후)을 `apps.is_installed("allauth.socialaccount")` 분기로 고쳤다. `desktop.py`의 `STATICFILES_STORAGE`(5.1에서 제거)를 `STORAGES`로, 미들웨어·백엔드 없이 올라 있던 `axes` 앱을 뺐다. PR 검사에 데스크톱 check 단계.
