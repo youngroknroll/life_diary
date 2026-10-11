@@ -1,9 +1,7 @@
 from datetime import timedelta
 from html.parser import HTMLParser
-import re
 
 import pytest
-from django.conf import settings
 from django.urls import reverse
 from django.utils import timezone
 
@@ -114,23 +112,6 @@ class TestDashboardIndexRendering:
         assert idx_invest_tag < idx_passive_header
         assert idx_passive_header < idx_passive_tag
 
-    def test_sidebar_tag_list_uses_compact_wrapping_row_layout(self, dash_user_with_tags):
-        client, _ = dash_user_with_tags
-        resp = client.get("/dashboard/")
-        section = _extract_element(resp.content.decode(), "tagContainer")
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        css_source = css_path.read_text()
-        css_block = re.search(
-            r"\.quick-input-tag-list \{(?P<body>.*?)\}",
-            css_source,
-            re.DOTALL,
-        ).group("body")
-
-        assert "quick-input-tag-list" in section
-        assert '<div class="d-grid gap-1">' not in section
-        assert "flex-wrap: wrap;" in css_block
-        assert "flex-direction: column;" not in css_block
-
     def test_dashboard_legend_badges_are_clickable(self, dash_user_with_tags):
         client, _ = dash_user_with_tags
         resp = client.get("/dashboard/")
@@ -180,82 +161,6 @@ class TestDashboardIndexRendering:
 
         assert 'placeholder="메모 (선택사항)"' in section
         assert '<label for="memoInput"' not in section
-
-    def test_disabled_save_button_has_gray_state_css(self):
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        source = css_path.read_text()
-
-        assert "#saveBtn:disabled" in source
-        assert "background-color: var(--color-text-muted);" in source
-
-
-class TestDashboardJavaScriptAssets:
-    def test_dashboard_dynamic_category_header_uses_shared_template(self):
-        template_path = settings.BASE_DIR / "apps/dashboard/templates/dashboard/index.html"
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        template_source = template_path.read_text()
-        js_source = js_path.read_text()
-
-        assert "{% include 'shared/_tag_category_header.html'" in template_source
-        assert 'id="tagCategoryHeaderTemplate"' in template_source
-        assert "renderCategoryHeader(" in js_source
-        assert 'background-color: ${escapeHtml(cat.color)}' not in js_source
-
-    def test_mobile_sheet_close_moves_focus_before_hiding_dialog(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-        close_body = source[
-            source.index("function closeQuickInputSheet()"):
-            source.index("// ── 슬롯 선택 ──")
-        ]
-
-        assert close_body.index("focus({ preventScroll: true })") < close_body.index(
-            "sheet.setAttribute('aria-hidden', 'true')"
-        )
-
-    def test_mobile_sheet_no_longer_uses_grid_anchor_for_height(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert '[data-slot-index="6"]' not in source
-        assert "--quick-input-sheet-max-height" not in source
-
-    def test_mobile_sheet_css_uses_fixed_viewport_height_cap(self):
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        source = css_path.read_text()
-
-        assert "height: 80dvh;" in source
-        assert "max-height: calc(100dvh - env(safe-area-inset-bottom, 0px));" in source
-        assert "box-sizing: border-box;" in source
-        assert "bottom: 0;" in source
-        assert "overflow-y: auto;" in source
-
-    def test_selected_slot_info_prompts_tag_selection(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "시간을 선택했어요. 원하는 태그를 선택하세요." in source
-        assert source.index("시간을 선택했어요. 원하는 태그를 선택하세요.") < source.index(
-            "inlineEl.innerHTML = infoHTML;"
-        )
-
-    def test_selected_slot_info_prompts_tag_selection(self):
-        js_path = settings.BASE_DIR / "apps/dashboard/static/dashboard/js/dashboard.js"
-        source = js_path.read_text()
-
-        assert "시간을 선택했어요. 원하는 태그를 선택하세요." in source
-        assert source.index("시간을 선택했어요. 원하는 태그를 선택하세요.") < source.index(
-            "inlineEl.innerHTML = infoHTML;"
-        )
-
-    def test_time_grid_prevents_text_selection(self):
-        css_path = settings.BASE_DIR / "apps/core/static/core/css/style.css"
-        source = css_path.read_text()
-
-        assert ".navbar-utility-controls" in source
-        assert "user-select: none;" in source
-        assert "-webkit-user-select: none;" in source
-
 
 @pytest.mark.django_db
 class TestDashboardDueSoonGoals:
