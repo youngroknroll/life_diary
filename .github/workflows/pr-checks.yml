@@ -26,7 +26,6 @@ env:
   DB_PASSWORD: test_password
   DB_HOST: localhost
   DB_PORT: '6543'
-  RESEND_API_KEY: re_test_dummy
   DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
 
 jobs:
@@ -54,11 +53,13 @@ jobs:
       - name: gettext 설치
         run: sudo apt-get update && sudo apt-get install -y gettext
 
-      # 이 저장소는 DEBUG 에서도 manifest 기반 정적 파일 저장소를 쓴다
-      # (dev.py 의 CompressedManifestStaticFilesStorage). 수집된 파일이
-      # 없으면 템플릿을 그리는 테스트가 static 조회에서 터진다.
+      # manifest 저장소는 prod.py 의 STORAGES 에만 있다. 여기서 수집하는 이유는
+      # 프로덕션 배포 검사가 collectstatic 결과를 전제로 하기 때문이다.
       - name: 정적 파일 수집
         run: python manage.py collectstatic --no-input --verbosity 0
+
+      - name: 린트 (ruff)
+        run: ruff check --output-format github .
 
       - name: Django check
         run: python manage.py check
@@ -97,8 +98,7 @@ jobs:
       # compilemessages 는 fuzzy 를 건너뛰어, 영어 화면에 한국어가 남거나
       # 전혀 다른 문장이 나온 적이 여러 번 있다.
       #
-      # 미번역은 경고만 한다. 지금 main 에 8건 있어서 실패로 걸면 첫날부터
-      # 빨간불이 된다. 그 8건이 0 이 되면 실패로 올린다.
+      # 미번역도 실패로 막는다. 2026-10-11 기준 네 카탈로그 모두 0건이다.
       - name: 번역 카탈로그
         run: |
           set -uo pipefail
@@ -119,7 +119,8 @@ jobs:
             untranslated=$(msgattrib --untranslated --no-obsolete "$po" \
               | grep '^msgid ' | grep -cv '^msgid ""' || true)
             if [ "$untranslated" -ne 0 ]; then
-              echo "::warning file=lifeDiary/$po::미번역 ${untranslated}건"
+              echo "::error file=lifeDiary/$po::미번역 ${untranslated}건"
+              status=1
             fi
           done
           exit $status
