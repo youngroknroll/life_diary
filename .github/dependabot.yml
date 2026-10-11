@@ -1,0 +1,36 @@
+# 의존성 패치가 뒤처지는 것을 PR 로 알려 준다. 2026-10-11 기준 Django 가
+# 5.2.4 에 멈춰 보안 릴리스 14개를 건너뛴 상태였다.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directories:
+      - /lifeDiary
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: Asia/Seoul
+    open-pull-requests-limit: 5
+    groups:
+      django-security:
+        patterns:
+          - django
+          - django-*
+          - cryptography
+          - PyJWT
+          - gunicorn
+          - psycopg
+      tooling:
+        patterns:
+          - pytest*
+          - ruff
+    ignore:
+      # 5.2 LTS 계열에 머문다. 메이저·마이너 승급은 별도 작업으로 한다.
+      - dependency-name: django
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+      timezone: Asia/Seoul
