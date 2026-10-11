@@ -1,15 +1,8 @@
-"""
-Django settings for lifeDiary project.
+"""프로덕션 설정. base.py 의 공유 값 위에 Render·Supabase 환경과 보안 강화를 얹는다."""
 
-프로덕션 환경 설정
-- dev.py의 개발 설정을 프로덕션용으로 오버라이드
-- 보안 강화 및 프로덕션 최적화
+import os
 
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/topics/settings/
-"""
-
-from .dev import *
+from .base import *
 
 # 프로덕션 환경 오버라이드
 DEBUG = False
@@ -57,12 +50,12 @@ CONTENT_SECURITY_POLICY = "; ".join(
     [
         "default-src 'self'",
         "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
-        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com"
+        " https://cdn.jsdelivr.net https://unpkg.com"
         " https://www.google.com https://www.gstatic.com"
         " https://www.googletagmanager.com",
         "style-src 'self' 'unsafe-inline'"
-        " https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-        "font-src 'self' data: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net",
+        " https://cdn.jsdelivr.net",
+        "font-src 'self' data: https://cdn.jsdelivr.net",
         "img-src 'self' data:"
         " https://*.google-analytics.com https://*.googletagmanager.com",
         "connect-src 'self'"
@@ -96,7 +89,14 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": "/tmp/lifediary-cache",
         "OPTIONS": {"MAX_ENTRIES": 500},
-    }
+    },
+    # 브루트포스 카운터는 /tmp 파일 캐시에 두지 않는다. 재배포·cull 에 지워지면
+    # reCAPTCHA 게이트가 풀린다. 테이블은 core 0001 마이그레이션이 만든다.
+    "security": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "lifediary_security_cache",
+        "OPTIONS": {"MAX_ENTRIES": 10000},
+    },
 }
 
 STATS_SERVER_TIMING_ENABLED = (
@@ -126,6 +126,12 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# 500 응답의 트레이스백을 메일로 받는다. 외부 추적 서비스 없이 Gmail SMTP 를
+# 그대로 쓴다. 따로 주소를 주지 않으면 발신 계정 자신(운영 문의 메일함)으로
+# 보낸다. 둘 다 비어 있으면 ADMINS 가 비어 콘솔 로그만 남는다.
+ERROR_REPORT_EMAIL = os.getenv("ERROR_REPORT_EMAIL", EMAIL_HOST_USER)
+ADMINS = [("LifeDiary", ERROR_REPORT_EMAIL)] if ERROR_REPORT_EMAIL else []
+
 # Production error visibility: keep DEBUG=False, but send server-side errors
 # and framework warnings/errors to the deployment console.
 LOGGING = {
@@ -135,6 +141,11 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "mail_admins": {
+            "class": "django.utils.log.AdminEmailHandler",
+            "level": "ERROR",
+            "include_html": False,
+        },
     },
     "root": {
         "handlers": ["console"],
@@ -142,7 +153,7 @@ LOGGING = {
     },
     "loggers": {
         "django.request": {
-            "handlers": ["console"],
+            "handlers": ["console", "mail_admins"],
             "level": "ERROR",
             "propagate": False,
         },

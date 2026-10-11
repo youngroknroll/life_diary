@@ -7,11 +7,11 @@
            value="{{ selected_date|date:'Y-m-d' }}"
            {% if ds_onchange %}onchange="{{ ds_onchange }}"{% endif %}>
     <button type="button" class="btn-sian" onclick="goToToday()">
-        <i class="fas fa-home"></i> {% trans "오늘" %}
+        <svg class="icon" aria-hidden="true"><use href="#icon-house-door-fill"/></svg> {% trans "오늘" %}
     </button>
     {% if user.is_authenticated and not user.is_superuser %}
     <a href="{% url 'users:mypage' %}" class="btn-sian">
-        <i class="fas fa-bullseye"></i> {{ ds_mypage_label|default:_("목표 확인") }}
+        <svg class="icon" aria-hidden="true"><use href="#icon-bullseye"/></svg> {{ ds_mypage_label|default:_("목표 확인") }}
     </a>
     {% endif %}
 </div>

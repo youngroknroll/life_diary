@@ -67,16 +67,16 @@ function showNotification(message, type = 'info', duration = 3000) {
  * 전역 로딩 오버레이를 커스텀 메시지로 표시.
  * base.html의 #loadingOverlay DOM을 재사용한다.
  * @param {string} message - 표시할 안내 문구
- * @param {string} [icon='fa-clock'] - Font Awesome 아이콘 클래스
+ * @param {string} [icon='clock'] - shared/_icons.svg 의 심볼 이름
  */
-function showOverlay(message, icon = 'fa-clock') {
+function showOverlay(message, icon = 'clock') {
     const overlay = document.getElementById('loadingOverlay');
     if (!overlay) return;
     if (message) {
         const text = overlay.querySelector('.loading-text');
         if (text) {
             // 아이콘은 innerHTML, message는 textNode로 분리해 XSS 소지 제거
-            text.innerHTML = `<i class="fas ${icon} me-2"></i>`;
+            text.innerHTML = `<svg class="icon me-2" aria-hidden="true"><use href="#icon-${String(icon).replace(/[^a-z0-9-]/g, '')}"/></svg>`;
             text.appendChild(document.createTextNode(message));
         }
     }
@@ -114,7 +114,7 @@ function setButtonLoading(btn, text) {
     const label = text || gettext('처리 중...');
     const original = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${label}`;
+    btn.innerHTML = `<svg class="icon icon--spin me-1" aria-hidden="true"><use href="#icon-arrow-repeat"/></svg>${label}`;
     return original;
 }
 

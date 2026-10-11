@@ -103,7 +103,7 @@
         <div class="card">
             <div class="card-header">
                 <h6 class="mb-0">
-                    <i class="fas fa-th me-2"></i>
+                    <svg class="icon me-2" aria-hidden="true"><use href="#icon-grid-3x3-gap-fill"/></svg>
                     {% trans "시간 그리드 (10분 단위)" %}
                 </h6>
             </div>
@@ -251,5 +251,8 @@
 {% block extra_js %}
 {% load static %}
 <script src="{% static 'core/js/tag.js' %}" defer></script>
-<script src="{% static 'dashboard/js/dashboard.js' %}" defer></script>
+<script src="{% static 'dashboard/js/dashboard-state.js' %}" defer></script>
+<script src="{% static 'dashboard/js/dashboard-selection.js' %}" defer></script>
+<script src="{% static 'dashboard/js/dashboard-save.js' %}" defer></script>
+<script src="{% static 'dashboard/js/dashboard-tags.js' %}" defer></script>
 {% endblock %}
