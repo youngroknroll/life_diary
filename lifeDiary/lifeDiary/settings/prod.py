@@ -1,15 +1,8 @@
-"""
-Django settings for lifeDiary project.
+"""프로덕션 설정. base.py 의 공유 값 위에 Render·Supabase 환경과 보안 강화를 얹는다."""
 
-프로덕션 환경 설정
-- dev.py의 개발 설정을 프로덕션용으로 오버라이드
-- 보안 강화 및 프로덕션 최적화
+import os
 
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/topics/settings/
-"""
-
-from .dev import *
+from .base import *
 
 # 프로덕션 환경 오버라이드
 DEBUG = False
