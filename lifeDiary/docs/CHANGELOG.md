@@ -10,6 +10,19 @@
 
 ## 2026-10
 
+### 2026-10-11 — 검토 후속 4: 프런트 자산 정리, 500 메일 알림, 자동 암호화 백업 [perf]
+- 죽은 CSS: 템플릿·JS·Python 어디에도 없는 클래스 65개(`collapsed`는 Bootstrap JS가 붙이므로 제외)를 요구하는 규칙 101개와 비게 된 `@media` 4개, 전부 죽은 섹션 머리말 2개(Welcome Screen, Auth Split)를 지웠다. 검토자가 찾은 `#statsTabs .nav-link` 계열(통계 탭이 `.segmented`로 바뀐 뒤 남은 것)과 `.card-header .nav-link` 12개 규칙을 더 지웠다. 4,628줄 → 4,002줄. 제거 도구는 주석을 인식하는 파서이고 죽은 집합을 비우고 돌리면 원본과 바이트 동일. 미해결 C-1 해소.
+- `style.css`를 섹션 머리말 위치에서 연속 12개 파일로 나눴다(`tokens`, `base`, `onboarding`, `forms`, `charts`, `dashboard`, `summary`, `dashboard-sheet`, `components`, `dark-mode`, `stats`, `goals`). 이어 붙이면 가지치기 결과와 바이트 동일, 각 파일 중괄호 균형. `templates/base.html` 링크 1개 → 같은 순서 12개.
+- `dashboard.js`(1,048줄)를 `dashboard-state`(307)·`dashboard-selection`(329)·`dashboard-save`(304)·`dashboard-tags`(108)로 나눴다. 이어 붙이면 원본과 바이트 동일. `dashboard/index.html`과 `users/welcome.html` 둘 다 같은 순서의 `<script defer>` 4개.
+- Pretendard: `scripts/subset_pretendard.py`(fonttools)로 KS X 1001 한글 2,350자 + 자모·호환 자모 + 라틴·그리스 + 구두점·통화·기호·화살표·수학·원문자·도형·딩벳 + CJK 구두점·전각 형식으로 서브셋. 코드포인트 14,336 → 3,762, 2,057,688 → 604,364바이트(71% 감소). 같은 경로라 preload 링크 불변, 가변 wght 축 유지, 샘플 글리프 41개의 외곽선·advance 원본과 동일. 2,350자 밖 음절은 시스템 글꼴 폴백. 미해결 C-6 해소.
+- 미참조 이미지 `tag_usage_guide.png`·`tag_usage_guide_en.png` 2.1MB 삭제. 미해결 C-2 해소.
+- prod: `ERROR_REPORT_EMAIL`이 있으면 `ADMINS`에 넣고 `django.request` ERROR를 `AdminEmailHandler`로 Gmail SMTP를 통해 메일 수신. 비어 있으면 콘솔 로그만(기존과 동일). 계약 테스트 2건(주소 유무).
+- `.github/workflows/db-backup.yml`: 매일 04:17 KST `pg_dump`(PGDG client 17, session pooler) → age 공개키 암호화 → Actions 아티팩트 30일 보관. secrets `BACKUP_DATABASE_URL`·`BACKUP_AGE_RECIPIENT`가 없으면 경고만 남기고 성공. 운영 문서에 secrets 발급·복호화·복구 절차를 더했다.
+- 검증(격리 SQLite 서버, Chrome DevTools, 변경 전·후 전체 페이지 스크린샷 픽셀 비교): 390px(DPR 2) login·mypage·goals·stats·dashboard 변경 픽셀 0(goals는 진행 막대의 현재 시각 표식만 이동). 1280px(DPR 1) 9개 화면은 0.3~0.7%의 글자 안티앨리어싱 차이만 — 폰트를 원본으로 되돌려도 같고, 가지치기 CSS를 단일 파일로 서빙하면 0이며, 분할·단일 상태의 계산 스타일 전체 해시(요소 9종 656~685속성, body 하위 400요소 글꼴·색)가 동일해 캐스케이드는 같다. 콘솔 오류 0(preload 미사용 경고 1건은 변경 전에도 동일). CSS 12개 200, 폰트 604,664바이트 전송. 대시보드 1280: 슬롯 선택 → 태그 → 저장(POST 201 1회, 스낵바 `role=status`) → 되돌리기(POST 200), ArrowRight 선택 이동. 390: 슬롯 탭으로 시트 열림(aria-hidden=false, 포커스 첫 태그 버튼, 포커스 가능 16, 헤더 sticky, 높이 675px), Escape로 닫히고 포커스 복귀. 전체 pytest 715 passed, `ruff check .` 0건, prod collectstatic 매니페스트에 CSS 12·JS 4·폰트 해시 생성, prod deploy check exit 0.
+- 실측하지 않은 것: 스와이프 닫기, Shift/Ctrl 추가 선택, "지금 채우기", 저장 실패 복구, reduced motion. 분할은 바이트 동일 연결이라 로직 변화가 없다는 근거로 대신한다. 2차 정리 뒤 stats 1280·390 재캡처는 진행 막대의 시각 표식 외 변경 픽셀 0.
+- 검토: 웹 경험 설계 Conforms with notes(남은 `#statsTabs` 규칙 → 이 작업에서 삭제, KS X 1001 밖 음절 폴백은 제품 결정 사항으로 기록), 브라우저 상호작용 Conforms with notes(스크립트 순서·@media 경계·preload 경로·sticky 규칙 직접 확인, `.quick-input-sheet` reduced-motion 분기는 원본에도 없던 것이라 미해결 C-15로).
+- PR #95 (#94 위에 쌓음).
+
 ### 2026-10-11 — 검토 후속 3: users 뷰 분리, 설정 base 분리 [refactor]
 - `apps/users/views.py`(1,000줄)를 `apps/users/views/` 패키지로 나눴다: `auth`(144줄), `verification`(150), `recovery`(74), `validation`(70), `password_reset`(174), `onboarding`(54), `goals`(154), `notes`(57), `account`(68). `__init__.py`가 URL이 쓰는 뷰 함수만 다시 내보내 `urls.py`는 그대로다.
 - 로그인 실패 카운터·레이트리밋·reCAPTCHA 검증은 `apps/users/login_protection.py`(103줄)로 뺐다. 뷰는 모듈 속성으로 불러 테스트의 패치가 서비스 모듈에서 걸린다. 테스트는 패치 대상 경로 3곳만 바꿨다.
@@ -274,7 +287,7 @@
 - A-7 로그인 후 응답에 `Cache-Control: private, no-store` 명시(지금은 Cloudflare가 `DYNAMIC`으로 캐시하지 않음).
 - A-9 DB 연결 재수립 비용(첫 요청 약 670ms, 1회 관찰). `CONN_MAX_AGE` 뒤 도쿄 풀러 재연결 가설.
 - A-10 서버·DB 리전 일치(Render 싱가포르 ↔ Supabase 도쿄, 쿼리당 81~85ms). 사용자가 보류.
-- 에러 추적·메트릭 미연동. 배포 콘솔 로그와 통계 `Server-Timing`뿐.
+- 메트릭 미연동. 500 트레이스백은 prod 설정의 관리자 메일 주소로 받는다(2026-10-11). 그 외는 배포 콘솔 로그와 통계 `Server-Timing`뿐.
 - 캐시 쓰기 실패 시 통계 요청 500. 운영 파일 캐시는 인스턴스 하나 전제.
 - Google 가입이 제공자 미인증 주소도 받음(인증 표시만 한정). 관리자 화면 편집은 캐시 세대를 바꾸지 않음. purge 때 캐시 잔존.
 
@@ -290,17 +303,15 @@
 - 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
 
 ### 프런트엔드·정적 자산
-- C-1 죽은 CSS(`.home-daygrid*`, `.navbar-utility-controls` 등) 삭제.
-- C-2 미참조 이미지 `tag_usage_guide*.png` 2.1MB 삭제 여부(사용자 확인 필요).
 - C-3 FontAwesome 전역 제거(템플릿 7개, `showOverlay` 아이콘).
 - C-4 44px 터치 타깃 전역 재확인(`.segmented__item` 약 28px, 시트 닫기 32px 등).
 - C-5 `.chip__swatch`·`.category-picker__swatch` 라이트 대비(1.44~2.15), 공용 테두리 규칙.
-- C-6 `PretendardVariable.woff2` 2.0MB 서브셋 파이프라인(Slow 4G에서 약 14초).
 - C-7 확인 모달 없는 태그 삭제의 이중 제출 가드. C-8 sessionStorage 차단 시 온보딩 STEP3 안내.
 - C-9 `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지움(새로고침하면 복구).
 - C-10 시안 1a 라이트 모드 work 라인 아래 영역(장식, 두 번 보류). C-11 `NEUTRAL_COLOR = "#8A9A91"`의 출처 확인.
 - C-12 저장 응답 직후 139~351ms 긴 프레임. C-13 응답 대기 중 새로 고른 칸 선택이 `clearSelection()`으로 지워질 가능성.
 - C-14 모바일 통계·대시보드 UX 잔여 항목과 통계 차트 지연 렌더(`AGENTS.md` 실행 순서 4항에서 옮김, 2026-10-08).
+- C-15 `.quick-input-sheet` 열림 트랜지션(translateY)에 `prefers-reduced-motion` 분기 추가. 되돌리기 스낵바와 목표 표에는 이미 있다(2026-10-11 검토자 제안, 원본 `style.css`도 같은 상태).
 - `dashboard.js` `#undoSnackbar`: 숨김→표시 때 문구 전달 장치 없음, 다시 그리기 뒤 포커스 복원 없음.
 - 목표 표: 되돌리기 한 단계(8초 안 연쇄 삭제의 첫 목표는 복원 불가). 자동 숨김으로 포커스가 추가 폼으로 갈 때 이유를 알리지 않음. 오류 문구를 칸마다 따로 두는 구조.
 - 실기기 스크린리더(NVDA·VoiceOver)·실제 모바일 기기·Safari 클릭-비포커스 경로는 어느 작업에서도 확인하지 않았다(접근성 트리·에뮬레이션으로 대신).
