@@ -126,6 +126,12 @@ EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", EMAIL_HOST_USER)
 SERVER_EMAIL = DEFAULT_FROM_EMAIL
 
+# 500 응답의 트레이스백을 메일로 받는다. 외부 추적 서비스 없이 Gmail SMTP 를
+# 그대로 쓴다. 주소가 비어 있으면 ADMINS 가 비어 AdminEmailHandler 는 아무것도
+# 보내지 않고 콘솔 로그만 남는다.
+ERROR_REPORT_EMAIL = os.getenv("ERROR_REPORT_EMAIL", "")
+ADMINS = [("LifeDiary", ERROR_REPORT_EMAIL)] if ERROR_REPORT_EMAIL else []
+
 # Production error visibility: keep DEBUG=False, but send server-side errors
 # and framework warnings/errors to the deployment console.
 LOGGING = {
@@ -135,6 +141,11 @@ LOGGING = {
         "console": {
             "class": "logging.StreamHandler",
         },
+        "mail_admins": {
+            "class": "django.utils.log.AdminEmailHandler",
+            "level": "ERROR",
+            "include_html": False,
+        },
     },
     "root": {
         "handlers": ["console"],
@@ -142,7 +153,7 @@ LOGGING = {
     },
     "loggers": {
         "django.request": {
-            "handlers": ["console"],
+            "handlers": ["console", "mail_admins"],
             "level": "ERROR",
             "propagate": False,
         },

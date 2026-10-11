@@ -1,0 +1,85 @@
+--- # 운영 DB 를 매일 덤프해 age 공개키로 암호화한 뒤 Actions 아티팩트(30일)에 둔다.
+#
+# Supabase 플랜의 자동 백업과 별개로 저장소 소유자가 쥔 복사본을 만든다.
+# 덤프는 개인정보를 담으므로 평문으로는 어디에도 올리지 않는다. 복호화 키
+# (age 비밀키)는 사용자만, 저장소 밖에 가진다.
+#
+# 필요한 secrets:
+#   BACKUP_DATABASE_URL   Supabase "Session pooler"(5432) 연결 문자열.
+#                         direct 호스트는 IPv6 전용이라 러너에서 닿지 않는다.
+#   BACKUP_AGE_RECIPIENT  age 공개키(age1...). `age-keygen` 으로 만든다.
+# 둘 중 하나라도 비어 있으면 경고만 남기고 성공으로 끝난다.
+name: database backup
+
+on:
+  schedule:
+    - cron: '17 19 * * *' # UTC 19:17 = KST 04:17, 매일 1회
+  workflow_dispatch:
+
+concurrency:
+  group: database-backup
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: secrets 확인
+        id: gate
+        env:
+          URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+        run: |
+          if [ -z "$URL" ] || [ -z "$RECIPIENT" ]; then
+            echo "::warning::BACKUP_DATABASE_URL 또는 BACKUP_AGE_RECIPIENT 가 없어 백업을 건너뜁니다. lifeDiary/docs/operations/2026-10-11_backup-and-recovery.md 를 보세요."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 서버가 PostgreSQL 17 이어도 덤프되도록 PGDG 의 client 17 을 쓴다.
+      - name: pg_dump 17 과 age 설치
+        if: steps.gate.outputs.ready == 'true'
+        run: |
+          set -euo pipefail
+          sudo install -d /usr/share/postgresql-common/pgdg
+          sudo curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+            https://www.postgresql.org/media/keys/ACCC4CF8.asc
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17 age
+
+      - name: 덤프와 암호화
+        id: dump
+        if: steps.gate.outputs.ready == 'true'
+        env:
+          BACKUP_DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          BACKUP_AGE_RECIPIENT: ${{ secrets.BACKUP_AGE_RECIPIENT }}
+        run: |
+          set -euo pipefail
+          stamp=$(TZ=Asia/Seoul date +%Y%m%d-%H%M)
+          name="lifediary-${stamp}"
+          /usr/lib/postgresql/17/bin/pg_dump "$BACKUP_DATABASE_URL" \
+            --format=custom --no-owner --no-privileges --schema=public \
+            | age -r "$BACKUP_AGE_RECIPIENT" -o "${name}.dump.age"
+          size=$(stat -c %s "${name}.dump.age")
+          if [ "$size" -lt 1024 ]; then
+            echo "::error::덤프가 ${size}바이트뿐입니다. 연결 문자열을 확인하세요."
+            exit 1
+          fi
+          echo "name=${name}" >> "$GITHUB_OUTPUT"
+          echo "- ${name}.dump.age: ${size} bytes" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: 아티팩트 업로드 (30일 보관)
+        if: steps.gate.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.dump.outputs.name }}
+          path: lifediary-*.dump.age
+          retention-days: 30
+          if-no-files-found: error

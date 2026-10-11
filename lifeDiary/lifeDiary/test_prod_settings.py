@@ -48,10 +48,13 @@ def test_prod_settings_send_error_logs_to_console(monkeypatch):
         "level": "WARNING",
     }
     assert prod_settings.LOGGING["loggers"]["django.request"] == {
-        "handlers": ["console"],
+        "handlers": ["console", "mail_admins"],
         "level": "ERROR",
         "propagate": False,
     }
+    assert prod_settings.LOGGING["handlers"]["mail_admins"]["class"] == (
+        "django.utils.log.AdminEmailHandler"
+    )
 
 
 def test_prod_settings_trust_render_proxy_ssl_header(monkeypatch):
@@ -202,3 +205,28 @@ def test_prod_settings_keep_security_counters_out_of_the_file_cache(monkeypatch)
     assert security["BACKEND"] == "django.core.cache.backends.db.DatabaseCache"
     assert security["LOCATION"] == "lifediary_security_cache"
     assert security["BACKEND"] != prod_settings.CACHES["default"]["BACKEND"]
+
+
+@pytest.mark.parametrize(
+    ("env_value", "expected_admins"),
+    [(None, []), ("ops@example.com", [("LifeDiary", "ops@example.com")])],
+    ids=["no_address_sends_nothing", "address_receives_500_reports"],
+)
+def test_prod_settings_mail_server_errors_to_the_configured_address(
+    monkeypatch, env_value, expected_admins
+):
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+    if env_value is None:
+        monkeypatch.delenv("ERROR_REPORT_EMAIL", raising=False)
+    else:
+        monkeypatch.setenv("ERROR_REPORT_EMAIL", env_value)
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    assert prod_settings.ADMINS == expected_admins
