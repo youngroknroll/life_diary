@@ -42,7 +42,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
@@ -50,7 +50,7 @@ jobs:
       - name: Fetch main and production
         run: git fetch --no-tags origin main production
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
 
@@ -68,10 +68,9 @@ jobs:
           DB_PASSWORD: test_password
           DB_HOST: localhost
           DB_PORT: '6543'
-          RESEND_API_KEY: re_test_dummy
           DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
         run: |
-          python -m pytest lifeDiary/test_prod_settings.py apps/core/test_email_backends.py --tb=short
+          python -m pytest lifeDiary/test_prod_settings.py --tb=short
           python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR
 
       - name: Refuse to deploy over production-only content

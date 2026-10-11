@@ -183,12 +183,21 @@ def pytest_sessionstart(session):
 
 
 @pytest.fixture(autouse=True)
+def _fast_password_hashing(settings):
+    """PBKDF2 1,000,000회는 테스트당 0.3초다. 해시 강도는 테스트 대상이 아니다."""
+    settings.PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
+
+
+@pytest.fixture(autouse=True)
 def _use_dummy_cache(settings):
     """테스트 구간 동안 파일 기반 캐시 대신 DummyCache 사용."""
     settings.CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
+        },
+        "security": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        },
     }
     settings.AXES_ENABLED = False
     settings.AUTHENTICATION_BACKENDS = [

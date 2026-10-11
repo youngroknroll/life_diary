@@ -50,7 +50,7 @@ class TestSignupSeedTagFailure:
         def failing_seed(user):
             raise RuntimeError("seed failure")
 
-        monkeypatch.setattr("apps.users.views.create_seed_tags", failing_seed)
+        monkeypatch.setattr("apps.users.views.auth.create_seed_tags", failing_seed)
 
         with pytest.raises(RuntimeError):
             client.post(reverse("users:signup"), signup_payload())

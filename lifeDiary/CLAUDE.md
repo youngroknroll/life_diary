@@ -61,7 +61,7 @@ Priority:
 - `templates/`, `locale/`, `scripts/`: shared web UI, translations, local
   tooling
 - `docs/`: change log and backlog (`CHANGELOG.md`), roadmap plans, security,
-  architecture
+  architecture, operations (backup and recovery)
 - `.claude/`: role adapters (`agents/`), path-scoped rules (`rules/`), hook
   scripts (`hooks/`), and `settings.json` registering them; all tracked
 
@@ -74,7 +74,9 @@ Priority:
 - Tags: `apps/tags/models.py`, `apps/tags/use_cases.py`,
   `apps/tags/domain_services.py`, `apps/tags/repositories.py`
 - Users: `apps/users/models.py`, `apps/users/use_cases.py`,
-  `apps/users/forms.py`, `apps/users/views.py`,
+  `apps/users/forms.py`, `apps/users/views/` (auth, verification, recovery,
+  validation, password_reset, onboarding, goals, notes, account),
+  `apps/users/login_protection.py` (failure counters, throttles, reCAPTCHA),
   `apps/users/account_deletion.py`, `apps/users/repositories.py`
 - Stats: `apps/stats/logic.py`, `apps/stats/use_cases.py`,
   `apps/stats/aggregation/`
@@ -95,6 +97,7 @@ unknown or the task requires a repository-wide repeated-pattern check.
 - Targeted test: `conda run -n knou-life-diary pytest <test-path> --tb=short`
 - Backend regression: `conda run -n knou-life-diary pytest`
 - Django check: `conda run -n knou-life-diary python manage.py check`
+- Lint: `conda run -n knou-life-diary ruff check .` (config `ruff.toml`; CI runs it)
 - Prod deploy check: `conda run -n knou-life-diary python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR`
 - Migration drift: `conda run -n knou-life-diary python manage.py makemigrations --check --dry-run`
 - Browser JS syntax: `node --check <static-js-path>`

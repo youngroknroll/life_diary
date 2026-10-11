@@ -213,7 +213,7 @@ Tag
 | `tags` | 태그·카테고리 관리와 JSON API, 가입 시 기본 태그 시드, 태그 정책 |
 | `users` | 인증(로그인 실패 제한·reCAPTCHA), 이메일 코드 인증, 소셜 가입 어댑터, 계정 삭제 유예·purge, 목표(기한), 메모, 설정, 온보딩 |
 | `stats` | 집계(요청당 창 1회 읽기), 관찰, 목표 진행, 캐시 세대, 엑셀 내보내기, `Server-Timing` |
-| `core` | 공통 상수·날짜 유틸, CSP 미들웨어, Resend 메일 백엔드(설정에서는 아직 미사용), API 공통 봉투, 템플릿 태그 |
+| `core` | 공통 상수·날짜 유틸, CSP 미들웨어, API 공통 봉투, 템플릿 태그 |
 
 `lifeDiary/`에는 설정 세 벌(`dev`, `prod`, `desktop`), 루트 라우팅, 공개 페이지(홈·개인정보·약관·robots·sitemap), `api.py`(NinjaAPI 조립)가 있다. `desktop/launcher.py`는 waitress와 pywebview로 같은 Django 앱을 띄운다.
 
@@ -487,7 +487,7 @@ GitHub Actions (매일 03:47 KST)
 
 ### 8.3 HTML 뷰는 아직 두껍다
 
-JSON API는 커맨드와 유스케이스로 얇아졌지만, `users/views.py`는 로그인 실패 제한, reCAPTCHA, 코드 인증 세션, 목표 조각 렌더까지 들고 있어 1,000줄에 가깝다. 설정 화면의 목표 추가 POST 분기도 남아 있다. "작은 Django 프로젝트에서 시작했고, 유스케이스 계층을 점진적으로 도입했다"는 식으로 솔직하게 설명하는 편이 좋다.
+JSON API는 커맨드와 유스케이스로 얇아졌다. `users/views.py`(1,000줄)는 2026-10-11에 `users/views/` 패키지 9개 모듈로 나뉘었고, 로그인 실패 카운터·스로틀·reCAPTCHA 검증은 `users/login_protection.py`로 빠졌다. 설정 화면의 목표 추가 POST 분기는 남아 있다. "작은 Django 프로젝트에서 시작했고, 유스케이스 계층을 점진적으로 도입했다"는 식으로 솔직하게 설명하는 편이 좋다.
 
 ### 8.4 캐시는 인스턴스 하나를 전제한다
 

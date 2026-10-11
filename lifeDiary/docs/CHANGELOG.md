@@ -10,6 +10,57 @@
 
 ## 2026-10
 
+### 2026-10-11 — 검토 후속 4: 프런트 자산 정리, 500 메일 알림, 자동 암호화 백업 [perf]
+- 죽은 CSS: 템플릿·JS·Python 어디에도 없는 클래스 65개(`collapsed`는 Bootstrap JS가 붙이므로 제외)를 요구하는 규칙 101개와 비게 된 `@media` 4개, 전부 죽은 섹션 머리말 2개(Welcome Screen, Auth Split)를 지웠다. 검토자가 찾은 `#statsTabs .nav-link` 계열(통계 탭이 `.segmented`로 바뀐 뒤 남은 것)과 `.card-header .nav-link` 12개 규칙을 더 지웠다. 4,628줄 → 4,002줄. 제거 도구는 주석을 인식하는 파서이고 죽은 집합을 비우고 돌리면 원본과 바이트 동일. 미해결 C-1 해소.
+- `style.css`를 섹션 머리말 위치에서 연속 12개 파일로 나눴다(`tokens`, `base`, `onboarding`, `forms`, `charts`, `dashboard`, `summary`, `dashboard-sheet`, `components`, `dark-mode`, `stats`, `goals`). 이어 붙이면 가지치기 결과와 바이트 동일, 각 파일 중괄호 균형. `templates/base.html` 링크 1개 → 같은 순서 12개.
+- `dashboard.js`(1,048줄)를 `dashboard-state`(307)·`dashboard-selection`(329)·`dashboard-save`(304)·`dashboard-tags`(108)로 나눴다. 이어 붙이면 원본과 바이트 동일. `dashboard/index.html`과 `users/welcome.html` 둘 다 같은 순서의 `<script defer>` 4개.
+- Pretendard: `scripts/subset_pretendard.py`(fonttools)로 KS X 1001 한글 2,350자 + 자모·호환 자모 + 라틴·그리스 + 구두점·통화·기호·화살표·수학·원문자·도형·딩벳 + CJK 구두점·전각 형식으로 서브셋. 코드포인트 14,336 → 3,762, 2,057,688 → 604,364바이트(71% 감소). 같은 경로라 preload 링크 불변, 가변 wght 축 유지, 샘플 글리프 41개의 외곽선·advance 원본과 동일. 2,350자 밖 음절은 시스템 글꼴 폴백. 미해결 C-6 해소.
+- 미참조 이미지 `tag_usage_guide.png`·`tag_usage_guide_en.png` 2.1MB 삭제. 미해결 C-2 해소.
+- prod: `ERROR_REPORT_EMAIL`이 있으면 `ADMINS`에 넣고 `django.request` ERROR를 `AdminEmailHandler`로 Gmail SMTP를 통해 메일 수신. 비어 있으면 콘솔 로그만(기존과 동일). 계약 테스트 2건(주소 유무).
+- `.github/workflows/db-backup.yml`: 매일 04:17 KST `pg_dump`(PGDG client 17, session pooler) → age 공개키 암호화 → Actions 아티팩트 30일 보관. secrets `BACKUP_DATABASE_URL`·`BACKUP_AGE_RECIPIENT`가 없으면 경고만 남기고 성공. 운영 문서에 secrets 발급·복호화·복구 절차를 더했다.
+- 검증(격리 SQLite 서버, Chrome DevTools, 변경 전·후 전체 페이지 스크린샷 픽셀 비교): 390px(DPR 2) login·mypage·goals·stats·dashboard 변경 픽셀 0(goals는 진행 막대의 현재 시각 표식만 이동). 1280px(DPR 1) 9개 화면은 0.3~0.7%의 글자 안티앨리어싱 차이만 — 폰트를 원본으로 되돌려도 같고, 가지치기 CSS를 단일 파일로 서빙하면 0이며, 분할·단일 상태의 계산 스타일 전체 해시(요소 9종 656~685속성, body 하위 400요소 글꼴·색)가 동일해 캐스케이드는 같다. 콘솔 오류 0(preload 미사용 경고 1건은 변경 전에도 동일). CSS 12개 200, 폰트 604,664바이트 전송. 대시보드 1280: 슬롯 선택 → 태그 → 저장(POST 201 1회, 스낵바 `role=status`) → 되돌리기(POST 200), ArrowRight 선택 이동. 390: 슬롯 탭으로 시트 열림(aria-hidden=false, 포커스 첫 태그 버튼, 포커스 가능 16, 헤더 sticky, 높이 675px), Escape로 닫히고 포커스 복귀. 전체 pytest 715 passed, `ruff check .` 0건, prod collectstatic 매니페스트에 CSS 12·JS 4·폰트 해시 생성, prod deploy check exit 0.
+- 실측하지 않은 것: 스와이프 닫기, Shift/Ctrl 추가 선택, "지금 채우기", 저장 실패 복구, reduced motion. 분할은 바이트 동일 연결이라 로직 변화가 없다는 근거로 대신한다. 2차 정리 뒤 stats 1280·390 재캡처는 진행 막대의 시각 표식 외 변경 픽셀 0.
+- 검토: 웹 경험 설계 Conforms with notes(남은 `#statsTabs` 규칙 → 이 작업에서 삭제, KS X 1001 밖 음절 폴백은 제품 결정 사항으로 기록), 브라우저 상호작용 Conforms with notes(스크립트 순서·@media 경계·preload 경로·sticky 규칙 직접 확인, `.quick-input-sheet` reduced-motion 분기는 원본에도 없던 것이라 미해결 C-15로).
+- 2차(같은 PR): 폰트 폴백을 없앴다. `PretendardVariable-rare.woff2`(나머지 8,822 음절, 1,349,632바이트)를 `unicode-range: U+AC00-D7A3; font-display: optional`로 먼저 선언하고 메인 파일을 정확한 범위(KS X 1001 1,613구간 + 기호 블록, 14KB)로 뒤에 선언해 드문 음절이 있는 화면에서만 두 번째 파일을 내려받는다. 스크립트는 두 파일과 범위 문자열을 만들고 timestamp를 고정해 재현 가능.
+- C-3 FontAwesome 제거: Bootstrap Icons(MIT) 17개를 `templates/shared/_icons.svg` 인라인 스프라이트로 넣고 사용처 11개 파일을 `<svg class="icon"><use href="#icon-…"/></svg>`로 바꿨다. 런타임 교체 4곳(테마 아이콘 href, `showOverlay`의 심볼 이름 인자와 `[^a-z0-9-]` 정제, `setButtonLoading` 스피너 `icon--spin`, `tag_list.js` createElementNS). 로딩 오버레이와 새 스피너 모두 reduced-motion에서 animation none. FA CDN 링크와 prod CSP의 cdnjs 출처를 뺐다(스타일시트 15→14, 외부 요청 19KB+157KB 감소). 그리드 헤더의 `fa-th`는 이전부터 렌더되지 않고 있어 이제 아이콘이 보인다. 테마 토글의 aria-label이 현재 선택을 붙인다("테마 선택 (다크)"). 홈 뷰의 죽은 `features` 컨텍스트 삭제.
+- C-4 터치 타깃: 390px에서 interactive 요소 전수 조사(대시보드·통계·설정·목표·태그·로그인). 세그먼트 탭 `::before` 세로 확장, 모바일 시트 닫기 44×44, 모바일 내비 설정 버튼 44×44, 아바타·브랜드·범례 배지(36px + 확장, 행 피치 44)·"목표 관리"·목표 행 "삭제"·"비밀번호를 잊으셨나요?" 링크에 `::before` 확장. 남긴 예외: 24px 밀집 그리드 칸, 인라인 텍스트 링크, 44px 라벨로 감싸인 체크박스, 데스크톱 내비 36px.
+- C-5 스와치: `.chip__swatch`·`.category-picker__swatch`에 `inset 0 0 0 1px var(--color-text-muted)`(#6C7A70, 흰 배경 4.51:1), 다크는 none.
+- C-15: `.quick-input-sheet`·backdrop 트랜지션을 reduced-motion에서 없앴다.
+- prod: `ERROR_REPORT_EMAIL`이 없으면 `EMAIL_HOST_USER`(발신 계정)로 500 트레이스백을 보낸다. 환경변수 없이 배포 즉시 켜진다. 계약 테스트 3건.
+- 2차 검증: 변경 전 FA 치수(테마 13×13, 탭바 15px)와 변경 후 동일. 깨진 `<use>` 0, cdnjs 요청 0, 콘솔 오류 0. 테마 다크 전환 시 moon 아이콘·라벨·스와치 none 확인. 390 재조사 결과 남은 44 미만은 예외 항목뿐(세그먼트 89×44, 삭제 링크 45×44, 잊으셨나요 112×44, 시트 닫기 44×44·"사용법"과 간격 12). 드문 음절 '뷁' 삽입 시에만 rare 파일 요청, `document.fonts.check` true. 전체 pytest 716 passed, `ruff check .` 0건, `node --check` 통과, prod 매니페스트 CSS 12·폰트 2.
+- 2차 검토: 웹 경험 설계 Conforms with notes(그리드 헤더 아이콘·범례 배지 36px·데스크톱 내비 예외·rare `optional` 모두 수용, 범례 배지만 시각 크기를 키운 점은 참고). 브라우저 상호작용은 Deviates로 결함 2건을 찾았고 같은 작업에서 고쳤다: (1) reduced-motion 규칙이 모바일 `@media` 블록보다 앞에 있어 캐스케이드에서 졌다 → 파일 끝으로 옮기고 CSSOM 순서(39 > 38)로 확인. (2) 목표 행 "삭제" 링크의 `::before`가 편집 중 나타나는 "저장" 버튼(간격 10px)과 2px 겹쳤다 → `inset: 0 -16px 0 -8px`로 바꾸고 편집 모드에서 저장 버튼 오른쪽 1px 안은 저장, 간격 1px는 셀, 3px는 삭제에 명중하는 것을 확인. 고친 뒤 전체 pytest 716 passed, ruff 0건, `node --check` 통과. 수정분 재검토: 웹 경험 설계 Conforms, 브라우저 상호작용 Conforms.
+- PR #95 (#94 위에 쌓음).
+
+### 2026-10-11 — 검토 후속 3: users 뷰 분리, 설정 base 분리 [refactor]
+- `apps/users/views.py`(1,000줄)를 `apps/users/views/` 패키지로 나눴다: `auth`(144줄), `verification`(150), `recovery`(74), `validation`(70), `password_reset`(174), `onboarding`(54), `goals`(154), `notes`(57), `account`(68). `__init__.py`가 URL이 쓰는 뷰 함수만 다시 내보내 `urls.py`는 그대로다.
+- 로그인 실패 카운터·레이트리밋·reCAPTCHA 검증은 `apps/users/login_protection.py`(103줄)로 뺐다. 뷰는 모듈 속성으로 불러 테스트의 패치가 서비스 모듈에서 걸린다. 테스트는 패치 대상 경로 3곳만 바꿨다.
+- `lifeDiary/settings/base.py`에 공유 값을 두고 `dev.py`(DEBUG, 호스트, SQLite, 파일 캐시, 콘솔 메일, axes 끔)와 `prod.py`(기존 오버라이드, `import os` 명시)가 각각 상속한다. `desktop.py`는 전처럼 독립.
+- 검증: 전체 pytest 713 passed in 30.55s, `ruff check .` 0건, `manage.py check` dev·desktop 0건, prod deploy check exit 0, `makemigrations --check` 변경 없음. 유효 설정은 `diffsettings --all --output unified`를 분리 전·후 모듈에 돌려 비교했고 dev·prod 모두 `SETTINGS_MODULE` 이름과 axes lazy 객체 주소 외 차이 없음(비밀값 마스킹).
+- `CLAUDE.md` Users 경로와 `docs/architecture` 가이드의 views 문장을 갱신했다.
+- PR #94 (#93 위에 쌓음).
+
+### 2026-10-11 — 검토 후속 2: 의존성 패치, 데스크톱 설정 복구, 보안 카운터 캐시 분리 [security]
+- 의존성: Django 5.2.4→5.2.18, cryptography 46.0.3→48.0.1(개발 환경 x86_64 macOS용 휠이 있는 최신. 50.x는 소스 빌드만 제공), django-allauth 65.19.7, django-axes 8.3.1(8.0 호환성 변경은 `axes.helpers`의 DB 함수 이동뿐, 이 저장소는 미사용), django-ninja 1.7.1, gunicorn 26.2.0, psycopg 3.3.6, PyJWT 2.15.1, pytest 9.1.1, pytest-django 4.14.0. `pydantic>=2.7`과 데스크톱 의존성 3개를 `==`로 고정.
+- 데스크톱: 루트 `urls.py`가 allauth를 무조건 import해 `--settings=desktop`에서 `RuntimeError`로 죽던 것(PR #53 이후)을 `apps.is_installed("allauth.socialaccount")` 분기로 고쳤다. `desktop.py`의 `STATICFILES_STORAGE`(5.1에서 제거)를 `STORAGES`로, 미들웨어·백엔드 없이 올라 있던 `axes` 앱을 뺐다. PR 검사에 데스크톱 check 단계.
+- 보안 카운터: 로그인 실패(reCAPTCHA 게이트)·복구·가입 검증 카운터를 캐시 별칭 `security`로 옮겼다(`apps/users/views.py` `_security_cache()`). prod는 `DatabaseCache`(`lifediary_security_cache`, 테이블은 `core 0001` 마이그레이션이 `createcachetable`로 만든다), dev·desktop은 별도 파일 캐시(MAX_ENTRIES 10000). 통계 캐시의 cull(500건)과 재배포에 카운터가 지워지지 않는다. `DatabaseCache.incr`도 원자적이지 않아 동시 요청에서 소폭 덜 셀 수 있다.
+- `AXES_FAILURE_LIMIT` 기본값 1000은 유지. 잠금 키가 `REMOTE_ADDR`인데 Render 프록시 뒤에서 이 값이 무엇인지 실측이 없다(미해결 A-3에 적음). 커뮤니티 보고로는 Render가 `X-Forwarded-For`에 덧붙이기만 하고 클라이언트 값을 지우지 않아 그 헤더도 그대로 믿을 수 없다.
+- 검증: 전체 pytest 713 passed in 30.43s(새 테스트 2: 캐시 분리 Red→Green, prod 설정 계약), `manage.py check` dev 0건, prod deploy check exit 0, desktop check 0건(이전 RuntimeError), `makemigrations --check` 변경 없음, `ruff check .` 0건.
+- PR #93 (#92 위에 쌓음).
+
+### 2026-10-11 — 검토 후속 1: 테스트 속도, 린트, CI·저장소 위생 [test]
+- 테스트 비밀번호 해시를 `MD5PasswordHasher`로 바꿨다(`conftest.py` autouse). PBKDF2 1,000,000회가 사용자 생성·로그인마다 약 0.3초였고, 전체 pytest가 548초에서 30초로 줄었다.
+- `apps/dashboard/tests.py`에서 JS·CSS 소스 문자열을 읽어 단언하던 테스트 9건(정의 기준, 같은 이름 2개 포함)을 지웠다. 미해결 D-1·D-2·D-3 해소. 루트 `test_pytest_i18n_compile.py` 첫 테스트는 `call_command` 인자 대신 `.mo` 파일의 존재와 갱신 시각을 확인한다.
+- ruff 0.15.10 도입(`ruff.toml`: E4·E7·E9·F·B006·B008, 설정 모듈은 star import 허용, 마이그레이션 제외). 미사용 import 7건 정리. PR 검사에 `ruff check` 단계.
+- PR 검사: 미번역 카탈로그를 경고에서 실패로 올렸다(네 카탈로그 모두 0건). collectstatic 주석이 dev가 manifest 저장소를 쓴다고 적던 것을 바로잡았다.
+- 메일: 쓰지 않던 `ResendEmailBackend`와 테스트 2건을 지우고, 워크플로 4개의 `RESEND_API_KEY` 더미와 deploy 검사의 테스트 경로를 정리했다. `.env.example`을 실제로 읽는 환경변수 19개 기준으로 다시 썼다.
+- `date.today()` 3곳(`apps/core/utils.py`, `apps/stats/use_cases.py`, `apps/stats/aggregation/summary.py`)을 `timezone.localdate()`로 통일했다.
+- 루트의 `월간_소비시간_기록_시트.xlsx`(134KB, 커밋 5d4713c부터 추적)를 추적 해제하고 `.gitignore`에 올렸다. 로컬 파일과 과거 이력은 그대로다. 이력에서 지울지는 사용자 결정.
+- `.github/dependabot.yml`: pip 주간(Django는 5.2 패치만), GitHub Actions 월간.
+- `docs/operations/2026-10-11_backup-and-recovery.md`: Supabase 백업 현황, 수동 `pg_dump` 절차, 복구 리허설, 장애 시 순서. RPO 24시간·RTO 1시간 제안. `CLAUDE.md`에 린트 명령과 운영 문서 경로를 더했다.
+- 검증: 전체 pytest 711 passed in 30.06s(기준선 721, 삭제 10건), `ruff check .` 0건, `manage.py check` 0건, prod deploy check exit 0, 워크플로 4개·Dependabot YAML 파싱 통과.
+- TDD 웨이버: 설정·테스트 인프라·문서 변경이라 새 테스트 없음(2026-08-31 합의).
+- PR #92.
+
 ### 2026-10-08 — 하네스 정비: 어댑터 한 벌, 프로젝트 훅 4종, 경로 한정 규칙 [docs]
 - 어댑터를 `lifeDiary/.claude/agents/` 11개 한 벌로 합쳐 추적한다. git 루트 `.claude/agents/`의 구판 12개(8월 14일판. `prompt_plan.md`, `.docs/frontend-integration-changelog.md`, "work logs and project status", DRF를 참조했고 구현 역할 3개는 그 구판이 활성이었다)와 범용 `project-planner-pm.md`를 지웠다. `lifeDiary/.gitignore`는 `.claude/*` 중 agents·hooks·rules·settings.json만 추적한다.
 - 훅을 전역 `~/.claude`에서 프로젝트 `.claude/settings.json`으로 옮기고 둘을 더했다. `bash_guard.py`: main에서 commit·push·merge, main으로 push, `gh pr merge`, 태그 생성, `conda run -n knou-life-diary` 밖의 pytest·manage.py·pip·.venv·uv 거부. `frontend_comment_guard.py`: 템플릿·CSS·JS에 새 주석 거부(`(사용자 승인 YYYY-MM-DD)` 표기는 통과). `changelog_defer_guard.py`, `defect_deferral_guard.py`는 옮기면서 Bash 검사를 명령 조각 단위로 바꿨다(다른 파일의 `sed -i`와 CHANGELOG `git add`가 한 명령에 있으면 거부하던 오탐을 이 작업에서 고쳤다).
@@ -239,12 +290,12 @@
 
 ### 운영·배포
 - A-2 보안 잔여: 쿠키·보안 플래그 재점검, 로그인 실패 알림 (`docs/security/2026-04-21_xss-bruteforce-sri-remediation.md`).
-- A-3 배포된 `Set-Cookie`·`SECURE_PROXY_SSL_HEADER` 실측.
+- A-3 배포된 `Set-Cookie`·`SECURE_PROXY_SSL_HEADER` 실측. 같은 자리에서 `REMOTE_ADDR` 값도 본다. 레이트리밋 키와 axes 잠금 키가 이 값이고, Render 프록시 뒤에서 클라이언트 IP 인지 프록시 IP 인지에 따라 `AXES_FAILURE_LIMIT` 기본값(1000)을 내릴 수 있는지가 갈린다. 2026-10-11 검토에서 적음.
 - A-4 메일 발신: Gmail SMTP. 전용 발신 도메인·DNS·발송량 한도 확인 전.
 - A-7 로그인 후 응답에 `Cache-Control: private, no-store` 명시(지금은 Cloudflare가 `DYNAMIC`으로 캐시하지 않음).
 - A-9 DB 연결 재수립 비용(첫 요청 약 670ms, 1회 관찰). `CONN_MAX_AGE` 뒤 도쿄 풀러 재연결 가설.
 - A-10 서버·DB 리전 일치(Render 싱가포르 ↔ Supabase 도쿄, 쿼리당 81~85ms). 사용자가 보류.
-- 에러 추적·메트릭 미연동. 배포 콘솔 로그와 통계 `Server-Timing`뿐.
+- 메트릭 미연동. 500 트레이스백은 prod 설정의 관리자 메일 주소로 받는다(2026-10-11). 그 외는 배포 콘솔 로그와 통계 `Server-Timing`뿐.
 - 캐시 쓰기 실패 시 통계 요청 500. 운영 파일 캐시는 인스턴스 하나 전제.
 - Google 가입이 제공자 미인증 주소도 받음(인증 표시만 한정). 관리자 화면 편집은 캐시 세대를 바꾸지 않음. purge 때 캐시 잔존.
 
@@ -260,12 +311,6 @@
 - 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
 
 ### 프런트엔드·정적 자산
-- C-1 죽은 CSS(`.home-daygrid*`, `.navbar-utility-controls` 등) 삭제 — D-2와 함께.
-- C-2 미참조 이미지 `tag_usage_guide*.png` 2.1MB 삭제 여부(사용자 확인 필요).
-- C-3 FontAwesome 전역 제거(템플릿 7개, `showOverlay` 아이콘).
-- C-4 44px 터치 타깃 전역 재확인(`.segmented__item` 약 28px, 시트 닫기 32px 등).
-- C-5 `.chip__swatch`·`.category-picker__swatch` 라이트 대비(1.44~2.15), 공용 테두리 규칙.
-- C-6 `PretendardVariable.woff2` 2.0MB 서브셋 파이프라인(Slow 4G에서 약 14초).
 - C-7 확인 모달 없는 태그 삭제의 이중 제출 가드. C-8 sessionStorage 차단 시 온보딩 STEP3 안내.
 - C-9 `renderRows`가 다시 그리는 행의 미래/현재 음영 오버레이를 지움(새로고침하면 복구).
 - C-10 시안 1a 라이트 모드 work 라인 아래 영역(장식, 두 번 보류). C-11 `NEUTRAL_COLOR = "#8A9A91"`의 출처 확인.
@@ -276,8 +321,6 @@
 - 실기기 스크린리더(NVDA·VoiceOver)·실제 모바일 기기·Safari 클릭-비포커스 경로는 어느 작업에서도 확인하지 않았다(접근성 트리·에뮬레이션으로 대신).
 
 ### 테스트
-- D-1 JS/CSS 소스 문자열 검사 테스트 삭제(Frontend Work Policy 위반 형태). D-2 `test_time_grid_prevents_text_selection`이 C-1의 죽은 CSS를 단언 — C-1과 한 트랙.
-- D-3 `test_selected_slot_info_prompts_tag_selection` 중복 정의(뒤엣것이 덮음).
 - D-4 로케일 파라미터화 확대, `factory_boy` 검토, 로케일 누수 가드.
 - 설정 화면(`mypage`) POST 경로의 직접 테스트.
 
