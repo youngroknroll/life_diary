@@ -151,11 +151,11 @@ function buildActions(tag) {
     actions.className = 'tag-row__actions';
 
     actions.appendChild(
-        actionButton(tag, 'edit', gettext('수정'), 'fa-pen',
+        actionButton(tag, 'edit', gettext('수정'), 'pencil',
             interpolate(gettext('%s 태그 수정'), [tag.name]))
     );
     actions.appendChild(
-        actionButton(tag, 'delete', gettext('삭제'), 'fa-trash',
+        actionButton(tag, 'delete', gettext('삭제'), 'trash',
             interpolate(gettext('%s 태그 삭제'), [tag.name]))
     );
     return actions;
@@ -171,9 +171,13 @@ function actionButton(tag, action, label, iconName, accessibleName) {
     // 보이는 글자가 행마다 똑같아서 "수정, 삭제, 수정, 삭제"로만 읽힌다.
     button.setAttribute('aria-label', accessibleName);
 
-    const icon = document.createElement('i');
-    icon.className = `fas ${iconName} d-none d-md-inline`;
+    const svgNs = 'http://www.w3.org/2000/svg';
+    const icon = document.createElementNS(svgNs, 'svg');
+    icon.setAttribute('class', 'icon d-none d-md-inline');
     icon.setAttribute('aria-hidden', 'true');
+    const use = document.createElementNS(svgNs, 'use');
+    use.setAttribute('href', `#icon-${iconName}`);
+    icon.appendChild(use);
     button.appendChild(icon);
 
     const text = document.createElement('span');

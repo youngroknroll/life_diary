@@ -161,7 +161,10 @@
 드래그·키보드·저장을 온보딩용으로 다시 만들지 않는다. 한 벌이 갈리면
        한쪽만 고쳐지고 다른 쪽이 조용히 낡는다.
 {% endcomment %}
-    <script src="{% static 'dashboard/js/dashboard.js' %}" defer></script>
+    <script src="{% static 'dashboard/js/dashboard-state.js' %}" defer></script>
+    <script src="{% static 'dashboard/js/dashboard-selection.js' %}" defer></script>
+    <script src="{% static 'dashboard/js/dashboard-save.js' %}" defer></script>
+    <script src="{% static 'dashboard/js/dashboard-tags.js' %}" defer></script>
 {% endif %}
 {% if step == 1 %}
     <script src="{% static 'core/js/tag.js' %}" defer></script>

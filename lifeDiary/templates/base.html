@@ -36,23 +36,32 @@
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous">
-    
     <!-- Custom CSS -->
     <link rel="preload" href="{% static 'core/fonts/PretendardVariable.woff2' %}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{% static 'core/fonts/IBMPlexMono-Regular.woff2' %}" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="{% static 'core/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/tokens.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/onboarding.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/forms.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/charts.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/summary.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dashboard-sheet.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/components.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/dark-mode.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/stats.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/goals.css' %}">
 
     {% block extra_css %}{% endblock %}
 </head>
 <body data-is-superuser="{{ user.is_superuser|yesno:'true,false' }}">
+{% include 'shared/_icons.svg' %}
     <!-- 로딩 오버레이 (Bootstrap Modal 아님 - body 스크롤 락 회피) -->
     <div id="loadingOverlay" class="loading-overlay" aria-hidden="true">
         <div class="loading-overlay-content">
             <div class="loading-spinner mx-auto"></div>
             <div class="loading-text mt-3">
-                <i class="fas fa-clock me-2"></i>
+                <svg class="icon me-2" aria-hidden="true"><use href="#icon-clock"/></svg>
                 {% trans "페이지를 불러오는 중입니다..." %}
             </div>
         </div>
@@ -128,19 +137,19 @@
     {% with app=request.resolver_match.app_name %}
     <nav class="tabbar" aria-label="{% trans '주요 화면' %}">
         <a class="tabbar__item{% if request.resolver_match.url_name == 'home' %} is-active{% endif %}" href="{% url 'home' %}">
-            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-house"></i></span>
+            <span class="tabbar__icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-house-door-fill"/></svg></span>
             {% trans "홈" %}
         </a>
         <a class="tabbar__item{% if app == 'dashboard' %} is-active{% endif %}" href="{% url 'dashboard:index' %}">
-            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-table-cells"></i></span>
+            <span class="tabbar__icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-grid-3x3-gap-fill"/></svg></span>
             {% trans "기록" %}
         </a>
         <a class="tabbar__item{% if app == 'stats' %} is-active{% endif %}" href="{% url 'stats:index' %}">
-            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-chart-simple"></i></span>
+            <span class="tabbar__icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-bar-chart-fill"/></svg></span>
             {% trans "분석" %}
         </a>
         <a class="tabbar__item{% if app == 'users' or app == 'tags' %} is-active{% endif %}" href="{% url 'users:mypage' %}">
-            <span class="tabbar__icon" aria-hidden="true"><i class="fas fa-gear"></i></span>
+            <span class="tabbar__icon" aria-hidden="true"><svg class="icon" aria-hidden="true"><use href="#icon-gear-fill"/></svg></span>
             {% trans "설정" %}
         </a>
     </nav>
@@ -156,7 +165,7 @@
                 <a href="{% url 'terms' %}" class="text-muted text-decoration-none">{% trans "이용약관" %}</a>
             </p>
             <p class="mb-0 text-muted" style="font-size: clamp(0.55rem, 2vw, 0.875rem); white-space: nowrap;">
-                <i class="fas fa-clock me-1"></i>
+                <svg class="icon me-1" aria-hidden="true"><use href="#icon-clock"/></svg>
                 {% now "Y" as current_year %}
                 {% if current_year == "2025" %}
                     {% blocktrans %}라이프 다이어리 &copy; 2025 LogBetter. All rights reserved.{% endblocktrans %}
@@ -285,9 +294,16 @@
                     item.classList.toggle('is-active', isCurrent);
                     item.setAttribute('aria-checked', isCurrent ? 'true' : 'false');
                 });
-                const icon = menu.querySelector('[data-theme-icon]');
+                const icon = menu.querySelector('[data-theme-icon] use');
                 if (icon) {
-                    icon.className = resolve(choice) === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+                    icon.setAttribute('href', resolve(choice) === 'dark' ? '#icon-moon-fill' : '#icon-sun-fill');
+                }
+                const toggle = menu.querySelector('[data-theme-toggle]');
+                const current = menu.querySelector('[data-theme-choice="' + choice + '"]');
+                if (toggle && current) {
+                    const base = toggle.dataset.baseLabel || toggle.getAttribute('aria-label');
+                    toggle.dataset.baseLabel = base;
+                    toggle.setAttribute('aria-label', base + ' (' + current.textContent.trim() + ')');
                 }
             }
 

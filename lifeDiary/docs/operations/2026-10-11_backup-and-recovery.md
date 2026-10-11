@@ -26,6 +26,29 @@ pg_dump "$SUPABASE_SESSION_URL" \
 - `--schema=public` 으로 Supabase 내부 스키마(auth, storage 등)를 뺀다. Django 가 쓰는 테이블은 모두 public 에 있다.
 - `auth_user`, `dashboard_timeblock`, `tags_*`, `users_*`, `axes_*`, `django_migrations` 가 들어 있는지 `pg_restore --list` 로 확인한다.
 
+## 자동 덤프 (GitHub Actions, 매일 04:17 KST)
+
+`.github/workflows/db-backup.yml` 이 매일 `pg_dump` 를 떠서 age 공개키로 암호화한 뒤 Actions 아티팩트에 30일 보관한다. 평문은 러너 메모리 밖으로 나가지 않는다. 켜려면 저장소 secrets 두 개가 필요하다.
+
+| secret | 값 | 만드는 법 |
+|---|---|---|
+| `BACKUP_DATABASE_URL` | Supabase 대시보드 Connect → **Session pooler**(5432) 연결 문자열 | direct 호스트는 IPv6 전용이라 러너에서 닿지 않는다 |
+| `BACKUP_AGE_RECIPIENT` | `age1...` 공개키 | 로컬에서 `age-keygen -o lifediary-backup.key` 를 실행하고 출력의 public key 를 넣는다. `.key` 파일은 비밀키이므로 저장소 밖(암호 관리자)에 둔다 |
+
+secrets 가 없으면 워크플로는 경고만 남기고 성공으로 끝난다. 켠 뒤 첫 실행은 Actions 탭에서 `database backup` 을 수동 실행(workflow_dispatch)해 아티팩트 크기를 확인한다.
+
+`age` 는 SSH ed25519 공개키도 수신자로 받으므로 `age-keygen` 없이 `ssh-keygen` 으로 만들 수 있다. 로컬 `.env` 의 `DATABASE_URL` 이 이미 session pooler(5432) 주소라 그대로 쓴다. 아래 세 줄을 저장소 루트(`lifeDiary/`)에서 실행하면 값이 화면에 찍히지 않고 등록된다.
+
+```bash
+ssh-keygen -q -t ed25519 -N "" -C "lifediary-db-backup" -f ~/.ssh/lifediary_backup_ed25519
+cut -d' ' -f1,2 ~/.ssh/lifediary_backup_ed25519.pub | gh secret set BACKUP_AGE_RECIPIENT
+grep -E '^DATABASE_URL=' .env | cut -d= -f2- | tr -d '"' | gh secret set BACKUP_DATABASE_URL
+```
+
+`~/.ssh/lifediary_backup_ed25519`(비밀키)는 암호 관리자에 복사해 둔다. 이 파일이 없으면 아티팩트를 풀 수 없다. 복호화는 `age -d -i ~/.ssh/lifediary_backup_ed25519 <파일>.dump.age > restore.dump`.
+
+복호화: 아티팩트를 내려받아 `age -d -i lifediary-backup.key lifediary-YYYYMMDD-HHMM.dump.age > restore.dump`. 그 뒤는 아래 복구 리허설과 같다.
+
 ## 복구 리허설 (분기 1회, 또는 마이그레이션이 테이블을 지우기 전)
 
 1. 로컬 PostgreSQL 에 빈 DB 를 만든다.
@@ -60,5 +83,5 @@ SQLite 파일은 사용자 데이터 폴더(macOS `~/Library/Application Support
 
 ## 남은 결정 (사용자)
 
-- 플랜 업그레이드 또는 PITR 애드온 여부.
-- 수동 덤프를 자동화할 저장 위치(암호화된 개인 저장소). 위치가 정해지면 예약 작업으로 옮긴다.
+- 플랜 업그레이드 또는 PITR 애드온 여부. 자동 덤프가 켜져 있으면 RPO 24시간은 플랜과 무관하게 지켜진다.
+- `BACKUP_DATABASE_URL`·`BACKUP_AGE_RECIPIENT` secrets 등록(위 표).
