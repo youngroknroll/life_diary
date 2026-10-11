@@ -61,7 +61,7 @@ Priority:
 - `templates/`, `locale/`, `scripts/`: shared web UI, translations, local
   tooling
 - `docs/`: change log and backlog (`CHANGELOG.md`), roadmap plans, security,
-  architecture
+  architecture, operations (backup and recovery)
 - `.claude/`: role adapters (`agents/`), path-scoped rules (`rules/`), hook
   scripts (`hooks/`), and `settings.json` registering them; all tracked
 
@@ -95,6 +95,7 @@ unknown or the task requires a repository-wide repeated-pattern check.
 - Targeted test: `conda run -n knou-life-diary pytest <test-path> --tb=short`
 - Backend regression: `conda run -n knou-life-diary pytest`
 - Django check: `conda run -n knou-life-diary python manage.py check`
+- Lint: `conda run -n knou-life-diary ruff check .` (config `ruff.toml`; CI runs it)
 - Prod deploy check: `conda run -n knou-life-diary python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR`
 - Migration drift: `conda run -n knou-life-diary python manage.py makemigrations --check --dry-run`
 - Browser JS syntax: `node --check <static-js-path>`

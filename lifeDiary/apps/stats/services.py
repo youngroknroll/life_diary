@@ -4,7 +4,6 @@ from apps.core.utils import (
     DAYS_PER_WEEK,
     MINUTES_PER_HOUR,
     UNCLASSIFIED_TAG_COLOR,
-    UNCLASSIFIED_TAG_NAME,
 )
 
 

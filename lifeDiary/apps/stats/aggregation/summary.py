@@ -1,5 +1,6 @@
-from datetime import date, timedelta
+from datetime import timedelta
 
+from django.utils import timezone
 from django.utils.translation import gettext
 
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
@@ -30,7 +31,7 @@ def build_summary(user, selected_date, today=None, calculator=None):
     grid = get_density_grid(user, selected_date, days=ROLLING_DAYS, calculator=calculator)
     rolling_week = _rolling_week(user, selected_date, grid, calculator)
     pattern = get_gap_pattern(grid)
-    goal = _goal_tile(user, selected_date, today or date.today(), calculator)
+    goal = _goal_tile(user, selected_date, today or timezone.localdate(), calculator)
 
     return {
         "today": _with_hours(day["current"]),

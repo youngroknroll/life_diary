@@ -213,7 +213,7 @@ Tag
 | `tags` | 태그·카테고리 관리와 JSON API, 가입 시 기본 태그 시드, 태그 정책 |
 | `users` | 인증(로그인 실패 제한·reCAPTCHA), 이메일 코드 인증, 소셜 가입 어댑터, 계정 삭제 유예·purge, 목표(기한), 메모, 설정, 온보딩 |
 | `stats` | 집계(요청당 창 1회 읽기), 관찰, 목표 진행, 캐시 세대, 엑셀 내보내기, `Server-Timing` |
-| `core` | 공통 상수·날짜 유틸, CSP 미들웨어, Resend 메일 백엔드(설정에서는 아직 미사용), API 공통 봉투, 템플릿 태그 |
+| `core` | 공통 상수·날짜 유틸, CSP 미들웨어, API 공통 봉투, 템플릿 태그 |
 
 `lifeDiary/`에는 설정 세 벌(`dev`, `prod`, `desktop`), 루트 라우팅, 공개 페이지(홈·개인정보·약관·robots·sitemap), `api.py`(NinjaAPI 조립)가 있다. `desktop/launcher.py`는 waitress와 pywebview로 같은 Django 앱을 띄운다.
 

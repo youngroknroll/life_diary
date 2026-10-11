@@ -10,6 +10,20 @@
 
 ## 2026-10
 
+### 2026-10-11 — 검토 후속 1: 테스트 속도, 린트, CI·저장소 위생 [test]
+- 테스트 비밀번호 해시를 `MD5PasswordHasher`로 바꿨다(`conftest.py` autouse). PBKDF2 1,000,000회가 사용자 생성·로그인마다 약 0.3초였고, 전체 pytest가 548초에서 30초로 줄었다.
+- `apps/dashboard/tests.py`에서 JS·CSS 소스 문자열을 읽어 단언하던 테스트 9건(정의 기준, 같은 이름 2개 포함)을 지웠다. 미해결 D-1·D-2·D-3 해소. 루트 `test_pytest_i18n_compile.py` 첫 테스트는 `call_command` 인자 대신 `.mo` 파일의 존재와 갱신 시각을 확인한다.
+- ruff 0.15.10 도입(`ruff.toml`: E4·E7·E9·F·B006·B008, 설정 모듈은 star import 허용, 마이그레이션 제외). 미사용 import 7건 정리. PR 검사에 `ruff check` 단계.
+- PR 검사: 미번역 카탈로그를 경고에서 실패로 올렸다(네 카탈로그 모두 0건). collectstatic 주석이 dev가 manifest 저장소를 쓴다고 적던 것을 바로잡았다.
+- 메일: 쓰지 않던 `ResendEmailBackend`와 테스트 2건을 지우고, 워크플로 4개의 `RESEND_API_KEY` 더미와 deploy 검사의 테스트 경로를 정리했다. `.env.example`을 실제로 읽는 환경변수 19개 기준으로 다시 썼다.
+- `date.today()` 3곳(`apps/core/utils.py`, `apps/stats/use_cases.py`, `apps/stats/aggregation/summary.py`)을 `timezone.localdate()`로 통일했다.
+- 루트의 `월간_소비시간_기록_시트.xlsx`(134KB, 커밋 5d4713c부터 추적)를 추적 해제하고 `.gitignore`에 올렸다. 로컬 파일과 과거 이력은 그대로다. 이력에서 지울지는 사용자 결정.
+- `.github/dependabot.yml`: pip 주간(Django는 5.2 패치만), GitHub Actions 월간.
+- `docs/operations/2026-10-11_backup-and-recovery.md`: Supabase 백업 현황, 수동 `pg_dump` 절차, 복구 리허설, 장애 시 순서. RPO 24시간·RTO 1시간 제안. `CLAUDE.md`에 린트 명령과 운영 문서 경로를 더했다.
+- 검증: 전체 pytest 711 passed in 30.06s(기준선 721, 삭제 10건), `ruff check .` 0건, `manage.py check` 0건, prod deploy check exit 0, 워크플로 4개·Dependabot YAML 파싱 통과.
+- TDD 웨이버: 설정·테스트 인프라·문서 변경이라 새 테스트 없음(2026-08-31 합의).
+- PR #92.
+
 ### 2026-10-08 — 하네스 정비: 어댑터 한 벌, 프로젝트 훅 4종, 경로 한정 규칙 [docs]
 - 어댑터를 `lifeDiary/.claude/agents/` 11개 한 벌로 합쳐 추적한다. git 루트 `.claude/agents/`의 구판 12개(8월 14일판. `prompt_plan.md`, `.docs/frontend-integration-changelog.md`, "work logs and project status", DRF를 참조했고 구현 역할 3개는 그 구판이 활성이었다)와 범용 `project-planner-pm.md`를 지웠다. `lifeDiary/.gitignore`는 `.claude/*` 중 agents·hooks·rules·settings.json만 추적한다.
 - 훅을 전역 `~/.claude`에서 프로젝트 `.claude/settings.json`으로 옮기고 둘을 더했다. `bash_guard.py`: main에서 commit·push·merge, main으로 push, `gh pr merge`, 태그 생성, `conda run -n knou-life-diary` 밖의 pytest·manage.py·pip·.venv·uv 거부. `frontend_comment_guard.py`: 템플릿·CSS·JS에 새 주석 거부(`(사용자 승인 YYYY-MM-DD)` 표기는 통과). `changelog_defer_guard.py`, `defect_deferral_guard.py`는 옮기면서 Bash 검사를 명령 조각 단위로 바꿨다(다른 파일의 `sed -i`와 CHANGELOG `git add`가 한 명령에 있으면 거부하던 오탐을 이 작업에서 고쳤다).
@@ -260,7 +274,7 @@
 - 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
 
 ### 프런트엔드·정적 자산
-- C-1 죽은 CSS(`.home-daygrid*`, `.navbar-utility-controls` 등) 삭제 — D-2와 함께.
+- C-1 죽은 CSS(`.home-daygrid*`, `.navbar-utility-controls` 등) 삭제.
 - C-2 미참조 이미지 `tag_usage_guide*.png` 2.1MB 삭제 여부(사용자 확인 필요).
 - C-3 FontAwesome 전역 제거(템플릿 7개, `showOverlay` 아이콘).
 - C-4 44px 터치 타깃 전역 재확인(`.segmented__item` 약 28px, 시트 닫기 32px 등).
@@ -276,8 +290,6 @@
 - 실기기 스크린리더(NVDA·VoiceOver)·실제 모바일 기기·Safari 클릭-비포커스 경로는 어느 작업에서도 확인하지 않았다(접근성 트리·에뮬레이션으로 대신).
 
 ### 테스트
-- D-1 JS/CSS 소스 문자열 검사 테스트 삭제(Frontend Work Policy 위반 형태). D-2 `test_time_grid_prevents_text_selection`이 C-1의 죽은 CSS를 단언 — C-1과 한 트랙.
-- D-3 `test_selected_slot_info_prompts_tag_selection` 중복 정의(뒤엣것이 덮음).
 - D-4 로케일 파라미터화 확대, `factory_boy` 검토, 로케일 누수 가드.
 - 설정 화면(`mypage`) POST 경로의 직접 테스트.
 

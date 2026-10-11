@@ -6,9 +6,10 @@
 """
 
 import json
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+from django.utils import timezone
 from django.utils.translation import gettext
 
 # 공통 상수
@@ -50,12 +51,12 @@ def safe_date_parse(date_str, default=None):
         date: 파싱된 날짜 객체
     """
     if not date_str:
-        return default or date.today()
+        return default or timezone.localdate()
 
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except (ValueError, TypeError):
-        return default or date.today()
+        return default or timezone.localdate()
 
 
 def calculate_time_statistics(blocks_count):

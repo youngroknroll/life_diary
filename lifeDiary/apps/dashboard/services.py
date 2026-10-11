@@ -1,4 +1,3 @@
-from django.utils.translation import gettext
 
 from apps.core.utils import HOURS_PER_DAY, SLOTS_PER_HOUR, TOTAL_SLOTS_PER_DAY
 
