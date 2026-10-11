@@ -70,6 +70,10 @@ class TestUsernameRecovery:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-username-recovery-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-username-recovery-rate-limit-security",
             }
         },
     )

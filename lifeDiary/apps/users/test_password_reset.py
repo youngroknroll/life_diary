@@ -65,6 +65,10 @@ class TestResetRequest:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-password-reset-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-password-reset-rate-limit-security",
             }
         },
     )

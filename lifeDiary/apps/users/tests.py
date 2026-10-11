@@ -85,6 +85,10 @@ class TestLoginRecaptchaChallenge:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-login-recaptcha-tests",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-login-recaptcha-tests-security",
             }
         }
         settings.AXES_ENABLED = False

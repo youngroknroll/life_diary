@@ -96,7 +96,14 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": "/tmp/lifediary-cache",
         "OPTIONS": {"MAX_ENTRIES": 500},
-    }
+    },
+    # 브루트포스 카운터는 /tmp 파일 캐시에 두지 않는다. 재배포·cull 에 지워지면
+    # reCAPTCHA 게이트가 풀린다. 테이블은 core 0001 마이그레이션이 만든다.
+    "security": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": "lifediary_security_cache",
+        "OPTIONS": {"MAX_ENTRIES": 10000},
+    },
 }
 
 STATS_SERVER_TIMING_ENABLED = (

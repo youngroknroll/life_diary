@@ -184,3 +184,21 @@ def test_prod_settings_server_timing_flag_follows_env_var(monkeypatch, env_value
     prod_settings = importlib.reload(prod_settings)
 
     assert prod_settings.STATS_SERVER_TIMING_ENABLED is expected
+
+
+def test_prod_settings_keep_security_counters_out_of_the_file_cache(monkeypatch):
+    """로그인 실패·복구 카운터가 /tmp 통계 캐시와 운명을 같이하면 재배포·cull 로 게이트가 풀린다."""
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    security = prod_settings.CACHES["security"]
+    assert security["BACKEND"] == "django.core.cache.backends.db.DatabaseCache"
+    assert security["LOCATION"] == "lifediary_security_cache"
+    assert security["BACKEND"] != prod_settings.CACHES["default"]["BACKEND"]

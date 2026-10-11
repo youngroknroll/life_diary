@@ -194,7 +194,10 @@ def _use_dummy_cache(settings):
     settings.CACHES = {
         "default": {
             "BACKEND": "django.core.cache.backends.dummy.DummyCache",
-        }
+        },
+        "security": {
+            "BACKEND": "django.core.cache.backends.dummy.DummyCache",
+        },
     }
     settings.AXES_ENABLED = False
     settings.AUTHENTICATION_BACKENDS = [
