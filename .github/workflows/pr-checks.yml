@@ -75,6 +75,11 @@ jobs:
           python manage.py check --settings=lifeDiary.settings.prod
           --deploy --fail-level ERROR
 
+      # 데스크톱 설정은 allauth 없이 뜬다. 루트 urls 가 allauth 를 무조건
+      # import 하던 회귀를 여기서 잡는다.
+      - name: 데스크톱 설정 검사
+        run: python manage.py check --settings=lifeDiary.settings.desktop
+
   frontend:
     name: 프런트엔드
     runs-on: ubuntu-latest

@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
-from django.core.cache import cache
+from django.core.cache import caches
 from django.core.mail import send_mail
 from django.db import transaction
 from django.template.loader import render_to_string
@@ -100,6 +100,11 @@ def _get_user_tag_queryset(user):
     return _tag_repo.find_accessible(user)
 
 
+def _security_cache():
+    # 로그인 실패·복구·가입 검증 카운터. 통계 캐시와 분리해 cull·재배포에 지워지지 않는다.
+    return caches["security"]
+
+
 def _get_client_identifier(request):
     return request.META.get("REMOTE_ADDR", "unknown")
 
@@ -112,9 +117,9 @@ def _is_rate_limited(request, scope, max_attempts_setting, window_setting):
     max_attempts = getattr(settings, max_attempts_setting, globals()[max_attempts_setting])
     window_seconds = getattr(settings, window_setting, globals()[window_setting])
     key = f"rate-limit:{scope}:{_get_client_identifier(request)}"
-    if cache.add(key, 1, timeout=window_seconds):
+    if _security_cache().add(key, 1, timeout=window_seconds):
         return False
-    attempts = cache.incr(key)
+    attempts = _security_cache().incr(key)
     return attempts > max_attempts
 
 
@@ -136,22 +141,22 @@ def _login_failure_key(request, username):
 
 
 def _get_login_failure_count(request, username):
-    return int(cache.get(_login_failure_key(request, username), 0) or 0)
+    return int(_security_cache().get(_login_failure_key(request, username), 0) or 0)
 
 
 def _record_login_failure(request, username):
     key = _login_failure_key(request, username)
-    if cache.add(key, 1, timeout=_login_failure_cache_timeout()):
+    if _security_cache().add(key, 1, timeout=_login_failure_cache_timeout()):
         return 1
     try:
-        return cache.incr(key)
+        return _security_cache().incr(key)
     except ValueError:
-        cache.set(key, 1, timeout=_login_failure_cache_timeout())
+        _security_cache().set(key, 1, timeout=_login_failure_cache_timeout())
         return 1
 
 
 def _reset_login_failures(request, username):
-    cache.delete(_login_failure_key(request, username))
+    _security_cache().delete(_login_failure_key(request, username))
 
 
 def _login_attempts_remaining(failure_count):

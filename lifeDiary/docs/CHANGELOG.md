@@ -10,6 +10,14 @@
 
 ## 2026-10
 
+### 2026-10-11 — 검토 후속 2: 의존성 패치, 데스크톱 설정 복구, 보안 카운터 캐시 분리 [security]
+- 의존성: Django 5.2.4→5.2.18, cryptography 46.0.3→48.0.1(개발 환경 x86_64 macOS용 휠이 있는 최신. 50.x는 소스 빌드만 제공), django-allauth 65.19.7, django-axes 8.3.1(8.0 호환성 변경은 `axes.helpers`의 DB 함수 이동뿐, 이 저장소는 미사용), django-ninja 1.7.1, gunicorn 26.2.0, psycopg 3.3.6, PyJWT 2.15.1, pytest 9.1.1, pytest-django 4.14.0. `pydantic>=2.7`과 데스크톱 의존성 3개를 `==`로 고정.
+- 데스크톱: 루트 `urls.py`가 allauth를 무조건 import해 `--settings=desktop`에서 `RuntimeError`로 죽던 것(PR #53 이후)을 `apps.is_installed("allauth.socialaccount")` 분기로 고쳤다. `desktop.py`의 `STATICFILES_STORAGE`(5.1에서 제거)를 `STORAGES`로, 미들웨어·백엔드 없이 올라 있던 `axes` 앱을 뺐다. PR 검사에 데스크톱 check 단계.
+- 보안 카운터: 로그인 실패(reCAPTCHA 게이트)·복구·가입 검증 카운터를 캐시 별칭 `security`로 옮겼다(`apps/users/views.py` `_security_cache()`). prod는 `DatabaseCache`(`lifediary_security_cache`, 테이블은 `core 0001` 마이그레이션이 `createcachetable`로 만든다), dev·desktop은 별도 파일 캐시(MAX_ENTRIES 10000). 통계 캐시의 cull(500건)과 재배포에 카운터가 지워지지 않는다. `DatabaseCache.incr`도 원자적이지 않아 동시 요청에서 소폭 덜 셀 수 있다.
+- `AXES_FAILURE_LIMIT` 기본값 1000은 유지. 잠금 키가 `REMOTE_ADDR`인데 Render 프록시 뒤에서 이 값이 무엇인지 실측이 없다(미해결 A-3에 적음). 커뮤니티 보고로는 Render가 `X-Forwarded-For`에 덧붙이기만 하고 클라이언트 값을 지우지 않아 그 헤더도 그대로 믿을 수 없다.
+- 검증: 전체 pytest 713 passed in 30.43s(새 테스트 2: 캐시 분리 Red→Green, prod 설정 계약), `manage.py check` dev 0건, prod deploy check exit 0, desktop check 0건(이전 RuntimeError), `makemigrations --check` 변경 없음, `ruff check .` 0건.
+- PR #93 (#92 위에 쌓음).
+
 ### 2026-10-11 — 검토 후속 1: 테스트 속도, 린트, CI·저장소 위생 [test]
 - 테스트 비밀번호 해시를 `MD5PasswordHasher`로 바꿨다(`conftest.py` autouse). PBKDF2 1,000,000회가 사용자 생성·로그인마다 약 0.3초였고, 전체 pytest가 548초에서 30초로 줄었다.
 - `apps/dashboard/tests.py`에서 JS·CSS 소스 문자열을 읽어 단언하던 테스트 9건(정의 기준, 같은 이름 2개 포함)을 지웠다. 미해결 D-1·D-2·D-3 해소. 루트 `test_pytest_i18n_compile.py` 첫 테스트는 `call_command` 인자 대신 `.mo` 파일의 존재와 갱신 시각을 확인한다.
@@ -253,7 +261,7 @@
 
 ### 운영·배포
 - A-2 보안 잔여: 쿠키·보안 플래그 재점검, 로그인 실패 알림 (`docs/security/2026-04-21_xss-bruteforce-sri-remediation.md`).
-- A-3 배포된 `Set-Cookie`·`SECURE_PROXY_SSL_HEADER` 실측.
+- A-3 배포된 `Set-Cookie`·`SECURE_PROXY_SSL_HEADER` 실측. 같은 자리에서 `REMOTE_ADDR` 값도 본다. 레이트리밋 키와 axes 잠금 키가 이 값이고, Render 프록시 뒤에서 클라이언트 IP 인지 프록시 IP 인지에 따라 `AXES_FAILURE_LIMIT` 기본값(1000)을 내릴 수 있는지가 갈린다. 2026-10-11 검토에서 적음.
 - A-4 메일 발신: Gmail SMTP. 전용 발신 도메인·DNS·발송량 한도 확인 전.
 - A-7 로그인 후 응답에 `Cache-Control: private, no-store` 명시(지금은 Cloudflare가 `DYNAMIC`으로 캐시하지 않음).
 - A-9 DB 연결 재수립 비용(첫 요청 약 670ms, 1회 관찰). `CONN_MAX_AGE` 뒤 도쿄 풀러 재연결 가설.

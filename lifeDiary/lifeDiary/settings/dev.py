@@ -219,7 +219,13 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
         "LOCATION": str(BASE_DIR / ".cache"),
         "OPTIONS": {"MAX_ENTRIES": 500},
-    }
+    },
+    # 로그인 실패·복구·가입 검증 카운터. 통계 캐시의 cull 에 밀려나지 않게 따로 둔다.
+    "security": {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": str(BASE_DIR / ".cache" / "security"),
+        "OPTIONS": {"MAX_ENTRIES": 10000},
+    },
 }
 
 # Email (development: print to console)

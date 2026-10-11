@@ -57,6 +57,10 @@ class TestCheckUsername:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-check-username-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-username-rate-limit-security",
             }
         },
     )
@@ -80,6 +84,10 @@ class TestCheckUsername:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-check-username-xff-bypass",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-username-xff-bypass-security",
             }
         },
     )
@@ -154,6 +162,10 @@ class TestCheckEmail:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-check-email-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-email-rate-limit-security",
             }
         },
     )
@@ -177,6 +189,10 @@ class TestCheckEmail:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-check-email-en-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-check-email-en-rate-limit-security",
             }
         },
     )
