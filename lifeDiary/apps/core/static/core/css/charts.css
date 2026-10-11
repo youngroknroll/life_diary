@@ -102,10 +102,18 @@
 }
 
 .goal-progress__manage {
+    position: relative;
+    display: inline-block;
     font-size: 11.5px;
     font-weight: 500;
     color: var(--color-primary);
     text-decoration: underline;
+}
+
+.goal-progress__manage::before {
+    content: '';
+    position: absolute;
+    inset: -14px -8px;
 }
 
 .goal-progress__row {

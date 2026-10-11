@@ -366,8 +366,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 32px;
-        height: 32px;
+        width: 44px;
+        height: 44px;
         border: none;
         background: none;
         font-size: 20px;
@@ -396,3 +396,9 @@
     }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .quick-input-sheet,
+    .quick-input-sheet-backdrop {
+        transition: none;
+    }
+}

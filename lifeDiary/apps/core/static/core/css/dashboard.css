@@ -92,7 +92,19 @@
 }
 
 .btn-tag-legend {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 36px;
     transition: box-shadow .15s ease;
+}
+
+.btn-tag-legend::before {
+    content: '';
+    position: absolute;
+    inset: -4px 0;
 }
 
 @media (hover: hover) and (pointer: fine) {

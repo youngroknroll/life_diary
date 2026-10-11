@@ -29,11 +29,18 @@ body {
 }
 
 .app-nav__brand {
+    position: relative;
     font-weight: 700;
     font-size: 15px;
     color: var(--color-primary);
     text-decoration: none;
     flex: none;
+}
+
+.app-nav__brand::before {
+    content: '';
+    position: absolute;
+    inset: -11px 0;
 }
 
 .app-nav__prefs {
@@ -153,6 +160,7 @@ body {
 }
 
 .app-nav__avatar {
+    position: relative;
     width: 32px;
     height: 32px;
     border: 0;
@@ -161,6 +169,12 @@ body {
     color: var(--color-primary);
     font-weight: 600;
     font-size: 11px;
+}
+
+.app-nav__avatar::before {
+    content: '';
+    position: absolute;
+    inset: -6px;
 }
 
 .app-nav__account-name {
@@ -182,7 +196,8 @@ body {
         margin-left: -10px;
     }
     .app-nav__pref {
-        min-width: 32px;
+        min-width: 44px;
+        height: 44px;
         padding: 0 6px;
     }
     .app-nav__tabs--guest {
@@ -196,6 +211,33 @@ body {
         padding: 7px 10px;
         font-size: 12px;
         white-space: nowrap;
+    }
+}
+
+.icon {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    vertical-align: -0.125em;
+    flex: none;
+}
+
+.icon--2x {
+    width: 2em;
+    height: 2em;
+}
+
+.icon--spin {
+    animation: icon-spin 1s linear infinite;
+}
+
+@keyframes icon-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .icon--spin {
+        animation: none;
     }
 }
 
@@ -246,6 +288,11 @@ body {
     height: 10px;
     border-radius: 3px;
     flex: none;
+    box-shadow: inset 0 0 0 1px var(--color-text-muted);
+}
+
+[data-theme="dark"] .chip__swatch {
+    box-shadow: none;
 }
 
 .chip.is-selected {
@@ -264,6 +311,7 @@ body {
 }
 
 .segmented__item {
+    position: relative;
     border: 0;
     background: transparent;
     border-radius: 6px;
@@ -271,6 +319,12 @@ body {
     font-size: 12px;
     color: var(--color-text-body);
     text-decoration: none;
+}
+
+.segmented__item::before {
+    content: '';
+    position: absolute;
+    inset: -7px 0;
 }
 
 .segmented__item.is-active {

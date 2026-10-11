@@ -207,12 +207,19 @@
 }
 
 .goal-row__delete {
+    position: relative;
     display: inline-flex;
     align-items: center;
     min-height: 34px;
     font-size: 12px;
     color: var(--color-text-meta);
     text-decoration: underline;
+}
+
+.goal-row__delete::before {
+    content: '';
+    position: absolute;
+    inset: 0 -16px 0 -8px;
 }
 
 .goal-row__delete:hover {

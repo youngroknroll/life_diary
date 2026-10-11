@@ -223,6 +223,11 @@
     height: 14px;
     border-radius: 4px;
     flex: none;
+    box-shadow: inset 0 0 0 1px var(--color-text-muted);
+}
+
+[data-theme="dark"] .category-picker__swatch {
+    box-shadow: none;
 }
 
 .category-picker__name {

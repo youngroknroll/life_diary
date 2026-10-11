@@ -243,6 +243,12 @@
     100% { transform: rotate(360deg); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+    .loading-spinner {
+        animation: none;
+    }
+}
+
 .loading-text {
     color: var(--color-text-muted);
     font-size: 1.1rem;
