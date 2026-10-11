@@ -45,6 +45,15 @@ gh secret set BACKUP_AGE_RECIPIENT --body "$(cut -d' ' -f1,2 ~/.ssh/lifediary_ba
 
 복호화: 아티팩트를 내려받아 `age -d -i ~/.ssh/lifediary_backup_ed25519 <파일>.dump.age > restore.dump`. 그 뒤는 아래 복구 리허설과 같다. 수동 실행은 Actions 탭의 `database backup` → Run workflow.
 
+덤프는 pg_dump 17 의 custom 포맷(archive 1.16)이라 **pg_restore 17 이상**이 필요하다. 이 Mac 의 기본 `pg_restore` 는 14 라 `unsupported version (1.16)` 로 실패하므로 `/opt/homebrew/opt/postgresql@17/bin/pg_restore` 를 쓴다. `brew install age` 가 미신뢰 탭 정책에 막히면 `gh release download --repo FiloSottile/age -p 'age-v*-darwin-arm64.tar.gz'` 로 받은 바이너리를 임시 디렉터리에서 쓴다. 평문을 디스크에 남기지 않으려면 파이프로 잇는다.
+
+```bash
+age -d -i ~/.ssh/lifediary_backup_ed25519 lifediary-*.dump.age \
+  | /opt/homebrew/opt/postgresql@17/bin/pg_restore --list | grep -c "TABLE DATA"
+```
+
+2026-10-11 첫 아티팩트(`lifediary-20261011-2141`, 316,400바이트)로 확인: 테이블 29, TABLE DATA 29, SEQUENCE SET 28, 서버 PostgreSQL 17.6.
+
 ## 복구 리허설 (분기 1회, 또는 마이그레이션이 테이블을 지우기 전)
 
 1. 로컬 PostgreSQL 에 빈 DB 를 만든다.
