@@ -1,5 +1,5 @@
 asgiref==3.12.1
-cryptography==48.0.1
+cryptography==50.0.2
 pydantic==2.13.2
 PyJWT==2.15.1
 django==5.2.18
@@ -18,5 +18,5 @@ sqlparse==0.5.3
 wheel==0.48.0
 whitenoise==6.9.0
 django-axes==8.3.1
-django-allauth==65.19.7
+django-allauth==65.20.1
 django-ninja==1.7.1
