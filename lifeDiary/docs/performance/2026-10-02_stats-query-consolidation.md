@@ -35,9 +35,9 @@
 | 도구 | 브라우저 개발자 도구의 TTFB와 응답의 `Server-Timing` 헤더 |
 | 경로 | Render(싱가포르) → Supabase PostgreSQL(도쿄), Transaction Pooler 6543 |
 
-결과: 캐시 미스 TTFB 중앙값 3,294ms. 그중 DB 2,363ms(72%), 쿼리 29개, 쿼리당 80ms 이상. 쿼리 하나마다 리전 간 왕복(약 70ms)이 든다.
+결과: 캐시 미스 TTFB 중앙값 3,294ms. 그중 DB 2,363ms(72%), 쿼리 29개, 쿼리당 80ms 이상.
 
-같은 날 로컬 측정(`apps/stats/conftest.py`의 측정 픽스처, SQLite, cold 5회·warm 5회): cold 298ms(쿼리 21), warm 17ms(쿼리 3). 로컬 PostgreSQL cold 849ms. 로컬과 운영의 10배 차이는 네트워크 왕복이 지배한다는 뜻이다.
+같은 날 로컬 측정(`apps/stats/conftest.py`의 측정 픽스처, SQLite, cold 5회·warm 5회): cold 298ms(쿼리 21), warm 17ms(쿼리 3). 로컬 PostgreSQL cold 849ms. 로컬 PostgreSQL과 운영의 차이로부터 쿼리당 비용의 대부분을 리전 간 왕복(약 70ms)으로 추정했다. 왕복 지연 자체를 따로 재지는 않았다.
 
 ## 선택
 
@@ -65,7 +65,7 @@ Red 증거: `test_goal_progress_query_count_does_not_grow_with_goal_count`가 �
 
 ## 한계
 
-- 미스 약 1초의 바닥은 리전 왕복이다. 더 내리려면 리전을 맞춰야 한다.
+- 미스 약 1초의 바닥은 리전 왕복으로 추정한다. 더 내리려면 리전을 맞추고 다시 재야 한다.
 - 측정은 운영 계정 1개, 날짜 5개의 중앙값이다. 사용자 수나 요청량 통계가 아니다.
 - 적중 경로에도 쿼리 3개(세션·사용자·메모)가 남는다.
 - 기록 저장 API의 TTFB(약 1.2초)는 아직 쿼리 수·DB 시간을 재지 않았다(미해결 B-10).

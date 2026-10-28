@@ -22,6 +22,7 @@
 - 옛 README §4-3·§4-4의 상세(쿼리 상한 이력, 측정 조건, 세대 토큰 설계 이유)는 `docs/performance/2026-10-02_stats-query-consolidation.md`, `docs/architecture/2026-10-04_stats-cache-generation.md`로 옮기고 README는 요약과 링크만 둔다. 사용자 수·요청량은 수집하지 않는다고 명시했다.
 - 검증: README의 상대 링크 12개(중복 제외) 존재 확인, 본문 194줄. Mermaid는 문법만 검토했고 렌더링은 GitHub에서 확인 전.
 - "진행 중인 계획" 표의 데스크톱 패키징 행에서 사실과 다른 `manage.py check` 실패 문구를 지웠다.
+- 면접관 관점 재검토(같은 날)로 과장·미검증 표현을 고쳤다: `TimeBlock` 유일 제약은 `0001`부터 있던 초기 설계이지 동시성 사고 뒤의 결정이 아님, `Index(user, tag)`는 현재 조회 경로에 없음, `select_for_update`는 동시성 테스트가 없고 `IntegrityError` 수정의 본체는 기존 행 재사용임, 리전 왕복은 측정이 아니라 추정, "예외 처리 제거로 500 확인" 주장은 근거가 없어 커밋 `11e1be9`의 Red-Green 서술로 교체, 카테고리 이름을 실제 시드 이름으로, AI 도구 사용과 1인 측정 범위를 상단에 명시.
 
 ### 2026-10-28 — `gh pr merge` 훅 차단 해제, 머지는 요청이 있을 때만 [ci]
 - 사용자가 "머지 차단 풀어"라고 지시해 `.claude/hooks/bash_guard.py`에서 `GH_MERGE` 정규식과 `gh pr merge` 거부 블록을 지웠다. 태그 생성, main으로의 push, main에서의 commit·push·merge, conda 밖 `pytest`·`manage.py`·`pip` 거부는 그대로다.
