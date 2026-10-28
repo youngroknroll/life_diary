@@ -21,6 +21,8 @@ class TestStatsServices:
     def test_build_unclassified_daily_entry(self):
         with translation.override("ko"):
             assert build_unclassified_daily_entry() == {
+                "key": "unclassified",
+                "tag_id": None,
                 "name": UNCLASSIFIED_TAG_NAME,
                 "color": UNCLASSIFIED_TAG_COLOR,
                 "minutes": 0,
@@ -31,6 +33,8 @@ class TestStatsServices:
     def test_build_unclassified_weekly_entry(self):
         with translation.override("ko"):
             assert build_unclassified_weekly_entry() == {
+                "key": "unclassified",
+                "tag_id": None,
                 "name": UNCLASSIFIED_TAG_NAME,
                 "color": UNCLASSIFIED_TAG_COLOR,
                 "daily_minutes": [0] * 7,
@@ -40,6 +44,8 @@ class TestStatsServices:
     def test_build_unclassified_monthly_entry(self):
         with translation.override("ko"):
             assert build_unclassified_monthly_entry(3) == {
+                "key": "unclassified",
+                "tag_id": None,
                 "name": UNCLASSIFIED_TAG_NAME,
                 "color": UNCLASSIFIED_TAG_COLOR,
                 "daily_hours": [0] * 3,
@@ -50,6 +56,8 @@ class TestStatsServices:
     def test_build_unclassified_analysis_entry(self):
         with translation.override("ko"):
             assert build_unclassified_analysis_entry() == {
+                "key": "unclassified",
+                "tag_id": None,
                 "name": UNCLASSIFIED_TAG_NAME,
                 "color": UNCLASSIFIED_TAG_COLOR,
                 "total_minutes": 0,

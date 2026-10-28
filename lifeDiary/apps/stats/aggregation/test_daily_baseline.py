@@ -42,7 +42,7 @@ class TestDeltaAgainstTheWeek:
 
         deltas = get_tag_deltas_vs_week(user, TODAY)
 
-        assert deltas["집중"] == 0.0
+        assert deltas[focus.id] == 0.0
 
     def test_a_heavier_day_reads_positive(self, user, focus):
         for back in range(1, 7):
@@ -51,7 +51,7 @@ class TestDeltaAgainstTheWeek:
 
         deltas = get_tag_deltas_vs_week(user, TODAY)
 
-        assert deltas["집중"] > 0
+        assert deltas[focus.id] > 0
 
     def test_a_lighter_day_reads_negative(self, user, focus):
         for back in range(1, 7):
@@ -60,14 +60,14 @@ class TestDeltaAgainstTheWeek:
 
         deltas = get_tag_deltas_vs_week(user, TODAY)
 
-        assert deltas["집중"] < 0
+        assert deltas[focus.id] < 0
 
     def test_a_tag_used_only_today_is_all_upside(self, user, focus):
         log_hours(user, focus, TODAY, 7)
 
         deltas = get_tag_deltas_vs_week(user, TODAY)
 
-        assert deltas["집중"] == 6.0
+        assert deltas[focus.id] == 6.0
 
     def test_days_outside_the_window_do_not_count(self, user, focus):
         log_hours(user, focus, TODAY - timedelta(days=30), 24)
@@ -75,7 +75,7 @@ class TestDeltaAgainstTheWeek:
 
         deltas = get_tag_deltas_vs_week(user, TODAY)
 
-        assert deltas["집중"] == pytest.approx(1 - 1 / 7, abs=0.05)
+        assert deltas[focus.id] == pytest.approx(1 - 1 / 7, abs=0.05)
 
     def test_an_untouched_week_yields_nothing(self, user, focus):
         deltas = get_tag_deltas_vs_week(user, TODAY)

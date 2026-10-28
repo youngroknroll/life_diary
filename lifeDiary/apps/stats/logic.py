@@ -58,7 +58,7 @@ def get_stats_context(user, selected_date):
     tag_deltas = get_tag_deltas_vs_week(user, selected_date, calculator=calculator)
     weekly_summary = build_weekly_summary(monthly_stats, today=selected_date)
     for tag in daily_stats["tag_stats"]:
-        tag["delta_vs_week"] = tag_deltas.get(tag["name"])
+        tag["delta_vs_week"] = tag_deltas.get(tag["tag_id"])
 
     context = {
         "page_title": "통계",
