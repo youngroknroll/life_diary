@@ -5,7 +5,6 @@ from apps.core.utils import (
     MINUTES_PER_HOUR,
     MINUTES_PER_SLOT,
     TOTAL_SLOTS_PER_DAY,
-    UNCLASSIFIED_TAG_NAME,
 )
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
 from apps.stats.services import minutes_to_hours
@@ -41,19 +40,21 @@ def get_weekly_stats_data(user, selected_date, calculator):
 
         def process_block(block, tag_info, _date=date_item):
             nonlocal active_blocks_count, active_minutes
-            tag_name = tag_info["name"]
-            tag_color = tag_info["color"]
-            daily_tag_stats[tag_name] = daily_tag_stats.get(tag_name, 0) + MINUTES_PER_SLOT
-            if tag_name != UNCLASSIFIED_TAG_NAME and tag_info["category_key"] != SLEEP_CATEGORY_KEY:
+            key = tag_info["key"]
+            daily_tag_stats[key] = daily_tag_stats.get(key, 0) + MINUTES_PER_SLOT
+            if tag_info["category_key"] != SLEEP_CATEGORY_KEY:
                 active_blocks_count += 1
                 active_minutes += MINUTES_PER_SLOT
-            if tag_name not in tag_weekly_stats:
-                tag_weekly_stats[tag_name] = {
-                    "name": tag_name, "color": tag_color,
+            if key not in tag_weekly_stats:
+                tag_weekly_stats[key] = {
+                    "key": key,
+                    "tag_id": tag_info["tag_id"],
+                    "name": tag_info["name"],
+                    "color": tag_info["color"],
                     "daily_minutes": [0] * DAYS_PER_WEEK,
                 }
             day_index = (_date - calculator.start_of_week).days
-            tag_weekly_stats[tag_name]["daily_minutes"][day_index] += MINUTES_PER_SLOT
+            tag_weekly_stats[key]["daily_minutes"][day_index] += MINUTES_PER_SLOT
 
             category_key = tag_info["category_key"]
             if category_key in category_weekly_minutes:

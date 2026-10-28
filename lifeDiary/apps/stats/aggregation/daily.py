@@ -3,7 +3,6 @@ from apps.core.utils import (
     MINUTES_PER_SLOT,
     SLOTS_PER_HOUR,
     TOTAL_SLOTS_PER_DAY,
-    UNCLASSIFIED_TAG_NAME,
 )
 from apps.stats.services import minutes_to_hours
 
@@ -16,14 +15,19 @@ def get_daily_stats_data(user, selected_date, calculator):
 
     def process_block(block, tag_info):
         nonlocal active_blocks_count
-        tag_name = tag_info["name"]
-        tag_color = tag_info["color"]
-        if tag_name not in tag_stats:
-            tag_stats[tag_name] = {"name": tag_name, "color": tag_color, "minutes": 0, "blocks": 0}
-        tag_stats[tag_name]["minutes"] += MINUTES_PER_SLOT
-        tag_stats[tag_name]["blocks"] += 1
-        if tag_name != UNCLASSIFIED_TAG_NAME:
-            active_blocks_count += 1
+        key = tag_info["key"]
+        if key not in tag_stats:
+            tag_stats[key] = {
+                "key": key,
+                "tag_id": tag_info["tag_id"],
+                "name": tag_info["name"],
+                "color": tag_info["color"],
+                "minutes": 0,
+                "blocks": 0,
+            }
+        tag_stats[key]["minutes"] += MINUTES_PER_SLOT
+        tag_stats[key]["blocks"] += 1
+        active_blocks_count += 1
         hour = block.slot_index // SLOTS_PER_HOUR
         category_key = tag_info["category_key"]
         hourly_stats[hour][category_key] = (

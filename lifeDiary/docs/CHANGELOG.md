@@ -10,6 +10,19 @@
 
 ## 2026-10
 
+### 2026-10-28 — 통계 집계 key를 표시명에서 식별자로 분리 [fix]
+- README 재작성 중 코드와 대조하다 발견했다. 집계 4종이 태그 표시명을 dict key로 쓰고 합성 미기록 항목은 상수 `"미분류"`를 key로 써서, 사용자 태그 `미분류`가 있으면 일간 10분이 1,440분으로, 월간·분석은 744시간으로 병합되고 주간은 `calculator.py:105`의 `TypeError`로 `/stats/`가 500이었다. 2026-08-15 커밋 `cd01609`가 이를 고쳤으나 어떤 브랜치에도 병합되지 않았고, 2026-10-04 선별 재적용(PR #83)에서 수면 제외만 옮겨졌다. 옛 README는 "해결"이라 적고 있었다.
+- 신규 `apps/stats/aggregation/identity.py`(`UNCLASSIFIED_KEY`, `real_tag_key`). `StatsCalculator.get_tag_info`가 `key`·`tag_id`를 담고 `daily`·`weekly`·`monthly`·`analysis`가 key로 색인한다. entry에 `key`·`tag_id` 추가, `name`은 표시 전용. `daily.py`·`weekly.py`의 `!= UNCLASSIFIED_TAG_NAME` 비교 제거(실제 태그 `미분류`가 활동 시간에서 빠지던 것). `services.py` 합성 entry 4종에 `key`·`tag_id: None`. 캐시 키 `:v4` → `:v5`. 템플릿·JS·리포지토리는 무변경(hourly 차트는 이미 카테고리 key).
+- 같은 뿌리의 표시 결함도 함께 고쳤다: '7일 평균 대비' 열이 태그 이름으로 조회해 합성 `미분류` 행이 같은 이름 실제 태그의 값을 빌려 보였다. `daily_baseline.get_tag_deltas_vs_week`가 `{tag_id: delta}`를 돌려주고 `logic.py`가 `tag["tag_id"]`로 찾는다. `test_daily_baseline.py` 6건은 조회 키만 `focus.id`로 바꿨다.
+- 검증: `apps/stats/aggregation/test_tag_identity.py` 8건(ko/en parametrize) 구현 전 전부 Red(주간 ko `TypeError`, 나머지 `key` 부재. 단언 메시지에 1,440분·744.0h 병합 확인), `apps/stats/tests.py` 빌더 4건 Red → Green, 전체 724 passed. 이어 STAT-ID-06(합성 행 delta `None`) `assert 0.0 is None` Red → Green. 전체 pytest 725 passed(기준선 716), `ruff check .` 0건, `manage.py check` 0건. 테스트 클라이언트 프로브로 `미분류` 태그 계정의 `GET /stats/` 200과 일간 표 `unclassified 1430 / tag:<id> 10` 분리 확인(프로브는 저장소에 두지 않음). Backend TDD Coach: 경계·parametrize·기존 테스트 보강 승인, Red 사유 서술 교정 반영.
+- 문서: `docs/architecture/2026-10-28_tag-identity-separation.md`.
+
+### 2026-10-28 — 채용용 README 재작성과 상세 문서 분리 [docs]
+- 루트 `README.md`를 코드 기준으로 다시 썼다. 옛 README의 틀린 사실을 바로잡았다: 식별자 분리 "해결"(위 항목), desktop `manage.py check` 실패(2026-10-11 PR #93에서 해소), "알림 없음"(2026-10-11부터 500 트레이스백 메일), pytest 721(→ 725), 코드 줄 수.
+- 옛 README §4-3·§4-4의 상세(쿼리 상한 이력, 측정 조건, 세대 토큰 설계 이유)는 `docs/performance/2026-10-02_stats-query-consolidation.md`, `docs/architecture/2026-10-04_stats-cache-generation.md`로 옮기고 README는 요약과 링크만 둔다. 사용자 수·요청량은 수집하지 않는다고 명시했다.
+- 검증: README의 상대 링크 12개(중복 제외) 존재 확인, 본문 194줄. Mermaid는 문법만 검토했고 렌더링은 GitHub에서 확인 전.
+- "진행 중인 계획" 표의 데스크톱 패키징 행에서 사실과 다른 `manage.py check` 실패 문구를 지웠다.
+
 ### 2026-10-28 — `gh pr merge` 훅 차단 해제, 머지는 요청이 있을 때만 [ci]
 - 사용자가 "머지 차단 풀어"라고 지시해 `.claude/hooks/bash_guard.py`에서 `GH_MERGE` 정규식과 `gh pr merge` 거부 블록을 지웠다. 태그 생성, main으로의 push, main에서의 commit·push·merge, conda 밖 `pytest`·`manage.py`·`pip` 거부는 그대로다.
 - 이어 "요청이 있을 때만 머지"로 정해 `CLAUDE.md`(Enforced Mechanically 목록, Engineering Guardrails), `AGENTS.md`(Enforced By The Harness 표, Prime Directives 6번, Git Commit Convention), `backend-integration-engineer` 어댑터의 "머지는 사용자 몫" 문구를 "사용자가 요청할 때만 PR을 머지한다"로 바꿨다. 구현·검증 승인이 머지 승인이 아니라는 문장은 유지했다. 태그와 main commit·push는 계속 사용자 몫이다.
@@ -287,7 +300,7 @@
 | 문서 | 범위 | 상태 |
 |---|---|---|
 | `docs/plans/2026-05-07_desktop-auth-single-user-plan.md` | 데스크톱 단일 로컬 사용자 자동 로그인, 인증 화면 차단 | 설정·런처만 있고 로컬 사용자 부트스트랩·미들웨어는 미구현 |
-| `docs/plans/2026-05-03_desktop-app-packaging-plan.md` | pywebview + waitress + PyInstaller로 macOS `.app`·Windows `.exe` | PyInstaller spec·데스크톱 README·릴리스 워크플로 없음. desktop 설정은 allauth URL 불일치로 `manage.py check` 실패(기존) |
+| `docs/plans/2026-05-03_desktop-app-packaging-plan.md` | pywebview + waitress + PyInstaller로 macOS `.app`·Windows `.exe` | PyInstaller spec·데스크톱 README·릴리스 워크플로 없음. desktop 설정 `manage.py check`는 2026-10-11(PR #93)부터 통과하고 PR 검사에 포함 |
 | `docs/plans/2026-05-06_distribution-and-monetization-plan.md` | 공개 배포, 운영 가시성, 수익화 실험 | 로드맵. 단계마다 승인 필요 |
 | `docs/plans/2026-05-28-ad-revenue-marketing-strategy.md` | 공개 콘텐츠 페이지와 보수적 광고로 월 약 3만 원 서버비 충당 | 계획 범위. 광고는 공개 페이지에만, 단계 승인 뒤 |
 
@@ -314,8 +327,7 @@
 - B-7 측정 헬퍼(`apps/stats/conftest.py`) 일반화. B-9 `_QueryTimer`를 `apps/core`로. 둘 다 두 번째 사용처가 생길 때.
 - B-8 `Server-Timing` 부착에 `status_code == 200` 명시 확인.
 - B-10 기록 저장 API TTFB 약 1.2초(쿼리 수·DB 시간 미계측). 되돌리기도 비슷.
-- 목표 (사용자, 태그, 기간) 유일성 DB 제약. `calculator=None` 두 경로 정리. `find_daily_counts` 운영 호출 없음. hit 경로 쿼리 3개.
-- 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
+- 목표 (사용자, 태그, 기간) 유일성 DB 제약. `calculator=None` 두 경로 정리. `find_daily_counts` 운영 호출 없음. hit 경로 쿼리 3개.- 데스크톱: 단일 로컬 사용자 인증, 패키징(위 계획 문서).
 
 ### 프런트엔드·정적 자산
 - C-7 확인 모달 없는 태그 삭제의 이중 제출 가드. C-8 sessionStorage 차단 시 온보딩 STEP3 안내.

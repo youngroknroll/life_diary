@@ -5,6 +5,7 @@ from apps.core.utils import (
     MINUTES_PER_HOUR,
     UNCLASSIFIED_TAG_COLOR,
 )
+from apps.stats.aggregation.identity import UNCLASSIFIED_KEY
 
 
 def _unclassified_display_name():
@@ -13,6 +14,8 @@ def _unclassified_display_name():
 
 def build_unclassified_daily_entry():
     return {
+        "key": UNCLASSIFIED_KEY,
+        "tag_id": None,
         "name": _unclassified_display_name(),
         "color": UNCLASSIFIED_TAG_COLOR,
         "minutes": 0,
@@ -23,6 +26,8 @@ def build_unclassified_daily_entry():
 
 def build_unclassified_weekly_entry(days=DAYS_PER_WEEK):
     return {
+        "key": UNCLASSIFIED_KEY,
+        "tag_id": None,
         "name": _unclassified_display_name(),
         "color": UNCLASSIFIED_TAG_COLOR,
         "daily_minutes": [0] * days,
@@ -32,6 +37,8 @@ def build_unclassified_weekly_entry(days=DAYS_PER_WEEK):
 
 def build_unclassified_monthly_entry(total_days):
     return {
+        "key": UNCLASSIFIED_KEY,
+        "tag_id": None,
         "name": _unclassified_display_name(),
         "color": UNCLASSIFIED_TAG_COLOR,
         "daily_hours": [0] * total_days,
@@ -42,6 +49,8 @@ def build_unclassified_monthly_entry(total_days):
 
 def build_unclassified_analysis_entry():
     return {
+        "key": UNCLASSIFIED_KEY,
+        "tag_id": None,
         "name": _unclassified_display_name(),
         "color": UNCLASSIFIED_TAG_COLOR,
         "total_minutes": 0,

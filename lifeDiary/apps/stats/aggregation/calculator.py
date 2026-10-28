@@ -6,12 +6,12 @@ from apps.core.utils import (
     MINUTES_PER_HOUR,
     MINUTES_PER_SLOT,
     TOTAL_SLOTS_PER_DAY,
-    UNCLASSIFIED_TAG_NAME,
     get_month_date_range,
     get_week_date_range,
 )
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG
+from apps.stats.aggregation.identity import UNCLASSIFIED_KEY, real_tag_key
 from apps.stats.services import (
     build_unclassified_analysis_entry,
     build_unclassified_daily_entry,
@@ -79,6 +79,8 @@ class StatsCalculator:
         if block.tag and block.tag.name:
             category = block.tag.category
             return {
+                "key": real_tag_key(block.tag_id),
+                "tag_id": block.tag_id,
                 "name": block.tag.name,
                 "color": block.tag.color or "#808080",
                 "category_key": CATEGORY_KEY_BY_SLUG.get(category.slug, category.slug),
@@ -100,21 +102,21 @@ class StatsCalculator:
         if empty_minutes <= 0:
             return
         if data_type == "daily":
-            if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = build_unclassified_daily_entry()
-            data_container[UNCLASSIFIED_TAG_NAME]["minutes"] += empty_minutes
-            data_container[UNCLASSIFIED_TAG_NAME]["blocks"] += empty_minutes // MINUTES_PER_SLOT
+            if UNCLASSIFIED_KEY not in data_container:
+                data_container[UNCLASSIFIED_KEY] = build_unclassified_daily_entry()
+            data_container[UNCLASSIFIED_KEY]["minutes"] += empty_minutes
+            data_container[UNCLASSIFIED_KEY]["blocks"] += empty_minutes // MINUTES_PER_SLOT
         elif data_type == "weekly":
-            if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = build_unclassified_weekly_entry()
-            data_container[UNCLASSIFIED_TAG_NAME]["daily_minutes"][day_index] += empty_minutes
+            if UNCLASSIFIED_KEY not in data_container:
+                data_container[UNCLASSIFIED_KEY] = build_unclassified_weekly_entry()
+            data_container[UNCLASSIFIED_KEY]["daily_minutes"][day_index] += empty_minutes
         elif data_type == "monthly":
             pass
         elif data_type == "analysis":
-            if UNCLASSIFIED_TAG_NAME not in data_container:
-                data_container[UNCLASSIFIED_TAG_NAME] = build_unclassified_analysis_entry()
-            data_container[UNCLASSIFIED_TAG_NAME]["total_minutes"] += empty_minutes
-            data_container[UNCLASSIFIED_TAG_NAME]["total_blocks"] += empty_minutes // MINUTES_PER_SLOT
+            if UNCLASSIFIED_KEY not in data_container:
+                data_container[UNCLASSIFIED_KEY] = build_unclassified_analysis_entry()
+            data_container[UNCLASSIFIED_KEY]["total_minutes"] += empty_minutes
+            data_container[UNCLASSIFIED_KEY]["total_blocks"] += empty_minutes // MINUTES_PER_SLOT
 
     def fill_empty_slots_daily(self, time_blocks, tag_stats, hourly_stats):
         """미분류(빈 슬롯) 시간은 태그 상세 표(tag_stats)에는 더하되,
@@ -142,10 +144,10 @@ class StatsCalculator:
             empty_blocks = TOTAL_SLOTS_PER_DAY - recorded_blocks
             if empty_blocks > 0:
                 empty_hours = empty_blocks * MINUTES_PER_SLOT / MINUTES_PER_HOUR
-                if UNCLASSIFIED_TAG_NAME not in daily_tag_stats:
-                    daily_tag_stats[UNCLASSIFIED_TAG_NAME] = build_unclassified_monthly_entry(total_days)
-                daily_tag_stats[UNCLASSIFIED_TAG_NAME]["daily_hours"][day_index] += empty_hours
-                daily_tag_stats[UNCLASSIFIED_TAG_NAME]["total_hours"] += empty_hours
+                if UNCLASSIFIED_KEY not in daily_tag_stats:
+                    daily_tag_stats[UNCLASSIFIED_KEY] = build_unclassified_monthly_entry(total_days)
+                daily_tag_stats[UNCLASSIFIED_KEY]["daily_hours"][day_index] += empty_hours
+                daily_tag_stats[UNCLASSIFIED_KEY]["total_hours"] += empty_hours
                 daily_totals[day_index] += empty_hours
 
     def fill_empty_slots_analysis(self, user, tag_analysis_data):

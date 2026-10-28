@@ -19,17 +19,20 @@ def get_monthly_stats_data(user, selected_date, calculator):
     }
 
     def process_block(block, tag_info):
-        tag_name = tag_info["name"]
-        tag_color = tag_info["color"]
+        key = tag_info["key"]
         day_index = (block.date - calculator.start_of_month).days
-        if tag_name not in daily_tag_stats:
-            daily_tag_stats[tag_name] = {
-                "name": tag_name, "color": tag_color,
-                "daily_hours": [0] * total_days, "total_hours": 0,
+        if key not in daily_tag_stats:
+            daily_tag_stats[key] = {
+                "key": key,
+                "tag_id": tag_info["tag_id"],
+                "name": tag_info["name"],
+                "color": tag_info["color"],
+                "daily_hours": [0] * total_days,
+                "total_hours": 0,
             }
         hours_inc = MINUTES_PER_SLOT / MINUTES_PER_HOUR
-        daily_tag_stats[tag_name]["daily_hours"][day_index] += hours_inc
-        daily_tag_stats[tag_name]["total_hours"] += hours_inc
+        daily_tag_stats[key]["daily_hours"][day_index] += hours_inc
+        daily_tag_stats[key]["total_hours"] += hours_inc
         daily_totals[day_index] += hours_inc
 
         category_key = tag_info["category_key"]

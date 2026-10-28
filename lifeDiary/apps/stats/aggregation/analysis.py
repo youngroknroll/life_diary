@@ -7,21 +7,26 @@ def get_tag_analysis_data(user, selected_date, calculator):
     tag_analysis_data = {}
 
     def process_block(block, tag_info):
-        tag_name = tag_info["name"]
-        tag_color = tag_info["color"]
-        if tag_name not in tag_analysis_data:
-            tag_analysis_data[tag_name] = {
-                "name": tag_name, "color": tag_color,
-                "total_minutes": 0, "total_blocks": 0,
+        key = tag_info["key"]
+        if key not in tag_analysis_data:
+            tag_analysis_data[key] = {
+                "key": key,
+                "tag_id": tag_info["tag_id"],
+                "name": tag_info["name"],
+                "color": tag_info["color"],
+                "total_minutes": 0,
+                "total_blocks": 0,
             }
-        tag_analysis_data[tag_name]["total_minutes"] += MINUTES_PER_SLOT
-        tag_analysis_data[tag_name]["total_blocks"] += 1
+        tag_analysis_data[key]["total_minutes"] += MINUTES_PER_SLOT
+        tag_analysis_data[key]["total_blocks"] += 1
 
     calculator.process_blocks_without_tag(monthly_blocks, process_block)
     calculator.fill_empty_slots_analysis(user, tag_analysis_data)
 
     analysis_list = [
         {
+            "key": d["key"],
+            "tag_id": d["tag_id"],
             "name": d["name"],
             "color": d["color"],
             "total_hours": minutes_to_hours(d["total_minutes"]),
