@@ -15,6 +15,7 @@
 - 이어 "요청이 있을 때만 머지"로 정해 `CLAUDE.md`(Enforced Mechanically 목록, Engineering Guardrails), `AGENTS.md`(Enforced By The Harness 표, Prime Directives 6번, Git Commit Convention), `backend-integration-engineer` 어댑터의 "머지는 사용자 몫" 문구를 "사용자가 요청할 때만 PR을 머지한다"로 바꿨다. 구현·검증 승인이 머지 승인이 아니라는 문장은 유지했다. 태그와 main commit·push는 계속 사용자 몫이다.
 - 이 해제로 같은 날 #108(백업 secrets)과 Dependabot #109~#113을 머지했다. 다섯 PR이 모두 `lifeDiary/requirements.txt`를 건드려 앞 PR이 머지되면 뒤 PR이 충돌했고(#110·#111·#113), 각 PR에 `@dependabot rebase`를 요청한 뒤 `MERGEABLE/CLEAN`과 CI 3개 통과를 확인하고 한 개씩 머지했다. 리베이스하면서 #110은 setuptools 84.0.0이 아니라 84.2.1로 올라갔다. 배포 PR #96(main → production)은 production 반영이라 머지하지 않고 사용자 확인을 기다린다.
 - 검증: `bash_guard.py`에 PreToolUse 입력을 흘려 `gh pr merge 96 --merge`와 작업 브랜치 push는 통과, `git tag`, `git push origin main`, `pytest apps/`는 각자의 메시지로 거부됨을 확인. `py_compile` 통과, 전체 pytest 716 passed in 32.90s, `ruff check .` 0건, `manage.py check` 0건. 훅은 pytest 대상이 아니라 입력 주입으로만 확인했다.
+- PR #114.
 
 ### 2026-10-11 — 검토 후속 4: 프런트 자산 정리, 500 메일 알림, 자동 암호화 백업 [perf]
 - 죽은 CSS: 템플릿·JS·Python 어디에도 없는 클래스 65개(`collapsed`는 Bootstrap JS가 붙이므로 제외)를 요구하는 규칙 101개와 비게 된 `@media` 4개, 전부 죽은 섹션 머리말 2개(Welcome Screen, Auth Split)를 지웠다. 검토자가 찾은 `#statsTabs .nav-link` 계열(통계 탭이 `.segmented`로 바뀐 뒤 남은 것)과 `.card-header .nav-link` 12개 규칙을 더 지웠다. 4,628줄 → 4,002줄. 제거 도구는 주석을 인식하는 파서이고 죽은 집합을 비우고 돌리면 원본과 바이트 동일. 미해결 C-1 해소.
