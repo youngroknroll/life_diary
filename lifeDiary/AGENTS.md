@@ -163,7 +163,7 @@ the line it allows.
 | PR checks | `.github/workflows/pr-checks.yml` | failing pytest, `manage.py check`, migration drift, prod deploy check, broken browser JS syntax, fuzzy translation entries |
 | Domain boundary test | `apps/dashboard/test_domain_boundaries.py` | `dashboard` importing `stats` |
 | Adapter tool limits | `tools:` in `.claude/agents/*.md` | decision and review roles editing files |
-| `bash_guard.py` | PreToolUse Bash | `commit`, `push`, `merge` on `main`; pushing to `main`; `gh pr merge`; tag creation; `pytest`, `manage.py`, `pip install`, `.venv`, `uv` outside `conda run -n knou-life-diary` |
+| `bash_guard.py` | PreToolUse Bash | `commit`, `push`, `merge` on `main`; pushing to `main`; tag creation; `pytest`, `manage.py`, `pip install`, `.venv`, `uv` outside `conda run -n knou-life-diary` |
 | `frontend_comment_guard.py` | PreToolUse Edit, Write, MultiEdit | a new comment in a template, stylesheet, or browser script |
 | `changelog_defer_guard.py` | PreToolUse Edit, Write, MultiEdit, Bash | a defect-like `미해결` entry without the approval marker; editing `docs/CHANGELOG.md` through Bash |
 | `defect_deferral_guard.py` | Stop | a final report that defers a found defect without user approval |
@@ -213,10 +213,10 @@ stylesheet, or browser script is read or edited.
 6. **Git actions stay on the agent's branch.**
    - The agent commits in small verified units on a feature branch, pushes
      it, and opens or updates the pull request for that track.
-   - Merging, release tagging, and any commit or push on `main` belong to
-     the user. `bash_guard.py` denies those commands.
-   - Approval for implementation or verification does not imply approval
-     for a merge.
+   - Release tagging and any commit or push on `main` belong to the user.
+     `bash_guard.py` denies those commands.
+   - A pull request is merged only when the user asks for that merge.
+     Approval for implementation or verification does not imply it.
 
 ## Role Catalog
 
@@ -786,6 +786,7 @@ Execution:
   behavior that already passed its verification, not a day's worth of edits.
 - Never commit on `main`. Open a branch per large track (`feat/<track>`), push
   it, and open a PR for that track.
-- Merging and release tagging stay with the user.
+- Release tagging stays with the user. Merge a PR only when the user asks
+  for it.
 
 Convention source: https://nohack.tistory.com/17

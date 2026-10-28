@@ -56,7 +56,6 @@ GIT_PREFIX = r'^git\s+(?:-C\s+\S+\s+)?(?:-c\s+\S+\s+)*'
 COMMIT_PUSH_MERGE = re.compile(GIT_PREFIX + r'(commit|push|merge)\b')
 PUSH_TO_MAIN = re.compile(GIT_PREFIX + r'push\b.*(?:\s|:)main(?:\s|$)')
 SWITCH_TO_MAIN = re.compile(GIT_PREFIX + r'(?:checkout|switch)\s+(?:-\S+\s+)*main(?:\s|$)')
-GH_MERGE = re.compile(r'^gh\s+pr\s+merge\b')
 TAG_CREATE = re.compile(GIT_PREFIX + r'tag\s+(?!-l\b|--list\b|-n\d*\b)')
 
 CONDA_RUN = re.compile(r'^conda\s+run\b')
@@ -71,9 +70,6 @@ NEEDS_ENV = re.compile(
 )
 
 segs = segments(cmd)
-
-if any(GH_MERGE.match(s) for s in segs):
-    deny('PR 머지는 사용자가 합니다. 머지 명령을 지우고 PR 링크만 보고하세요.')
 
 if any(TAG_CREATE.match(s) for s in segs):
     deny('릴리스 태그는 사용자가 만듭니다. 태그 명령을 지우세요.')
