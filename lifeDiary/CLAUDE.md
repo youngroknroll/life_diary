@@ -124,8 +124,8 @@ targeted test before broad regression.
 Hooks registered in `.claude/settings.json` (loaded only when Claude Code
 starts in `lifeDiary/`) deny these actions; see `AGENTS.md` Enforced By The
 Harness for the full table:
-- `git commit`, `push`, or `merge` on `main`, pushing to `main`, `gh pr merge`,
-  and tag creation (`bash_guard.py`)
+- `git commit`, `push`, or `merge` on `main`, pushing to `main`, and tag
+  creation (`bash_guard.py`)
 - `pytest`, `manage.py`, `pip install`, `.venv`, or `uv` outside
   `conda run -n knou-life-diary` (`bash_guard.py`)
 - a new comment in a template, stylesheet, or browser script
@@ -154,7 +154,8 @@ with an explicit question and carry the approval marker on the allowed line.
 - Do not comment by default. Make the name and the structure carry the meaning
   first; comment only what the code cannot show. See `AGENTS.md` Comments.
 - Commit in small feature units and push a branch per large track, opening a
-  PR for it. Never work directly on `main`. Merging stays with the user.
+  PR for it. Never work directly on `main`. Merge a PR only when the user
+  asks for it.
 - Frontend work carries no automated tests. Templates, CSS, and browser
   JavaScript are verified in the browser, not by asserting markup strings,
   CSS rules, or JS source text. See `AGENTS.md` Frontend Work Policy.

@@ -35,8 +35,8 @@ Responsibilities:
 
 Do not expand scope, overrule product or architecture decisions, or revert
 user changes. Never create permanent objects in the dev database from a
-verification script. Commit only on a feature branch; merging stays with the
-user.
+verification script. Commit only on a feature branch; merge a PR only when the
+user asks for it.
 
 Output:
 
