@@ -18,6 +18,7 @@
 - `AGENTS.md`: Comments 절의 docstring 문구를 "공개 API는 요약 한 줄, 섹션은 이름과 타입으로 알 수 없는 것만"으로 바꾸고 "Python Style" 절을 더했다(기준, 프로젝트 예외 6개).
 - 검증: 규칙을 켠 직후 339건(Red) → `ruff check .` 0건. 전체 pytest 725 passed in 32.29s(변경 전과 같은 개수), `manage.py check` 0건, desktop 설정 `check` 0건, `makemigrations --check --dry-run` 변경 없음, prod `--deploy --fail-level ERROR` 통과. `.claude/hooks`와 마이그레이션 파일은 변경 없음.
 - 잔여 위험: 자동 수정이 `desktop/launcher.py`와 `scripts/`의 import 순서를 바꿨으나 함수 안 연속 import라 순서 의존은 없다. 공개 API가 아닌 모듈 12개(`email_verification`, `login_protection` 등)는 docstring 의무에서 빠져 있다. 새 모듈이 공개 API 계층이면 이름을 맞추거나 ignore에서 빼야 한다.
+- PR #117.
 
 ### 2026-10-28 — 통계 집계 key를 표시명에서 식별자로 분리 [fix]
 - README 재작성 중 코드와 대조하다 발견했다. 집계 4종이 태그 표시명을 dict key로 쓰고 합성 미기록 항목은 상수 `"미분류"`를 key로 써서, 사용자 태그 `미분류`가 있으면 일간 10분이 1,440분으로, 월간·분석은 744시간으로 병합되고 주간은 `calculator.py:105`의 `TypeError`로 `/stats/`가 500이었다. 2026-08-15 커밋 `cd01609`가 이를 고쳤으나 어떤 브랜치에도 병합되지 않았고, 2026-10-04 선별 재적용(PR #83)에서 수면 제외만 옮겨졌다. 옛 README는 "해결"이라 적고 있었다.
