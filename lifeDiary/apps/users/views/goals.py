@@ -1,18 +1,22 @@
-from django.shortcuts import render, redirect
+"""목표 목록·생성·수정·삭제 뷰."""
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
-from django.contrib.auth.decorators import login_required
+
+from apps.stats.aggregation.goal_progress import (
+    build_goal_progress_rows,
+    with_deadline_states,
+)
+from apps.tags.repositories import TagRepository
+
 from ..forms import (
     UserGoalForm,
 )
 from ..goal_deadline import deadline_state
 from ..models import UserGoal
 from ..repositories import GoalRepository
-from apps.tags.repositories import TagRepository
-from apps.stats.aggregation.goal_progress import (
-    build_goal_progress_rows,
-    with_deadline_states,
-)
 from ..use_cases import (
     DeleteGoalUseCase,
     GoalData,
@@ -26,11 +30,12 @@ _delete_goal = DeleteGoalUseCase()
 
 
 def user_tag_queryset(user):
-    """사용자 태그 쿼리셋"""
+    """사용자 태그 쿼리셋."""
     return _tag_repo.find_accessible(user)
 
 
 def goal_data_from_form(form: UserGoalForm) -> GoalData:
+    """검증을 통과한 목표 폼을 저장 입력값으로 바꾼다."""
     cleaned = form.cleaned_data
     return GoalData(
         tag_id=cleaned["tag"].id,
@@ -41,8 +46,10 @@ def goal_data_from_form(form: UserGoalForm) -> GoalData:
 
 
 def _submitted_goal_values(request):
-    """거절된 폼이 사용자가 입력한 값을 그대로 들고 있게 한다 — 저장된 값으로
-    되돌리면 무엇을 잘못 넣었는지 화면에서 사라진다."""
+    """거절된 폼이 사용자가 입력한 값을 그대로 들고 있게 한다.
+
+    저장된 값으로 되돌리면 무엇을 잘못 넣었는지 화면에서 사라진다.
+    """
     return {
         "tag": request.POST.get("tag", ""),
         "period": request.POST.get("period", ""),
@@ -111,8 +118,10 @@ def _goal_mutation_failed(request, **errors):
 
 
 def _first_form_error(form) -> tuple[str, str]:
-    """행 안에 한 줄로 보여줄 오류와 그 필드 이름. 둘을 한 번에 꺼내야
-    화면이 표시하는 칸과 문구가 어긋나지 않는다."""
+    """행 안에 한 줄로 보여줄 오류와 그 필드 이름.
+
+    둘을 한 번에 꺼내야 화면이 표시하는 칸과 문구가 어긋나지 않는다.
+    """
     for field, errors in form.errors.items():
         if errors:
             return field, errors[0]
@@ -121,11 +130,13 @@ def _first_form_error(form) -> tuple[str, str]:
 
 @login_required
 def usergoal_list(request):
+    """목표 목록 화면을 렌더링한다."""
     return render(request, "users/goals.html", _goal_page_context(request))
 
 
 @login_required
 def usergoal_create(request):
+    """목표를 만든다."""
     if request.method != "POST":
         return redirect("users:usergoal_list")
 
@@ -140,6 +151,7 @@ def usergoal_create(request):
 
 @login_required
 def usergoal_update(request, pk):
+    """목표를 수정한다."""
     goal = _goal_repo.get_or_404(pk, request.user)
     if request.method != "POST":
         return redirect("users:usergoal_list")
@@ -158,6 +170,7 @@ def usergoal_update(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def usergoal_delete(request, pk):
+    """목표를 삭제한다."""
     goal = _goal_repo.get_or_404(pk, request.user)
     if request.method == "POST":
         _delete_goal.execute(request.user, pk)

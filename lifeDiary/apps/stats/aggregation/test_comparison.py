@@ -8,7 +8,6 @@ from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.comparison import get_period_delta
 from apps.tags.models import Category, Tag
 
-
 # 2026-08-01 은 토요일. 그 주는 07-27(월)~08-02(일)
 SATURDAY = date(2026, 8, 1)
 SUNDAY = date(2026, 8, 2)

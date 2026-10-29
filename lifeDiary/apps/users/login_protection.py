@@ -1,6 +1,7 @@
 import json
 import logging
-from urllib import parse, request as urlrequest
+from urllib import parse
+from urllib import request as urlrequest
 from urllib.error import URLError
 
 from django.conf import settings

@@ -1,5 +1,4 @@
-"""
-WSGI config for lifeDiary project.
+"""WSGI config for lifeDiary project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

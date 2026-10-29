@@ -1,16 +1,20 @@
-from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
-from django.urls import reverse
+"""마이페이지와 계정 삭제 뷰."""
+
+from django.contrib import messages
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext
 from django.views.decorators.http import require_http_methods
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+
+from apps.tags.models import Category
+
+from ..account_deletion import request_account_deletion
 from ..forms import (
     UserGoalForm,
 )
-from ..account_deletion import request_account_deletion
-from apps.tags.models import Category
 from ..use_cases import (
     GetMyPageUseCase,
 )
@@ -21,6 +25,7 @@ _mypage_use_case = GetMyPageUseCase()
 
 @login_required
 def mypage(request):
+    """마이페이지를 보여주고 목표 저장 요청을 처리한다."""
     user = request.user
     form = UserGoalForm(request.POST or None)
     form.fields["tag"].queryset = user_tag_queryset(user)
@@ -54,6 +59,7 @@ def mypage(request):
 @login_required
 @require_http_methods(["GET", "POST"])
 def account_delete(request):
+    """계정 삭제를 확인받고 유예 기간이 있는 삭제를 요청한다."""
     if request.method == "POST":
         request_account_deletion(request.user)
         logout(request)

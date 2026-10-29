@@ -1,6 +1,6 @@
 """실행취소 스냅샷 보관소 — TTL과 1회 사용 규칙."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from apps.dashboard.undo import (
     MAX_PENDING_SNAPSHOTS,
@@ -9,8 +9,7 @@ from apps.dashboard.undo import (
     save_snapshot,
 )
 
-
-NOW = datetime(2026, 8, 1, 12, 0, 0, tzinfo=timezone.utc)
+NOW = datetime(2026, 8, 1, 12, 0, 0, tzinfo=UTC)
 
 
 def snapshot(target_date="2026-08-01", slots=None):

@@ -6,7 +6,6 @@
 
 from datetime import date, datetime
 
-
 from apps.dashboard.day_window import (
     SLOTS_PER_HOUR,
     annotate_future,

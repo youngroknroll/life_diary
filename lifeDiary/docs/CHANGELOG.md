@@ -10,6 +10,16 @@
 
 ## 2026-10
 
+### 2026-10-29 — 파이썬 코드 컨벤션을 구글 스타일 가이드에 맞춤 [refactor]
+- 사용자 지시로 https://google.github.io/styleguide/pyguide.html 를 기준으로 삼았다. 범위는 사용자가 정했다: 규칙 확장과 위반 수정, 줄 길이 100 유지, docstring은 공개 API에만, `.claude/hooks`는 수정하지 않고 파일별로 끈다. 전면 `ruff format`, 줄 길이 변경, 타입 힌트 3,114건, "모듈만 import" 규칙은 범위 밖이다.
+- `ruff.toml`: `select`에 `E501`, `W`, `I`, `N`, `UP`, `B`, `SIM`, `D`(google convention)를 더했다. `D1`(미작성)은 `use_cases`·`domain_services`·`services`·`api`·`views` 모듈에만 적용하고 나머지는 per-file-ignores에 올렸다. `lifeDiary/__init__.py`는 패키지명이라 `N999`, `.claude/hooks/*.py`는 `E501`·`I`·`UP`·`D`를 끈다.
+- 위반 수정: 변경 전 `main`에 최종 설정을 적용하면 339건. import 정렬 72건, 공백·현대 문법, docstring 형식 47건은 ruff 자동 수정으로, 나머지 docstring 형식 62건(마침표 35, 요약 줄 뒤 빈 줄 21, 한 줄 병합 6. 모듈 머리의 `====` 배너 포함)과 100자 초과 23건은 손으로 고쳤다. 공개 API docstring 104곳을 새로 썼다.
+- 코드 변경: `raise ... from None` 3곳(`tags/api.py`, `stats/views.py`), `pytest.raises(Exception)` 7곳을 실제 예외(`IntegrityError`, `ValueError`, `FrozenInstanceError`)로 좁힘, 예외 이름 `ResendBlocked`·`ForcedRollback`·`StatsBuildFailure`에 `Error` 접미사(참조 14곳), 지역변수 `User`·`MigratedTimeBlock` 소문자화, 삼항·`contextlib.suppress`·중첩 `with` 병합, `conftest.py`의 `zip` 미사용 변수 제거. `weekly.py`의 B023은 `process_block`이 같은 반복 안에서 바로 호출돼 실제 버그가 아니었고, 기존 `_date` 방식대로 기본 인자로 묶어 경고를 없앴다.
+- `AGENTS.md`: Comments 절의 docstring 문구를 "공개 API는 요약 한 줄, 섹션은 이름과 타입으로 알 수 없는 것만"으로 바꾸고 "Python Style" 절을 더했다(기준, 프로젝트 예외 6개).
+- 검증: 규칙을 켠 직후 339건(Red) → `ruff check .` 0건. 전체 pytest 725 passed in 32.29s(변경 전과 같은 개수), `manage.py check` 0건, desktop 설정 `check` 0건, `makemigrations --check --dry-run` 변경 없음, prod `--deploy --fail-level ERROR` 통과. `.claude/hooks`와 마이그레이션 파일은 변경 없음.
+- 잔여 위험: 자동 수정이 `desktop/launcher.py`와 `scripts/`의 import 순서를 바꿨으나 함수 안 연속 import라 순서 의존은 없다. 공개 API가 아닌 모듈 12개(`email_verification`, `login_protection` 등)는 docstring 의무에서 빠져 있다. 새 모듈이 공개 API 계층이면 이름을 맞추거나 ignore에서 빼야 한다.
+- PR #117.
+
 ### 2026-10-28 — 통계 집계 key를 표시명에서 식별자로 분리 [fix]
 - README 재작성 중 코드와 대조하다 발견했다. 집계 4종이 태그 표시명을 dict key로 쓰고 합성 미기록 항목은 상수 `"미분류"`를 key로 써서, 사용자 태그 `미분류`가 있으면 일간 10분이 1,440분으로, 월간·분석은 744시간으로 병합되고 주간은 `calculator.py:105`의 `TypeError`로 `/stats/`가 500이었다. 2026-08-15 커밋 `cd01609`가 이를 고쳤으나 어떤 브랜치에도 병합되지 않았고, 2026-10-04 선별 재적용(PR #83)에서 수면 제외만 옮겨졌다. 옛 README는 "해결"이라 적고 있었다.
 - 신규 `apps/stats/aggregation/identity.py`(`UNCLASSIFIED_KEY`, `real_tag_key`). `StatsCalculator.get_tag_info`가 `key`·`tag_id`를 담고 `daily`·`weekly`·`monthly`·`analysis`가 key로 색인한다. entry에 `key`·`tag_id` 추가, `name`은 표시 전용. `daily.py`·`weekly.py`의 `!= UNCLASSIFIED_TAG_NAME` 비교 제거(실제 태그 `미분류`가 활동 시간에서 빠지던 것). `services.py` 합성 entry 4종에 `key`·`tag_id: None`. 캐시 키 `:v4` → `:v5`. 템플릿·JS·리포지토리는 무변경(hourly 차트는 이미 카테고리 key).

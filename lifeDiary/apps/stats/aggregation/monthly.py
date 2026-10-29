@@ -58,7 +58,9 @@ def get_monthly_stats_data(user, selected_date, calculator):
         tag_data["daily_hours"] = [round(h, 1) for h in tag_data["daily_hours"]]
         tag_data["total_hours"] = round(tag_data["total_hours"], 1)
         active_days = sum(1 for h in tag_data["daily_hours"] if h > 0)
-        tag_data["avg_hours"] = round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        tag_data["avg_hours"] = (
+            round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        )
 
     daily_totals = [round(h, 1) for h in daily_totals]
     tag_list = sorted(daily_tag_stats.values(), key=lambda x: x["total_hours"], reverse=True)

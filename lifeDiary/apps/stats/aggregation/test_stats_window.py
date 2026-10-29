@@ -8,13 +8,13 @@ from django.test.utils import CaptureQueriesContext
 
 from apps.dashboard.models import TimeBlock
 from apps.dashboard.repositories import TimeBlockRepository
+from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.calculator import StatsCalculator
 from apps.stats.aggregation.comparison import get_period_delta
-from apps.stats.aggregation.analysis import get_tag_analysis_data
 from apps.stats.aggregation.daily import get_daily_stats_data
 from apps.stats.aggregation.daily_baseline import get_tag_deltas_vs_week
-from apps.stats.aggregation.goal_progress import build_goal_progress_rows
 from apps.stats.aggregation.density import get_density_grid
+from apps.stats.aggregation.goal_progress import build_goal_progress_rows
 from apps.stats.aggregation.monthly import get_monthly_stats_data
 from apps.stats.aggregation.summary import build_summary
 from apps.stats.aggregation.weekly import get_weekly_stats_data
@@ -22,7 +22,6 @@ from apps.stats.logic import get_stats_context
 from apps.stats.test_stats_perf import TARGET_MAX_QUERIES
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
-
 
 RECORDS_START = date(2026, 1, 5)
 RECORDS_END = date(2026, 8, 31)
@@ -184,7 +183,11 @@ def test_categories_are_read_once_per_calculator(recorded):
 
 
 def _timeblock_queries(queries):
-    return [query["sql"] for query in queries.captured_queries if "dashboard_timeblock" in query["sql"]]
+    return [
+        query["sql"]
+        for query in queries.captured_queries
+        if "dashboard_timeblock" in query["sql"]
+    ]
 
 
 @pytest.mark.django_db

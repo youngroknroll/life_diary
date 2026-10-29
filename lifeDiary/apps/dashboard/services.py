@@ -1,6 +1,7 @@
+"""대시보드 시간 행 구성과 슬롯 인덱스 검증."""
+
 
 from apps.core.utils import HOURS_PER_DAY, SLOTS_PER_HOUR, TOTAL_SLOTS_PER_DAY
-
 
 SLOT_START_MINUTES = [0, 10, 20, 30, 40, 50]
 
@@ -29,6 +30,7 @@ def build_slot_rows(slot_data):
 
 
 def serialize_rows(rows, hours=None):
+    """시간 행을 JSON 응답용 딕셔너리로 바꾼다. hours를 주면 그 시간의 행만 낸다."""
     wanted = None if hours is None else set(hours)
 
     return [
@@ -53,8 +55,9 @@ def serialize_rows(rows, hours=None):
 
 
 def hours_to_refresh(slot_indexes):
-    """라벨은 구간이 시작하는 블록에 붙으므로, 한 시간을 고치면 옆 시간의
-    라벨이 따라 움직인다. 건드린 시간만 돌려주면 옛 라벨이 화면에 남는다.
+    """라벨은 구간이 시작하는 블록에 붙으므로, 한 시간을 고치면 옆 시간의 라벨이 따라 움직인다.
+
+    건드린 시간만 돌려주면 옛 라벨이 화면에 남는다.
     """
     touched = {index // SLOTS_PER_HOUR for index in slot_indexes}
     widened = {hour + offset for hour in touched for offset in (-1, 0, 1)}
@@ -128,6 +131,7 @@ def _same_tag(left, right):
 
 
 def validate_slot_indexes(slot_indexes):
+    """슬롯 인덱스가 0~143 범위 정수의 리스트인지 검사한다."""
     return isinstance(slot_indexes, list) and all(
         isinstance(slot_index, int) and 0 <= slot_index < TOTAL_SLOTS_PER_DAY
         for slot_index in slot_indexes

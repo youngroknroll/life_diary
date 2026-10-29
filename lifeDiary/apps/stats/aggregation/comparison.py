@@ -10,7 +10,6 @@ from apps.core.utils import (
 )
 from apps.stats.aggregation.calculator import read_blocks
 
-
 SPARKLINE_DAYS = 7
 BASELINE_AVG_WEEKS = 4
 BASELINE_MAX_WEEKS = 12

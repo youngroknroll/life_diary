@@ -1,3 +1,5 @@
+"""통계 화면과 월간 엑셀 내보내기 뷰."""
+
 import time
 from contextlib import ExitStack
 from dataclasses import dataclass
@@ -15,6 +17,7 @@ from django.utils.translation import gettext
 from django.views.decorators.http import require_GET
 
 from apps.core.utils import safe_date_parse
+
 from .aggregation.goal_progress import with_deadline_states
 from .use_cases import ExportMonthlyWorkbookUseCase, GetStatsContextUseCase
 
@@ -50,6 +53,7 @@ class _QueryTimer:
 
 @login_required
 def index(request):
+    """통계 화면을 렌더링한다."""
     selected_date = safe_date_parse(request.GET.get("date"))
     result, timing = _timed_stats_context(request.user, selected_date)
     context = result.context
@@ -135,7 +139,7 @@ def _parse_month(raw):
     try:
         year, month = int(parts[0]), int(parts[1])
     except ValueError:
-        raise ValueError(gettext("올바른 달이 아닙니다."))
+        raise ValueError(gettext("올바른 달이 아닙니다.")) from None
     if not 1 <= month <= 12:
         raise ValueError(gettext("올바른 달이 아닙니다."))
     return year, month

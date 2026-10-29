@@ -8,7 +8,6 @@ from apps.core.utils import (
 )
 from apps.stats.aggregation.calculator import read_blocks
 
-
 PATTERN_WINDOW_HOURS = 2
 
 

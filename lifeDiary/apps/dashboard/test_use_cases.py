@@ -1,6 +1,4 @@
-"""
-Use Case 단위 테스트 — DB 없이 Fake Port로 실행
-"""
+"""Use Case 단위 테스트 — DB 없이 Fake Port로 실행."""
 from datetime import date
 
 import pytest
@@ -171,21 +169,21 @@ class TestDeleteTimeBlocksUseCase:
 
 class TestUpsertTimeBlocksCommand:
     def test_rejects_out_of_range_slots(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             UpsertTimeBlocksCommand(
                 user_id=1, target_date=date(2026, 4, 20),
                 slot_indexes=[0, 144], tag_id=1
             )
 
     def test_rejects_empty_slots(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             UpsertTimeBlocksCommand(
                 user_id=1, target_date=date(2026, 4, 20),
                 slot_indexes=[], tag_id=1
             )
 
     def test_rejects_memo_over_500_chars(self):
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             UpsertTimeBlocksCommand(
                 user_id=1, target_date=date(2026, 4, 20),
                 slot_indexes=[0], tag_id=1, memo="x" * 501

@@ -8,7 +8,6 @@ import pytest
 from apps.dashboard.models import TimeBlock
 from apps.tags.models import Category, Tag
 
-
 API_URL = "/api/time-blocks/"
 UNDO_URL = "/api/time-blocks/undo/"
 TODAY = date(2026, 8, 1)
@@ -90,9 +89,10 @@ class TestSaveResponse:
         assert filled["color"] == Category.objects.get(slug="investment").color
 
     def test_save_moves_label_into_a_newly_touched_adjacent_hour(self, logged_in):
-        """06:00–06:50 을 먼저 저장하면 라벨은 6시 행에 있다. 이어서 05:40–05:50 을
-        같은 태그로 저장하면 구간 시작이 5시로 옮겨가므로, 응답은 5시에 이름을
-        싣고 6시의 옛 이름을 지운 상태로 와야 한다.
+        """06:00–06:50 을 먼저 저장하면 라벨은 6시 행에 있다.
+
+        이어서 05:40–05:50 을 같은 태그로 저장하면 구간 시작이 5시로 옮겨가므로,
+        응답은 5시에 이름을 싣고 6시의 옛 이름을 지운 상태로 와야 한다.
         """
         client, _, focus, _ = logged_in
         save(client, focus, [36, 37, 38, 39, 40, 41])

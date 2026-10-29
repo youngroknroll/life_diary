@@ -1,15 +1,19 @@
+"""아이디 찾기 뷰."""
+
 import logging
 from smtplib import SMTPException
-from django.shortcuts import render, redirect
+
+from django.conf import settings
 from django.core.mail import send_mail
+from django.shortcuts import redirect, render
 from django.template.loader import render_to_string
 from django.utils.translation import gettext
-from django.conf import settings
+
+from .. import login_protection
 from ..forms import (
     UsernameRecoveryForm,
 )
 from ..repositories import UserAccountRepository
-from .. import login_protection
 
 logger = logging.getLogger(__name__)
 _user_repo = UserAccountRepository()
@@ -69,6 +73,7 @@ def username_recovery_view(request):
 
 
 def username_recovery_done_view(request):
+    """아이디 찾기 요청을 접수했다는 안내 화면을 보여준다."""
     return render(
         request,
         "users/recovery/username_recovery_done.html",

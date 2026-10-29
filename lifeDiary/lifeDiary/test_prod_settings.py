@@ -125,8 +125,10 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
 
 
 def test_prod_settings_serve_hashed_static_files_with_whitenoise(monkeypatch):
-    """Django 5.1에서 STATICFILES_STORAGE 가 제거되어 STORAGES 로만
-    manifest 해시·압축·장기 캐시가 활성화된다."""
+    """STORAGES 로만 manifest 해시·압축·장기 캐시가 활성화된다.
+
+    Django 5.1에서 STATICFILES_STORAGE 가 제거되었기 때문이다.
+    """
     monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
     monkeypatch.setenv("DB_NAME", "test_db")
     monkeypatch.setenv("DB_USER", "test_user")
@@ -238,4 +240,4 @@ def test_prod_settings_mail_server_errors_to_the_configured_address(
     prod_settings = importlib.import_module("lifeDiary.settings.prod")
     prod_settings = importlib.reload(prod_settings)
 
-    assert prod_settings.ADMINS == expected_admins
+    assert expected_admins == prod_settings.ADMINS

@@ -6,7 +6,6 @@ from django.utils import timezone
 
 from .models import AccountDeletionRequest, DeletedAccountRecord
 
-
 GRACE_PERIOD_DAYS = 15
 
 
@@ -112,12 +111,12 @@ def purge_due_deleted_accounts(now=None):
         )
     )
     purged_count = 0
-    User = get_user_model()
+    user_model = get_user_model()
     for deletion_request in due_requests:
         original_user_id = deletion_request.user_id
         _create_deleted_account_record(deletion_request, now)
         deletion_request.purged_at = now
         deletion_request.save(update_fields=["purged_at"])
-        User.objects.filter(id=original_user_id).delete()
+        user_model.objects.filter(id=original_user_id).delete()
         purged_count += 1
     return purged_count

@@ -1,8 +1,12 @@
+"""시간 블록 저장·복원·삭제 유스케이스."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from django.db import transaction
+
+from apps.tags.ports import TagReader
 
 from .commands import (
     DeleteTimeBlocksCommand,
@@ -11,11 +15,12 @@ from .commands import (
 )
 from .ports import TimeBlockWriter
 from .signals import time_blocks_changed
-from apps.tags.ports import TagReader
 
 
 @dataclass(frozen=True)
 class UpsertResult:
+    """저장 결과: 새로 만든 슬롯 수, 갱신한 슬롯 수, 적용한 태그."""
+
     created: int
     updated: int
     tag_id: int
@@ -26,6 +31,8 @@ class UpsertResult:
 
 @dataclass(frozen=True)
 class DeleteResult:
+    """삭제 결과: 삭제한 슬롯 수, 요청한 슬롯 수, 삭제 전 상태."""
+
     deleted: int
     requested: int
     previous_state: list[dict]
@@ -33,17 +40,27 @@ class DeleteResult:
 
 @dataclass(frozen=True)
 class RestoreResult:
+    """복원 결과: 되살린 슬롯 수와 비운 슬롯 수."""
+
     restored: int
     cleared: int
 
 
 class UpsertTimeBlocksUseCase:
+    """선택한 슬롯에 태그와 메모를 저장한다. 이미 있는 슬롯은 갱신한다."""
+
     def __init__(self, writer: TimeBlockWriter, tags: TagReader):
+        """시간 블록 저장소와 태그 조회 포트를 받는다."""
         self._writer = writer
         self._tags = tags
 
     @transaction.atomic
     def execute(self, cmd: UpsertTimeBlocksCommand, user) -> UpsertResult:
+        """선택한 슬롯에 태그와 메모를 저장한다.
+
+        Raises:
+            PermissionError: 태그가 없거나 사용자의 태그가 아닐 때.
+        """
         tag = self._tags.find_by_id_accessible(cmd.tag_id, user)
         if not tag:
             raise PermissionError("존재하지 않는 태그이거나 접근 권한이 없습니다.")
@@ -113,11 +130,13 @@ class RestoreTimeBlocksUseCase:
     """슬롯마다 돌아갈 태그와 메모가 달라 저장 use case를 재사용하지 않는다."""
 
     def __init__(self, writer: TimeBlockWriter, tags: TagReader):
+        """시간 블록 저장소와 태그 조회 포트를 받는다."""
         self._writer = writer
         self._tags = tags
 
     @transaction.atomic
     def execute(self, cmd: RestoreTimeBlocksCommand, user) -> RestoreResult:
+        """삭제·저장 직전의 슬롯 상태로 되돌린다. 태그가 없던 슬롯은 비운다."""
         tags_by_id = self._resolve_tags(cmd, user)
 
         to_delete = [slot.slot_index for slot in cmd.slots if slot.tag_id is None]
@@ -203,11 +222,15 @@ class RestoreTimeBlocksUseCase:
 
 
 class DeleteTimeBlocksUseCase:
+    """선택한 슬롯의 기록을 삭제하고 삭제 전 상태를 돌려준다."""
+
     def __init__(self, writer: TimeBlockWriter):
+        """시간 블록 저장소를 받는다."""
         self._writer = writer
 
     @transaction.atomic
     def execute(self, cmd: DeleteTimeBlocksCommand, user) -> DeleteResult:
+        """선택한 슬롯의 기록을 삭제하고, 되돌릴 수 있도록 삭제 전 상태를 담아 돌려준다."""
         previous_state = self._writer.snapshot_slots(
             user, cmd.target_date, cmd.slot_indexes
         )

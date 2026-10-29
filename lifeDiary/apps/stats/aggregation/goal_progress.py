@@ -11,7 +11,6 @@ from apps.stats.aggregation.category_keys import CATEGORY_KEY_BY_SLUG, CATEGORY_
 from apps.users.goal_deadline import deadline_state
 from apps.users.repositories import GoalRepository
 
-
 _goal_repo = GoalRepository()
 
 DAYS_PER_PERIOD = {"daily": 1, "weekly": 7, "monthly": 30}
@@ -115,8 +114,9 @@ def _goal_progress_row(blocks, goal, selected_date, today, now):
 
 
 def build_goal_progress_rows(user, selected_date, today=None, now=None, calculator=None):
-    """요약 탭 목표 진행 바 행. 일간 → 주간 → 월간 순, 조회일(selected_date)
-    기준 그 기간의 누적 진행률이다.
+    """요약 탭 목표 진행 바 행. 일간 → 주간 → 월간 순이다.
+
+    조회일(selected_date) 기준 그 기간의 누적 진행률이다.
 
     `today`(실제 오늘)와 `selected_date`(조회 중인 날)를 분리하는 이유는
     "미달 확정"을 판단하려면 그 기간이 실제로 끝났는지가 필요한데,

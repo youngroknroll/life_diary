@@ -59,7 +59,7 @@ class VerificationOutcome:
         return self.status is VerificationStatus.OK
 
 
-class ResendBlocked(Exception):
+class ResendBlockedError(Exception):
     def __init__(self, retry_after_seconds: int):
         super().__init__(f"resend blocked for {retry_after_seconds}s")
         self.retry_after_seconds = retry_after_seconds
@@ -115,9 +115,9 @@ def _sends_in_window(user, purpose) -> int:
 def resend_code(user, purpose) -> IssuedCode:
     retry_after = seconds_until_resend_allowed(user, purpose)
     if retry_after:
-        raise ResendBlocked(retry_after)
+        raise ResendBlockedError(retry_after)
     if _sends_in_window(user, purpose) >= verification_policy.max_sends_per_window():
-        raise ResendBlocked(verification_policy.send_window_seconds())
+        raise ResendBlockedError(verification_policy.send_window_seconds())
     return issue_code(user, purpose)
 
 

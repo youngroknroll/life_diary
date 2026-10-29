@@ -1,11 +1,15 @@
+"""가입 폼의 아이디·이메일 사용 가능 여부 검사 뷰."""
+
 import re
+
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.utils.translation import gettext
 from django.views.decorators.http import require_GET
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError as DjangoValidationError
-from ..repositories import UserAccountRepository
+
 from .. import login_protection
+from ..repositories import UserAccountRepository
 
 _user_repo = UserAccountRepository()
 
@@ -22,7 +26,7 @@ def _get_rate_limit_retry_message():
 
 @require_GET
 def check_username_view(request):
-    """signup blur 시 username 중복/형식 비동기 검증."""
+    """Signup blur 시 username 중복/형식 비동기 검증."""
     if login_protection.is_rate_limited(
         request,
         "check-username",
@@ -50,7 +54,7 @@ def check_username_view(request):
 
 @require_GET
 def check_email_view(request):
-    """signup blur 시 email 형식/중복 비동기 검증."""
+    """Signup blur 시 email 형식/중복 비동기 검증."""
     if login_protection.is_rate_limited(
         request,
         "check-email",

@@ -1,5 +1,4 @@
-"""
-ASGI config for lifeDiary project.
+"""ASGI config for lifeDiary project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

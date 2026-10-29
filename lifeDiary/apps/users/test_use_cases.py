@@ -1,9 +1,10 @@
-"""
-users Use Case 단위 테스트 — DB 의존 제거 확인용.
+"""users Use Case 단위 테스트 — DB 의존 제거 확인용.
+
 SaveGoalUseCase/SaveNoteUseCase가 ModelForm이 아닌 순수 DTO를 받는지 검증.
 """
 from __future__ import annotations
 
+from dataclasses import FrozenInstanceError
 from datetime import date, timedelta
 
 import pytest
@@ -20,7 +21,7 @@ from apps.users.use_cases import (
 class TestGoalDataDTO:
     def test_is_frozen(self):
         data = GoalData(tag_id=1, period="daily", target_hours=2.0)
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             data.tag_id = 2  # type: ignore[misc]
 
     def test_fields(self):
@@ -38,7 +39,7 @@ class TestGoalDataDTO:
 class TestNoteDataDTO:
     def test_is_frozen(self):
         data = NoteData(note="hello")
-        with pytest.raises(Exception):
+        with pytest.raises(FrozenInstanceError):
             data.note = "world"  # type: ignore[misc]
 
     def test_fields(self):

@@ -669,9 +669,36 @@ needs a better name or a smaller function; fix that first.
 - Write only what the reader cannot recover from the code: a rule imposed by
   the spec, a framework behavior being worked around, or the incident that a
   non-obvious choice prevents.
-- Docstrings follow the same bar. One line stating the contract. Do not
-  enumerate rules the tests already pin down.
+- Docstrings follow the same bar. Public API (see Python Style) carries a
+  one-line summary that ends with a period. Add `Args:`, `Returns:`, or
+  `Raises:` only for what the name and type hints cannot show, such as an
+  exception the caller must handle. Do not enumerate rules the tests already
+  pin down.
 - No section-divider comment banners.
+
+### Python Style
+
+The Google Python Style Guide
+(https://google.github.io/styleguide/pyguide.html) is the base. `ruff.toml`
+enforces what a linter can check: import order (`I`), naming (`N`),
+whitespace (`W`), modern syntax (`UP`), bug risks (`B`), simplification
+(`SIM`), line length (`E501`), and docstring form (`D`, google convention).
+CI runs `ruff check`, so a violation blocks the PR.
+
+Project exceptions to the guide:
+
+- Line length is 100, not 80. There is no `ruff format` step.
+- `from module import Name` stays, as is idiomatic in Django. The guide's
+  "import packages and modules only" rule is not enforced.
+- Public API is the `use_cases`, `domain_services`, `services`, `api`, and
+  `views` modules. Their public modules, classes, functions, and methods
+  require a docstring (`D1`). Other modules are listed in `ruff.toml`
+  per-file-ignores; add a new module there only when it is not public API.
+- Type annotations are not required, only kept where they already exist.
+- `.claude/hooks/*.py` are exempt from `E501`, `UP`, and `D` so the guards are
+  not edited for style.
+- `lifeDiary/__init__.py` is exempt from `N999` because the package name is the
+  project name.
 
 ### Pythonic Code Design
 

@@ -1,5 +1,4 @@
-"""
-통계 탭 성능 회귀 테스트.
+"""통계 탭 성능 회귀 테스트.
 
 목적:
 - StatsCalculator의 월간 데이터 lazy 캐시 동작 보장
@@ -118,7 +117,8 @@ def test_get_stats_context_query_count_within_target(seeded_user):
     n = len(ctx.captured_queries)
     assert n <= TARGET_MAX_QUERIES, (
         f"쿼리 수 {n}개로 목표 {TARGET_MAX_QUERIES}개 초과. "
-        f"쿼리 내역:\n" + "\n".join(f"  {i}: {q['sql'][:120]}" for i, q in enumerate(ctx.captured_queries))
+        f"쿼리 내역:\n"
+        + "\n".join(f"  {i}: {q['sql'][:120]}" for i, q in enumerate(ctx.captured_queries))
     )
 
 

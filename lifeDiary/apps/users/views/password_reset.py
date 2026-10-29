@@ -1,15 +1,15 @@
+"""이메일로 받은 코드를 확인해 비밀번호를 재설정하는 뷰."""
+
 from datetime import datetime
-from django.shortcuts import render, redirect
-from django.urls import reverse
+
 from django.contrib.auth.forms import SetPasswordForm
+from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
-from django.views.decorators.http import require_POST, require_http_methods
-from ..forms import (
-    PasswordResetEmailForm,
-    VerificationCodeForm,
-)
-from .. import verification_policy
+from django.views.decorators.http import require_http_methods, require_POST
+
+from .. import login_protection, verification_policy
 from ..email_verification import (
     PASSWORD_RESET,
     VerificationOutcome,
@@ -18,8 +18,11 @@ from ..email_verification import (
     mark_email_verified,
     verify_code,
 )
+from ..forms import (
+    PasswordResetEmailForm,
+    VerificationCodeForm,
+)
 from ..repositories import UserAccountRepository
-from .. import login_protection
 from .verification import resend_verification, verification_context
 
 _user_repo = UserAccountRepository()
@@ -103,6 +106,7 @@ def password_reset_view(request):
 
 @require_http_methods(["GET", "POST"])
 def password_reset_verify_view(request):
+    """이메일로 받은 재설정 코드를 확인한다."""
     email = request.session.get(PASSWORD_RESET_EMAIL_KEY)
     if not email:
         return redirect("users:password_reset")
@@ -143,6 +147,7 @@ def password_reset_verify_view(request):
 
 @require_POST
 def password_reset_resend_view(request):
+    """재설정 코드를 다시 보낸다."""
     if not request.session.get(PASSWORD_RESET_EMAIL_KEY):
         return redirect("users:password_reset")
     for user in _password_reset_candidates(request):
@@ -165,6 +170,7 @@ def _verified_password_reset_user(request):
 
 @require_http_methods(["GET", "POST"])
 def password_reset_set_view(request):
+    """코드 확인을 마친 사용자의 새 비밀번호를 저장한다."""
     user = _verified_password_reset_user(request)
     if user is None:
         return redirect("users:password_reset")
