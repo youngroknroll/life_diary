@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.django_db
 def test_login_page_has_enhance_and_no_test_creds(client):
     r = client.get('/accounts/login/')

@@ -19,7 +19,7 @@ def member(db):
 
 @pytest.fixture(autouse=True)
 def counting_cache(settings):
-    """conftest pins every test to DummyCache, which cannot count.
+    """Conftest pins every test to DummyCache, which cannot count.
 
     The failure budget lives in the cache, so this suite needs a backend that
     actually retains and increments.

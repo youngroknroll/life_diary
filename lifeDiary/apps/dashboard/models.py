@@ -1,17 +1,18 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.utils.translation import gettext_lazy as _
-from apps.tags.models import Tag
+
 from apps.core.utils import UNCLASSIFIED_TAG_NAME
+from apps.tags.models import Tag
 
 # Create your models here.
 
 
 class TimeBlock(models.Model):
-    """
-    10분 단위 시간 블록 관리
+    """10분 단위 시간 블록 관리.
+
     - 하루 24시간 = 144개 슬롯 (0~143)
     - 각 슬롯은 10분 단위 (00:00~00:10 = 슬롯 0, 00:10~00:20 = 슬롯 1, ...)
     """
@@ -55,7 +56,7 @@ class TimeBlock(models.Model):
         return f"{self.user.username} - {self.date} [{self.get_time_range()}] {tag_name}"
 
     def get_time_range(self):
-        """슬롯 인덱스를 시간 범위로 변환"""
+        """슬롯 인덱스를 시간 범위로 변환."""
         start_hour, start_minute = divmod(self.slot_index * 10, 60)
         end_hour, end_minute = divmod((self.slot_index + 1) * 10, 60)
 
@@ -63,18 +64,18 @@ class TimeBlock(models.Model):
 
     @staticmethod
     def time_to_slot_index(hour, minute):
-        """시간을 슬롯 인덱스로 변환"""
+        """시간을 슬롯 인덱스로 변환."""
         return hour * 6 + minute // 10
 
     @staticmethod
     def slot_index_to_time(slot_index):
-        """슬롯 인덱스를 시간으로 변환"""
+        """슬롯 인덱스를 시간으로 변환."""
         total_minutes = slot_index * 10
         hour, minute = divmod(total_minutes, 60)
         return hour, minute
 
     def clean(self):
-        """추가 유효성 검사"""
+        """추가 유효성 검사."""
         super().clean()
         # 태그와 사용자가 일치하는지 확인
         if self.tag and self.user and self.tag.user_id != self.user_id:

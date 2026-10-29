@@ -1,5 +1,4 @@
-"""
-GoalRepository 단위 테스트 — find_grouped_by_period 동작 검증.
+"""GoalRepository 단위 테스트 — find_grouped_by_period 동작 검증.
 
 목적:
 - period별 3회 쿼리 → 1회 쿼리 통합 (성능 최적화)

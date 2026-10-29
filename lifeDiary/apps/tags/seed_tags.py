@@ -9,11 +9,11 @@
 """
 
 from django.db import transaction
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from .models import Category, Tag
 from .name_limit import MAX_TAG_NAME_LENGTH
-
 
 # (카테고리 슬러그, 태그명) — 카테고리 표시 순서대로.
 SEED_TAGS = (

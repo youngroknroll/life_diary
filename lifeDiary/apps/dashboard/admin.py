@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+
 from .models import TimeBlock
 
 # Register your models here.
@@ -31,7 +32,7 @@ class TimeBlockAdmin(admin.ModelAdmin):
     readonly_fields = ("created_at", "updated_at")
 
     def memo_preview(self, obj):
-        """메모 미리보기"""
+        """메모 미리보기."""
         if obj.memo:
             return obj.memo[:50] + "..." if len(obj.memo) > 50 else obj.memo
         return "-"
@@ -39,9 +40,10 @@ class TimeBlockAdmin(admin.ModelAdmin):
     memo_preview.short_description = "메모"
 
     def tag_display(self, obj):
-        """태그를 색상과 함께 표시"""
+        """태그를 색상과 함께 표시."""
         return format_html(
-            '<span style="background-color: {}; padding: 2px 8px; border-radius: 3px; color: white; font-size: 0.8em;">{}</span>',
+            '<span style="background-color: {}; padding: 2px 8px; border-radius: 3px; '
+            'color: white; font-size: 0.8em;">{}</span>',
             obj.tag.color,
             obj.tag.name,
         )
@@ -49,11 +51,11 @@ class TimeBlockAdmin(admin.ModelAdmin):
     tag_display.short_description = "태그"
 
     def get_queryset(self, request):
-        """쿼리 최적화"""
+        """쿼리 최적화."""
         return super().get_queryset(request).select_related("user", "tag")
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """태그 선택 시 사용자별로 필터링"""
+        """태그 선택 시 사용자별로 필터링."""
         if db_field.name == "tag" and hasattr(request, "_obj_"):
             kwargs["queryset"] = db_field.related_model.objects.filter(
                 user=request._obj_.user
@@ -61,6 +63,6 @@ class TimeBlockAdmin(admin.ModelAdmin):
         return super().formfield_for_foreignkey(db_field, request, **kwargs)
 
     def get_form(self, request, obj=None, **kwargs):
-        """폼 커스터마이징"""
+        """폼 커스터마이징."""
         request._obj_ = obj
         return super().get_form(request, obj, **kwargs)

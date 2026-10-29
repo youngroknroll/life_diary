@@ -1,3 +1,5 @@
+"""시간 블록 저장·삭제·되돌리기 JSON API."""
+
 import logging
 
 from django.utils import timezone
@@ -8,6 +10,7 @@ from pydantic import ValidationError as CommandValidationError
 from apps.core.schemas import ErrorEnvelope, error_payload
 from apps.core.utils import calculate_time_statistics
 from apps.tags.repositories import TagRepository
+
 from .commands import (
     DeleteTimeBlocksCommand,
     RestoreTimeBlocksCommand,
@@ -88,9 +91,13 @@ def _mutation_payload(request, target_date, slot_indexes, previous_state, extra=
         500: ErrorEnvelope,
     },
     summary="시간 블록 저장",
-    description="선택한 날짜의 슬롯(0~143)들에 태그와 메모를 기록한다. 성공 시 갱신된 구간(runs)과 하루 통계, 60초 유효한 undo_token을 돌려준다.",
+    description=(
+        "선택한 날짜의 슬롯(0~143)들에 태그와 메모를 기록한다. "
+        "성공 시 갱신된 구간(runs)과 하루 통계, 60초 유효한 undo_token을 돌려준다."
+    ),
 )
 def time_block_upsert(request, payload: TimeBlockUpsertIn):
+    """선택한 날짜의 슬롯에 태그와 메모를 저장한다."""
     try:
         cmd = UpsertTimeBlocksCommand(
             user_id=request.user.id,
@@ -154,6 +161,7 @@ def time_block_upsert(request, payload: TimeBlockUpsertIn):
     description="선택한 날짜의 슬롯 기록을 지운다. 지운 기록이 없으면 404를 돌려준다.",
 )
 def time_block_delete(request, payload: TimeBlockDeleteIn):
+    """선택한 날짜의 슬롯 기록을 삭제한다."""
     try:
         cmd = DeleteTimeBlocksCommand(
             user_id=request.user.id,
@@ -206,9 +214,14 @@ def time_block_delete(request, payload: TimeBlockDeleteIn):
         500: ErrorEnvelope,
     },
     summary="시간 블록 변경 되돌리기",
-    description="저장·삭제 응답의 undo_token으로 직전 변경을 되돌린다. 되돌릴 대상은 요청 본문이 아니라 세션 스냅샷에서만 온다. 토큰은 60초 뒤 만료되고 한 번만 쓸 수 있다.",
+    description=(
+        "저장·삭제 응답의 undo_token으로 직전 변경을 되돌린다. "
+        "되돌릴 대상은 요청 본문이 아니라 세션 스냅샷에서만 온다. "
+        "토큰은 60초 뒤 만료되고 한 번만 쓸 수 있다."
+    ),
 )
 def time_block_undo(request, payload: UndoIn):
+    """응답으로 받은 undo 토큰으로 직전 저장·삭제를 되돌린다."""
     snapshot = pop_snapshot(request.session, payload.undo_token, now=timezone.now())
     if snapshot is None:
         return _error(

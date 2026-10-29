@@ -4,11 +4,10 @@ from django.contrib.auth.models import User
 from django.utils import translation
 from django.utils.translation import gettext
 
-from conftest import DEFAULT_TEST_PASSWORD
-
 from apps.tags.models import Category, Tag
 from apps.tags.name_limit import MAX_TAG_NAME_LENGTH
 from apps.tags.seed_tags import SEED_TAGS, create_seed_tags
+from conftest import DEFAULT_TEST_PASSWORD
 
 
 @pytest.fixture

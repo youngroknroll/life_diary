@@ -1,11 +1,14 @@
+"""가입 직후 온보딩 화면 뷰."""
+
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext
-from django.contrib.auth.decorators import login_required
-from apps.tags.repositories import TagRepository
+
 from apps.dashboard.day_window import annotate_future, current_slot_index
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.dashboard.services import build_slot_rows, build_time_headers
+from apps.tags.repositories import TagRepository
 
 _tag_repo = TagRepository()
 _time_block_repo = TimeBlockRepository()

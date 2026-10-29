@@ -6,7 +6,10 @@ register = template.Library()
 
 @register.simple_tag
 def tag_dot(color):
-    """색상 점 배지. 호출: {% tag_dot tag.color %}"""
+    """색상 점 배지.
+
+    호출: {% tag_dot tag.color %}
+    """
     return format_html(
         '<span class="badge me-2" style="background-color: {};">&nbsp;</span>',
         color,
@@ -15,8 +18,8 @@ def tag_dot(color):
 
 @register.simple_tag
 def tag_badge(color, text_color, name, clickable=False, tag_id=None):
-    """
-    이름 포함 전체 배지.
+    """이름 포함 전체 배지.
+
     - 기본: {% tag_badge tag.color tag.text_color tag.name %}
     - 클릭 가능: {% tag_badge tag.color tag.text_color tag.name clickable=True tag_id=tag.id %}
       → <button>으로 렌더링되고 클릭 시 selectTag(id, color, name) 호출.

@@ -1,19 +1,23 @@
-from django.shortcuts import render, redirect
+"""로그아웃, 회원가입, 로그인 뷰."""
+
+from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login, logout
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.hashers import check_password
 from django.db import transaction
+from django.shortcuts import redirect, render
 from django.utils.translation import gettext
 from django.views.decorators.http import require_POST
-from django.contrib import messages
-from django.conf import settings
+
+from apps.tags.seed_tags import create_seed_tags
+
+from .. import login_protection
+from ..account_deletion import cancel_account_deletion
 from ..forms import (
     SignupForm,
 )
-from ..account_deletion import cancel_account_deletion
 from ..repositories import UserAccountRepository
-from apps.tags.seed_tags import create_seed_tags
-from .. import login_protection
 from .verification import (
     requires_email_verification,
     start_login_verification,
@@ -25,18 +29,14 @@ _user_repo = UserAccountRepository()
 
 @require_POST
 def logout_view(request):
-    """
-    사용자 로그아웃 (POST 요청만 허용)
-    """
+    """사용자 로그아웃 (POST 요청만 허용)."""
     logout(request)
     messages.success(request, gettext("성공적으로 로그아웃되었습니다."))
     return redirect("home")
 
 
 def signup_view(request):
-    """
-    사용자 회원가입
-    """
+    """사용자 회원가입."""
     if request.method == "POST":
         form = SignupForm(request.POST)
         if form.is_valid():
@@ -60,9 +60,7 @@ REMEMBER_ME_DURATION_SECONDS = 60 * 60 * 24 * 14  # 14 days
 
 
 def login_view(request):
-    """
-    사용자 로그인
-    """
+    """사용자 로그인."""
     recaptcha_required = False
     failure_count = 0
     if request.method == "POST":
@@ -70,7 +68,9 @@ def login_view(request):
         recaptcha_required = login_protection.login_requires_recaptcha(request, username)
         if recaptcha_required:
             token = request.POST.get("g-recaptcha-response", "")
-            if not login_protection.verify_recaptcha(token, login_protection.get_client_identifier(request)):
+            if not login_protection.verify_recaptcha(
+                token, login_protection.get_client_identifier(request)
+            ):
                 form = AuthenticationForm(request, data=request.POST)
                 messages.error(request, gettext("reCAPTCHA 확인 후 다시 로그인해주세요."))
                 for field in form.fields.values():
@@ -117,7 +117,8 @@ def login_view(request):
             return redirect("home")
         failure_count = login_protection.record_login_failure(request, username)
         recaptcha_required = (
-            login_protection.login_recaptcha_enabled() and failure_count >= login_protection.login_failure_limit()
+            login_protection.login_recaptcha_enabled()
+            and failure_count >= login_protection.login_failure_limit()
         )
     else:
         form = AuthenticationForm()

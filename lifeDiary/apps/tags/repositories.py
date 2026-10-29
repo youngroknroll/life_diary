@@ -38,7 +38,7 @@ class TagRepository:
         return get_object_or_404(Tag, id=tag_id, user=user)
 
     def exists_duplicate(self, user, name, exclude_id=None):
-        """같은 사용자 안에서 같은 이름 존재 여부"""
+        """같은 사용자 안에서 같은 이름 존재 여부."""
         qs = Tag.objects.filter(user=user, name=name)
         if exclude_id:
             qs = qs.exclude(id=exclude_id)
@@ -53,7 +53,7 @@ class TagRepository:
         )
 
     def find_by_category(self, user, category):
-        """특정 카테고리의 사용자 접근 가능 태그"""
+        """특정 카테고리의 사용자 접근 가능 태그."""
         return self.find_accessible(user).filter(category=category)
 
     def save(self, tag):

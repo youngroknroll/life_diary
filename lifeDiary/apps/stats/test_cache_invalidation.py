@@ -15,7 +15,8 @@ from apps.tags.use_cases import UpdateTagUseCase
 from apps.users.models import UserGoal
 from apps.users.use_cases import GoalData, NoteData, SaveGoalUseCase, SaveNoteUseCase
 
-class ForcedRollback(Exception):
+
+class ForcedRollbackError(Exception):
     pass
 
 
@@ -139,22 +140,24 @@ def test_rolled_back_slot_change_keeps_serving_cached_statistics(
     use_case = GetStatsContextUseCase()
     use_case.execute(owner, SELECTED_DATE)
 
-    with django_capture_on_commit_callbacks(execute=True):
-        with pytest.raises(ForcedRollback):
-            with transaction.atomic():
-                UpsertTimeBlocksUseCase(
-                    writer=TimeBlockRepository(), tags=TagRepository()
-                ).execute(
-                    UpsertTimeBlocksCommand(
-                        user_id=owner.id,
-                        target_date=OTHER_DATE_IN_SELECTED_WEEK,
-                        slot_indexes=[0],
-                        tag_id=focus_tag.id,
-                        memo="",
-                    ),
-                    owner,
-                )
-                raise ForcedRollback()
+    with (
+        django_capture_on_commit_callbacks(execute=True),
+        pytest.raises(ForcedRollbackError),
+        transaction.atomic(),
+    ):
+        UpsertTimeBlocksUseCase(
+            writer=TimeBlockRepository(), tags=TagRepository()
+        ).execute(
+            UpsertTimeBlocksCommand(
+                user_id=owner.id,
+                target_date=OTHER_DATE_IN_SELECTED_WEEK,
+                slot_indexes=[0],
+                tag_id=focus_tag.id,
+                memo="",
+            ),
+            owner,
+        )
+        raise ForcedRollbackError()
 
     assert use_case.execute(owner, SELECTED_DATE).cache_hit is True
 

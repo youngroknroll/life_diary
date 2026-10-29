@@ -1,8 +1,8 @@
-"""
-URL configuration for lifeDiary project.
+"""URL configuration for lifeDiary project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
+
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -18,11 +18,12 @@ Including another URLconf
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
-from django.views.generic.base import RedirectView
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
+from django.urls import include, path
+from django.views.generic.base import RedirectView
 from django.views.i18n import JavaScriptCatalog
+
 from . import views
 from .api import api
 

@@ -1,6 +1,8 @@
+"""태그 접근 정책."""
+
 class TagPolicyService:
-    """
-    태그 접근 정책 도메인 서비스.
+    """태그 접근 정책 도메인 서비스.
+
     ORM 없음, request 없음. 순수 정책 판단만 담당.
 
     태그는 전부 개인 소유이므로 규칙은 하나다 — 자기 것만 다룬다.
@@ -8,12 +10,15 @@ class TagPolicyService:
     """
 
     def can_manage(self, user, tag) -> bool:
+        """태그 소유자만 관리할 수 있다."""
         return tag.user_id == user.id
 
     def can_edit(self, user, tag) -> bool:
+        """수정 권한은 관리 권한과 같다."""
         return self.can_manage(user, tag)
 
     def can_delete(self, user, tag) -> bool:
+        """삭제 권한은 관리 권한과 같다."""
         return self.can_manage(user, tag)
 
 

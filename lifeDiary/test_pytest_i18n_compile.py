@@ -1,5 +1,4 @@
 import conftest
-
 from conftest import _compile_test_messages
 
 LOCALE_DIR = conftest.BASE_DIR / "locale" if hasattr(conftest, "BASE_DIR") else None

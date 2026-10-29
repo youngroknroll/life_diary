@@ -53,9 +53,9 @@ def main() -> None:
     if not hasattr(sys, "_MEIPASS"):
         call_command("collectstatic", "--noinput", verbosity=0)
 
+    import webview
     from django.core.wsgi import get_wsgi_application
     from waitress import serve
-    import webview
 
     app = get_wsgi_application()
     port = _find_free_port()

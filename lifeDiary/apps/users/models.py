@@ -1,9 +1,10 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
 from apps.tags.models import Tag
 
 from . import verification_policy
@@ -30,7 +31,7 @@ class UserGoal(models.Model):
         return f"{self.user.username} - {self.tag.name} ({self.period}): {self.target_hours}시간"
 
     def clean(self):
-        """목표 시간 유효성 검사"""
+        """목표 시간 유효성 검사."""
         super().clean()
 
         if self.target_hours is not None:
@@ -44,11 +45,10 @@ class UserGoal(models.Model):
                     raise ValidationError(
                         {"target_hours": _("주간 목표는 100시간을 초과할 수 없습니다.")}
                     )
-            elif self.period == "monthly":
-                if self.target_hours > 300:
-                    raise ValidationError(
-                        {"target_hours": _("월간 목표는 300시간을 초과할 수 없습니다.")}
-                    )
+            elif self.period == "monthly" and self.target_hours > 300:
+                raise ValidationError(
+                    {"target_hours": _("월간 목표는 300시간을 초과할 수 없습니다.")}
+                )
 
 
 class UserNote(models.Model):

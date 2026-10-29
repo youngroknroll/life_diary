@@ -1,5 +1,6 @@
 import pytest
 
+
 @pytest.mark.django_db
 def test_signup_en_loads_catalog_and_scripts(en_client):
     r = en_client.get('/accounts/signup/')

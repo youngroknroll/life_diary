@@ -4,7 +4,6 @@ import pytest
 
 from apps.tags.models import INK_ON_ACCENT, Category, Tag
 
-
 SIAN_PALETTE = {
     "investment": "#7CD9A0",
     "proactive": "#7DCFE8",
@@ -86,7 +85,7 @@ class TestTagFollowsItsCategory:
             tag = Tag.objects.create(
                 user=user,
                 name=f"태그{category.pk}",
-               
+
                 category=category,
             )
             assert tag.text_color == INK_ON_ACCENT

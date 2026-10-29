@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from apps.dashboard.signals import time_blocks_changed
 from apps.tags.signals import tags_changed
 from apps.users.signals import goals_changed, notes_changed
+
 from .use_cases import rotate_stats_generation
 
 

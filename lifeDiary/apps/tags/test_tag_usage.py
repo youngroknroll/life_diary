@@ -12,7 +12,6 @@ from apps.dashboard.models import TimeBlock
 from apps.tags.models import Category, Tag
 from apps.tags.use_cases import ListTagsUseCase
 
-
 TARGET = date(2026, 8, 1)
 
 

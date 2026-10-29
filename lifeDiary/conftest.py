@@ -1,8 +1,9 @@
 import ast
-import pytest
 import shutil
 import struct
 from pathlib import Path
+
+import pytest
 from django.core import management
 from django.core.management.base import CommandError
 
@@ -60,7 +61,9 @@ def _parse_po_entries(content: str):
         if entry["msgid_plural"] is not None:
             original = f"{msgid}\x00{entry['msgid_plural']}"
             max_index = max(entry["msgstrs"]) if entry["msgstrs"] else 0
-            translated = "\x00".join(entry["msgstrs"].get(index, "") for index in range(max_index + 1))
+            translated = "\x00".join(
+                entry["msgstrs"].get(index, "") for index in range(max_index + 1)
+            )
         else:
             original = msgid
             translated = entry["msgstrs"].get(0, "")
@@ -146,7 +149,7 @@ def _write_mo_file(handle, entries):
     string_data = bytearray()
     current_offset = strings_offset
 
-    for original_bytes, translation_bytes in zip(originals, translations):
+    for original_bytes in originals:
         original_table.append((len(original_bytes), current_offset))
         string_data.extend(original_bytes + b"\0")
         current_offset += len(original_bytes) + 1
@@ -231,7 +234,7 @@ def test_password():
 
 @pytest.fixture
 def make_user(db, django_user_model):
-    """user factory — 호출마다 새 user 생성."""
+    """User factory — 호출마다 새 user 생성."""
     from apps.users.email_verification import mark_email_verified
 
     counter = {"n": 0}

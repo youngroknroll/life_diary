@@ -1,5 +1,4 @@
-"""
-Django settings for lifeDiary project.
+"""Django settings for lifeDiary project.
 
 dev.py 와 prod.py 가 공유하는 값. 환경이 갈리는 값(DEBUG, 호스트, DB, 캐시,
 메일, axes 활성화)은 각 모듈이 정한다. desktop.py 는 이 파일을 쓰지 않는다.
@@ -11,11 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-from django.contrib.messages import constants as message_constants
-from dotenv import load_dotenv
+import os
 from pathlib import Path
 
-import os
+from django.contrib.messages import constants as message_constants
+from dotenv import load_dotenv
 
 load_dotenv()
 

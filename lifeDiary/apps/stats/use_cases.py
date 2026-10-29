@@ -1,3 +1,5 @@
+"""통계 화면 컨텍스트 조회, 캐시 세대 관리, 월간 엑셀 내보내기 유스케이스."""
+
 from __future__ import annotations
 
 import secrets
@@ -24,7 +26,7 @@ def _generation_key(user_id: int) -> str:
 
 
 def get_stats_generation(user_id: int) -> str:
-    """eviction 뒤에도 새 token이 만들어져 옛 세대 key가 되살아나지 않는다.
+    """Eviction 뒤에도 새 token이 만들어져 옛 세대 key가 되살아나지 않는다.
 
     FileBasedCache의 incr()가 원자적이지 않아 숫자 증가 대신 무작위 값을 쓴다.
     """
@@ -36,6 +38,7 @@ def get_stats_generation(user_id: int) -> str:
 
 
 def rotate_stats_generation(user_id: int) -> None:
+    """사용자의 통계 캐시 세대를 바꿔 이전 세대의 캐시 키를 모두 쓸 수 없게 한다."""
     cache.set(_generation_key(user_id), secrets.token_urlsafe(12), timeout=None)
 
 
@@ -49,10 +52,16 @@ class ExportMonthlyWorkbookUseCase:
     """기록이 없는 달은 거절한다. 빈 워크북은 "기록이 사라졌다"로 읽힌다."""
 
     def available_months(self, user) -> list[tuple[int, int]]:
+        """기록이 있는 (연, 월) 목록을 돌려준다."""
         dates = _time_block_repo.find_recorded_months(user)
         return [(item.year, item.month) for item in dates]
 
     def execute(self, user, year: int, month: int):
+        """한 달 기록을 엑셀 워크북으로 만들어 (워크북, 파일명)으로 돌려준다.
+
+        Raises:
+            ValueError: 달이 1~12가 아니거나 그 달에 기록이 없을 때.
+        """
         if not 1 <= month <= 12:
             raise ValueError(gettext("올바른 달이 아닙니다."))
         if (year, month) not in self.available_months(user):
@@ -64,12 +73,17 @@ class ExportMonthlyWorkbookUseCase:
 
 @dataclass(frozen=True)
 class StatsContextResult:
+    """통계 컨텍스트와 캐시 적중 여부."""
+
     context: dict
     cache_hit: bool
 
 
 class GetStatsContextUseCase:
+    """통계 화면 컨텍스트를 캐시를 거쳐 돌려준다."""
+
     def execute(self, user, target_date: date) -> StatsContextResult:
+        """캐시에 있으면 그 컨텍스트를, 없으면 집계해서 만든 컨텍스트를 돌려준다."""
         key = _cache_key(user.id, target_date)
         cached = cache.get(key)
         if cached is not None:

@@ -38,10 +38,10 @@ def get_weekly_stats_data(user, selected_date, calculator):
         active_blocks_count = 0
         active_minutes = 0
 
-        def process_block(block, tag_info, _date=date_item):
+        def process_block(block, tag_info, _date=date_item, _tag_stats=daily_tag_stats):
             nonlocal active_blocks_count, active_minutes
             key = tag_info["key"]
-            daily_tag_stats[key] = daily_tag_stats.get(key, 0) + MINUTES_PER_SLOT
+            _tag_stats[key] = _tag_stats.get(key, 0) + MINUTES_PER_SLOT
             if tag_info["category_key"] != SLEEP_CATEGORY_KEY:
                 active_blocks_count += 1
                 active_minutes += MINUTES_PER_SLOT
@@ -63,7 +63,9 @@ def get_weekly_stats_data(user, selected_date, calculator):
                 )
 
         calculator.process_blocks_without_tag(daily_blocks, process_block)
-        calculator.fill_empty_slots_weekly(daily_blocks, daily_tag_stats, tag_weekly_stats, date_item)
+        calculator.fill_empty_slots_weekly(
+            daily_blocks, daily_tag_stats, tag_weekly_stats, date_item
+        )
         weekly_data.append({
             "date": date_item,
             "day_name": date_item.strftime("%a"),
@@ -79,7 +81,9 @@ def get_weekly_stats_data(user, selected_date, calculator):
         tag_data["total_hours"] = minutes_to_hours(sum(tag_data["daily_minutes"]))
         tag_data["daily_hours"] = [minutes_to_hours(m) for m in tag_data["daily_minutes"]]
         active_days = sum(1 for m in tag_data["daily_minutes"] if m > 0)
-        tag_data["avg_hours"] = round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        tag_data["avg_hours"] = (
+            round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        )
 
     category_stats = [
         {

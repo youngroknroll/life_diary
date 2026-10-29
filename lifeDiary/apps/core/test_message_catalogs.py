@@ -10,7 +10,6 @@ import re
 import pytest
 from django.conf import settings
 
-
 HANGUL = re.compile(r"[가-힣]")
 ENTRY = re.compile(r'^msgid "(.*)"\n^msgstr "(.*)"', re.M)
 

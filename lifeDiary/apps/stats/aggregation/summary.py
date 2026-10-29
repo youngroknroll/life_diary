@@ -11,7 +11,6 @@ from .comparison import get_period_delta
 from .density import get_density_grid, get_gap_pattern
 from .goal_progress import goal_hit_dates
 
-
 _goal_repo = GoalRepository()
 
 ROLLING_DAYS = 7

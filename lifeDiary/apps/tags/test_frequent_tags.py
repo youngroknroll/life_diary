@@ -13,7 +13,6 @@ from apps.tags.models import Category, Tag
 from apps.tags.repositories import TagRepository
 from apps.tags.use_cases import FREQUENT_TAG_LIMIT, ListFrequentTagsUseCase
 
-
 TARGET = date(2026, 8, 1)
 
 

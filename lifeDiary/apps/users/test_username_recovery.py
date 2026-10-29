@@ -1,8 +1,9 @@
+from smtplib import SMTPServerDisconnected
+
 import pytest
 from django.core import mail
 from django.test import override_settings
 from django.urls import reverse
-from smtplib import SMTPServerDisconnected
 
 
 @pytest.mark.django_db

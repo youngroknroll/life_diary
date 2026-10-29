@@ -1,16 +1,16 @@
-from django.shortcuts import render, redirect
-from django.urls import reverse
-from django.contrib.auth import login
-from django.utils.translation import gettext
-from django.views.decorators.http import require_POST, require_http_methods
+"""가입·로그인 이메일 인증 흐름 뷰."""
+
 from django.contrib import messages
-from ..forms import (
-    VerificationCodeForm,
-)
+from django.contrib.auth import login
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.translation import gettext
+from django.views.decorators.http import require_http_methods, require_POST
+
 from .. import verification_policy
 from ..email_verification import (
     SIGNUP,
-    ResendBlocked,
+    ResendBlockedError,
     VerificationStatus,
     ensure_active_code,
     is_email_verified,
@@ -22,6 +22,9 @@ from ..email_verification import (
     seconds_until_resend_allowed,
     start_verification,
     verify_code,
+)
+from ..forms import (
+    VerificationCodeForm,
 )
 from ..repositories import UserAccountRepository
 
@@ -45,10 +48,12 @@ def start_signup_verification(request, user):
 
 
 def requires_email_verification(user):
+    """이메일 인증이 켜져 있고 사용자가 아직 인증하지 않았는지 돌려준다."""
     return verification_policy.is_enabled() and not is_email_verified(user)
 
 
 def start_login_verification(request, user):
+    """로그인하려는 미인증 사용자에게 인증 코드를 보내고 인증 대기 상태로 둔다."""
     start_verification(user)
     ensure_active_code(user, SIGNUP)
     request.session[SIGNUP_VERIFICATION_SESSION_KEY] = user.pk
@@ -101,9 +106,10 @@ def verification_context(email, user, purpose, form, outcome=None, **extra):
 
 
 def resend_verification(request, user, purpose):
+    """인증 코드를 다시 보낸다. 재전송이 막힌 경우 남은 시간을 안내한다."""
     try:
         resend_and_send(user, purpose)
-    except ResendBlocked as blocked:
+    except ResendBlockedError as blocked:
         messages.info(
             request,
             gettext("%(seconds)s초 후에 코드를 다시 받을 수 있습니다.")
@@ -152,6 +158,7 @@ def signup_verify_view(request):
 
 @require_POST
 def signup_verify_resend_view(request):
+    """가입 인증 코드를 다시 보낸다."""
     user = _pending_verification_user(request)
     if user is None:
         return redirect("users:login")

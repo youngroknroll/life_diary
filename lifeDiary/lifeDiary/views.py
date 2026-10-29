@@ -1,6 +1,8 @@
+"""공개 홈과 약관 페이지 뷰."""
+
 from django.conf import settings
-from django.shortcuts import render
 from django.http import HttpRequest
+from django.shortcuts import render
 
 
 def _public_page_context() -> dict:
@@ -12,9 +14,7 @@ def _public_page_context() -> dict:
 
 
 def index(request: HttpRequest):
-    """
-    메인 홈페이지
-    """
+    """메인 홈페이지."""
     context = {
         **_public_page_context(),
         "project_name": "라이프 다이어리",

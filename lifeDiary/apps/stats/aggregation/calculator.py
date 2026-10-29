@@ -98,7 +98,9 @@ class StatsCalculator:
         empty_blocks = TOTAL_SLOTS_PER_DAY - recorded_blocks_count
         return empty_blocks * MINUTES_PER_SLOT
 
-    def add_unclassified_data(self, data_container, empty_minutes, day_index=None, data_type="daily"):
+    def add_unclassified_data(
+        self, data_container, empty_minutes, day_index=None, data_type="daily"
+    ):
         if empty_minutes <= 0:
             return
         if data_type == "daily":
@@ -119,9 +121,11 @@ class StatsCalculator:
             data_container[UNCLASSIFIED_KEY]["total_blocks"] += empty_minutes // MINUTES_PER_SLOT
 
     def fill_empty_slots_daily(self, time_blocks, tag_stats, hourly_stats):
-        """미분류(빈 슬롯) 시간은 태그 상세 표(tag_stats)에는 더하되,
-        시간대별 스택 차트(hourly_stats)에는 넣지 않는다 — 표에서만
-        --color-track으로 노출한다(P0 v2 §1.3)."""
+        """미분류(빈 슬롯) 시간은 태그 상세 표(tag_stats)에만 더한다.
+
+        시간대별 스택 차트(hourly_stats)에는 넣지 않고, 표에서만
+        --color-track으로 노출한다(P0 v2 §1.3).
+        """
         for hour in range(HOURS_PER_DAY):
             total_minutes_in_hour = sum(hourly_stats[hour].values())
             empty_minutes = MINUTES_PER_HOUR - total_minutes_in_hour
@@ -134,7 +138,9 @@ class StatsCalculator:
         if empty_minutes > 0:
             self.add_unclassified_data(daily_tag_stats, empty_minutes, data_type="daily")
             day_index = (date_item - self.start_of_week).days
-            self.add_unclassified_data(tag_weekly_stats, empty_minutes, day_index, data_type="weekly")
+            self.add_unclassified_data(
+                tag_weekly_stats, empty_minutes, day_index, data_type="weekly"
+            )
 
     def fill_empty_slots_monthly(self, user, daily_tag_stats, daily_totals, total_days):
         daily_counts = self.get_monthly_daily_counts()

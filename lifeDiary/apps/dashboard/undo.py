@@ -3,7 +3,6 @@ from __future__ import annotations
 import secrets
 from datetime import datetime, timedelta
 
-
 UNDO_SESSION_KEY = "dashboard_undo"
 UNDO_TTL_SECONDS = 60
 MAX_PENDING_SNAPSHOTS = 3

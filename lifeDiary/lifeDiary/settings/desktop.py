@@ -7,6 +7,7 @@ cross-cutting settings must be repeated here on purpose.
 
 from __future__ import annotations
 
+import contextlib
 import os
 import secrets
 import sys
@@ -35,10 +36,8 @@ def _load_or_create_secret_key(data_dir: Path) -> str:
         return key_path.read_text(encoding="utf-8").strip()
     new_key = secrets.token_urlsafe(50)
     key_path.write_text(new_key, encoding="utf-8")
-    try:
+    with contextlib.suppress(OSError):
         os.chmod(key_path, 0o600)
-    except OSError:
-        pass
     return new_key
 
 

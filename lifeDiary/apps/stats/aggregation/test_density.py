@@ -8,7 +8,6 @@ from apps.dashboard.models import TimeBlock
 from apps.stats.aggregation.density import get_density_grid, get_gap_pattern
 from apps.tags.models import Category, Tag
 
-
 END = date(2026, 8, 1)
 
 
