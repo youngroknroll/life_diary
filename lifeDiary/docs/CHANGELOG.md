@@ -10,6 +10,12 @@
 
 ## 2026-10
 
+### 2026-10-30 — 파이썬 컨벤션을 경로 규칙 문서로 분리해 자동 참조 [docs]
+- 사용자 지적: 컨벤션이 `AGENTS.md` 680행 부근에만 있어 `.py` 파일을 편집할 때 참조되지 않았다. `.claude/rules/`에는 테스트·프런트 규칙만 있었다.
+- 신규 `.claude/rules/python-style.md`(`paths: "**/*.py"`, 131줄): 구글 가이드 기준, ruff 규칙군 표, 프로젝트 예외 6개, import 그룹, 이름 규칙, docstring 형식과 예시 2개(`lifeDiary/api.py`, `goal_progress.py`), `B`·`SIM`이 요구하는 코드 형태, `# noqa`·ignore 추가는 사용자 승인 필요. hooks 면제 목록을 `ruff.toml`과 같게 `E401`·`E741`·`E501`·`I`·`UP`·`D`로 적었다(이전 `AGENTS.md`는 `I`가 빠져 있었다).
+- `AGENTS.md` Python Style 절은 요약 4항목과 링크로 줄였다(23줄 → 16줄). 규칙 파일 목록 두 곳과 `CLAUDE.md` Context Loading·Instruction Placement에 `python-style.md`와 "Python module"을 더했다. `CLAUDE.md` 181줄.
+- 코드·`ruff.toml` 변경 없음. `ruff check .` 0건.
+
 ### 2026-10-29 — 파이썬 코드 컨벤션을 구글 스타일 가이드에 맞춤 [refactor]
 - 사용자 지시로 https://google.github.io/styleguide/pyguide.html 를 기준으로 삼았다. 범위는 사용자가 정했다: 규칙 확장과 위반 수정, 줄 길이 100 유지, docstring은 공개 API에만, `.claude/hooks`는 수정하지 않고 파일별로 끈다. 전면 `ruff format`, 줄 길이 변경, 타입 힌트 3,114건, "모듈만 import" 규칙은 범위 밖이다.
 - `ruff.toml`: `select`에 `E501`, `W`, `I`, `N`, `UP`, `B`, `SIM`, `D`(google convention)를 더했다. `D1`(미작성)은 `use_cases`·`domain_services`·`services`·`api`·`views` 모듈에만 적용하고 나머지는 per-file-ignores에 올렸다. `lifeDiary/__init__.py`는 패키지명이라 `N999`, `.claude/hooks/*.py`는 `E501`·`I`·`UP`·`D`를 끈다.

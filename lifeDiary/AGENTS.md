@@ -140,7 +140,8 @@ views -> use_cases -> repositories/domain_services -> models
   adapter each, here; no copy lives elsewhere in the repository.
 - `.claude/rules/*.md` files hold the policy sections of this guide that
   matter only while matching files are open (`backend-tests.md`,
-  `frontend.md`). They load by path and carry this guide's authority.
+  `frontend.md`, `python-style.md`). They load by path and carry this guide's
+  authority.
 - `.claude/settings.json` and `.claude/hooks/` hold the deterministic guards
   listed under Enforced By The Harness. A rule that can be checked
   mechanically lives there as well as here.
@@ -171,7 +172,7 @@ the line it allows.
 The hooks are registered in `.claude/settings.json`, which Claude Code reads
 only when started in this directory (`lifeDiary/`). Path-scoped rules in
 `.claude/rules/` load the matching policy section when a test, template,
-stylesheet, or browser script is read or edited.
+stylesheet, browser script, or Python module is read or edited.
 
 ## Prime Directives
 
@@ -678,27 +679,20 @@ needs a better name or a smaller function; fix that first.
 
 ### Python Style
 
-The Google Python Style Guide
-(https://google.github.io/styleguide/pyguide.html) is the base. `ruff.toml`
-enforces what a linter can check: import order (`I`), naming (`N`),
-whitespace (`W`), modern syntax (`UP`), bug risks (`B`), simplification
-(`SIM`), line length (`E501`), and docstring form (`D`, google convention).
-CI runs `ruff check`, so a violation blocks the PR.
+The full policy lives in `.claude/rules/python-style.md` and loads by itself
+whenever a Python module is read or edited. The Google Python Style Guide
+(https://google.github.io/styleguide/pyguide.html) is the base; `ruff.toml`
+enforces what a linter can check and CI runs `ruff check`, so a violation
+blocks the PR. The binding points:
 
-Project exceptions to the guide:
-
-- Line length is 100, not 80. There is no `ruff format` step.
-- `from module import Name` stays, as is idiomatic in Django. The guide's
-  "import packages and modules only" rule is not enforced.
+- Line length is 100 and there is no `ruff format` step.
+- `from module import Name` stays; the guide's "import modules only" rule is
+  not enforced. Type annotations are not required.
 - Public API is the `use_cases`, `domain_services`, `services`, `api`, and
-  `views` modules. Their public modules, classes, functions, and methods
-  require a docstring (`D1`). Other modules are listed in `ruff.toml`
-  per-file-ignores; add a new module there only when it is not public API.
-- Type annotations are not required, only kept where they already exist.
-- `.claude/hooks/*.py` are exempt from `E501`, `UP`, and `D` so the guards are
-  not edited for style.
-- `lifeDiary/__init__.py` is exempt from `N999` because the package name is the
-  project name.
+  `views` modules; their public objects carry a docstring. Other modules are
+  exempt through `ruff.toml` per-file-ignores.
+- `.claude/hooks/*.py` and `lifeDiary/__init__.py` carry the only standing
+  exemptions. A new `# noqa` or ignore needs the user's approval.
 
 ### Pythonic Code Design
 

@@ -46,7 +46,8 @@ Priority:
 - Verify repository facts from code and configuration before relying on prose.
 - Role adapters live in `.claude/agents/` (tracked) and load only when
   activated. Path-scoped rules in `.claude/rules/` load by themselves when a
-  matching test, template, stylesheet, or browser script is read or edited.
+  matching test, template, stylesheet, browser script, or Python module is
+  read or edited.
 - Do not duplicate detailed role contracts or import all of `AGENTS.md` here.
 
 ## Project Map
@@ -166,7 +167,7 @@ with an explicit question and carry the approval marker on the allowed line.
 - `AGENTS.md`: detailed product constraints, workflow, roles, and review gates
 - `.claude/agents/`: one tracked adapter per role, thin by design
 - `.claude/rules/`: policy that matters only while matching files are open
-  (`backend-tests.md`, `frontend.md`), loaded by path
+  (`backend-tests.md`, `frontend.md`, `python-style.md`), loaded by path
 - `.claude/hooks/` and `.claude/settings.json`: deterministic guards; a rule
   that can be checked mechanically lives here, not only in prose
 - `docs/CHANGELOG.md`: one entry per finished task with verification evidence,
