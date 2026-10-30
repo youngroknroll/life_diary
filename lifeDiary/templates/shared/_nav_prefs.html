@@ -5,26 +5,26 @@
 <div class="app-nav__prefs">
     <div class="dropdown" id="themeMenu">
         <button class="app-nav__pref" type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                aria-label="{% trans '테마 선택' %}" title="{% trans '테마 선택' %}">
-            <i class="fas fa-sun" data-theme-icon aria-hidden="true"></i>
+                aria-label="{% trans '테마 선택' %}" title="{% trans '테마 선택' %}" data-theme-toggle>
+            <svg class="icon" aria-hidden="true" data-theme-icon><use href="#icon-sun-fill"/></svg>
         </button>
         <ul class="dropdown-menu dropdown-menu-end app-nav__pref-menu" role="menu">
             <li>
                 <button type="button" class="dropdown-item app-nav__pref-item" data-theme-choice="light"
                         role="menuitemradio" aria-checked="false">
-                    <i class="fas fa-sun app-nav__pref-icon" aria-hidden="true"></i>{% trans "라이트" %}
+                    <svg class="icon app-nav__pref-icon" aria-hidden="true"><use href="#icon-sun-fill"/></svg>{% trans "라이트" %}
                 </button>
             </li>
             <li>
                 <button type="button" class="dropdown-item app-nav__pref-item" data-theme-choice="dark"
                         role="menuitemradio" aria-checked="false">
-                    <i class="fas fa-moon app-nav__pref-icon" aria-hidden="true"></i>{% trans "다크" %}
+                    <svg class="icon app-nav__pref-icon" aria-hidden="true"><use href="#icon-moon-fill"/></svg>{% trans "다크" %}
                 </button>
             </li>
             <li>
                 <button type="button" class="dropdown-item app-nav__pref-item" data-theme-choice="system"
                         role="menuitemradio" aria-checked="false">
-                    <i class="fas fa-circle-half-stroke app-nav__pref-icon" aria-hidden="true"></i>{% trans "시스템" %}
+                    <svg class="icon app-nav__pref-icon" aria-hidden="true"><use href="#icon-circle-half"/></svg>{% trans "시스템" %}
                 </button>
             </li>
         </ul>

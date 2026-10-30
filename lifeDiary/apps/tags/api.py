@@ -1,3 +1,5 @@
+"""카테고리·태그 JSON API."""
+
 import json
 import logging
 
@@ -6,6 +8,7 @@ from django.utils.translation import gettext
 from ninja import Router, Status
 
 from apps.core.schemas import ErrorEnvelope, MessageEnvelope, error_payload
+
 from .repositories import CategoryRepository
 from .schemas import CategoryListOut, TagIn, TagListOut, TagMutationOut
 from .use_cases import (
@@ -40,9 +43,13 @@ def _tag_not_found():
     "/categories/",
     response={200: CategoryListOut, 401: ErrorEnvelope, 500: ErrorEnvelope},
     summary="카테고리 목록 조회",
-    description="소비시간 5분류 카테고리를 표시 순서대로 반환한다. 이름과 설명은 요청 locale을 따른다.",
+    description=(
+        "소비시간 5분류 카테고리를 표시 순서대로 반환한다. "
+        "이름과 설명은 요청 locale을 따른다."
+    ),
 )
 def category_list(request):
+    """카테고리를 표시 순서대로 반환한다."""
     try:
         categories = _category_repo.find_all()
         return Status(
@@ -77,6 +84,7 @@ def category_list(request):
     description="로그인한 사용자의 태그를 사용량(기록 슬롯 수, 누적 시간)과 함께 반환한다.",
 )
 def tag_list(request):
+    """내가 접근할 수 있는 태그를 반환한다."""
     try:
         tags = _list_tags.execute(request.user)
         return Status(
@@ -117,6 +125,7 @@ def tag_list(request):
     description="선택한 카테고리에 새 태그를 만든다. 태그 색상은 카테고리 색상으로 정해진다.",
 )
 def tag_create(request, payload: TagIn):
+    """태그를 만든다."""
     try:
         tag = _create_tag.execute(
             user=request.user,
@@ -153,6 +162,7 @@ def tag_create(request, payload: TagIn):
     description="내가 소유한 태그의 이름·카테고리를 수정한다.",
 )
 def tag_update(request, tag_id: int, payload: TagIn):
+    """내 태그의 이름·색상·카테고리를 바꾼다."""
     try:
         tag = _update_tag.execute(
             user=request.user,
@@ -189,7 +199,10 @@ def tag_update(request, tag_id: int, payload: TagIn):
         500: ErrorEnvelope,
     },
     summary="태그 삭제",
-    description="내가 소유한 태그를 지운다. move_to_id를 주면 그 태그로 기록을 옮기고, 없으면 해당 기록은 미기록으로 돌아간다.",
+    description=(
+        "내가 소유한 태그를 지운다. move_to_id를 주면 그 태그로 기록을 옮기고, "
+        "없으면 해당 기록은 미기록으로 돌아간다."
+    ),
     openapi_extra={
         "requestBody": {
             "required": False,
@@ -211,6 +224,7 @@ def tag_update(request, tag_id: int, payload: TagIn):
     },
 )
 def tag_delete(request, tag_id: int):
+    """내 태그를 삭제한다. move_to_id를 주면 기록을 그 태그로 옮긴다."""
     try:
         move_to = _parse_move_to(request)
     except ValueError as exc:
@@ -244,7 +258,7 @@ def _parse_move_to(request):
     try:
         payload = json.loads(request.body or b"{}")
     except json.JSONDecodeError:
-        raise ValueError(gettext("올바른 JSON 형식이 아닙니다."))
+        raise ValueError(gettext("올바른 JSON 형식이 아닙니다.")) from None
     if not isinstance(payload, dict):
         raise ValueError(gettext("요청이 올바르지 않습니다."))
 
@@ -254,4 +268,4 @@ def _parse_move_to(request):
     try:
         return int(raw)
     except (TypeError, ValueError):
-        raise ValueError(gettext("옮길 태그를 찾을 수 없습니다."))
+        raise ValueError(gettext("옮길 태그를 찾을 수 없습니다.")) from None

@@ -1,14 +1,14 @@
-"""
-=================================================================================
-공통 유틸리티 Python 모듈
-- 여러 앱에서 공통으로 사용되는 헬퍼 함수들과 상수들을 포함합니다.
-=================================================================================
+"""공통 유틸리티 모듈.
+
+여러 앱에서 공통으로 사용되는 헬퍼 함수들과 상수들을 포함합니다.
 """
 
 import json
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
+
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
+from django.utils import timezone
 from django.utils.translation import gettext
 
 # 공통 상수
@@ -26,8 +26,7 @@ DAYS_PER_WEEK = 7
 
 
 def serialize_for_js(data):
-    """
-    Django 객체를 JavaScript에서 사용할 수 있는 JSON 문자열로 직렬화
+    """Django 객체를 JavaScript에서 사용할 수 있는 JSON 문자열로 직렬화.
 
     Args:
         data: 직렬화할 데이터 (dict, list, 또는 기타 JSON 호환 타입)
@@ -39,8 +38,7 @@ def serialize_for_js(data):
 
 
 def safe_date_parse(date_str, default=None):
-    """
-    안전한 날짜 파싱 함수
+    """안전한 날짜 파싱 함수.
 
     Args:
         date_str (str): 파싱할 날짜 문자열 (YYYY-MM-DD 형식)
@@ -50,17 +48,16 @@ def safe_date_parse(date_str, default=None):
         date: 파싱된 날짜 객체
     """
     if not date_str:
-        return default or date.today()
+        return default or timezone.localdate()
 
     try:
         return datetime.strptime(date_str, "%Y-%m-%d").date()
     except (ValueError, TypeError):
-        return default or date.today()
+        return default or timezone.localdate()
 
 
 def calculate_time_statistics(blocks_count):
-    """
-    시간 블록 개수를 기반으로 시간 통계 계산
+    """시간 블록 개수를 기반으로 시간 통계 계산.
 
     Args:
         blocks_count (int): 시간 블록 개수
@@ -82,8 +79,7 @@ def calculate_time_statistics(blocks_count):
 
 
 def success_response(message, data=None, status=200):
-    """
-    성공 응답을 위한 표준 JsonResponse 생성
+    """성공 응답을 위한 표준 JsonResponse 생성.
 
     Args:
         message (str): 성공 메시지
@@ -102,8 +98,7 @@ def success_response(message, data=None, status=200):
 
 
 def error_response(message, error_code=None, status=400):
-    """
-    오류 응답을 위한 표준 JsonResponse 생성
+    """오류 응답을 위한 표준 JsonResponse 생성.
 
     Args:
         message (str): 오류 메시지
@@ -122,8 +117,7 @@ def error_response(message, error_code=None, status=400):
 
 
 def get_slot_from_time(hour, minute):
-    """
-    시간(시, 분)을 슬롯 인덱스로 변환
+    """시간(시, 분)을 슬롯 인덱스로 변환.
 
     Args:
         hour (int): 시 (0-23)
@@ -138,8 +132,7 @@ def get_slot_from_time(hour, minute):
 
 
 def get_time_from_slot(slot_index):
-    """
-    슬롯 인덱스를 시간(시, 분)으로 변환
+    """슬롯 인덱스를 시간(시, 분)으로 변환.
 
     Args:
         slot_index (int): 슬롯 인덱스 (0-143)
@@ -153,8 +146,7 @@ def get_time_from_slot(slot_index):
 
 
 def format_time_display(hours, minutes):
-    """
-    시간을 사용자 친화적 형식으로 포맷팅
+    """시간을 사용자 친화적 형식으로 포맷팅.
 
     Args:
         hours (int): 시간
@@ -175,8 +167,7 @@ def format_time_display(hours, minutes):
 
 
 def get_week_date_range(target_date):
-    """
-    주어진 날짜가 포함된 주의 시작일과 종료일을 반환 (월요일 시작)
+    """주어진 날짜가 포함된 주의 시작일과 종료일을 반환 (월요일 시작).
 
     Args:
         target_date (date): 기준 날짜
@@ -193,8 +184,7 @@ def get_week_date_range(target_date):
 
 
 def get_month_date_range(target_date):
-    """
-    주어진 날짜가 포함된 월의 시작일과 종료일을 반환
+    """주어진 날짜가 포함된 월의 시작일과 종료일을 반환.
 
     Args:
         target_date (date): 기준 날짜

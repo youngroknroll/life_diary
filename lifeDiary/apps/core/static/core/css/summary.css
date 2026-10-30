@@ -1,0 +1,172 @@
+/* Summary tab — 수치 타일 · 관찰 · 기록 밀도 */
+.summary-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.summary-tile {
+    background: var(--color-surface);
+    padding: 12px 14px;
+}
+
+.summary-tile__label {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-bottom: 4px;
+}
+
+.summary-tile__value {
+    font-size: 1.35rem;
+    font-weight: 600;
+    line-height: 1.1;
+}
+
+.summary-tile__value--empty {
+    color: var(--color-text-muted);
+}
+
+.summary-tile__unit {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-muted);
+    margin-left: 2px;
+}
+
+.summary-tile__note {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-top: 3px;
+}
+
+.observation-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+}
+
+.observation {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 14px;
+}
+
+.observation + .observation {
+    border-top: 1px solid var(--color-border-muted);
+}
+
+.observation__mark {
+    flex: none;
+    width: 3px;
+    align-self: stretch;
+    border-radius: 2px;
+}
+
+.observation__headline {
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.observation__detail {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+    margin-top: 2px;
+}
+
+/* 축 라벨과 격자를 같은 행 높이·같은 간격으로 맞춘다. 셀 14px + gap 1px 을
+   ylabels 쪽에서 그대로 되풀이해야 날짜가 제 행에 선다. */
+.density__chart {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.density__ylabels {
+    display: grid;
+    grid-auto-rows: 14px;
+    gap: 1px;
+    flex: none;
+}
+
+.density__ylabel {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
+.density__plot {
+    flex: 1;
+    min-width: 0;
+}
+
+.density__xlabels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3px;
+}
+
+.density__xlabel {
+    font-size: 9.5px;
+    line-height: 1;
+    color: var(--color-text-meta);
+}
+
+.density__grid {
+    display: grid;
+    grid-template-columns: repeat(24, 1fr);
+    gap: 1px;
+}
+
+.density__cell {
+    display: block;
+    height: 14px;
+    background: var(--color-border-muted);
+}
+
+/* 다섯 단계 단일 색조. 카테고리 색과 섞이면 의미가 겹친다. */
+.density__cell:not([data-minutes="0"]) { background: #C3D8CB; }
+.density__cell[data-minutes="0"] { background: #E7EAE6; }
+.density__cell[data-minutes="30"],
+.density__cell[data-minutes="40"] { background: #8FBBA0; }
+.density__cell[data-minutes="50"] { background: #4E8F63; }
+.density__cell[data-minutes="60"] { background: #2C6E4A; }
+
+/* 다크에서 밝은 회색을 그대로 쓰면 빈 칸이 제일 도드라져 의미가 뒤집힌다. */
+[data-theme="dark"] .density__cell:not([data-minutes="0"]) { background: #2E5E44; }
+[data-theme="dark"] .density__cell[data-minutes="0"] { background: #272E29; }
+[data-theme="dark"] .density__cell[data-minutes="30"],
+[data-theme="dark"] .density__cell[data-minutes="40"] { background: #3C7A55; }
+[data-theme="dark"] .density__cell[data-minutes="50"] { background: #4E8F63; }
+[data-theme="dark"] .density__cell[data-minutes="60"] { background: #6BB183; }
+
+.density__legend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+}
+
+.density__legend .density__cell {
+    width: 14px;
+}
+
+@media (max-width: 767.98px) {
+    .summary-tiles {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+

@@ -1,3 +1,5 @@
+"""태그 관리 화면 뷰."""
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.views.decorators.http import require_GET
@@ -10,6 +12,7 @@ _category_repo = CategoryRepository()
 
 @login_required
 def index(request):
+    """태그 관리 화면을 렌더링한다."""
     return render(request, "tags/index.html")
 
 

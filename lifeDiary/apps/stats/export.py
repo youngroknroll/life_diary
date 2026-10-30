@@ -19,7 +19,6 @@ from apps.core.utils import HOURS_PER_DAY, MINUTES_PER_HOUR, MINUTES_PER_SLOT, S
 from apps.dashboard.repositories import TimeBlockRepository
 from apps.tags.repositories import CategoryRepository
 
-
 _time_block_repo = TimeBlockRepository()
 _category_repo = CategoryRepository()
 

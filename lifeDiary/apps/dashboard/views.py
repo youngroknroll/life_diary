@@ -1,3 +1,5 @@
+"""대시보드 화면 뷰."""
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from django.utils import timezone
@@ -26,9 +28,7 @@ _list_due_soon_goals = ListDueSoonGoalsUseCase()
 @login_required
 @require_GET
 def dashboard_view(request):
-    """
-    메인 대시보드 - Django 템플릿 기반으로 초기 데이터 렌더링
-    """
+    """메인 대시보드 - Django 템플릿 기반으로 초기 데이터 렌더링."""
     selected_date = safe_date_parse(request.GET.get("date"))
 
     # 시간 블록 데이터 조회

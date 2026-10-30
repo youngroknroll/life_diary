@@ -9,7 +9,7 @@ from django.core import mail
 from django.test import override_settings
 from django.urls import NoReverseMatch, reverse
 
-from apps.users.email_verification import PASSWORD_RESET, is_email_verified, issue_code
+from apps.users.email_verification import is_email_verified
 
 NEW_PASSWORD = "brand-new-Pass-9!"
 
@@ -65,6 +65,10 @@ class TestResetRequest:
             "default": {
                 "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
                 "LOCATION": "users-test-password-reset-rate-limit",
+            },
+            "security": {
+                "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+                "LOCATION": "users-test-password-reset-rate-limit-security",
             }
         },
     )

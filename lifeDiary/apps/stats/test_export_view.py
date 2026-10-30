@@ -8,7 +8,6 @@ from django.contrib.messages import get_messages
 from apps.dashboard.models import TimeBlock
 from apps.tags.models import Category, Tag
 
-
 XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
 ENDPOINT = "/stats/export/"
 INDEX_URL = "/stats/"

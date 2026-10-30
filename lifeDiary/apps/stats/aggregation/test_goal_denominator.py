@@ -13,7 +13,6 @@ from apps.stats.aggregation.summary import ROLLING_DAYS, build_summary
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
-
 TODAY = date(2026, 8, 5)
 
 

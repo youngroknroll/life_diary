@@ -16,7 +16,6 @@ from apps.tags.models import Category, Tag
 from apps.users.goal_deadline import DeadlineState
 from apps.users.models import UserGoal
 
-
 MONDAY = date(2026, 7, 27)
 SUNDAY = date(2026, 8, 2)
 

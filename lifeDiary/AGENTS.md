@@ -140,7 +140,8 @@ views -> use_cases -> repositories/domain_services -> models
   adapter each, here; no copy lives elsewhere in the repository.
 - `.claude/rules/*.md` files hold the policy sections of this guide that
   matter only while matching files are open (`backend-tests.md`,
-  `frontend.md`). They load by path and carry this guide's authority.
+  `frontend.md`, `python-style.md`). They load by path and carry this guide's
+  authority.
 - `.claude/settings.json` and `.claude/hooks/` hold the deterministic guards
   listed under Enforced By The Harness. A rule that can be checked
   mechanically lives there as well as here.
@@ -163,7 +164,7 @@ the line it allows.
 | PR checks | `.github/workflows/pr-checks.yml` | failing pytest, `manage.py check`, migration drift, prod deploy check, broken browser JS syntax, fuzzy translation entries |
 | Domain boundary test | `apps/dashboard/test_domain_boundaries.py` | `dashboard` importing `stats` |
 | Adapter tool limits | `tools:` in `.claude/agents/*.md` | decision and review roles editing files |
-| `bash_guard.py` | PreToolUse Bash | `commit`, `push`, `merge` on `main`; pushing to `main`; `gh pr merge`; tag creation; `pytest`, `manage.py`, `pip install`, `.venv`, `uv` outside `conda run -n knou-life-diary` |
+| `bash_guard.py` | PreToolUse Bash | `commit`, `push`, `merge` on `main`; pushing to `main`; tag creation; `pytest`, `manage.py`, `pip install`, `.venv`, `uv` outside `conda run -n knou-life-diary` |
 | `frontend_comment_guard.py` | PreToolUse Edit, Write, MultiEdit | a new comment in a template, stylesheet, or browser script |
 | `changelog_defer_guard.py` | PreToolUse Edit, Write, MultiEdit, Bash | a defect-like `미해결` entry without the approval marker; editing `docs/CHANGELOG.md` through Bash |
 | `defect_deferral_guard.py` | Stop | a final report that defers a found defect without user approval |
@@ -171,7 +172,7 @@ the line it allows.
 The hooks are registered in `.claude/settings.json`, which Claude Code reads
 only when started in this directory (`lifeDiary/`). Path-scoped rules in
 `.claude/rules/` load the matching policy section when a test, template,
-stylesheet, or browser script is read or edited.
+stylesheet, browser script, or Python module is read or edited.
 
 ## Prime Directives
 
@@ -213,10 +214,10 @@ stylesheet, or browser script is read or edited.
 6. **Git actions stay on the agent's branch.**
    - The agent commits in small verified units on a feature branch, pushes
      it, and opens or updates the pull request for that track.
-   - Merging, release tagging, and any commit or push on `main` belong to
-     the user. `bash_guard.py` denies those commands.
-   - Approval for implementation or verification does not imply approval
-     for a merge.
+   - Release tagging and any commit or push on `main` belong to the user.
+     `bash_guard.py` denies those commands.
+   - A pull request is merged only when the user asks for that merge.
+     Approval for implementation or verification does not imply it.
 
 ## Role Catalog
 
@@ -669,9 +670,29 @@ needs a better name or a smaller function; fix that first.
 - Write only what the reader cannot recover from the code: a rule imposed by
   the spec, a framework behavior being worked around, or the incident that a
   non-obvious choice prevents.
-- Docstrings follow the same bar. One line stating the contract. Do not
-  enumerate rules the tests already pin down.
+- Docstrings follow the same bar. Public API (see Python Style) carries a
+  one-line summary that ends with a period. Add `Args:`, `Returns:`, or
+  `Raises:` only for what the name and type hints cannot show, such as an
+  exception the caller must handle. Do not enumerate rules the tests already
+  pin down.
 - No section-divider comment banners.
+
+### Python Style
+
+The full policy lives in `.claude/rules/python-style.md` and loads by itself
+whenever a Python module is read or edited. The Google Python Style Guide
+(https://google.github.io/styleguide/pyguide.html) is the base; `ruff.toml`
+enforces what a linter can check and CI runs `ruff check`, so a violation
+blocks the PR. The binding points:
+
+- Line length is 100 and there is no `ruff format` step.
+- `from module import Name` stays; the guide's "import modules only" rule is
+  not enforced. Type annotations are not required.
+- Public API is the `use_cases`, `domain_services`, `services`, `api`, and
+  `views` modules; their public objects carry a docstring. Other modules are
+  exempt through `ruff.toml` per-file-ignores.
+- `.claude/hooks/*.py` and `lifeDiary/__init__.py` carry the only standing
+  exemptions. A new `# noqa` or ignore needs the user's approval.
 
 ### Pythonic Code Design
 
@@ -786,6 +807,7 @@ Execution:
   behavior that already passed its verification, not a day's worth of edits.
 - Never commit on `main`. Open a branch per large track (`feat/<track>`), push
   it, and open a PR for that track.
-- Merging and release tagging stay with the user.
+- Release tagging stays with the user. Merge a PR only when the user asks
+  for it.
 
 Convention source: https://nohack.tistory.com/17

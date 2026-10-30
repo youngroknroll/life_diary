@@ -44,11 +44,11 @@ def test_required_tag_migration_removes_legacy_tagless_time_blocks():
         executor.loader.build_graph()
         executor.migrate(MIGRATE_TO)
         new_apps = executor.loader.project_state(MIGRATE_TO).apps
-        MigratedTimeBlock = new_apps.get_model("dashboard", "TimeBlock")
+        migrated_time_block = new_apps.get_model("dashboard", "TimeBlock")
 
-        assert not MigratedTimeBlock.objects.filter(tag__isnull=True).exists()
-        assert MigratedTimeBlock.objects.filter(slot_index=0).count() == 1
-        tag_field = MigratedTimeBlock._meta.get_field("tag")
+        assert not migrated_time_block.objects.filter(tag__isnull=True).exists()
+        assert migrated_time_block.objects.filter(slot_index=0).count() == 1
+        tag_field = migrated_time_block._meta.get_field("tag")
         assert tag_field.null is False
         assert tag_field.remote_field.on_delete is models.CASCADE
     finally:

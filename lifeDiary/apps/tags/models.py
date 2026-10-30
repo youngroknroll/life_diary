@@ -1,11 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
-from django.utils.translation import gettext, gettext_lazy as _
+from django.core.validators import RegexValidator
+from django.db import models
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from .name_limit import MAX_TAG_NAME_LENGTH
-
 
 # CSS 의 --ink-on-accent 와 같은 값. 서버가 인라인 style 로도 내보내야 해서
 # 여기에 한 번 더 둔다.
@@ -30,8 +30,8 @@ _CATEGORY_I18N_REGISTRY = (
 
 
 class Category(models.Model):
-    """
-    시간 소비의 대분류 (시스템 고정 5가지).
+    """시간 소비의 대분류 (시스템 고정 5가지).
+
     - 수동적 소비시간, 주도적 사용시간, 투자시간, 기초 생활시간, 수면시간
     """
 
@@ -69,8 +69,8 @@ class Category(models.Model):
 
 
 class Tag(models.Model):
-    """
-    사용자별 태그 관리
+    """사용자별 태그 관리.
+
     - 이름: 태그명 (예: "업무", "운동", "식사")
     - 색상: HEX 색상 코드 (예: "#FF5733")
     """
@@ -141,7 +141,7 @@ class Tag(models.Model):
         return f"{self.user.username} - {self.name}"
 
     def clean(self):
-        """추가 유효성 검사"""
+        """추가 유효성 검사."""
         super().clean()
         if self.name:
             self.name = self.name.strip()

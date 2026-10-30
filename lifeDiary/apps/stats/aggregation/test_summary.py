@@ -9,7 +9,6 @@ from apps.stats.aggregation.summary import build_summary
 from apps.tags.models import Category, Tag
 from apps.users.models import UserGoal
 
-
 SATURDAY = date(2026, 8, 1)
 
 

@@ -1,6 +1,6 @@
 import pytest
 from django.contrib.auth import get_user_model
-from django.core.cache import cache
+from django.core.cache import cache, caches
 from django.urls import reverse
 
 from conftest import DEFAULT_TEST_PASSWORD
@@ -19,7 +19,7 @@ def member(db):
 
 @pytest.fixture(autouse=True)
 def counting_cache(settings):
-    """conftest pins every test to DummyCache, which cannot count.
+    """Conftest pins every test to DummyCache, which cannot count.
 
     The failure budget lives in the cache, so this suite needs a backend that
     actually retains and increments.
@@ -29,11 +29,17 @@ def counting_cache(settings):
         "default": {
             "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
             "LOCATION": "login-remaining-attempts",
+        },
+        "security": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "login-remaining-attempts-security",
         }
     }
     cache.clear()
+    caches["security"].clear()
     yield
     cache.clear()
+    caches["security"].clear()
 
 
 def fail_login(client, times=1):

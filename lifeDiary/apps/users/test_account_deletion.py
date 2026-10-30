@@ -16,7 +16,6 @@ from apps.users.account_deletion import (
 )
 from apps.users.models import AccountDeletionRequest, DeletedAccountRecord, UserGoal, UserNote
 
-
 pytestmark = pytest.mark.django_db
 
 

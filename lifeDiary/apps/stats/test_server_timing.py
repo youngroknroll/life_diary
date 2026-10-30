@@ -157,7 +157,7 @@ def test_stats_page_still_renders_when_server_timing_measurement_fails(
     assert "Server-Timing" not in response
 
 
-class StatsBuildFailure(Exception):
+class StatsBuildFailureError(Exception):
     pass
 
 
@@ -168,9 +168,9 @@ def test_stats_page_propagates_real_database_errors(
     client.force_login(recorded_user)
 
     def failing_build(user, target_date):
-        raise StatsBuildFailure("statistics could not be built")
+        raise StatsBuildFailureError("statistics could not be built")
 
     monkeypatch.setattr("apps.stats.use_cases.get_stats_context", failing_build)
 
-    with pytest.raises(StatsBuildFailure):
+    with pytest.raises(StatsBuildFailureError):
         client.get(STATS_PATH)

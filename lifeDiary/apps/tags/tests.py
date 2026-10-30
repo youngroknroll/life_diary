@@ -2,13 +2,13 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from django.db import IntegrityError
 from django.db.models import ProtectedError
 from django.template import Context, Template
 
 from apps.tags.domain_services import TagPolicyService
 from apps.tags.models import Category, Tag
 from apps.tags.repositories import CategoryRepository, TagRepository
-
 
 # === Domain Service Tests (No DB) ===
 
@@ -48,13 +48,17 @@ class TestCategoryModel:
 
     def test_category_unique_slug(self):
         Category.objects.create(name="테스트A", slug="test_a", color="#111111", display_order=90)
-        with pytest.raises(Exception):
-            Category.objects.create(name="테스트B", slug="test_a", color="#222222", display_order=91)
+        with pytest.raises(IntegrityError):
+            Category.objects.create(
+                name="테스트B", slug="test_a", color="#222222", display_order=91
+            )
 
     def test_category_unique_name(self):
         Category.objects.create(name="테스트C", slug="test_c", color="#333333", display_order=92)
-        with pytest.raises(Exception):
-            Category.objects.create(name="테스트C", slug="test_d", color="#444444", display_order=93)
+        with pytest.raises(IntegrityError):
+            Category.objects.create(
+                name="테스트C", slug="test_d", color="#444444", display_order=93
+            )
 
     def test_category_ordering(self):
         Category.objects.create(name="Z카테고리", slug="z_cat", color="#555555", display_order=99)

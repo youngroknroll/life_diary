@@ -48,10 +48,13 @@ def test_prod_settings_send_error_logs_to_console(monkeypatch):
         "level": "WARNING",
     }
     assert prod_settings.LOGGING["loggers"]["django.request"] == {
-        "handlers": ["console"],
+        "handlers": ["console", "mail_admins"],
         "level": "ERROR",
         "propagate": False,
     }
+    assert prod_settings.LOGGING["handlers"]["mail_admins"]["class"] == (
+        "django.utils.log.AdminEmailHandler"
+    )
 
 
 def test_prod_settings_trust_render_proxy_ssl_header(monkeypatch):
@@ -105,7 +108,6 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
     # 현재 템플릿이 실제로 사용하는 CDN·reCAPTCHA·GA 출처만 허용한다.
     for host in (
         "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
         "https://unpkg.com",
         "https://www.google.com",
         "https://www.gstatic.com",
@@ -115,6 +117,7 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
         "https://*.googletagmanager.com",
     ):
         assert host in policy
+    assert "cdnjs.cloudflare.com" not in policy
     assert (
         "apps.core.middleware.ContentSecurityPolicyMiddleware"
         in prod_settings.MIDDLEWARE
@@ -122,8 +125,10 @@ def test_prod_csp_policy_covers_required_sources(monkeypatch):
 
 
 def test_prod_settings_serve_hashed_static_files_with_whitenoise(monkeypatch):
-    """Django 5.1에서 STATICFILES_STORAGE 가 제거되어 STORAGES 로만
-    manifest 해시·압축·장기 캐시가 활성화된다."""
+    """STORAGES 로만 manifest 해시·압축·장기 캐시가 활성화된다.
+
+    Django 5.1에서 STATICFILES_STORAGE 가 제거되었기 때문이다.
+    """
     monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
     monkeypatch.setenv("DB_NAME", "test_db")
     monkeypatch.setenv("DB_USER", "test_user")
@@ -184,3 +189,55 @@ def test_prod_settings_server_timing_flag_follows_env_var(monkeypatch, env_value
     prod_settings = importlib.reload(prod_settings)
 
     assert prod_settings.STATS_SERVER_TIMING_ENABLED is expected
+
+
+def test_prod_settings_keep_security_counters_out_of_the_file_cache(monkeypatch):
+    """로그인 실패·복구 카운터가 /tmp 통계 캐시와 운명을 같이하면 재배포·cull 로 게이트가 풀린다."""
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    security = prod_settings.CACHES["security"]
+    assert security["BACKEND"] == "django.core.cache.backends.db.DatabaseCache"
+    assert security["LOCATION"] == "lifediary_security_cache"
+    assert security["BACKEND"] != prod_settings.CACHES["default"]["BACKEND"]
+
+
+@pytest.mark.parametrize(
+    ("env_value", "host_user", "expected_admins"),
+    [
+        (None, "", []),
+        (None, "ops@example.com", [("LifeDiary", "ops@example.com")]),
+        ("alerts@example.com", "ops@example.com", [("LifeDiary", "alerts@example.com")]),
+    ],
+    ids=[
+        "nothing_configured_sends_nothing",
+        "falls_back_to_the_sending_account",
+        "explicit_address_wins",
+    ],
+)
+def test_prod_settings_mail_server_errors_to_the_configured_address(
+    monkeypatch, env_value, host_user, expected_admins
+):
+    monkeypatch.setenv("DJANGO_SECRET_KEY", "test-secret")
+    monkeypatch.setenv("DB_NAME", "test_db")
+    monkeypatch.setenv("DB_USER", "test_user")
+    monkeypatch.setenv("DB_PASSWORD", "test_password")
+    monkeypatch.setenv("DB_HOST", "localhost")
+    monkeypatch.setenv("DB_PORT", "6543")
+    monkeypatch.setenv("EMAIL_HOST_USER", host_user)
+    if env_value is None:
+        monkeypatch.delenv("ERROR_REPORT_EMAIL", raising=False)
+    else:
+        monkeypatch.setenv("ERROR_REPORT_EMAIL", env_value)
+
+    prod_settings = importlib.import_module("lifeDiary.settings.prod")
+    prod_settings = importlib.reload(prod_settings)
+
+    assert expected_admins == prod_settings.ADMINS

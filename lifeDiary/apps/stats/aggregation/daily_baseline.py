@@ -13,7 +13,7 @@ WINDOW_DAYS = 7
 
 
 def get_tag_deltas_vs_week(user, selected_date, calculator=None):
-    """{태그명: 기준일 시간 − 7일 하루 평균} 을 돌려준다.
+    """{tag_id: 기준일 시간 − 7일 하루 평균} 을 돌려준다.
 
     미기록 구간은 태그가 없으므로 빠진다. 이 열은 태그가 붙은 시간만 다룬다.
     """
@@ -25,14 +25,14 @@ def get_tag_deltas_vs_week(user, selected_date, calculator=None):
     for block in blocks:
         if not block.tag:
             continue
-        name = block.tag.name
-        window_minutes[name] = window_minutes.get(name, 0) + MINUTES_PER_SLOT
+        tag_id = block.tag_id
+        window_minutes[tag_id] = window_minutes.get(tag_id, 0) + MINUTES_PER_SLOT
         if block.date == selected_date:
-            today_minutes[name] = today_minutes.get(name, 0) + MINUTES_PER_SLOT
+            today_minutes[tag_id] = today_minutes.get(tag_id, 0) + MINUTES_PER_SLOT
 
     deltas = {}
-    for name, total in window_minutes.items():
+    for tag_id, total in window_minutes.items():
         average = total / WINDOW_DAYS / MINUTES_PER_HOUR
-        actual = today_minutes.get(name, 0) / MINUTES_PER_HOUR
-        deltas[name] = round(actual - average, 1)
+        actual = today_minutes.get(tag_id, 0) / MINUTES_PER_HOUR
+        deltas[tag_id] = round(actual - average, 1)
     return deltas

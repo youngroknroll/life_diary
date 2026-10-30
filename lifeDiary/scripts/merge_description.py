@@ -7,7 +7,6 @@ import argparse
 import subprocess
 from pathlib import Path
 
-
 DEFAULT_VERIFICATION = [
     "pytest <관련 테스트 명령>",
     "python manage.py check",

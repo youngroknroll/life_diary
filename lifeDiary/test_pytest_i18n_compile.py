@@ -1,29 +1,25 @@
 import conftest
-
 from conftest import _compile_test_messages
 
+LOCALE_DIR = conftest.BASE_DIR / "locale" if hasattr(conftest, "BASE_DIR") else None
 
-def test_compile_test_messages_runs_django_compilemessages(monkeypatch):
-    calls = []
 
-    def fake_call_command(*args, **kwargs):
-        calls.append((args, kwargs))
+def _catalog_pairs():
+    import pathlib
 
-    monkeypatch.setattr("shutil.which", lambda name: "/usr/bin/msgfmt")
-    monkeypatch.setattr("django.core.management.call_command", fake_call_command)
+    base = pathlib.Path(__file__).resolve().parent / "locale"
+    for language in ("en", "ko"):
+        messages = base / language / "LC_MESSAGES"
+        for domain in ("django", "djangojs"):
+            yield messages / f"{domain}.po", messages / f"{domain}.mo"
 
+
+def test_compile_test_messages_leaves_every_catalog_compiled_and_current():
     _compile_test_messages()
 
-    assert calls == [
-        (
-            ("compilemessages",),
-            {
-                "ignore": [".venv/*", ".worktrees/*", "staticfiles/*"],
-                "locale": ["en", "ko"],
-                "verbosity": 0,
-            },
-        )
-    ]
+    for po_path, mo_path in _catalog_pairs():
+        assert mo_path.exists(), mo_path
+        assert mo_path.stat().st_mtime >= po_path.stat().st_mtime, mo_path
 
 
 def test_compile_test_messages_uses_python_fallback_when_msgfmt_is_missing(monkeypatch):

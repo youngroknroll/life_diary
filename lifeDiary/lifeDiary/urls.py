@@ -1,8 +1,8 @@
-"""
-URL configuration for lifeDiary project.
+"""URL configuration for lifeDiary project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
+
 Examples:
 Function views
     1. Add an import:  from my_app import views
@@ -15,14 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
-from django.urls import path, include
-from allauth.urls import build_provider_urlpatterns
-from django.views.generic.base import RedirectView
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
+from django.urls import include, path
+from django.views.generic.base import RedirectView
 from django.views.i18n import JavaScriptCatalog
+
 from . import views
 from .api import api
 
@@ -85,17 +86,30 @@ urlpatterns = [
     path("stats/", include("apps.stats.urls")),
     path("tags/", include("apps.tags.urls")),
     path("accounts/", include("apps.users.urls")),
-    # allauth.urls 전체 대신 소셜 경로만 연다. account URL 을 열어 두면 링크
-    # 방식 비밀번호 재설정이 코드 방식 옆에 그대로 살아 있게 된다.
-    path("accounts/3rdparty/", include("allauth.socialaccount.urls")),
-    path("accounts/", include(build_provider_urlpatterns())),
-    # allauth 내부가 reverse("account_login") 을 쓴다. 해석은 위의 users 로그인이
-    # 먼저 가져가고, 이 항목은 이름만 채운다.
-    path(
-        "accounts/login/",
-        RedirectView.as_view(pattern_name="users:login"),
-        name="account_login",
-    ),
     # API URLs
     path("api/", api.urls),
 ]
+
+
+def _social_login_urlpatterns():
+    # 데스크톱 설정은 allauth 를 싣지 않는다. 모듈 import 자체가 모델 등록을
+    # 요구하므로 앱이 설치된 경우에만 읽는다.
+    from allauth.urls import build_provider_urlpatterns
+
+    return [
+        # allauth.urls 전체 대신 소셜 경로만 연다. account URL 을 열어 두면 링크
+        # 방식 비밀번호 재설정이 코드 방식 옆에 그대로 살아 있게 된다.
+        path("accounts/3rdparty/", include("allauth.socialaccount.urls")),
+        path("accounts/", include(build_provider_urlpatterns())),
+        # allauth 내부가 reverse("account_login") 을 쓴다. 해석은 위의 users 로그인이
+        # 먼저 가져가고, 이 항목은 이름만 채운다.
+        path(
+            "accounts/login/",
+            RedirectView.as_view(pattern_name="users:login"),
+            name="account_login",
+        ),
+    ]
+
+
+if apps.is_installed("allauth.socialaccount"):
+    urlpatterns += _social_login_urlpatterns()

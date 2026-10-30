@@ -1,5 +1,5 @@
-"""
-stats/logic.py — 얇은 오케스트레이터.
+"""stats/logic.py — 얇은 오케스트레이터.
+
 집계 로직은 aggregation/ 패키지에 위치한다.
 """
 from datetime import timedelta
@@ -7,16 +7,16 @@ from datetime import timedelta
 from apps.core.utils import get_month_date_range, get_week_date_range
 from apps.users.repositories import GoalRepository, NoteRepository
 
+from .aggregation.analysis import get_tag_analysis_data
 from .aggregation.calculator import StatsCalculator
 from .aggregation.comparison import BASELINE_MAX_WEEKS
 from .aggregation.daily import get_daily_stats_data
-from .aggregation.weekly import get_weekly_stats_data
-from .aggregation.monthly import get_monthly_stats_data
-from .aggregation.analysis import get_tag_analysis_data
 from .aggregation.daily_baseline import get_tag_deltas_vs_week
-from .aggregation.weekly_summary import build_weekly_summary
-from .aggregation.summary import ROLLING_DAYS, build_summary
 from .aggregation.goal_progress import build_goal_progress_rows
+from .aggregation.monthly import get_monthly_stats_data
+from .aggregation.summary import ROLLING_DAYS, build_summary
+from .aggregation.weekly import get_weekly_stats_data
+from .aggregation.weekly_summary import build_weekly_summary
 
 __all__ = [
     "StatsCalculator",
@@ -58,7 +58,7 @@ def get_stats_context(user, selected_date):
     tag_deltas = get_tag_deltas_vs_week(user, selected_date, calculator=calculator)
     weekly_summary = build_weekly_summary(monthly_stats, today=selected_date)
     for tag in daily_stats["tag_stats"]:
-        tag["delta_vs_week"] = tag_deltas.get(tag["name"])
+        tag["delta_vs_week"] = tag_deltas.get(tag["tag_id"])
 
     context = {
         "page_title": "통계",

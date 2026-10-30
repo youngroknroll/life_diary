@@ -6,7 +6,6 @@ import pytest
 
 from apps.users.goal_deadline import deadline_state
 
-
 TODAY = date(2026, 10, 6)
 
 

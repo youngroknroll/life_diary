@@ -7,7 +7,7 @@
 # secrets 최소권한: 진짜 값은 DB_NAME/DB_USER/DB_PASSWORD/DB_HOST 뿐이다.
 # DJANGO_SECRET_KEY 는 웹 서비스 키를 복사하지 말고 이 워크플로 전용
 # 무작위 값을 새로 만들어 넣는다(purge 는 세션·토큰 서명을 하지 않는다).
-# 메일도 보내지 않으므로 RESEND 관련 값은 더미다.
+# 메일도 보내지 않으므로 발신 주소는 더미다.
 name: purge deleted accounts
 
 on:
@@ -30,7 +30,6 @@ env:
   DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
   DB_HOST: ${{ secrets.DB_HOST }}
   DB_PORT: '6543'
-  RESEND_API_KEY: re_dummy_purge_job_sends_no_mail
   DEFAULT_FROM_EMAIL: LifeDiary <noreply@example.com>
 
 jobs:
@@ -41,11 +40,11 @@ jobs:
       run:
         working-directory: lifeDiary
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: production
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: '3.13'
           cache: pip

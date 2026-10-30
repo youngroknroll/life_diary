@@ -135,7 +135,7 @@ class TestSocialScreens:
         assert response.status_code == 200
 
     def test_authentication_error_screen_renders(self, client):
-        """allauth 는 이 화면을 401 로 낸다. 렌더만 확인한다."""
+        """Allauth 는 이 화면을 401 로 낸다. 렌더만 확인한다."""
         response = client.get(reverse("socialaccount_login_error"))
 
         assert response.status_code == 401

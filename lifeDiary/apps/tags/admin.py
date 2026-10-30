@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
+
 from .models import Category, Tag
 
 
@@ -10,7 +11,8 @@ class CategoryAdmin(admin.ModelAdmin):
 
     def color_display(self, obj):
         return format_html(
-            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; color: white; font-weight: bold;">{}</span>',
+            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; '
+            'color: white; font-weight: bold;">{}</span>',
             obj.color,
             obj.color,
         )
@@ -39,7 +41,8 @@ class TagAdmin(admin.ModelAdmin):
 
     def color_display(self, obj):
         return format_html(
-            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; color: white; font-weight: bold;">{}</span>',
+            '<span style="background-color: {}; padding: 5px 15px; border-radius: 3px; '
+            'color: white; font-weight: bold;">{}</span>',
             obj.color,
             obj.color,
         )

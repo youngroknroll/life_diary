@@ -45,8 +45,10 @@ def _tagged_daily_hours(tag_stats, total_days):
 
 
 def _top_tag(tag_stats):
-    """기록이 0인 달에도 태그가 있으면 열을 유지한다. 열이 사라졌다 나타나면
-    표의 모양이 달마다 달라진다."""
+    """기록이 0인 달에도 태그가 있으면 열을 유지한다.
+
+    열이 사라졌다 나타나면 표의 모양이 달마다 달라진다.
+    """
     ranked = [t for t in tag_stats if not t.get("is_unclassified")]
     if not ranked:
         return None

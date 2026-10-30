@@ -19,17 +19,20 @@ def get_monthly_stats_data(user, selected_date, calculator):
     }
 
     def process_block(block, tag_info):
-        tag_name = tag_info["name"]
-        tag_color = tag_info["color"]
+        key = tag_info["key"]
         day_index = (block.date - calculator.start_of_month).days
-        if tag_name not in daily_tag_stats:
-            daily_tag_stats[tag_name] = {
-                "name": tag_name, "color": tag_color,
-                "daily_hours": [0] * total_days, "total_hours": 0,
+        if key not in daily_tag_stats:
+            daily_tag_stats[key] = {
+                "key": key,
+                "tag_id": tag_info["tag_id"],
+                "name": tag_info["name"],
+                "color": tag_info["color"],
+                "daily_hours": [0] * total_days,
+                "total_hours": 0,
             }
         hours_inc = MINUTES_PER_SLOT / MINUTES_PER_HOUR
-        daily_tag_stats[tag_name]["daily_hours"][day_index] += hours_inc
-        daily_tag_stats[tag_name]["total_hours"] += hours_inc
+        daily_tag_stats[key]["daily_hours"][day_index] += hours_inc
+        daily_tag_stats[key]["total_hours"] += hours_inc
         daily_totals[day_index] += hours_inc
 
         category_key = tag_info["category_key"]
@@ -55,7 +58,9 @@ def get_monthly_stats_data(user, selected_date, calculator):
         tag_data["daily_hours"] = [round(h, 1) for h in tag_data["daily_hours"]]
         tag_data["total_hours"] = round(tag_data["total_hours"], 1)
         active_days = sum(1 for h in tag_data["daily_hours"] if h > 0)
-        tag_data["avg_hours"] = round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        tag_data["avg_hours"] = (
+            round(tag_data["total_hours"] / active_days, 1) if active_days > 0 else 0
+        )
 
     daily_totals = [round(h, 1) for h in daily_totals]
     tag_list = sorted(daily_tag_stats.values(), key=lambda x: x["total_hours"], reverse=True)

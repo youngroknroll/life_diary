@@ -1,16 +1,18 @@
+"""태그 조회·생성·수정·삭제 유스케이스."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 
 from django.db import transaction
+from django.utils.translation import gettext
 
 from apps.core.utils import MINUTES_PER_HOUR, MINUTES_PER_SLOT
-from django.utils.translation import gettext
+from apps.dashboard.repositories import TimeBlockRepository
 
 from .domain_services import _tag_policy_service
 from .repositories import CategoryRepository, TagRepository
 from .signals import tags_changed
-from apps.dashboard.repositories import TimeBlockRepository
 
 _tag_repo = TagRepository()
 _category_repo = CategoryRepository()
@@ -19,6 +21,8 @@ _time_block_repo = TimeBlockRepository()
 
 @dataclass(frozen=True)
 class TagData:
+    """태그 목록 응답용 값."""
+
     id: int
     name: str
     color: str
@@ -30,7 +34,10 @@ class TagData:
 
 
 class ListTagsUseCase:
+    """내가 접근할 수 있는 태그를 기록 수와 함께 나열한다."""
+
     def execute(self, user) -> list[TagData]:
+        """정렬된 태그 목록을 태그별 기록 수와 함께 돌려준다."""
         tags = _tag_repo.find_accessible_ordered(user)
         blocks_by_tag = _time_block_repo.count_blocks_by_tag(user)
 
@@ -64,6 +71,7 @@ class ListFrequentTagsUseCase:
     """
 
     def execute(self, user, limit: int = FREQUENT_TAG_LIMIT) -> list:
+        """기록이 많은 순으로 태그를 limit개까지 돌려준다. 같은 수면 목록 순서를 따른다."""
         tags = list(_tag_repo.find_accessible_ordered(user))
         if not tags:
             return []
@@ -77,6 +85,7 @@ class ListFrequentTagsUseCase:
         return [tag for _position, tag in ordered[:limit]]
 
     def has_usage(self, user) -> bool:
+        """기록이 하나라도 있는 태그가 있는지 돌려준다."""
         return bool(_time_block_repo.count_blocks_by_tag(user))
 
 
@@ -87,8 +96,16 @@ def _notify_tags_changed(sender, user_id: int) -> None:
 
 
 class CreateTagUseCase:
+    """태그를 만든다."""
+
     @transaction.atomic
     def execute(self, user, name: str, color: str, category_id) -> dict:
+        """태그를 만들어 응답용 딕셔너리로 돌려준다.
+
+        Raises:
+            ValueError: 이름·색상·카테고리가 비었거나 같은 이름의 태그가 이미 있을 때.
+            LookupError: 카테고리가 존재하지 않을 때.
+        """
         if not name or not color:
             raise ValueError(gettext("태그명과 색상을 입력해주세요."))
 
@@ -109,8 +126,17 @@ class CreateTagUseCase:
 
 
 class UpdateTagUseCase:
+    """내 태그의 이름·색상·카테고리를 바꾼다."""
+
     @transaction.atomic
     def execute(self, user, tag_id: int, name: str, color: str, category_id) -> dict:
+        """태그를 수정해 응답용 딕셔너리로 돌려준다.
+
+        Raises:
+            ValueError: 이름·색상이 비었거나 같은 이름의 태그가 이미 있을 때.
+            LookupError: 카테고리가 존재하지 않을 때.
+            Http404: 내 태그가 아닐 때.
+        """
         tag = _tag_repo.get_for_owner_or_404(tag_id, user)
 
         if not name or not color:
@@ -134,6 +160,8 @@ class UpdateTagUseCase:
 
 
 class DeleteTagUseCase:
+    """내 태그를 삭제한다."""
+
     @transaction.atomic
     def execute(self, user, tag_id: int, move_to_id: int | None = None) -> str:
         """옮길 곳을 주면 기록을 살린 뒤 지운다.

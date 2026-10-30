@@ -46,7 +46,8 @@ Priority:
 - Verify repository facts from code and configuration before relying on prose.
 - Role adapters live in `.claude/agents/` (tracked) and load only when
   activated. Path-scoped rules in `.claude/rules/` load by themselves when a
-  matching test, template, stylesheet, or browser script is read or edited.
+  matching test, template, stylesheet, browser script, or Python module is
+  read or edited.
 - Do not duplicate detailed role contracts or import all of `AGENTS.md` here.
 
 ## Project Map
@@ -61,7 +62,7 @@ Priority:
 - `templates/`, `locale/`, `scripts/`: shared web UI, translations, local
   tooling
 - `docs/`: change log and backlog (`CHANGELOG.md`), roadmap plans, security,
-  architecture
+  architecture, operations (backup and recovery)
 - `.claude/`: role adapters (`agents/`), path-scoped rules (`rules/`), hook
   scripts (`hooks/`), and `settings.json` registering them; all tracked
 
@@ -74,7 +75,9 @@ Priority:
 - Tags: `apps/tags/models.py`, `apps/tags/use_cases.py`,
   `apps/tags/domain_services.py`, `apps/tags/repositories.py`
 - Users: `apps/users/models.py`, `apps/users/use_cases.py`,
-  `apps/users/forms.py`, `apps/users/views.py`,
+  `apps/users/forms.py`, `apps/users/views/` (auth, verification, recovery,
+  validation, password_reset, onboarding, goals, notes, account),
+  `apps/users/login_protection.py` (failure counters, throttles, reCAPTCHA),
   `apps/users/account_deletion.py`, `apps/users/repositories.py`
 - Stats: `apps/stats/logic.py`, `apps/stats/use_cases.py`,
   `apps/stats/aggregation/`
@@ -95,6 +98,7 @@ unknown or the task requires a repository-wide repeated-pattern check.
 - Targeted test: `conda run -n knou-life-diary pytest <test-path> --tb=short`
 - Backend regression: `conda run -n knou-life-diary pytest`
 - Django check: `conda run -n knou-life-diary python manage.py check`
+- Lint: `conda run -n knou-life-diary ruff check .` (config `ruff.toml`; CI runs it)
 - Prod deploy check: `conda run -n knou-life-diary python manage.py check --settings=lifeDiary.settings.prod --deploy --fail-level ERROR`
 - Migration drift: `conda run -n knou-life-diary python manage.py makemigrations --check --dry-run`
 - Browser JS syntax: `node --check <static-js-path>`
@@ -121,8 +125,8 @@ targeted test before broad regression.
 Hooks registered in `.claude/settings.json` (loaded only when Claude Code
 starts in `lifeDiary/`) deny these actions; see `AGENTS.md` Enforced By The
 Harness for the full table:
-- `git commit`, `push`, or `merge` on `main`, pushing to `main`, `gh pr merge`,
-  and tag creation (`bash_guard.py`)
+- `git commit`, `push`, or `merge` on `main`, pushing to `main`, and tag
+  creation (`bash_guard.py`)
 - `pytest`, `manage.py`, `pip install`, `.venv`, or `uv` outside
   `conda run -n knou-life-diary` (`bash_guard.py`)
 - a new comment in a template, stylesheet, or browser script
@@ -151,7 +155,8 @@ with an explicit question and carry the approval marker on the allowed line.
 - Do not comment by default. Make the name and the structure carry the meaning
   first; comment only what the code cannot show. See `AGENTS.md` Comments.
 - Commit in small feature units and push a branch per large track, opening a
-  PR for it. Never work directly on `main`. Merging stays with the user.
+  PR for it. Never work directly on `main`. Merge a PR only when the user
+  asks for it.
 - Frontend work carries no automated tests. Templates, CSS, and browser
   JavaScript are verified in the browser, not by asserting markup strings,
   CSS rules, or JS source text. See `AGENTS.md` Frontend Work Policy.
@@ -162,7 +167,7 @@ with an explicit question and carry the approval marker on the allowed line.
 - `AGENTS.md`: detailed product constraints, workflow, roles, and review gates
 - `.claude/agents/`: one tracked adapter per role, thin by design
 - `.claude/rules/`: policy that matters only while matching files are open
-  (`backend-tests.md`, `frontend.md`), loaded by path
+  (`backend-tests.md`, `frontend.md`, `python-style.md`), loaded by path
 - `.claude/hooks/` and `.claude/settings.json`: deterministic guards; a rule
   that can be checked mechanically lives here, not only in prose
 - `docs/CHANGELOG.md`: one entry per finished task with verification evidence,

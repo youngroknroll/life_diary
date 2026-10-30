@@ -4,8 +4,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from .models import UserGoal, UserNote
 
+from .models import UserGoal, UserNote
 
 User = get_user_model()
 
@@ -20,7 +20,9 @@ class SignupForm(UserCreationForm):
     consent = forms.BooleanField(
         required=True,
         label=_("이용약관과 개인정보처리방침에 동의합니다"),
-        error_messages={"required": _("이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다.")},
+        error_messages={
+            "required": _("이용약관과 개인정보처리방침에 동의해야 가입할 수 있습니다.")
+        },
     )
 
     class Meta(UserCreationForm.Meta):
@@ -121,7 +123,9 @@ class UserGoalForm(forms.ModelForm):
                 choices=[("daily", _("일간")), ("weekly", _("주간")), ("monthly", _("월간"))],
                 attrs={"class": "form-select", "style": "width: 50%"},
             ),
-            "target_hours": forms.NumberInput(attrs={"step": 0.5, "min": 0, "class": "form-control"}),
+            "target_hours": forms.NumberInput(
+                attrs={"step": 0.5, "min": 0, "class": "form-control"}
+            ),
             "due_date": forms.DateInput(attrs={"type": "date", "class": "form-control"}),
         }
         help_texts = {
@@ -133,8 +137,10 @@ class UserGoalForm(forms.ModelForm):
         self._user = user or (self.instance.user if self.instance.pk else None)
 
     def clean(self):
-        """같은 태그·기간 목표는 하나만 둔다. 둘이면 어느 쪽이 진행률에
-        반영되는지 사용자가 알 수 없다."""
+        """같은 태그·기간 목표는 하나만 둔다.
+
+        둘이면 어느 쪽이 진행률에 반영되는지 사용자가 알 수 없다.
+        """
         cleaned = super().clean()
         self._clean_due_date(cleaned)
         tag = cleaned.get("tag")
@@ -153,8 +159,11 @@ class UserGoalForm(forms.ModelForm):
         return cleaned
 
     def _clean_due_date(self, cleaned):
-        """과거 날짜는 새로 정할 때만 막는다. 이미 지난 기한까지 막으면 그 목표의
-        다른 칸을 고칠 수 없고, 지운 목표를 되돌릴 때(restore) 기한을 잃는다."""
+        """과거 날짜는 새로 정할 때만 막는다.
+
+        이미 지난 기한까지 막으면 그 목표의
+        다른 칸을 고칠 수 없고, 지운 목표를 되돌릴 때(restore) 기한을 잃는다.
+        """
         due_date = cleaned.get("due_date")
         if cleaned.get("no_due_date"):
             cleaned["due_date"] = None
@@ -178,6 +187,10 @@ class UserNoteForm(forms.ModelForm):
         }
         widgets = {
             "note": forms.Textarea(
-                attrs={"rows": 4, "placeholder": _("특이사항을 입력하세요."), "class": "form-control"}
+                attrs={
+                    "rows": 4,
+                    "placeholder": _("특이사항을 입력하세요."),
+                    "class": "form-control",
+                }
             ),
         }

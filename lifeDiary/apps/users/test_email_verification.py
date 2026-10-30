@@ -8,7 +8,7 @@ from django.utils import timezone
 from apps.users.email_verification import (
     PASSWORD_RESET,
     SIGNUP,
-    ResendBlocked,
+    ResendBlockedError,
     VerificationStatus,
     issue_code,
     resend_code,
@@ -111,7 +111,7 @@ class TestResendPolicy:
         user = make_user()
         issue_code(user, SIGNUP)
 
-        with pytest.raises(ResendBlocked):
+        with pytest.raises(ResendBlockedError):
             resend_code(user, SIGNUP)
 
         assert EmailVerificationCode.objects.filter(user=user).count() == 1
@@ -123,7 +123,7 @@ class TestResendPolicy:
         for _ in range(4):
             resend_code(user, SIGNUP)
 
-        with pytest.raises(ResendBlocked):
+        with pytest.raises(ResendBlockedError):
             resend_code(user, SIGNUP)
 
     @override_settings(EMAIL_VERIFICATION_RESEND_COOLDOWN_SECONDS=0)
