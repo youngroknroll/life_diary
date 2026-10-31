@@ -83,7 +83,7 @@ jobs:
 
       - name: 아티팩트 업로드 (30일 보관)
         if: steps.gate.outputs.ready == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.dump.outputs.name }}
           path: lifediary-*.dump.age
