@@ -18,5 +18,5 @@ sqlparse==0.5.3
 wheel==0.48.0
 whitenoise==6.9.0
 django-axes==8.3.1
-django-allauth==65.20.1
-django-ninja==1.7.1
+django-allauth==65.21.0
+django-ninja==1.7.3
