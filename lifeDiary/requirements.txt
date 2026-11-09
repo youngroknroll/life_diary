@@ -2,7 +2,7 @@ asgiref==3.12.1
 cryptography==50.0.2
 pydantic==2.13.2
 PyJWT==2.15.1
-django==5.2.18
+django==5.2.19
 pytest==9.1.1
 pytest-django==4.14.0
 ruff==0.16.10
@@ -10,13 +10,13 @@ et-xmlfile==2.0.0
 gunicorn==26.2.0
 openpyxl==3.1.5
 packaging==26.0
-psycopg==3.3.6
+psycopg==3.3.8
 python-dotenv==1.2.4
 requests==2.34.2
 setuptools==84.2.1
 sqlparse==0.5.3
 wheel==0.48.0
 whitenoise==6.9.0
-django-axes==8.3.1
-django-allauth==65.20.1
-django-ninja==1.7.1
+django-axes==9.0.0
+django-allauth==65.21.1
+django-ninja==1.7.3
